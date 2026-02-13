@@ -1,0 +1,372 @@
+{
+    "appName":"Gym",
+    "name": "AddMember",
+    "id": "1",
+    "owner": "Suryanrayan Biswal",
+    "createdAt": "19 Nov 2024",
+    "API_INTIGATION_CONFIG":{
+        
+
+    },
+    "scriptFiles": [
+        "Gym/addMemberScript.ts"
+    ],
+    "postScript": "documentPostScript",
+    "UI_VIEW": {
+        "schema": {
+            "config": [
+                {
+                    "name": "Panel 1",
+                    "text": "Details for Panel 1",
+                    "hidden": false,
+                    "isOpen": true,
+                    "widget": "panel",
+                    "styles": {
+                        "direction": "column",
+                        "flex": 1,
+                        "minWidth": {
+                            "base": "100%",
+                            "sm": "50%",
+                            "lg": "33.33%"
+                        }
+                    },
+                    "widgets": [
+                        {
+                            "name": "memberName",
+                            "text": "Member Name",
+                            "description": "Enter the member's name",
+                            "type": "text",
+                            "disabled": false,
+                            "hidden": false,
+                            "widget": "textField",
+                            "oneLiner": true,
+                            "outLineBorder": true,
+                            "listeners": {
+                                "change": {
+                                    "methodName": "onChangedoesTheDocumentIsALink",
+                                    "param": "value"
+                                }
+                            }
+                        },
+                        {
+                            "name": "memberEmail",
+                            "text": "Member Email",
+                            "description": "Enter the member's email",
+                            "type": "email",
+                            "disabled": false,
+                            "hidden": false,
+                            "widget": "textField",
+                            "oneLiner": true,
+                            "listeners": {
+                                "change": {
+                                    "methodName": "onChangedoesTheDocumentIsALink",
+                                    "param": "value"
+                                }
+                            }
+                        },
+                        {
+                            "name": "memberPhone",
+                            "text": "Member Phone",
+                            "description": "Enter the member's phone number",
+                            "type": "tel",
+                            "disabled": false,
+                            "hidden": false,
+                            "widget": "textField",
+                            "oneLiner": true,
+                            "listeners": {
+                                "change": {
+                                    "methodName": "onChangedoesTheDocumentIsALink",
+                                    "param": "value"
+                                }
+                            }
+                        },
+                        {
+                            "name": "memberDOB",
+                            "text": "Date of Birth",
+                            "description": "Select the member's date of birth",
+                            "type": "date",
+                            "disabled": false,
+                            "hidden": false,
+                            "widget": "textField",
+                            "oneLiner": true,
+                            "listeners": {
+                                "change": {
+                                    "methodName": "onChangedoesTheDocumentIsALink",
+                                    "param": "value"
+                                }
+                            }
+                        },
+                        {
+                            "name": "memberAddress",
+                            "text": "Address",
+                            "description": "Enter the member's address",
+                            "type": "text",
+                            "disabled": false,
+                            "hidden": false,
+                            "widget": "textAreaField",
+                            "oneLiner": true,
+                            "listeners": {
+                                "change": {
+                                    "methodName": "onChangedoesTheDocumentIsALink",
+                                    "param": "value"
+                                }
+                            }
+                        },
+                        {
+                            "name": "memberCity",
+                            "text": "City",
+                            "description": "Enter the city of residence",
+                            "type": "text",
+                            "disabled": false,
+                            "hidden": false,
+                            "widget": "textField",
+                            "oneLiner": true,
+                            "listeners": {
+                                "change": {
+                                    "methodName": "onChangedoesTheDocumentIsALink",
+                                    "param": "value"
+                                }
+                            }
+                        },
+                        {
+                            "name": "memberState",
+                            "text": "State/Province",
+                            "description": "Enter the member's state or province",
+                            "type": "text",
+                            "disabled": false,
+                            "hidden": false,
+                            "widget": "textField",
+                            "oneLiner": true,
+                            "listeners": {
+                                "change": {
+                                    "methodName": "onChangedoesTheDocumentIsALink",
+                                    "param": "value"
+                                }
+                            }
+                        },
+                        {
+                            "name": "memberZip",
+                            "text": "Postal Code",
+                            "description": "Enter the postal code",
+                            "type": "text",
+                            "disabled": false,
+                            "hidden": false,
+                            "widget": "textField",
+                            "oneLiner": true,
+                            "listeners": {
+                                "change": {
+                                    "methodName": "onChangedoesTheDocumentIsALink",
+                                    "param": "value"
+                                }
+                            }
+                        },
+                        {
+                            "name": "memberEmergencyContact",
+                            "text": "Emergency Contact Name",
+                            "description": "Enter the emergency contact's name",
+                            "type": "text",
+                            "disabled": false,
+                            "hidden": false,
+                            "widget": "textField",
+                            "oneLiner": true,
+                            "listeners": {
+                                "change": {
+                                    "methodName": "onChangedoesTheDocumentIsALink",
+                                    "param": "value"
+                                }
+                            }
+                        },
+                        {
+                            "name": "memberEmergencyPhone",
+                            "text": "Emergency Contact Phone",
+                            "description": "Enter the emergency contact's phone number",
+                            "type": "tel",
+                            "disabled": false,
+                            "hidden": false,
+                            "widget": "textField",
+                            "oneLiner": true,
+                            "listeners": {
+                                "change": {
+                                    "methodName": "onChangedoesTheDocumentIsALink",
+                                    "param": "value"
+                                }
+                            }
+                        },
+                        {
+                            "name": "memberGender",
+                            "text": "Gender",
+                            "description": "Select the member's gender",
+                            "type": "text",
+                            "disabled": false,
+                            "hidden": false,
+                            "widget": "textField",
+                            "oneLiner": true,
+                            "listeners": {
+                                "change": {
+                                    "methodName": "onChangedoesTheDocumentIsALink",
+                                    "param": "value"
+                                }
+                            }
+                        },
+                        {
+                            "name": "memberMembershipType",
+                            "text": "Membership Type",
+                            "description": "Select the type of membership",
+                            "type": "text",
+                            "disabled": false,
+                            "hidden": false,
+                            "widget": "textField",
+                            "oneLiner": true,
+                            "listeners": {
+                                "change": {
+                                    "methodName": "onChangedoesTheDocumentIsALink",
+                                    "param": "value"
+                                }
+                            }
+                        },
+                        {
+                            "name": "Panel 2",
+                            "text": "Details for Panel 1",
+                            "hidden": false,
+                            "widget": "panel",
+                            "styles": {
+                                "direction": "row",
+                                "justifyContent": "flex-start",
+                                "flex": 1,
+                                "minWidth": {
+                                    "base": "100%",
+                                    "sm": "50%",
+                                    "lg": "33.33%"
+                                }
+                            },
+                            "widgets": [
+                                {
+                                    "name": "memberMembershipType1",
+                                    "text": "Membership Type",
+                                    "description": "Select the type of membership",
+                                    "type": "text",
+                                    "disabled": false,
+                                    "hidden": false,
+                                    "widget": "textField",
+                                    "oneLiner": true,
+                                    "listeners": {
+                                        "change": {
+                                            "methodName": "onChangedoesTheDocumentIsALink",
+                                            "param": "value"
+                                        }
+                                    }
+                                },
+                                {
+                                    "name": "memberMembershipType2",
+                                    "text": "Membership Type",
+                                    "description": "Select the type of membership",
+                                    "type": "text",
+                                    "disabled": false,
+                                    "hidden": false,
+                                    "widget": "textField",
+                                    "oneLiner": true,
+                                    "listeners": {
+                                        "change": {
+                                            "methodName": "onChangedoesTheDocumentIsALink",
+                                            "param": "value"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "memberMembershipTypee",
+                    "text": "Membership Type",
+                    "description": "Select the type of membership",
+                    "type": "radio",
+                    "disabled": false,
+                    "hidden": false,
+                    "widget": "radioField",
+                    "oneLiner": true,
+                    "outLineBorder": true,
+                    "options": [
+                        {
+                            "label": "Standard",
+                            "value": "standard"
+                        },
+                        {
+                            "label": "Premium",
+                            "value": "premium"
+                        },
+                        {
+                            "label": "VIP",
+                            "value": "vip"
+                        }
+                    ],
+                    "defaultValue": "VIP",
+                    "listeners": {
+                        "change": {
+                            "methodName": "onMembershipTypeChange",
+                            "param": "value"
+                        }
+                    }
+                },
+                {
+                    "name": "Panel 3",
+                    "text": "Details for Panel 1",
+                    "hidden": false,
+                    "widget": "panel",
+                    "styles": {
+                        "direction": "row",
+                        "justifyContent": "flex-start",
+                        "flex": 1,
+                        "minWidth": {
+                            "base": "100%",
+                            "sm": "50%",
+                            "lg": "33.33%"
+                        }
+                    },
+                    "widgets": [
+                        {
+                            "name": "memberMembershipType3",
+                            "text": "Membership Type",
+                            "description": "Select the type of membership",
+                            "type": "text",
+                            "disabled": false,
+                            "hidden": false,
+                            "widget": "textField",
+                            "oneLiner": true,
+                            "listeners": {
+                                "change": {
+                                    "methodName": "onChangedoesTheDocumentIsALink",
+                                    "param": "value"
+                                }
+                            }
+                        },
+                        {
+                            "name": "memberMembershipType4",
+                            "text": "Membership Type",
+                            "description": "Select the type of membership",
+                            "type": "text",
+                            "disabled": false,
+                            "hidden": false,
+                            "widget": "textField",
+                            "oneLiner": true,
+                            "listeners": {
+                                "change": {
+                                    "methodName": "onChangedoesTheDocumentIsALink",
+                                    "param": "value"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "active": true,
+    "truncated": false,
+    "theme": "default",
+    "language": "en",
+    "isHtmlSanitizeRequired": false,
+    "securityEnabled": true,
+    "handlers": [],
+    "mobileView": {}
+}

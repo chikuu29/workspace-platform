@@ -1,0 +1,79 @@
+import { Steps, Button, useDisclosure, Dialog, Portal, Icon } from "@chakra-ui/react";
+import React, { useEffect, useRef } from "react";
+import { LuRepeat } from 'react-icons/lu';
+
+interface AppVersionInterface {
+  isNewVersionAvailable: boolean;
+  version?: string;
+}
+
+const AppVersionAlert: React.FC<AppVersionInterface> = ({
+  isNewVersionAvailable,
+  version,
+}) => {
+  const { open, onOpen, onClose } = useDisclosure();
+  const cancelRef = useRef(null); // Reference for the least destructive action (Cancel)
+
+  const handleRefresh = () => {
+    window.location.reload(); // Refreshes the page
+  };
+
+  useEffect(() => {
+    if (isNewVersionAvailable) {
+      onOpen();
+    }
+  }, [isNewVersionAvailable, onOpen]);
+
+  return (
+    <Dialog.Root
+      open={isOpen}
+      initialFocusEl={() => cancelRef.current}
+      closeOnInteractOutside={false}
+      placement='center'
+      role='alertdialog'
+      onOpenChange={e => {
+        if (!e.open) {
+          onClose();
+        }
+      }}>
+      <Portal>
+
+        <Dialog.Backdrop>
+          <div className="pyro">
+            <div className="before"></div>
+            <div className="after"></div>
+          </div>
+          <Dialog.Positioner>
+            <Dialog.Content borderRadius={"15px"}>
+              <Dialog.Header
+                fontSize="lg"
+                fontWeight="bold"
+                color={"green"}
+                textAlign={"center"}
+                borderRadius={"15px"}
+              >
+                New Version Available
+              </Dialog.Header>
+              <Dialog.Body textAlign="center" fontWeight={100}>
+                A new version is available. You're currently running an older
+                version. Please refresh to update.
+              </Dialog.Body>
+              <Dialog.Footer>
+                <Button
+                  colorPalette="green"
+                  variant="outline"
+                  onClick={handleRefresh}
+                  ml={3}
+                  width="100%"><Icon as={LuRepeat} style={{ animation: "spin 2s linear infinite" }} />Refresh Now
+                                  </Button>
+              </Dialog.Footer>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Dialog.Backdrop>
+
+      </Portal>
+    </Dialog.Root>
+  );
+};
+
+export default AppVersionAlert;

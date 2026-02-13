@@ -1,0 +1,18 @@
+# Ignore node_modules
+node_modules
+docs
+dist
+DB_CONFIG
+# Ignore logs
+logs
+*.log
+
+# Ignore environment variables
+
+
+# Ignore build artifacts
+dist
+build
+
+# Ignore git
+.git

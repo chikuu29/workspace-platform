@@ -1,0 +1,12 @@
+2. Build and Run the Docker Container
+After setting up the Dockerfile, run the following commands to build and run the Docker container:
+
+bash
+Copy code
+# Build the Docker image
+docker build -t my-react-app .
+
+# Run the Docker container
+docker run -p 80:80 my-react-app
+
+docker run -d -p 80:80 my-react-app

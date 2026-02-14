@@ -4,13 +4,13 @@ import { Suspense, lazy } from "react";
 import { AppLoader } from "./features/ui/components/Loader/Loader";
 import HandleDynamicView from "./utils/app/HandleDynamicView";
 
-const AuthCallback = lazy(() => import("./features/auth/AuthCallback"));
-const AuthLayout = lazy(() => import("./features/ui/layouts/auth/auth"));
-const SignInPage = lazy(() => import("./features/auth/signin/SignIn"));
-const SignUpPage = lazy(() => import("./features/auth/signup/SignUp"));
-const PanelLayout = lazy(() => import("./features/ui/layouts/dashboard/dash"));
-const PrivateRoute = lazy(() => import("./contexts/PrivateRoute"));
-const MyApps = lazy(() => import("./features/myApps/MyApps"));
+const AuthCallback = lazy(() => import("@/features/auth/AuthCallback"));
+const AuthLayout = lazy(() => import("@/features/ui/layouts/auth/auth"));
+const SignInPage = lazy(() => import("@/features/auth/signin/SignIn"));
+const SignUpPage = lazy(() => import("@/features/auth/signup/SignUp"));
+const PanelLayout = lazy(() => import("@/features/ui/layouts/dashboard/dash"));
+const PrivateRoute = lazy(() => import("@/contexts/PrivateRoute"));
+const MyApps = lazy(() => import("@/features/myApps/MyApps"));
 
 const routes: RouteObject[] = [
   {

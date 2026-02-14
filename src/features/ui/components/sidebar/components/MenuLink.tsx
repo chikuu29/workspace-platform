@@ -98,9 +98,9 @@ export default function MenuLink(props: MenuLinkInterFace) {
   return menuConfig.path ? (
     menuConfig.target && menuConfig.target !== "" ? (
       <a
-        href={`${tenant_name}/${menuConfig.target}`}
+        href={`${tenant_name}/workspace/${menuConfig.target}`}
         style={{ width: "100%" }}
-        target={`${tenant_name}/${menuConfig.target}`}
+        target={`${tenant_name}/workspace/${menuConfig.target}`}
         rel="noopener noreferrer" // Security recommendation
       >
         {content}
@@ -111,7 +111,7 @@ export default function MenuLink(props: MenuLinkInterFace) {
       // </Link>
 
       (<NavLink
-        to={`/${tenant_name}${menuConfig.path}`}
+        to={`/${tenant_name}/workspace${menuConfig.path}`}
         style={({ isActive }) => ({
           background: isActive ? activeBg : "unset",
           borderRadius: "8px",

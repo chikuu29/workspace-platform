@@ -70,7 +70,7 @@ const Appbreadcurmb = forwardRef((props, ref) => {
 
   const bgColor = useColorModeValue("white", "dark.100");
   return (
-    <Box minH={"4vh"}>
+    <Box minH={"40px"}>
       <Box
         // top={"3.1rem"}
         // top={"9%"}

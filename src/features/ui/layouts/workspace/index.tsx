@@ -32,11 +32,11 @@ const workspace = () => {
       {/* <Flex flex="1" > */}
       <PanelSideBar showSidebar={showSidebar} togglesidebar={toggleSidebar} />
       {/* Main Content */}
-      <VStack flex="1" align="stretch" m={"1.4rem"}>
+      <VStack flex="1" align="stretch" m={"1.7rem"}>
         {/* <Container maxW="100%"> */}
         <Outlet></Outlet>
         {/* </Container> */}
-        {/* <AppFooter /> */}
+        <AppFooter />
         <Flex position="fixed" flexDirection="column" bottom="30px" right="10" gap={3}>
           <ColorModeButton />
           <FullscreenButton />

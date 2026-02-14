@@ -26,11 +26,11 @@ const Navbar = ({
 
   const bgColor = useColorModeValue("white", 'gray.950');
   return (
-    <Box minH="69px" bg={bgColor}>
+    <Box minH="115px" bg={bgColor}>
       <Box
         w="100%"
         // boxShadow="md"
-        // position="fixed"
+        position="fixed"
         // position="sticky"
         // top="1"
         // left="0"

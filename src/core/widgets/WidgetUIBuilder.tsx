@@ -1,10 +1,11 @@
+import "./index";
 import { Steps, Box, Button, Skeleton, SkeletonText } from "@chakra-ui/react";
 import RunTimeWidgetRender from "./RunTimeWidget";
 import { FormProvider, useForm } from "react-hook-form";
 import { memo, useEffect, useState, forwardRef } from "react";
 import { GETAPI } from "../../app/api";
-import { ScriptProvider } from "../ui/components/contexts/ScriptProvider";
-import Loader from "../ui/components/Loader/Loader";
+import { ScriptProvider } from "../../features/ui/components/contexts/ScriptProvider";
+import Loader from "../../features/ui/components/Loader/Loader";
 
 const WidgetUIBuilder = forwardRef<any, any>(({ formData = {}, ...rest }, ref) => {
   console.log("%c===Widget UI Builder===", "color:green");

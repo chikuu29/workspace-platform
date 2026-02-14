@@ -79,7 +79,7 @@ const Appbreadcurmb = forwardRef((props, ref) => {
         bg={bgColor}
         zIndex={999}
         p={"2"}
-        boxShadow={"md"}
+        // boxShadow={"md"}
         // border={'black'}
         // borderRadius={'4xl'}
         // display="inline-block"

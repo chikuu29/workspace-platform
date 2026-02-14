@@ -1,0 +1,2679 @@
+{
+    "success": true,
+    "data": {
+        "_id": {
+            "$oid": "66472bdfce8344000177a077"
+        },
+        "name": "",
+        "isDyanmic": true,
+        "text": "Form Details",
+        "active": true,
+        "truncated": false,
+        "theme": "default",
+        "language": "en",
+        "isHtmlSanitizeRequired": false,
+        "securityEnabled": true,
+        "boxHandlers": [],
+        "handlers": [
+            {
+                "className": "com.pzeon.handler.BYOADefaultHandler",
+                "handlerType": "post"
+            }
+        ],
+        "scriptFiles": [
+            "byoaDefaultScriptParameter"
+        ],
+        "postScript": "byoaDefaultPostScript",
+        "id": "344",
+        "owner": "punyatoya.mishra@inovaare.com",
+        "username": "Punyatoya Mishra",
+        "ownerEmail": "punyatoya.mishra@inovaare.com",
+        "createdAt": {
+            "$date": 1715940319657
+        },
+        "isTrash": false,
+        "schema": {
+            "section": [
+                {
+                    "name": "ticket_Intake",
+                    "text": "Ticket Intake",
+                    "tabs": [
+                        {
+                            "name": "ticket_Details",
+                            "text": "Ticket Details",
+                            "isEdit": true,
+                            "fields": [
+                                {
+                                    "name": "customer_Name",
+                                    "text": "Account Name",
+                                    "widget": "combo",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {
+                                        "multiselect": false,
+                                        "datasource": [
+                                            "VIVA",
+                                            "OSCAR",
+                                            "SUMMACARE",
+                                            "SHARP",
+                                            "IMPERIAL",
+                                            "KELSEYCARE",
+                                            "PEAK",
+                                            "VERSANT",
+                                            "UCLA",
+                                            "ADVANTASURE",
+                                            "COHERE",
+                                            "IUCLA - 1",
+                                            "IOSCAR - 1",
+                                            "ISUMMACARE - 1",
+                                            "IPEAK - 1",
+                                            "IVIVA - 1",
+                                            "ISHARP - 1",
+                                            "IIMPERIAL - 1",
+                                            "ICOHERE - 1",
+                                            "IVERSANT - 1",
+                                            "IADVSURE - 1",
+                                            "IKLYCARE - 1",
+                                            "OCHSNER",
+                                            "IOSCHNER - 1"
+                                        ],
+                                        "isDeleteBtn": true
+                                    },
+                                    "data": [
+                                        "VIVA",
+                                        "OSCAR",
+                                        "SUMMACARE",
+                                        "SHARP",
+                                        "IMPERIAL",
+                                        "KELSEYCARE",
+                                        "PEAK",
+                                        "VERSANT",
+                                        "UCLA",
+                                        "ADVANTASURE",
+                                        "COHERE",
+                                        "IUCLA - 1",
+                                        "IOSCAR - 1",
+                                        "ISUMMACARE - 1",
+                                        "IPEAK - 1",
+                                        "IVIVA - 1",
+                                        "ISHARP - 1",
+                                        "IIMPERIAL - 1",
+                                        "ICOHERE - 1",
+                                        "IVERSANT - 1",
+                                        "IADVSURE - 1",
+                                        "IKLYCARE - 1",
+                                        "OCHSNER",
+                                        "IOSCHNER - 1"
+                                    ],
+                                    "isAuditField": true
+                                },
+                                {
+                                    "name": "project_Name",
+                                    "text": "Project Name",
+                                    "widget": "combo",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {
+                                        "multiselect": false,
+                                        "datasource": [
+                                            "A&G"
+                                        ],
+                                        "isDeleteBtn": true,
+                                        "defaultValue": "A&G"
+                                    },
+                                    "data": [
+                                        "A&G"
+                                    ]
+                                },
+                                {
+                                    "name": "support_Ticket_ID",
+                                    "text": "Jira Ticket ID",
+                                    "widget": "textfield",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {},
+                                    "hidden": false,
+                                    "disabled": true,
+                                    "spellcheck": false,
+                                    "isAuditField": true,
+                                    "isTrusted": true
+                                },
+                                {
+                                    "name": "FIELD_4345",
+                                    "text": "Jira Status",
+                                    "fieldToReport": true,
+                                    "widget": "combo",
+                                    "enableTemplateEditor": true,
+                                    "properties": {
+                                        "datasource": [
+                                            "Open",
+                                            "Closed",
+                                            "Inprogress"
+                                        ],
+                                        "readDataFromFile": false,
+                                        "proxy": {
+                                            "url": ""
+                                        },
+                                        "isDeleteBtn": true
+                                    },
+                                    "oneLiner": true,
+                                    "selectAllOption": false,
+                                    "mandatory": true,
+                                    "disabled": true,
+                                    "hidden": false,
+                                    "emptyText": "",
+                                    "hierarchy": false,
+                                    "isJavascript": true,
+                                    "data": [
+                                        "Open",
+                                        "Closed",
+                                        "Inprogress"
+                                    ]
+                                },
+                                {
+                                    "name": "FIELD_8804",
+                                    "text": "Jira Comment",
+                                    "widget": "comment",
+                                    "fieldToReport": true,
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": false,
+                                    "disabled": true,
+                                    "hidden": false,
+                                    "emptyText": "",
+                                    "canEveryoneDelete": true,
+                                    "canUserDelete": true,
+                                    "isJavascript": true,
+                                    "properties": {
+                                        "defaultValue": []
+                                    }
+                                },
+                                {
+                                    "name": "ticket_Received_Date__Time",
+                                    "text": "Ticket Received Date & Time",
+                                    "widget": "dateTimeField",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {},
+                                    "requiredISODate": true,
+                                    "timeZone": "Asia/Calcutta",
+                                    "format": "MM-DD-YYYY hh:mm:ss A",
+                                    "isAuditField": true,
+                                    "bundleInfo": {
+                                        "bundleId": null,
+                                        "key": null,
+                                        "value": null,
+                                        "displayList": [],
+                                        "filters": []
+                                    },
+                                    "defaultTodayDate": true,
+                                    "isDisableFutureDate": true
+                                },
+                                {
+                                    "name": "PZEON_AUTO_ID",
+                                    "text": "Ticket Id",
+                                    "widget": "textfield",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": false,
+                                    "disabled": true,
+                                    "hidden": false,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "isJavascript": true,
+                                    "properties": {
+                                        "defaultValue": ""
+                                    },
+                                    "enableAutoId": true,
+                                    "spellcheck": false,
+                                    "isAuditField": true,
+                                    "isTrusted": true
+                                },
+                                {
+                                    "name": "ticket_Summary",
+                                    "text": "Ticket Summary",
+                                    "widget": "textarea",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {},
+                                    "maxlength": "500",
+                                    "minlength": 0,
+                                    "spellcheck": false,
+                                    "isAuditField": true
+                                },
+                                {
+                                    "name": "ticket_Description",
+                                    "text": "Ticket Description",
+                                    "widget": "textarea",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {},
+                                    "maxlength": "10000",
+                                    "minlength": 0,
+                                    "spellcheck": false
+                                },
+                                {
+                                    "name": "type_of_Ticket",
+                                    "text": "Type of Ticket",
+                                    "widget": "combo",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {
+                                        "multiselect": false,
+                                        "datasource": [
+                                            "Bug",
+                                            "New Feature",
+                                            "Support"
+                                        ],
+                                        "isDeleteBtn": true
+                                    },
+                                    "data": [
+                                        "Bug",
+                                        "New Feature",
+                                        "Support"
+                                    ],
+                                    "isJavascript": true,
+                                    "javascript": "console.log('model',model)\r\nconsole.log('fieldList',fieldList)\r\nconsole.log(\"quickAdd::\",quickAdd)\r\n// console.log(fieldList[\"approval_status\"])\r\n// if(!quickAdd){\r\n//     if(model.type_of_Ticket == 'New Feature'){\r\n//           fieldList[\"approver_name\"][\"mandatory\"] = true;\r\n//           fieldList[\"approval_status\"][\"mandatory\"] = true;\r\n//           fieldList[\"decision_Date_Time\"][\"mandatory\"] = true;\r\n//         //   console.log(fieldList[\"FIELD_7465\"])\r\n//     } else {\r\n//          fieldList[\"approver_name\"][\"mandatory\"] = false;\r\n//           fieldList[\"approval_status\"][\"mandatory\"] = false;\r\n//           fieldList[\"decision_Date_Time\"][\"mandatory\"] = false;\r\n//     }\r\n// }",
+                                    "logic": [
+                                        {
+                                            "name": "NewFeature",
+                                            "trigger": {
+                                                "field": "",
+                                                "value": "New Feature",
+                                                "type": "value"
+                                            },
+                                            "action": [
+                                                {
+                                                    "field": "FIELD_7465",
+                                                    "name": "",
+                                                    "type": "property",
+                                                    "value": "true",
+                                                    "property": {
+                                                        "label": "",
+                                                        "value": "mandatory",
+                                                        "type": ""
+                                                    }
+                                                },
+                                                {
+                                                    "field": "FIELD_5942",
+                                                    "name": "",
+                                                    "type": "property",
+                                                    "value": "true",
+                                                    "property": {
+                                                        "label": "",
+                                                        "value": "mandatory",
+                                                        "type": ""
+                                                    }
+                                                },
+                                                {
+                                                    "field": "decision_Date_Time",
+                                                    "name": "",
+                                                    "type": "property",
+                                                    "value": "true",
+                                                    "property": {
+                                                        "label": "",
+                                                        "value": "mandatory",
+                                                        "type": ""
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "name": "Bug",
+                                            "trigger": {
+                                                "field": "",
+                                                "value": "Bug",
+                                                "type": "value"
+                                            },
+                                            "action": [
+                                                {
+                                                    "field": "FIELD_7465",
+                                                    "name": "",
+                                                    "type": "property",
+                                                    "value": "false",
+                                                    "property": {
+                                                        "label": "",
+                                                        "value": "mandatory",
+                                                        "type": ""
+                                                    }
+                                                },
+                                                {
+                                                    "field": "FIELD_5942",
+                                                    "name": "",
+                                                    "type": "property",
+                                                    "value": "false",
+                                                    "property": {
+                                                        "label": "",
+                                                        "value": "mandatory",
+                                                        "type": ""
+                                                    }
+                                                },
+                                                {
+                                                    "field": "decision_Date_Time",
+                                                    "name": "",
+                                                    "type": "property",
+                                                    "value": "false",
+                                                    "property": {
+                                                        "label": "",
+                                                        "value": "mandatory",
+                                                        "type": ""
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "name": "Support",
+                                            "trigger": {
+                                                "field": "",
+                                                "value": "Support",
+                                                "type": "value"
+                                            },
+                                            "action": [
+                                                {
+                                                    "field": "FIELD_7465",
+                                                    "name": "",
+                                                    "type": "property",
+                                                    "value": "false",
+                                                    "property": {
+                                                        "label": "",
+                                                        "value": "mandatory",
+                                                        "type": ""
+                                                    }
+                                                },
+                                                {
+                                                    "field": "approval_Details",
+                                                    "name": "",
+                                                    "type": "property",
+                                                    "value": "false",
+                                                    "property": {
+                                                        "label": "",
+                                                        "value": "mandatory",
+                                                        "type": ""
+                                                    }
+                                                },
+                                                {
+                                                    "field": "decision_Date_Time",
+                                                    "name": "",
+                                                    "type": "property",
+                                                    "value": "false",
+                                                    "property": {
+                                                        "label": "",
+                                                        "value": "mandatory",
+                                                        "type": ""
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "childCombo": [
+                                        "NEW_FIELD_6164"
+                                    ],
+                                    "hierarchy": true
+                                },
+                                {
+                                    "name": "NEW_FIELD_6164",
+                                    "text": "Category",
+                                    "widget": "combo",
+                                    "enableTemplateEditor": true,
+                                    "properties": {
+                                        "datasource": [
+                                            "Clarification",
+                                            "Defect",
+                                            "Maintenance",
+                                            "Training Issue",
+                                            "Enhancement",
+                                            "Compliance"
+                                        ],
+                                        "hierarchyOptions": [
+                                            {
+                                                "masterValue": "Bug",
+                                                "options": [
+                                                    "Clarification",
+                                                    "Defect",
+                                                    "Maintenance",
+                                                    "Training Issue",
+                                                    "Enhancement",
+                                                    "Compliance"
+                                                ]
+                                            },
+                                            {
+                                                "masterValue": "New Feature",
+                                                "options": [
+                                                    "Compliance",
+                                                    "Enhancement"
+                                                ]
+                                            },
+                                            {
+                                                "masterValue": "Support",
+                                                "options": [
+                                                    "Clarification",
+                                                    "Defect",
+                                                    "Maintenance",
+                                                    "Training Issue",
+                                                    "Enhancement",
+                                                    "Compliance"
+                                                ]
+                                            }
+                                        ],
+                                        "isDeleteBtn": true,
+                                        "isAddBtn": true
+                                    },
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "disabled": false,
+                                    "hidden": false,
+                                    "emptyText": "Enter place holder",
+                                    "hierarchy": true,
+                                    "childCombo": [],
+                                    "masterCombo": "type_of_Ticket",
+                                    "data": [],
+                                    "fieldToReport": true
+                                },
+                                {
+                                    "name": "priority",
+                                    "text": "Priority",
+                                    "widget": "combo",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {
+                                        "multiselect": false,
+                                        "datasource": [
+                                            "Critical",
+                                            "Major",
+                                            "Moderate",
+                                            "Routine",
+                                            "CR",
+                                            "high"
+                                        ],
+                                        "isDeleteBtn": true
+                                    },
+                                    "data": [
+                                        "Critical",
+                                        "Major",
+                                        "Moderate",
+                                        "Routine",
+                                        "CR",
+                                        "high"
+                                    ]
+                                },
+                                {
+                                    "name": "is_this_Issue_Recurred_Before",
+                                    "text": "Is this Issue Recurred Before?",
+                                    "widget": "radio",
+                                    "fieldToReport": true,
+                                    "enableTemplateEditor": true,
+                                    "properties": {
+                                        "datasource": [
+                                            "Yes",
+                                            "No"
+                                        ]
+                                    },
+                                    "hidden": false,
+                                    "oneLiner": true,
+                                    "disabled": false,
+                                    "isJavascript": true,
+                                    "mandatory": true,
+                                    "javascript": "if(model.FIELD_1356 == 'Yes'){\r\n   model[\"is_this_Issue_Recurred_Before\"] = 'Yes';\r\n}else if(model.FIELD_1356 == 'No') {\r\n   model[\"is_this_Issue_Recurred_Before\"] = 'No';\r\n}",
+                                    "flexButton": true
+                                },
+                                {
+                                    "name": "planned_closed_date",
+                                    "text": "Planned Closed Date",
+                                    "fieldToReport": true,
+                                    "widget": "dateTimeField",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": false,
+                                    "disabled": false,
+                                    "hidden": false,
+                                    "isJavascript": true,
+                                    "properties": {
+                                        "defaultValue": ""
+                                    },
+                                    "format": "MM-DD-YYYY hh:mm:ss A",
+                                    "timeZone": "Asia/Calcutta"
+                                },
+                                {
+                                    "name": "supporting_Documents",
+                                    "text": "Supporting Documents",
+                                    "widget": "fileuploadContainer",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": false,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {},
+                                    "isVersion": true,
+                                    "showViewBtn": true,
+                                    "showDescription": true,
+                                    "showRemoveBtn": true,
+                                    "showDownloadBtn": true,
+                                    "displayAllFile": true,
+                                    "fileType": [
+                                        "pdf",
+                                        "txt",
+                                        "docx",
+                                        "xlsx",
+                                        "ppt",
+                                        "tiff",
+                                        "pptx",
+                                        "csv"
+                                    ],
+                                    "displayText": "Supporting Documents",
+                                    "isTrusted": true,
+                                    "isAuditField": true,
+                                    "bundleInfo": {
+                                        "bundleId": null,
+                                        "key": null,
+                                        "value": null,
+                                        "displayList": [],
+                                        "filters": []
+                                    }
+                                },
+                                {
+                                    "name": "status",
+                                    "text": "Status",
+                                    "widget": "combo",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {
+                                        "multiselect": false,
+                                        "datasource": [
+                                            "New",
+                                            "Support - Under Review",
+                                            "Ready for BA",
+                                            "Ready for DEV",
+                                            "Ready for QA",
+                                            "Ready for DEV-Production",
+                                            "Ready for Closure",
+                                            "Closed",
+                                            "Ready for DEV-Review",
+                                            "Ready for BA Review",
+                                            "QA Completed - Fail",
+                                            "QA Completed - Pass",
+                                            "Rejected",
+                                            "Ready for Client UAT",
+                                            "Waiting for customer",
+                                            "Ready for Support",
+                                            "On Hold",
+                                            "Closure - Ready for Production",
+                                            "Cannot Reproduce",
+                                            "Moved to Production"
+                                        ],
+                                        "isDeleteBtn": true
+                                    },
+                                    "data": [
+                                        "New",
+                                        "Support - Under Review",
+                                        "Ready for BA",
+                                        "Ready for DEV",
+                                        "Ready for QA",
+                                        "Ready for DEV-Production",
+                                        "Ready for Closure",
+                                        "Closed",
+                                        "Ready for DEV-Review",
+                                        "Ready for BA Review",
+                                        "QA Completed - Fail",
+                                        "QA Completed - Pass",
+                                        "Rejected",
+                                        "Ready for Client UAT",
+                                        "Waiting for customer",
+                                        "Ready for Support",
+                                        "On Hold",
+                                        "Closure - Ready for Production",
+                                        "Cannot Reproduce",
+                                        "Moved to Production"
+                                    ],
+                                    "isJavascript": true,
+                                    "javascript": "if (typeof fieldList !== \"object\" || fieldList === null) {\n\n    var fieldList = {};\n\n}\n \nif (!fieldList[\"qA_Completed_Date__Time\"]) {\n\n    fieldList[\"qA_Completed_Date__Time\"] = { hidden: true, mandatory: false };\n\n}\n \nif (!fieldList[\"FIELD_1443\"]) {\n\n    fieldList[\"FIELD_1443\"] = { hidden: true, mandatory: false };\n\n}\n \n// Ensure model is defined and has a valid status\n\nif (typeof model === \"object\" &&model !== null &&typeof model.status === \"string\") {\n\n    let status = model.status.trim(); // Remove any leading/trailing spaces\n \n    if (status === \"QA Completed - Pass\") {\n\n        fieldList[\"qA_Completed_Date__Time\"].hidden = false;\n\n        fieldList[\"qA_Completed_Date__Time\"].mandatory = true;\n\n    } else {\n\n        fieldList[\"qA_Completed_Date__Time\"].hidden = true;\n\n        fieldList[\"qA_Completed_Date__Time\"].mandatory = false;\n\n    }\n \n    if (status === \"Moved to Production\") {\n\n        fieldList[\"FIELD_1443\"].hidden = false;\n\n        fieldList[\"FIELD_1443\"].mandatory = true;\n\n    } else {\n\n        fieldList[\"FIELD_1443\"].hidden = true;\n\n        fieldList[\"FIELD_1443\"].mandatory = false;\n\n    }\n\n} else {\n\n    console.error(\"model or model.status is undefined or not a string.\");\n\n}\n ",
+                                    "logic": [],
+                                    "mandatory": true
+                                },
+                                {
+                                    "name": "support_status",
+                                    "text": "Support Status",
+                                    "fieldToReport": true,
+                                    "widget": "combo",
+                                    "enableTemplateEditor": true,
+                                    "properties": {
+                                        "datasource": [
+                                            "Ready for Approval",
+                                            "Ready for BA",
+                                            "Ready for QA",
+                                            "Ready for UAT",
+                                            "Ready for DEV",
+                                            "Ready for Production",
+                                            "Rejected",
+                                            "On Hold",
+                                            "Deferred",
+                                            "Withdrawn",
+                                            "New",
+                                            "Cancelled",
+                                            "In Progress",
+                                            "Resolved",
+                                            "Closed",
+                                            "Waiting for Support",
+                                            "Waiting for Customer"
+                                        ],
+                                        "readDataFromFile": false,
+                                        "proxy": {
+                                            "url": ""
+                                        },
+                                        "isDeleteBtn": true
+                                    },
+                                    "oneLiner": true,
+                                    "mandatory": false,
+                                    "disabled": false,
+                                    "hidden": true,
+                                    "emptyText": "Enter Support Status",
+                                    "selectAllOptionText": "You have selected all the option",
+                                    "hierarchy": false,
+                                    "isJavascript": true,
+                                    "data": [
+                                        "Ready for Approval",
+                                        "Ready for BA",
+                                        "Ready for QA",
+                                        "Ready for UAT",
+                                        "Ready for DEV",
+                                        "Ready for Production",
+                                        "Rejected",
+                                        "On Hold",
+                                        "Deferred",
+                                        "Withdrawn",
+                                        "New",
+                                        "Cancelled",
+                                        "In Progress",
+                                        "Resolved",
+                                        "Closed",
+                                        "Waiting for Support",
+                                        "Waiting for Customer"
+                                    ],
+                                    "javascript": "// if(model.support_status == 'Ready for Approval'){\r\n//   model.status = 'Ready for Approval';\r\n// }else if(model.support_status == 'Ready for BA'){\r\n//   model.status = 'Ready for BA';\r\n// }else if(model.support_status == 'Ready for DEV'){\r\n//   model.status = 'Ready for DEV';\r\n// }else if(model.support_status == 'Ready for QA'){\r\n//   model.status = 'Ready for QA';\r\n// }else if(model.support_status == 'Ready for UAT'){\r\n//   model.status = 'Ready for UAT';\r\n// }else if(model.support_status == 'Ready for Production'){\r\n//   model.status = 'Ready for Production';\r\n// }else if(model.support_status == 'Rejected'){\r\n//   model.status = 'Rejected';\r\n// }else if(model.support_status == 'On Hold'){\r\n//   model.status = 'On Hold';\r\n// }else if(model.support_status == 'Deferred'){\r\n//   model.status = 'Deferred';\r\n// }else if(model.support_status == 'Withdrawn'){\r\n//   model.status = 'Withdrawn';\r\n// }else if(model.support_status == 'New'){\r\n//   model.status = 'New';\r\n// }else if(model.support_status == 'Cancelled'){\r\n//   model.status = 'Cancelled';\r\n// }else if(model.support_status == 'In Progress'){\r\n//   model.status = 'In Progress';\r\n// }else if(model.support_status == 'Resolved'){\r\n//   model.status = 'Resolved';\r\n// }else if(model.support_status == 'Waiting for customer'){\r\n//   model.status = 'Waiting for customer';\r\n// }\r\n"
+                                },
+                                {
+                                    "name": "pzeon_assignee_to",
+                                    "text": "Assigned To",
+                                    "widget": "bundleFilter",
+                                    "enableTemplateEditor": true,
+                                    "singleSelect": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "disabled": false,
+                                    "hidden": false,
+                                    "isJavascript": false,
+                                    "pagination": {
+                                        "pageSize": 20,
+                                        "itemsPerPage": [
+                                            20,
+                                            50,
+                                            100,
+                                            200
+                                        ]
+                                    },
+                                    "maxsearchlength": 50,
+                                    "bundleInfo": {
+                                        "minCharacterForLikeSearch": 3,
+                                        "displayList": [
+                                            {
+                                                "label": "User ID",
+                                                "key": "userID",
+                                                "value": "recentData.userID"
+                                            },
+                                            {
+                                                "label": "Full Name",
+                                                "key": "userFullName",
+                                                "value": "recentData.userFullName"
+                                            },
+                                            {
+                                                "label": "Email",
+                                                "key": "userEmailId",
+                                                "value": "recentData.userEmailId"
+                                            },
+                                            {
+                                                "label": "Job Title",
+                                                "key": "jobTitle",
+                                                "value": "recentData.jobTitle"
+                                            }
+                                        ],
+                                        "filters": [
+                                            {
+                                                "label": "Job Title",
+                                                "key": "recentData.jobTitle",
+                                                "value": "recentData.jobTitle",
+                                                "likeSearch": false,
+                                                "linkToparent": false
+                                            }
+                                        ],
+                                        "bundleId": 7100,
+                                        "key": "recentData.userEmailId",
+                                        "value": "recentData.userEmailId"
+                                    },
+                                    "bundleId": 7100,
+                                    "fieldToReport": true,
+                                    "javascript": "",
+                                    "logic": [
+                                        {
+                                            "name": "role",
+                                            "trigger": {
+                                                "field": "",
+                                                "value": "",
+                                                "type": "change"
+                                            },
+                                            "action": [
+                                                {
+                                                    "field": "FIELD_2531",
+                                                    "name": "",
+                                                    "type": "field",
+                                                    "value": [
+                                                        "jobTitle"
+                                                    ],
+                                                    "property": {}
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "FIELD_2531",
+                                    "text": "Department",
+                                    "widget": "textfield",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": false,
+                                    "disabled": false,
+                                    "hidden": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "isJavascript": true,
+                                    "properties": {
+                                        "defaultValue": ""
+                                    },
+                                    "javascript": "",
+                                    "spellcheck": false
+                                },
+                                {
+                                    "name": "assignment_comments",
+                                    "text": "Assignment Comments",
+                                    "widget": "comment",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {},
+                                    "canEveryoneDelete": true,
+                                    "canUserDelete": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "name": "created_by",
+                                    "text": "Created By",
+                                    "widget": "textfield",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": false,
+                                    "disabled": false,
+                                    "hidden": false,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "isJavascript": true,
+                                    "convertToURL": false,
+                                    "properties": {
+                                        "defaultValue": ""
+                                    },
+                                    "isAuditField": true,
+                                    "spellcheck": false
+                                },
+                                {
+                                    "name": "pzeon_created_by",
+                                    "text": "Created By",
+                                    "widget": "textfield",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": false,
+                                    "disabled": false,
+                                    "hidden": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "isAuditField": true,
+                                    "isJavascript": true,
+                                    "javascript": "debugger\nmodel[\"pzeon_created_by\"] = model?.pzeon_created_by || \"\"",
+                                    "spellcheck": false
+                                },
+                                {
+                                    "name": "FIELD_5357",
+                                    "text": "Ticket Status",
+                                    "fieldToReport": true,
+                                    "widget": "combo",
+                                    "enableTemplateEditor": true,
+                                    "properties": {
+                                        "datasource": [
+                                            "Ready for Approval",
+                                            "Ready for BA",
+                                            "Ready for QA",
+                                            "Ready for UAT",
+                                            "Ready for Production",
+                                            "Closed",
+                                            "Rejected",
+                                            "On Hold",
+                                            "Deferred",
+                                            "BA - Pending with Customer",
+                                            "BA - In progress",
+                                            "DEV - In progress",
+                                            "DEV - Development Completed",
+                                            "DEV - Code Review Completed",
+                                            "DEV - Ready for QA",
+                                            "DEV - Need More Information",
+                                            "QA - In progress",
+                                            "QA - QA Completed - Pass",
+                                            "QA - QA Completed Fail",
+                                            "QA - Need More Information",
+                                            "Closure - Ready for UAT",
+                                            "Closure - Ready for Production",
+                                            "Closure - Ready for QA",
+                                            "Closure - Ready for BA",
+                                            "Withdrawn",
+                                            "New",
+                                            "Cancelled",
+                                            "In Progress",
+                                            "Resolved",
+                                            "Cannot Reproduce",
+                                            "Closed: Not an Issue",
+                                            "Closed: Change Request",
+                                            "Closed: Resolved",
+                                            "Completed Work",
+                                            "Declined",
+                                            "Done",
+                                            "Duplicate",
+                                            "Working as per Design",
+                                            "Closure - Ready for DEV",
+                                            "Ready for DEV",
+                                            "Waiting for customer",
+                                            "BA - Ready for DEV",
+                                            "BA - Ready for QA",
+                                            "BA - Ready for Closure"
+                                        ],
+                                        "readDataFromFile": false,
+                                        "proxy": {
+                                            "url": ""
+                                        },
+                                        "isDeleteBtn": true
+                                    },
+                                    "oneLiner": true,
+                                    "mandatory": false,
+                                    "disabled": false,
+                                    "hidden": true,
+                                    "emptyText": "Enter Ticket Status",
+                                    "selectAllOptionText": "You have selected all the option",
+                                    "hierarchy": false,
+                                    "isJavascript": true,
+                                    "data": [
+                                        "Ready for Approval",
+                                        "Ready for BA",
+                                        "Ready for QA",
+                                        "Ready for UAT",
+                                        "Ready for Production",
+                                        "Closed",
+                                        "Rejected",
+                                        "On Hold",
+                                        "Deferred",
+                                        "BA - Pending with Customer",
+                                        "BA - In progress",
+                                        "DEV - In progress",
+                                        "DEV - Development Completed",
+                                        "DEV - Code Review Completed",
+                                        "DEV - Ready for QA",
+                                        "DEV - Need More Information",
+                                        "QA - In progress",
+                                        "QA - QA Completed - Pass",
+                                        "QA - QA Completed Fail",
+                                        "QA - Need More Information",
+                                        "Closure - Ready for UAT",
+                                        "Closure - Ready for Production",
+                                        "Closure - Ready for QA",
+                                        "Closure - Ready for BA",
+                                        "Withdrawn",
+                                        "New",
+                                        "Cancelled",
+                                        "In Progress",
+                                        "Resolved",
+                                        "Cannot Reproduce",
+                                        "Closed: Not an Issue",
+                                        "Closed: Change Request",
+                                        "Closed: Resolved",
+                                        "Completed Work",
+                                        "Declined",
+                                        "Done",
+                                        "Duplicate",
+                                        "Working as per Design",
+                                        "Closure - Ready for DEV",
+                                        "Ready for DEV",
+                                        "Waiting for customer",
+                                        "BA - Ready for DEV",
+                                        "BA - Ready for QA",
+                                        "BA - Ready for Closure"
+                                    ],
+                                    "javascript": ""
+                                },
+                                {
+                                    "name": "pzeon_created_on",
+                                    "text": "Created On",
+                                    "widget": "datefield",
+                                    "enableTemplateEditor": true,
+                                    "requiredISODate": false,
+                                    "oneLiner": true,
+                                    "fieldToReport": true,
+                                    "mandatory": false,
+                                    "disabled": false,
+                                    "format": "YYYY-MM-DD",
+                                    "hidden": true,
+                                    "emptyText": "",
+                                    "allowUserToEdit": false
+                                },
+                                {
+                                    "name": "age",
+                                    "text": "Age",
+                                    "widget": "textfield",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": false,
+                                    "disabled": false,
+                                    "hidden": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "isJavascript": true,
+                                    "properties": {
+                                        "defaultValue": ""
+                                    },
+                                    "spellcheck": false
+                                },
+                                {
+                                    "name": "FIELD_8099",
+                                    "text": "Status Actual",
+                                    "fieldToReport": false,
+                                    "widget": "combo",
+                                    "enableTemplateEditor": true,
+                                    "properties": {
+                                        "datasource": [
+                                            "Open",
+                                            "Closed"
+                                        ],
+                                        "readDataFromFile": false,
+                                        "proxy": {
+                                            "url": ""
+                                        },
+                                        "isDeleteBtn": true,
+                                        "defaultValue": "Open"
+                                    },
+                                    "oneLiner": true,
+                                    "mandatory": false,
+                                    "disabled": true,
+                                    "hidden": true,
+                                    "emptyText": "Enter Status Actual",
+                                    "selectAllOptionText": "You have selected all the option",
+                                    "hierarchy": false,
+                                    "isJavascript": true,
+                                    "data": [
+                                        "Open",
+                                        "Closed"
+                                    ],
+                                    "javascript": "",
+                                    "removeFromExport": true
+                                }
+                            ]
+                        },
+                        {
+                            "name": "approval_Details",
+                            "text": "Approval Details",
+                            "isEdit": true,
+                            "fields": [
+                                {
+                                    "name": "approver_name",
+                                    "text": "Approver Name",
+                                    "widget": "bundleFilter",
+                                    "enableTemplateEditor": true,
+                                    "singleSelect": true,
+                                    "oneLiner": true,
+                                    "mandatory": false,
+                                    "disabled": false,
+                                    "hidden": false,
+                                    "isJavascript": true,
+                                    "pagination": {
+                                        "pageSize": 20,
+                                        "itemsPerPage": [
+                                            20,
+                                            50,
+                                            100,
+                                            200
+                                        ]
+                                    },
+                                    "maxsearchlength": 50,
+                                    "bundleInfo": {
+                                        "minCharacterForLikeSearch": 3,
+                                        "displayList": [
+                                            {
+                                                "label": "Email",
+                                                "key": "userEmailId",
+                                                "value": "recentData.userEmailId"
+                                            },
+                                            {
+                                                "label": "First Name",
+                                                "key": "userFirstName",
+                                                "value": "recentData.userFirstName"
+                                            },
+                                            {
+                                                "label": "Last Name",
+                                                "key": "userLastName",
+                                                "value": "recentData.userLastName"
+                                            }
+                                        ],
+                                        "filters": [
+                                            {
+                                                "label": "Email",
+                                                "key": "recentData.userEmailId",
+                                                "value": "recentData.userEmailId",
+                                                "likeSearch": false,
+                                                "linkToparent": false
+                                            }
+                                        ],
+                                        "bundleId": 7100,
+                                        "key": "recentData.userEmailId",
+                                        "value": "recentData.userEmailId"
+                                    },
+                                    "fieldToReport": true,
+                                    "bundleId": 7100,
+                                    "javascript": ""
+                                },
+                                {
+                                    "name": "approval_status",
+                                    "text": "Approval Status",
+                                    "widget": "radio",
+                                    "fieldToReport": true,
+                                    "enableTemplateEditor": true,
+                                    "properties": {
+                                        "datasource": [
+                                            "Approved",
+                                            "Rejected",
+                                            "Deferred",
+                                            "On Hold"
+                                        ]
+                                    },
+                                    "hidden": false,
+                                    "oneLiner": true,
+                                    "disabled": false,
+                                    "isJavascript": true,
+                                    "mandatory": false,
+                                    "javascript": "console.log(model.FIELD_5942)\r\nif(model.FIELD_5942 == 'Approved'){\r\n  model.decision_Date_Time= new Date().toLocaleString();\r\n}else {\r\n\tmodel.decision_Date_Time= null;\r\n}"
+                                },
+                                {
+                                    "name": "decision_Date_Time",
+                                    "text": "Decision Date & Time",
+                                    "widget": "dateTimeField",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": false,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {},
+                                    "requiredISODate": true,
+                                    "format": "MM-DD-YYYY hh:mm:ss A",
+                                    "allowUserToEdit": true,
+                                    "isJavascript": false,
+                                    "javascript": "",
+                                    "timeZone": "Asia/Calcutta"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "documentation",
+                    "text": "BA Phase",
+                    "tabs": [
+                        {
+                            "name": "document_Detaills",
+                            "text": "Document Detaills",
+                            "isEdit": true,
+                            "fields": [
+                                {
+                                    "name": "FIELD_8022",
+                                    "text": "BA Name",
+                                    "widget": "bundleFilter",
+                                    "enableTemplateEditor": true,
+                                    "singleSelect": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "disabled": false,
+                                    "hidden": false,
+                                    "isJavascript": true,
+                                    "pagination": {
+                                        "pageSize": 20,
+                                        "itemsPerPage": [
+                                            20,
+                                            50,
+                                            100,
+                                            200
+                                        ]
+                                    },
+                                    "maxsearchlength": 50,
+                                    "bundleInfo": {
+                                        "minCharacterForLikeSearch": 3,
+                                        "displayList": [
+                                            {
+                                                "label": "Email",
+                                                "key": "userEmailId",
+                                                "value": "recentData.userEmailId"
+                                            },
+                                            {
+                                                "label": "Full Name",
+                                                "key": "userFullName",
+                                                "value": "recentData.userFullName"
+                                            },
+                                            {
+                                                "label": "Email",
+                                                "key": "userEmailId",
+                                                "value": "recentData.userEmailId"
+                                            }
+                                        ],
+                                        "filters": [
+                                            {
+                                                "label": "Job Title",
+                                                "key": "recentData.jobTitle",
+                                                "value": "recentData.jobTitle",
+                                                "likeSearch": false,
+                                                "linkToparent": false
+                                            }
+                                        ],
+                                        "bundleId": 7100,
+                                        "key": "recentData.userEmailId",
+                                        "value": "recentData.userEmailId"
+                                    },
+                                    "bundleId": 7100,
+                                    "allowUserToEdit": false,
+                                    "enableTypeIn": false,
+                                    "fieldToReport": true
+                                },
+                                {
+                                    "name": "pzeon_assignee_to",
+                                    "text": "Assigned To",
+                                    "widget": "bundleFilter",
+                                    "enableTemplateEditor": true,
+                                    "singleSelect": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "disabled": false,
+                                    "hidden": false,
+                                    "isJavascript": false,
+                                    "pagination": {
+                                        "pageSize": 20,
+                                        "itemsPerPage": [
+                                            20,
+                                            50,
+                                            100,
+                                            200
+                                        ]
+                                    },
+                                    "maxsearchlength": 50,
+                                    "bundleInfo": {
+                                        "minCharacterForLikeSearch": 3,
+                                        "displayList": [
+                                            {
+                                                "label": "User ID",
+                                                "key": "userID",
+                                                "value": "recentData.userID"
+                                            },
+                                            {
+                                                "label": "Full Name",
+                                                "key": "userFullName",
+                                                "value": "recentData.userFullName"
+                                            },
+                                            {
+                                                "label": "Email",
+                                                "key": "userEmailId",
+                                                "value": "recentData.userEmailId"
+                                            },
+                                            {
+                                                "label": "Job Title",
+                                                "key": "jobTitle",
+                                                "value": "recentData.jobTitle"
+                                            }
+                                        ],
+                                        "filters": [
+                                            {
+                                                "label": "Job Title",
+                                                "key": "recentData.jobTitle",
+                                                "value": "recentData.jobTitle",
+                                                "likeSearch": false,
+                                                "linkToparent": false
+                                            }
+                                        ],
+                                        "bundleId": 7100,
+                                        "key": "recentData.userEmailId",
+                                        "value": "recentData.userEmailId"
+                                    },
+                                    "bundleId": 7100,
+                                    "fieldToReport": true,
+                                    "javascript": "",
+                                    "logic": [
+                                        {
+                                            "name": "role",
+                                            "trigger": {
+                                                "field": "",
+                                                "value": "",
+                                                "type": "change"
+                                            },
+                                            "action": [
+                                                {
+                                                    "field": "FIELD_2531",
+                                                    "name": "",
+                                                    "type": "field",
+                                                    "value": [
+                                                        "jobTitle"
+                                                    ],
+                                                    "property": {}
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "status",
+                                    "text": "Status",
+                                    "widget": "combo",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {
+                                        "multiselect": false,
+                                        "datasource": [
+                                            "New",
+                                            "Support - Under Review",
+                                            "Ready for BA",
+                                            "Ready for DEV",
+                                            "Ready for QA",
+                                            "Ready for DEV-Production",
+                                            "Ready for Closure",
+                                            "Closed",
+                                            "Ready for DEV-Review",
+                                            "Ready for BA Review",
+                                            "QA Completed - Fail",
+                                            "QA Completed - Pass",
+                                            "Rejected",
+                                            "Ready for Client UAT",
+                                            "Waiting for customer",
+                                            "Ready for Support",
+                                            "On Hold",
+                                            "Closure - Ready for Production",
+                                            "Cannot Reproduce",
+                                            "Moved to Production"
+                                        ],
+                                        "isDeleteBtn": true
+                                    },
+                                    "data": [
+                                        "New",
+                                        "Support - Under Review",
+                                        "Ready for BA",
+                                        "Ready for DEV",
+                                        "Ready for QA",
+                                        "Ready for DEV-Production",
+                                        "Ready for Closure",
+                                        "Closed",
+                                        "Ready for DEV-Review",
+                                        "Ready for BA Review",
+                                        "QA Completed - Fail",
+                                        "QA Completed - Pass",
+                                        "Rejected",
+                                        "Ready for Client UAT",
+                                        "Waiting for customer",
+                                        "Ready for Support",
+                                        "On Hold",
+                                        "Closure - Ready for Production",
+                                        "Cannot Reproduce",
+                                        "Moved to Production"
+                                    ],
+                                    "isJavascript": true,
+                                    "javascript": "if (typeof fieldList !== \"object\" || fieldList === null) {\n\n    var fieldList = {};\n\n}\n \nif (!fieldList[\"qA_Completed_Date__Time\"]) {\n\n    fieldList[\"qA_Completed_Date__Time\"] = { hidden: true, mandatory: false };\n\n}\n \nif (!fieldList[\"FIELD_1443\"]) {\n\n    fieldList[\"FIELD_1443\"] = { hidden: true, mandatory: false };\n\n}\n \n// Ensure model is defined and has a valid status\n\nif (typeof model === \"object\" &&model !== null &&typeof model.status === \"string\") {\n\n    let status = model.status.trim(); // Remove any leading/trailing spaces\n \n    if (status === \"QA Completed - Pass\") {\n\n        fieldList[\"qA_Completed_Date__Time\"].hidden = false;\n\n        fieldList[\"qA_Completed_Date__Time\"].mandatory = true;\n\n    } else {\n\n        fieldList[\"qA_Completed_Date__Time\"].hidden = true;\n\n        fieldList[\"qA_Completed_Date__Time\"].mandatory = false;\n\n    }\n \n    if (status === \"Moved to Production\") {\n\n        fieldList[\"FIELD_1443\"].hidden = false;\n\n        fieldList[\"FIELD_1443\"].mandatory = true;\n\n    } else {\n\n        fieldList[\"FIELD_1443\"].hidden = true;\n\n        fieldList[\"FIELD_1443\"].mandatory = false;\n\n    }\n\n} else {\n\n    console.error(\"model or model.status is undefined or not a string.\");\n\n}\n ",
+                                    "logic": [],
+                                    "mandatory": true
+                                },
+                                {
+                                    "name": "final_CR_Document",
+                                    "text": "Final CR Document",
+                                    "widget": "fileuploadContainer",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {},
+                                    "isVersion": true,
+                                    "showViewBtn": true,
+                                    "showDescription": true,
+                                    "showRemoveBtn": true,
+                                    "showDownloadBtn": true,
+                                    "displayAllFile": true,
+                                    "fileType": [
+                                        "pdf",
+                                        "txt",
+                                        "docx",
+                                        "xlsx",
+                                        "ppt",
+                                        "tiff",
+                                        "pptx",
+                                        "jpg",
+                                        "jpeg",
+                                        "png",
+                                        "gif",
+                                        "csv"
+                                    ],
+                                    "displayText": "Final CR Document",
+                                    "isTrusted": true
+                                },
+                                {
+                                    "name": "planned_closed_date",
+                                    "text": "Planned Closed Date",
+                                    "fieldToReport": true,
+                                    "widget": "dateTimeField",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": false,
+                                    "disabled": false,
+                                    "hidden": false,
+                                    "isJavascript": true,
+                                    "properties": {
+                                        "defaultValue": ""
+                                    },
+                                    "format": "MM-DD-YYYY hh:mm:ss A",
+                                    "timeZone": "Asia/Calcutta"
+                                },
+                                {
+                                    "name": "FIELD_3113",
+                                    "text": "BA Completion Date & Time",
+                                    "fieldToReport": true,
+                                    "widget": "dateTimeField",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "disabled": false,
+                                    "hidden": false,
+                                    "isJavascript": true,
+                                    "properties": {
+                                        "defaultValue": ""
+                                    },
+                                    "format": "MM-DD-YYYY hh:mm:ss A",
+                                    "timeZone": "Asia/Calcutta"
+                                },
+                                {
+                                    "name": "assignment_comments",
+                                    "text": "Assignment Comments",
+                                    "widget": "comment",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {},
+                                    "canEveryoneDelete": true,
+                                    "canUserDelete": true,
+                                    "hidden": false
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "development_Phase",
+                    "text": "Development Phase",
+                    "tabs": [
+                        {
+                            "name": "development_Details",
+                            "text": "Development Details",
+                            "isEdit": true,
+                            "fields": [
+                                {
+                                    "name": "deveoper_LeadReviewer",
+                                    "text": "Deveoper Lead/Reviewer",
+                                    "widget": "bundleFilter",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {},
+                                    "pagination": {
+                                        "pageSize": 20,
+                                        "itemsPerPage": [
+                                            20,
+                                            50,
+                                            100,
+                                            200
+                                        ]
+                                    },
+                                    "maxsearchlength": 50,
+                                    "bundleInfo": {
+                                        "minCharacterForLikeSearch": 3,
+                                        "displayList": [
+                                            {
+                                                "label": "Email",
+                                                "key": "userEmailId",
+                                                "value": "recentData.userEmailId"
+                                            },
+                                            {
+                                                "label": "First Name",
+                                                "key": "userFirstName",
+                                                "value": "recentData.userFirstName"
+                                            },
+                                            {
+                                                "label": "Last Name",
+                                                "key": "userLastName",
+                                                "value": "recentData.userLastName"
+                                            }
+                                        ],
+                                        "filters": [
+                                            {
+                                                "label": "Job Title",
+                                                "key": "recentData.jobTitle",
+                                                "value": "recentData.jobTitle",
+                                                "likeSearch": false,
+                                                "linkToparent": false
+                                            }
+                                        ],
+                                        "bundleId": 7100,
+                                        "key": "recentData.userEmailId",
+                                        "value": "recentData.userEmailId"
+                                    },
+                                    "bundleId": 7100
+                                },
+                                {
+                                    "name": "pzeon_assignee_to",
+                                    "text": "Assigned To",
+                                    "widget": "bundleFilter",
+                                    "enableTemplateEditor": true,
+                                    "singleSelect": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "disabled": false,
+                                    "hidden": false,
+                                    "isJavascript": false,
+                                    "pagination": {
+                                        "pageSize": 20,
+                                        "itemsPerPage": [
+                                            20,
+                                            50,
+                                            100,
+                                            200
+                                        ]
+                                    },
+                                    "maxsearchlength": 50,
+                                    "bundleInfo": {
+                                        "minCharacterForLikeSearch": 3,
+                                        "displayList": [
+                                            {
+                                                "label": "User ID",
+                                                "key": "userID",
+                                                "value": "recentData.userID"
+                                            },
+                                            {
+                                                "label": "Full Name",
+                                                "key": "userFullName",
+                                                "value": "recentData.userFullName"
+                                            },
+                                            {
+                                                "label": "Email",
+                                                "key": "userEmailId",
+                                                "value": "recentData.userEmailId"
+                                            },
+                                            {
+                                                "label": "Job Title",
+                                                "key": "jobTitle",
+                                                "value": "recentData.jobTitle"
+                                            }
+                                        ],
+                                        "filters": [
+                                            {
+                                                "label": "Job Title",
+                                                "key": "recentData.jobTitle",
+                                                "value": "recentData.jobTitle",
+                                                "likeSearch": false,
+                                                "linkToparent": false
+                                            }
+                                        ],
+                                        "bundleId": 7100,
+                                        "key": "recentData.userEmailId",
+                                        "value": "recentData.userEmailId"
+                                    },
+                                    "bundleId": 7100,
+                                    "fieldToReport": true,
+                                    "javascript": "",
+                                    "logic": [
+                                        {
+                                            "name": "role",
+                                            "trigger": {
+                                                "field": "",
+                                                "value": "",
+                                                "type": "change"
+                                            },
+                                            "action": [
+                                                {
+                                                    "field": "FIELD_2531",
+                                                    "name": "",
+                                                    "type": "field",
+                                                    "value": [
+                                                        "jobTitle"
+                                                    ],
+                                                    "property": {}
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "developer",
+                                    "text": "Developer",
+                                    "widget": "bundleFilter",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {},
+                                    "pagination": {
+                                        "pageSize": 20,
+                                        "itemsPerPage": [
+                                            20,
+                                            50,
+                                            100,
+                                            200
+                                        ]
+                                    },
+                                    "maxsearchlength": 50,
+                                    "bundleInfo": {
+                                        "minCharacterForLikeSearch": 3,
+                                        "displayList": [
+                                            {
+                                                "label": "Employee ID",
+                                                "key": "userID",
+                                                "value": "recentData.userID"
+                                            },
+                                            {
+                                                "label": "Full Name",
+                                                "key": "userFullName",
+                                                "value": "recentData.userFullName"
+                                            },
+                                            {
+                                                "label": "Email",
+                                                "key": "userEmailId",
+                                                "value": "recentData.userEmailId"
+                                            },
+                                            {
+                                                "label": "Email",
+                                                "key": "userEmailId",
+                                                "value": "recentData.userEmailId"
+                                            },
+                                            {
+                                                "label": "First Name",
+                                                "key": "userFirstName",
+                                                "value": "recentData.userFirstName"
+                                            },
+                                            {
+                                                "label": "Email",
+                                                "key": "userEmailId",
+                                                "value": "recentData.userEmailId"
+                                            },
+                                            {
+                                                "label": "First Name",
+                                                "key": "userFirstName",
+                                                "value": "recentData.userFirstName"
+                                            },
+                                            {
+                                                "label": "Last Name",
+                                                "key": "userLastName",
+                                                "value": "recentData.userLastName"
+                                            }
+                                        ],
+                                        "filters": [
+                                            {
+                                                "label": "Job Title",
+                                                "key": "recentData.jobTitle",
+                                                "value": "recentData.jobTitle",
+                                                "likeSearch": false,
+                                                "linkToparent": false
+                                            }
+                                        ],
+                                        "bundleId": 7100,
+                                        "key": "recentData.userEmailId",
+                                        "value": "recentData.userEmailId"
+                                    },
+                                    "bundleId": 7100
+                                },
+                                {
+                                    "name": "files_Impacted",
+                                    "text": "Files Impacted",
+                                    "widget": "textarea",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {}
+                                },
+                                {
+                                    "name": "resolution_Type",
+                                    "text": "Resolution Type",
+                                    "widget": "combo",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {
+                                        "multiselect": true,
+                                        "datasource": [
+                                            "DB Update",
+                                            "Code Change",
+                                            "Letter Configuration",
+                                            "Letter Server Code Change",
+                                            "Config Change",
+                                            "Integration Server Config",
+                                            "Integration Server Code Change",
+                                            "Alert Server Config Change",
+                                            "Alert Server Code Change",
+                                            "KAFKA Code Change",
+                                            "KAFKA Config Change",
+                                            "Report & Dashboard Config Change",
+                                            "New Report & Dashboard"
+                                        ],
+                                        "isDeleteBtn": true
+                                    },
+                                    "data": [
+                                        "Alert Server Code Change",
+                                        "Alert Server Config Change",
+                                        "Code Change",
+                                        "Config Change",
+                                        "DB Update",
+                                        "Integration Server Code Change",
+                                        "Integration Server Config",
+                                        "KAFKA Code Change",
+                                        "KAFKA Config Change",
+                                        "Letter Configuration",
+                                        "Letter Server Code Change",
+                                        "New Report & Dashboard",
+                                        "Report & Dashboard Config Change"
+                                    ]
+                                },
+                                {
+                                    "name": "status",
+                                    "text": "Status",
+                                    "widget": "combo",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {
+                                        "multiselect": false,
+                                        "datasource": [
+                                            "New",
+                                            "Support - Under Review",
+                                            "Ready for BA",
+                                            "Ready for DEV",
+                                            "Ready for QA",
+                                            "Ready for DEV-Production",
+                                            "Ready for Closure",
+                                            "Closed",
+                                            "Ready for DEV-Review",
+                                            "Ready for BA Review",
+                                            "QA Completed - Fail",
+                                            "QA Completed - Pass",
+                                            "Rejected",
+                                            "Ready for Client UAT",
+                                            "Waiting for customer",
+                                            "Ready for Support",
+                                            "On Hold",
+                                            "Closure - Ready for Production",
+                                            "Cannot Reproduce",
+                                            "Moved to Production"
+                                        ],
+                                        "isDeleteBtn": true
+                                    },
+                                    "data": [
+                                        "Cannot Reproduce",
+                                        "Closed",
+                                        "Closure - Ready for Production",
+                                        "Moved to Production",
+                                        "New",
+                                        "On Hold",
+                                        "QA Completed - Fail",
+                                        "QA Completed - Pass",
+                                        "Ready for BA",
+                                        "Ready for BA Review",
+                                        "Ready for Client UAT",
+                                        "Ready for Closure",
+                                        "Ready for DEV",
+                                        "Ready for DEV-Production",
+                                        "Ready for DEV-Review",
+                                        "Ready for QA",
+                                        "Ready for Support",
+                                        "Rejected",
+                                        "Support - Under Review",
+                                        "Waiting for customer"
+                                    ],
+                                    "isJavascript": true,
+                                    "javascript": "if (typeof fieldList !== \"object\" || fieldList === null) {\n\n    var fieldList = {};\n\n}\n \nif (!fieldList[\"qA_Completed_Date__Time\"]) {\n\n    fieldList[\"qA_Completed_Date__Time\"] = { hidden: true, mandatory: false };\n\n}\n \nif (!fieldList[\"FIELD_1443\"]) {\n\n    fieldList[\"FIELD_1443\"] = { hidden: true, mandatory: false };\n\n}\n \n// Ensure model is defined and has a valid status\n\nif (typeof model === \"object\" &&model !== null &&typeof model.status === \"string\") {\n\n    let status = model.status.trim(); // Remove any leading/trailing spaces\n \n    if (status === \"QA Completed - Pass\") {\n\n        fieldList[\"qA_Completed_Date__Time\"].hidden = false;\n\n        fieldList[\"qA_Completed_Date__Time\"].mandatory = true;\n\n    } else {\n\n        fieldList[\"qA_Completed_Date__Time\"].hidden = true;\n\n        fieldList[\"qA_Completed_Date__Time\"].mandatory = false;\n\n    }\n \n    if (status === \"Moved to Production\") {\n\n        fieldList[\"FIELD_1443\"].hidden = false;\n\n        fieldList[\"FIELD_1443\"].mandatory = true;\n\n    } else {\n\n        fieldList[\"FIELD_1443\"].hidden = true;\n\n        fieldList[\"FIELD_1443\"].mandatory = false;\n\n    }\n\n} else {\n\n    console.error(\"model or model.status is undefined or not a string.\");\n\n}\n ",
+                                    "logic": [],
+                                    "mandatory": true
+                                },
+                                {
+                                    "name": "FIELD_1443",
+                                    "text": "Production Deployment Date & Time",
+                                    "fieldToReport": true,
+                                    "widget": "dateTimeField",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": false,
+                                    "disabled": false,
+                                    "hidden": true,
+                                    "isJavascript": true,
+                                    "properties": {
+                                        "defaultValue": ""
+                                    },
+                                    "format": "MM-DD-YYYY hh:mm:ss A",
+                                    "timeZone": "Asia/Calcutta"
+                                },
+                                {
+                                    "name": "release_Version",
+                                    "text": "Release Version",
+                                    "widget": "textfield",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {}
+                                },
+                                {
+                                    "name": "planned_closed_date",
+                                    "text": "Planned Closed Date",
+                                    "fieldToReport": true,
+                                    "widget": "dateTimeField",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": false,
+                                    "disabled": false,
+                                    "hidden": false,
+                                    "isJavascript": true,
+                                    "properties": {
+                                        "defaultValue": ""
+                                    },
+                                    "format": "MM-DD-YYYY hh:mm:ss A",
+                                    "timeZone": "Asia/Calcutta"
+                                },
+                                {
+                                    "name": "development_Completed_Date__Time",
+                                    "text": "Development Completion Date & Time",
+                                    "widget": "dateTimeField",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {},
+                                    "requiredISODate": true,
+                                    "format": "MM-DD-YYYY hh:mm:ss A",
+                                    "mandatory": true,
+                                    "timeZone": "Asia/Calcutta"
+                                },
+                                {
+                                    "name": "development_Details_comments",
+                                    "text": "Comments",
+                                    "widget": "comment",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {},
+                                    "canEveryoneDelete": true,
+                                    "canUserDelete": true
+                                },
+                                {
+                                    "name": "assignment_comments",
+                                    "text": "Assignment Comments",
+                                    "widget": "comment",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {},
+                                    "canEveryoneDelete": true,
+                                    "canUserDelete": true,
+                                    "hidden": false
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "qA_Phase",
+                    "text": "QA Phase",
+                    "tabs": [
+                        {
+                            "name": "qA_Details",
+                            "text": "QA Details",
+                            "isEdit": true,
+                            "fields": [
+                                {
+                                    "name": "qA_Lead",
+                                    "text": "QA Lead",
+                                    "widget": "bundleFilter",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {},
+                                    "pagination": {
+                                        "pageSize": 20,
+                                        "itemsPerPage": [
+                                            20,
+                                            50,
+                                            100,
+                                            200
+                                        ]
+                                    },
+                                    "maxsearchlength": 50,
+                                    "bundleInfo": {
+                                        "minCharacterForLikeSearch": 3,
+                                        "displayList": [
+                                            {
+                                                "label": "Employee ID",
+                                                "key": "userID",
+                                                "value": "recentData.userID"
+                                            },
+                                            {
+                                                "label": "Full Name",
+                                                "key": "userFullName",
+                                                "value": "recentData.userFullName"
+                                            },
+                                            {
+                                                "label": "Email",
+                                                "key": "userEmailId",
+                                                "value": "recentData.userEmailId"
+                                            },
+                                            {
+                                                "label": "Email",
+                                                "key": "userEmailId",
+                                                "value": "recentData.userEmailId"
+                                            },
+                                            {
+                                                "label": "First Name",
+                                                "key": "userFirstName",
+                                                "value": "recentData.userFirstName"
+                                            },
+                                            {
+                                                "label": "Last Name",
+                                                "key": "userLastName",
+                                                "value": "recentData.userLastName"
+                                            },
+                                            {
+                                                "label": "Email",
+                                                "key": "userEmailId",
+                                                "value": "recentData.userEmailId"
+                                            },
+                                            {
+                                                "label": "First Name",
+                                                "key": "userFirstName",
+                                                "value": "recentData.userFirstName"
+                                            },
+                                            {
+                                                "label": "Last Name",
+                                                "key": "userLastName",
+                                                "value": "recentData.userLastName"
+                                            },
+                                            {
+                                                "label": "Email",
+                                                "key": "userEmailId",
+                                                "value": "recentData.userEmailId"
+                                            },
+                                            {
+                                                "label": "First Name",
+                                                "key": "userFirstName",
+                                                "value": "recentData.userFirstName"
+                                            },
+                                            {
+                                                "label": "Last Name",
+                                                "key": "userLastName",
+                                                "value": "recentData.userLastName"
+                                            }
+                                        ],
+                                        "filters": [
+                                            {
+                                                "label": "Job Title",
+                                                "key": "recentData.jobTitle",
+                                                "value": "recentData.jobTitle",
+                                                "likeSearch": false,
+                                                "linkToparent": false
+                                            }
+                                        ],
+                                        "bundleId": 7100,
+                                        "key": "recentData.userEmailId",
+                                        "value": "recentData.userEmailId"
+                                    },
+                                    "bundleId": 7100
+                                },
+                                {
+                                    "name": "qA_Name",
+                                    "text": "QA Name",
+                                    "widget": "bundleFilter",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {},
+                                    "pagination": {
+                                        "pageSize": 20,
+                                        "itemsPerPage": [
+                                            20,
+                                            50,
+                                            100,
+                                            200
+                                        ]
+                                    },
+                                    "maxsearchlength": 50,
+                                    "bundleInfo": {
+                                        "minCharacterForLikeSearch": 3,
+                                        "displayList": [
+                                            {
+                                                "label": "Employee ID",
+                                                "key": "userID",
+                                                "value": "recentData.userID"
+                                            },
+                                            {
+                                                "label": "Full Name",
+                                                "key": "userFullName",
+                                                "value": "recentData.userFullName"
+                                            },
+                                            {
+                                                "label": "Email",
+                                                "key": "userEmailId",
+                                                "value": "recentData.userEmailId"
+                                            }
+                                        ],
+                                        "filters": [
+                                            {
+                                                "label": "Job Title",
+                                                "key": "recentData.jobTitle",
+                                                "value": "recentData.jobTitle",
+                                                "likeSearch": false,
+                                                "linkToparent": false
+                                            }
+                                        ],
+                                        "bundleId": 7100,
+                                        "key": "recentData.userEmailId",
+                                        "value": "recentData.userEmailId"
+                                    },
+                                    "bundleId": 7100
+                                },
+                                {
+                                    "name": "pzeon_assignee_to",
+                                    "text": "Assigned To",
+                                    "widget": "bundleFilter",
+                                    "enableTemplateEditor": true,
+                                    "singleSelect": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "disabled": false,
+                                    "hidden": false,
+                                    "isJavascript": false,
+                                    "pagination": {
+                                        "pageSize": 20,
+                                        "itemsPerPage": [
+                                            20,
+                                            50,
+                                            100,
+                                            200
+                                        ]
+                                    },
+                                    "maxsearchlength": 50,
+                                    "bundleInfo": {
+                                        "minCharacterForLikeSearch": 3,
+                                        "displayList": [
+                                            {
+                                                "label": "User ID",
+                                                "key": "userID",
+                                                "value": "recentData.userID"
+                                            },
+                                            {
+                                                "label": "Full Name",
+                                                "key": "userFullName",
+                                                "value": "recentData.userFullName"
+                                            },
+                                            {
+                                                "label": "Email",
+                                                "key": "userEmailId",
+                                                "value": "recentData.userEmailId"
+                                            },
+                                            {
+                                                "label": "Job Title",
+                                                "key": "jobTitle",
+                                                "value": "recentData.jobTitle"
+                                            }
+                                        ],
+                                        "filters": [
+                                            {
+                                                "label": "Job Title",
+                                                "key": "recentData.jobTitle",
+                                                "value": "recentData.jobTitle",
+                                                "likeSearch": false,
+                                                "linkToparent": false
+                                            }
+                                        ],
+                                        "bundleId": 7100,
+                                        "key": "recentData.userEmailId",
+                                        "value": "recentData.userEmailId"
+                                    },
+                                    "bundleId": 7100,
+                                    "fieldToReport": true,
+                                    "javascript": "",
+                                    "logic": [
+                                        {
+                                            "name": "role",
+                                            "trigger": {
+                                                "field": "",
+                                                "value": "",
+                                                "type": "change"
+                                            },
+                                            "action": [
+                                                {
+                                                    "field": "FIELD_2531",
+                                                    "name": "",
+                                                    "type": "field",
+                                                    "value": [
+                                                        "jobTitle"
+                                                    ],
+                                                    "property": {}
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "test_Cases_Executed",
+                                    "text": "Test Cases Executed",
+                                    "widget": "textarea",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {}
+                                },
+                                {
+                                    "name": "automation_Test_Report_If_Applicable",
+                                    "text": "Automation Test Report (If Applicable)",
+                                    "widget": "fileuploadContainer",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {},
+                                    "isVersion": true,
+                                    "showViewBtn": true,
+                                    "showDescription": true,
+                                    "showRemoveBtn": true,
+                                    "showDownloadBtn": true,
+                                    "displayAllFile": true,
+                                    "fileType": [
+                                        "pdf",
+                                        "txt",
+                                        "docx",
+                                        "xlsx",
+                                        "ppt",
+                                        "tiff",
+                                        "pptx",
+                                        "jpg",
+                                        "jpeg",
+                                        "png",
+                                        "gif"
+                                    ],
+                                    "displayText": "Automation Test Report (If Applicable)",
+                                    "isTrusted": true
+                                },
+                                {
+                                    "name": "status",
+                                    "text": "Status",
+                                    "widget": "combo",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {
+                                        "multiselect": false,
+                                        "datasource": [
+                                            "New",
+                                            "Support - Under Review",
+                                            "Ready for BA",
+                                            "Ready for DEV",
+                                            "Ready for QA",
+                                            "Ready for DEV-Production",
+                                            "Ready for Closure",
+                                            "Closed",
+                                            "Ready for DEV-Review",
+                                            "Ready for BA Review",
+                                            "QA Completed - Fail",
+                                            "QA Completed - Pass",
+                                            "Rejected",
+                                            "Ready for Client UAT",
+                                            "Waiting for customer",
+                                            "Ready for Support",
+                                            "On Hold",
+                                            "Closure - Ready for Production",
+                                            "Cannot Reproduce",
+                                            "Moved to Production"
+                                        ],
+                                        "isDeleteBtn": true
+                                    },
+                                    "data": [
+                                        "New",
+                                        "Support - Under Review",
+                                        "Ready for BA",
+                                        "Ready for DEV",
+                                        "Ready for QA",
+                                        "Ready for DEV-Production",
+                                        "Ready for Closure",
+                                        "Closed",
+                                        "Ready for DEV-Review",
+                                        "Ready for BA Review",
+                                        "QA Completed - Fail",
+                                        "QA Completed - Pass",
+                                        "Rejected",
+                                        "Ready for Client UAT",
+                                        "Waiting for customer",
+                                        "Ready for Support",
+                                        "On Hold",
+                                        "Closure - Ready for Production",
+                                        "Cannot Reproduce",
+                                        "Moved to Production"
+                                    ],
+                                    "isJavascript": true,
+                                    "javascript": "if (typeof fieldList !== \"object\" || fieldList === null) {\n\n    var fieldList = {};\n\n}\n \nif (!fieldList[\"qA_Completed_Date__Time\"]) {\n\n    fieldList[\"qA_Completed_Date__Time\"] = { hidden: true, mandatory: false };\n\n}\n \nif (!fieldList[\"FIELD_1443\"]) {\n\n    fieldList[\"FIELD_1443\"] = { hidden: true, mandatory: false };\n\n}\n \n// Ensure model is defined and has a valid status\n\nif (typeof model === \"object\" &&model !== null &&typeof model.status === \"string\") {\n\n    let status = model.status.trim(); // Remove any leading/trailing spaces\n \n    if (status === \"QA Completed - Pass\") {\n\n        fieldList[\"qA_Completed_Date__Time\"].hidden = false;\n\n        fieldList[\"qA_Completed_Date__Time\"].mandatory = true;\n\n    } else {\n\n        fieldList[\"qA_Completed_Date__Time\"].hidden = true;\n\n        fieldList[\"qA_Completed_Date__Time\"].mandatory = false;\n\n    }\n \n    if (status === \"Moved to Production\") {\n\n        fieldList[\"FIELD_1443\"].hidden = false;\n\n        fieldList[\"FIELD_1443\"].mandatory = true;\n\n    } else {\n\n        fieldList[\"FIELD_1443\"].hidden = true;\n\n        fieldList[\"FIELD_1443\"].mandatory = false;\n\n    }\n\n} else {\n\n    console.error(\"model or model.status is undefined or not a string.\");\n\n}\n ",
+                                    "logic": [],
+                                    "mandatory": true
+                                },
+                                {
+                                    "name": "qA_Completed_Date__Time",
+                                    "text": "QA Completion Date & Time",
+                                    "widget": "dateTimeField",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": false,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {},
+                                    "requiredISODate": true,
+                                    "timeZone": "Asia/Calcutta",
+                                    "hidden": true
+                                },
+                                {
+                                    "name": "is_this_Issue_Recurred_Before",
+                                    "text": "Is this Issue Recurred Before?",
+                                    "widget": "radio",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {
+                                        "multiselect": false,
+                                        "datasource": [
+                                            "Yes",
+                                            "No"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "name": "is_There_any_Regression_Issues_arised_for_This_Ticket",
+                                    "text": "Is There any Regression Issues arised for This Ticket?",
+                                    "widget": "radio",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {
+                                        "multiselect": false,
+                                        "datasource": [
+                                            "Yes",
+                                            "No"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "name": "planned_closed_date",
+                                    "text": "Planned Closed Date",
+                                    "fieldToReport": true,
+                                    "widget": "dateTimeField",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": false,
+                                    "disabled": false,
+                                    "hidden": false,
+                                    "isJavascript": true,
+                                    "properties": {
+                                        "defaultValue": ""
+                                    },
+                                    "format": "MM-DD-YYYY hh:mm:ss A",
+                                    "timeZone": "Asia/Calcutta"
+                                },
+                                {
+                                    "name": "qA_Details_comments",
+                                    "text": "Comments",
+                                    "widget": "comment",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {},
+                                    "canEveryoneDelete": true,
+                                    "canUserDelete": true
+                                },
+                                {
+                                    "name": "assignment_comments",
+                                    "text": "Assignment Comments",
+                                    "widget": "comment",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {},
+                                    "canEveryoneDelete": true,
+                                    "canUserDelete": true,
+                                    "hidden": false
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "closure",
+                    "text": "Closure",
+                    "tabs": [
+                        {
+                            "name": "closure_Details",
+                            "text": "Closure Details",
+                            "isEdit": true,
+                            "fields": [
+                                {
+                                    "name": "FIELD_1054",
+                                    "text": "Customer Support Lead",
+                                    "widget": "bundleFilter",
+                                    "enableTemplateEditor": true,
+                                    "singleSelect": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "disabled": false,
+                                    "hidden": false,
+                                    "isJavascript": true,
+                                    "pagination": {
+                                        "pageSize": 20,
+                                        "itemsPerPage": [
+                                            20,
+                                            50,
+                                            100,
+                                            200
+                                        ]
+                                    },
+                                    "maxsearchlength": 50,
+                                    "bundleInfo": {
+                                        "minCharacterForLikeSearch": 3,
+                                        "displayList": [
+                                            {
+                                                "label": "Email",
+                                                "key": "userEmailId",
+                                                "value": "recentData.userEmailId"
+                                            },
+                                            {
+                                                "label": "First Name",
+                                                "key": "userFirstName",
+                                                "value": "recentData.userFirstName"
+                                            },
+                                            {
+                                                "label": "Last Name",
+                                                "key": "userLastName",
+                                                "value": "recentData.userLastName"
+                                            }
+                                        ],
+                                        "filters": [
+                                            {
+                                                "label": "Job Title",
+                                                "key": "recentData.jobTitle",
+                                                "value": "recentData.jobTitle",
+                                                "likeSearch": false,
+                                                "linkToparent": false
+                                            }
+                                        ],
+                                        "bundleId": 7100,
+                                        "key": "recentData.userEmailId",
+                                        "value": "recentData.userEmailId"
+                                    },
+                                    "bundleId": 7100,
+                                    "fieldToReport": true
+                                },
+                                {
+                                    "name": "pzeon_assignee_to",
+                                    "text": "Assigned To",
+                                    "widget": "bundleFilter",
+                                    "enableTemplateEditor": true,
+                                    "singleSelect": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "disabled": false,
+                                    "hidden": false,
+                                    "isJavascript": false,
+                                    "pagination": {
+                                        "pageSize": 20,
+                                        "itemsPerPage": [
+                                            20,
+                                            50,
+                                            100,
+                                            200
+                                        ]
+                                    },
+                                    "maxsearchlength": 50,
+                                    "bundleInfo": {
+                                        "minCharacterForLikeSearch": 3,
+                                        "displayList": [
+                                            {
+                                                "label": "User ID",
+                                                "key": "userID",
+                                                "value": "recentData.userID"
+                                            },
+                                            {
+                                                "label": "Full Name",
+                                                "key": "userFullName",
+                                                "value": "recentData.userFullName"
+                                            },
+                                            {
+                                                "label": "Email",
+                                                "key": "userEmailId",
+                                                "value": "recentData.userEmailId"
+                                            },
+                                            {
+                                                "label": "Job Title",
+                                                "key": "jobTitle",
+                                                "value": "recentData.jobTitle"
+                                            }
+                                        ],
+                                        "filters": [
+                                            {
+                                                "label": "Job Title",
+                                                "key": "recentData.jobTitle",
+                                                "value": "recentData.jobTitle",
+                                                "likeSearch": false,
+                                                "linkToparent": false
+                                            }
+                                        ],
+                                        "bundleId": 7100,
+                                        "key": "recentData.userEmailId",
+                                        "value": "recentData.userEmailId"
+                                    },
+                                    "bundleId": 7100,
+                                    "fieldToReport": true,
+                                    "javascript": "",
+                                    "logic": [
+                                        {
+                                            "name": "role",
+                                            "trigger": {
+                                                "field": "",
+                                                "value": "",
+                                                "type": "change"
+                                            },
+                                            "action": [
+                                                {
+                                                    "field": "FIELD_2531",
+                                                    "name": "",
+                                                    "type": "field",
+                                                    "value": [
+                                                        "jobTitle"
+                                                    ],
+                                                    "property": {}
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "FIELD_7015",
+                                    "text": "Customer Support Executive",
+                                    "widget": "bundleFilter",
+                                    "enableTemplateEditor": true,
+                                    "singleSelect": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "disabled": false,
+                                    "hidden": false,
+                                    "isJavascript": true,
+                                    "pagination": {
+                                        "pageSize": 20,
+                                        "itemsPerPage": [
+                                            20,
+                                            50,
+                                            100,
+                                            200
+                                        ]
+                                    },
+                                    "maxsearchlength": 50,
+                                    "bundleInfo": {
+                                        "minCharacterForLikeSearch": 3,
+                                        "displayList": [
+                                            {
+                                                "label": "Email",
+                                                "key": "userEmailId",
+                                                "value": "recentData.userEmailId"
+                                            },
+                                            {
+                                                "label": "First Name",
+                                                "key": "userFirstName",
+                                                "value": "recentData.userFirstName"
+                                            },
+                                            {
+                                                "label": "Last Name",
+                                                "key": "userLastName",
+                                                "value": "recentData.userLastName"
+                                            }
+                                        ],
+                                        "filters": [
+                                            {
+                                                "label": "Job Title",
+                                                "key": "recentData.jobTitle",
+                                                "value": "recentData.jobTitle",
+                                                "likeSearch": false,
+                                                "linkToparent": false
+                                            }
+                                        ],
+                                        "bundleId": 7100,
+                                        "key": "recentData.userEmailId",
+                                        "value": "recentData.userEmailId"
+                                    },
+                                    "bundleId": 7100,
+                                    "fieldToReport": true
+                                },
+                                {
+                                    "name": "status",
+                                    "text": "Status",
+                                    "widget": "combo",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "fieldToReport": true,
+                                    "emptyText": "",
+                                    "aiSearchEnable": false,
+                                    "properties": {
+                                        "multiselect": false,
+                                        "datasource": [
+                                            "New",
+                                            "Support - Under Review",
+                                            "Ready for BA",
+                                            "Ready for DEV",
+                                            "Ready for QA",
+                                            "Ready for DEV-Production",
+                                            "Ready for Closure",
+                                            "Closed",
+                                            "Ready for DEV-Review",
+                                            "Ready for BA Review",
+                                            "QA Completed - Fail",
+                                            "QA Completed - Pass",
+                                            "Rejected",
+                                            "Ready for Client UAT",
+                                            "Waiting for customer",
+                                            "Ready for Support",
+                                            "On Hold",
+                                            "Closure - Ready for Production",
+                                            "Cannot Reproduce",
+                                            "Moved to Production"
+                                        ],
+                                        "isDeleteBtn": true
+                                    },
+                                    "data": [
+                                        "Cannot Reproduce",
+                                        "Closed",
+                                        "Closure - Ready for Production",
+                                        "Moved to Production",
+                                        "New",
+                                        "On Hold",
+                                        "QA Completed - Fail",
+                                        "QA Completed - Pass",
+                                        "Ready for BA",
+                                        "Ready for BA Review",
+                                        "Ready for Client UAT",
+                                        "Ready for Closure",
+                                        "Ready for DEV",
+                                        "Ready for DEV-Production",
+                                        "Ready for DEV-Review",
+                                        "Ready for QA",
+                                        "Ready for Support",
+                                        "Rejected",
+                                        "Support - Under Review",
+                                        "Waiting for customer"
+                                    ],
+                                    "isJavascript": true,
+                                    "javascript": "if (typeof fieldList !== \"object\" || fieldList === null) {\n\n    var fieldList = {};\n\n}\n \nif (!fieldList[\"qA_Completed_Date__Time\"]) {\n\n    fieldList[\"qA_Completed_Date__Time\"] = { hidden: true, mandatory: false };\n\n}\n \nif (!fieldList[\"FIELD_1443\"]) {\n\n    fieldList[\"FIELD_1443\"] = { hidden: true, mandatory: false };\n\n}\n \n// Ensure model is defined and has a valid status\n\nif (typeof model === \"object\" &&model !== null &&typeof model.status === \"string\") {\n\n    let status = model.status.trim(); // Remove any leading/trailing spaces\n \n    if (status === \"QA Completed - Pass\") {\n\n        fieldList[\"qA_Completed_Date__Time\"].hidden = false;\n\n        fieldList[\"qA_Completed_Date__Time\"].mandatory = true;\n\n    } else {\n\n        fieldList[\"qA_Completed_Date__Time\"].hidden = true;\n\n        fieldList[\"qA_Completed_Date__Time\"].mandatory = false;\n\n    }\n \n    if (status === \"Moved to Production\") {\n\n        fieldList[\"FIELD_1443\"].hidden = false;\n\n        fieldList[\"FIELD_1443\"].mandatory = true;\n\n    } else {\n\n        fieldList[\"FIELD_1443\"].hidden = true;\n\n        fieldList[\"FIELD_1443\"].mandatory = false;\n\n    }\n\n} else {\n\n    console.error(\"model or model.status is undefined or not a string.\");\n\n}\n ",
+                                    "logic": [],
+                                    "mandatory": true
+                                },
+                                {
+                                    "name": "planned_closed_date",
+                                    "text": "Planned Closed Date",
+                                    "fieldToReport": true,
+                                    "widget": "dateTimeField",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": false,
+                                    "disabled": false,
+                                    "hidden": false,
+                                    "isJavascript": true,
+                                    "properties": {
+                                        "defaultValue": ""
+                                    },
+                                    "format": "MM-DD-YYYY hh:mm:ss A",
+                                    "timeZone": "Asia/Calcutta"
+                                },
+                                {
+                                    "name": "FIELD_9352",
+                                    "text": "Closure Date & Time",
+                                    "fieldToReport": true,
+                                    "widget": "dateTimeField",
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": true,
+                                    "disabled": false,
+                                    "hidden": false,
+                                    "isJavascript": true,
+                                    "properties": {
+                                        "defaultValue": ""
+                                    },
+                                    "format": "MM-DD-YYYY hh:mm:ss A",
+                                    "timeZone": "Asia/Calcutta"
+                                },
+                                {
+                                    "name": "FIELD_4604",
+                                    "text": "Comment",
+                                    "widget": "comment",
+                                    "fieldToReport": true,
+                                    "enableTemplateEditor": true,
+                                    "oneLiner": true,
+                                    "mandatory": false,
+                                    "disabled": false,
+                                    "hidden": false,
+                                    "emptyText": "",
+                                    "canEveryoneDelete": true,
+                                    "canUserDelete": true,
+                                    "isJavascript": true,
+                                    "properties": {
+                                        "defaultValue": []
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "isSectionView": true
+        }
+    }
+}

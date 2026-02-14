@@ -1,12 +1,13 @@
 import React, { useMemo } from "react";
 
-import TextArea from "./TextArea/TextArea";
-import CollapsiblePanel from "./Panel/PanelComponet";
+import TextArea from "./TextArea";
+import CollapsiblePanel from "./Panel";
 import { Steps, Box } from "@chakra-ui/react";
-import RadioField from "./RadioField/RadioField";
+import RadioField from "./RadioField";
 import { useForm, useFormState } from "react-hook-form";
-import TextField from "./TextField/TextField";
-import UploadField from "./UploadField/UploadField";
+import TextField from "./TextField";
+import UploadField from "./UploadField";
+import { ComponentRegistry } from "../registry/ComponentRegistry";
 
 
 
@@ -32,10 +33,10 @@ interface RunTimeWidgetRendererProps {
   }>;
 }
 
-const RunTimeWidgetRender: React.FC<any> = React.memo(({ configs,...rest}) => {
+const RunTimeWidgetRender: React.FC<any> = React.memo(({ configs, ...rest }) => {
   console.log("====Calling RunTimeWidgetRender===");
-  const {scriptFiles,...styles}=rest
-  const {errors}=useFormState()
+  const { scriptFiles, ...styles } = rest
+  const { errors } = useFormState()
   if (!configs) return null;
   return (
     <>
@@ -45,23 +46,27 @@ const RunTimeWidgetRender: React.FC<any> = React.memo(({ configs,...rest}) => {
           {(() => {
             switch (widgetConfig.widget) {
               case "textField":
-                return <TextField {...widgetConfig}   errors={errors[widgetConfig.name]}/>;
+                return <TextField {...widgetConfig} errors={errors[widgetConfig.name]} />;
               case "textAreaField":
-                return <TextArea {...widgetConfig}  errors={errors[widgetConfig.name]}/>;
+                return <TextArea {...widgetConfig} errors={errors[widgetConfig.name]} />;
               case "uploadField":
-                return <UploadField {...widgetConfig}  errors={errors[widgetConfig.name]}/>;
+                return <UploadField {...widgetConfig} errors={errors[widgetConfig.name]} />;
               case "panel":
                 return (
                   <CollapsiblePanel
                     {...widgetConfig}
                     {...rest}
                     widgets={widgetConfig.widgets || []}
-                    
+
                   />
                 );
               case "radioField":
-                return <RadioField {...widgetConfig} {...rest} errors={errors[widgetConfig.name]}/>
+                return <RadioField {...widgetConfig} {...rest} errors={errors[widgetConfig.name]} />
               default:
+                const RegisteredComponent = ComponentRegistry.get(widgetConfig.widget);
+                if (RegisteredComponent) {
+                  return <RegisteredComponent {...widgetConfig} {...rest} errors={errors[widgetConfig.name]} widgets={widgetConfig.widgets} />;
+                }
                 return null; // Handle unknown widget types gracefully
             }
           })()}

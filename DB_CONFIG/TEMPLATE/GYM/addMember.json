@@ -1,17 +1,34 @@
 {
-    "appName": "Gym",
-    "name": "AddMember",
     "id": "1",
-    "owner": "Suryanrayan Biswal",
-    "createdAt": "19 Nov 2024",
-    "API_INTIGATION_CONFIG": {},
-    "scriptFiles": [
-        "Gym/addMemberScript"
-    ],
-    "postScript": "documentPostScript",
+    "appMeta": {
+        "appName": "Gym",
+        "viewName": "AddMember",
+        "viewId": "1",
+        "version": "1.0.0",
+        "owner": "Suryanarayan Biswal",
+        "createdAt": "2024-11-19"
+    },
+    "settings": {
+        "theme": "default",
+        "language": "en",
+        "securityEnabled": true,
+        "sanitizeHtml": false
+    },
+    "scripts": {
+        "files": [
+            "Gym/addMemberScript"
+        ],
+        "postScript": "documentPostScript"
+    },
+    "UI_TYPE": {
+        "type": "FORM_VIEW",
+        "title": "Create New Member",
+        "description": "",
+        "target": "widgets"
+    },
     "UI_VIEW": {
         "schema": {
-            "config": [
+            "widgets": [
                 {
                     "name": "memberName",
                     "text": "Member Name",
@@ -144,18 +161,85 @@
                     "description": "Upload a document or image for verification",
                     "type": "file",
                     "accept": "image/*",
-                    "s3Config":{},
-                    "defaultApiConfig":{
-                        "uploadURL":"app/upload"
+                    "s3Config": {},
+                    "defaultApiConfig": {
+                        "uploadURL": "app/upload"
                     },
                     "disabled": false,
                     "hidden": false,
-                    "liveCameraAllow":true,
+                    "liveCameraAllow": true,
                     "widget": "uploadField",
                     "capture": "environment",
                     "required": true,
                     "multiple": false,
                     "maxFileSize": 5000000
+                },
+                {
+                    "name": "viewPanel",
+                    "text": "View Time",
+                    "hidden": false,
+                    "isOpen": true,
+                    "widget": "panel",
+                    "widgets": [
+                        {
+                            "name": "onboardingStepper",
+                            "widget": "stepper",
+                            "activeStep": 1,
+                            "steps": [
+                                {
+                                    "title": "Registration"
+                                },
+                                {
+                                    "title": "Verification"
+                                },
+                                {
+                                    "title": "Approval"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "statsGrid",
+                            "widget": "grid",
+                            "columns": 2,
+                            "widgets": [
+                                {
+                                    "name": "totalMembers",
+                                    "widget": "kpi",
+                                    "label": "Total Members",
+                                    "value": "1,204",
+                                    "helpText": "+24% this month"
+                                },
+                                {
+                                    "name": "activeMembers",
+                                    "widget": "kpi",
+                                    "label": "Active Members",
+                                    "value": "890",
+                                    "helpText": "74% retention"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "recentActivityTable",
+                            "widget": "kpiTable",
+                            "headers": [
+                                "Date",
+                                "Activity",
+                                "Status"
+                            ],
+                            "data": [
+                                {
+                                    "date": "2024-02-14",
+                                    "activity": "New Signup",
+                                    "status": "Pending"
+                                },
+                                {
+                                    "date": "2024-02-13",
+                                    "activity": "Payment",
+                                    "status": "Completed"
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         }

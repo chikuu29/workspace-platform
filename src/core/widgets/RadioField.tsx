@@ -1,8 +1,8 @@
 import { Steps, Box, Button, Flex, RadioGroup, Spacer, Stack, Field } from "@chakra-ui/react";
-import { useColorModeValue } from "../../../components/ui/color-mode";
+import { useColorModeValue } from "../../components/ui/color-mode";
 import { useEffect, useState } from "react";
 import { FieldError, useFormContext, useWatch } from "react-hook-form";
-import { useScriptInstance } from "../../ui/components/contexts/ScriptProvider";
+import { useScriptInstance } from "../../features/ui/components/contexts/ScriptProvider";
 import { FaTimes } from "react-icons/fa";
 import React from "react";
 

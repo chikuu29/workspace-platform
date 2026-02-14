@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useColorModeValue } from "../../../components/ui/color-mode";
-import WidgetUIBuilder from "../../../features/widgets/WidgetUIBuilder";
+import WidgetUIBuilder from "../../../core/widgets/WidgetUIBuilder";
 import { Steps, Box, Button, Heading, HStack, Separator } from "@chakra-ui/react";
 import { POSTAPI } from "../../../app/api";
 import { FaCheck, FaRedo } from "react-icons/fa";

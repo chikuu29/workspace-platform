@@ -1,15 +1,16 @@
-import { Steps, Box, Flex, Input, Field } from "@chakra-ui/react";
-import { useColorModeValue } from "../../../components/ui/color-mode";
-import { useEffect, useState } from "react";
-import React from "react";
+import { Steps, Box, Flex, Textarea, Field } from "@chakra-ui/react";
+
+import { useColorModeValue } from "../../components/ui/color-mode";
+
+import { memo, useEffect, useState } from "react";
 import { FieldError, useFormContext, useWatch } from "react-hook-form";
-import { useScriptInstance } from "../../ui/components/contexts/ScriptProvider";
-interface TEXTFIELD {
+import { useScriptInstance } from "../../features/ui/components/contexts/ScriptProvider";
+
+interface TEXTAREA {
   name: string;
   text: string;
-  required?: boolean;
+  required: boolean;
   description?: string;
-  type?: string;
   disabled?: boolean; // Optional property
   hidden?: boolean; // Optional property
   widget?: string; // Optional property
@@ -27,24 +28,24 @@ interface TEXTFIELD {
   errors: FieldError;
 }
 
-const TextField = ({
+const TextArea = ({
   name,
   text,
   description,
-  type = "string",
   disabled = false,
   hidden = false,
   widget,
   oneLiner = false,
-  outLineBorder = true,
   required = false,
+  outLineBorder = true,
   listeners = {},
   maxLength,
   minLength,
   errors,
-}: TEXTFIELD) => {
-  if (hidden) return null;
-  console.log("===EXECUTE TextField===");
+}: TEXTAREA) => {
+  console.log("===EXECUTE TextArea===");
+  if (hidden) return null; // If hidden is true, do not render anything
+
   // If hidden is true, do not render anything
   const [dynamicMethods, setDynamicMethods] = useState<any>({});
   const { getScriptInstance, scriptFiles } = useScriptInstance();
@@ -85,7 +86,6 @@ const TextField = ({
           value: event.target.value,
           text,
           description,
-          type,
           disabled,
           widget,
           oneLiner,
@@ -112,7 +112,6 @@ const TextField = ({
       align: "center",
     };
   }
-
   return (
     <Box
       m={2}
@@ -132,12 +131,13 @@ const TextField = ({
             width={{ base: "100%", md: "30%" }}
             fontSize={{ base: "sm", md: "md" }} // Responsive font size
             fontWeight="bold" // Bold text
+            // color="blue.500"
             color="gray.600"
           >
             {text}
           </Field.Label>
           <Flex direction="column" width="100%">
-            <Input
+            <Textarea
               {...methods.register(name, {
                 required: required ? `${text} Field Is Required` : false,
                 ...(maxLength && {
@@ -153,11 +153,11 @@ const TextField = ({
                   },
                 }),
               })}
-              type={type}
-              variant="outline"
+              // required={required}
+              // variant="main"
               id={name}
               placeholder={description}
-              onChange={(e) => {
+              onChange={(e: any) => {
                 inputChanges(e);
                 methods.setValue(name, e.target.value, {
                   shouldValidate: true,
@@ -194,4 +194,4 @@ const TextField = ({
   );
 };
 
-export default React.memo(TextField);
+export default memo(TextArea);

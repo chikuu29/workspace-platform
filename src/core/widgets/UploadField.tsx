@@ -16,7 +16,7 @@ import {
   Dialog,
   Portal,
 } from "@chakra-ui/react";
-import { useColorModeValue } from "../../../components/ui/color-mode";
+import { useColorModeValue } from "@/components/ui/color-mode";
 import React from "react";
 import { useRef, useState } from "react";
 import { FieldError, useFormContext } from "react-hook-form";
@@ -30,7 +30,7 @@ import {
   FaCheck,
 } from "react-icons/fa";
 import { FcOldTimeCamera, FcStackOfPhotos, FcVideoCall } from "react-icons/fc";
-import { POSTAPI } from "../../../app/api";
+import { POSTAPI } from "../../app/api";
 
 import { LuUpload } from "react-icons/lu";
 

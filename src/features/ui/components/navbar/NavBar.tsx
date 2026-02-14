@@ -29,7 +29,7 @@ const Navbar = ({
     <Box minH="115px" bg={bgColor}>
       <Box
         w="100%"
-        // boxShadow="md"
+        boxShadow="md"
         position="fixed"
         // position="sticky"
         // top="1"

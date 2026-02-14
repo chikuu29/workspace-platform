@@ -3,7 +3,6 @@ import React, { Suspense, useMemo } from "react";
 import { lazy } from "react";
 import { useSearchParams } from "react-router";
 import componentConfig from "../../componentConfig";
-import { AppLoader } from "@/features/ui/components/Loader/Loader";
 import { Skeleton, VStack } from "@chakra-ui/react";
 const LayoutSkeleton = () => (
   <VStack gap={4} p={6}>

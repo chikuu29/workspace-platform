@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { APP_LOADER } from "../../../types/appConfigInterface";
+import { APP_LOADER } from "../../types/appConfigInterface";
 
 const initialState: APP_LOADER = {
     loaderText: "Loading Please Wait..",

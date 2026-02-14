@@ -1,16 +1,16 @@
 import { AuthProvider } from "./contexts/AuthProvider";
 import { Navigate, createBrowserRouter, RouteObject } from "react-router-dom";
 import { Suspense, lazy } from "react";
-import { AppLoader } from "./ui/components/Loader/Loader";
-// const AppLoader=lazy(()=>import("./ui/components/Loader/Loader"))
+import { AppLoader } from "./features/ui/components/Loader/Loader";
 import HandleDynamicView from "./utils/app/HandleDynamicView";
-// import AuthCallback from "./views/auth/AuthCallback";
-const AuthCallback = lazy(() => import("./views/auth/AuthCallback"));
-const AuthLayout = lazy(() => import("./ui/layouts/auth/auth"));
-const SignInPage = lazy(() => import("./views/auth/signin/SignIn"));
-const SignUpPage = lazy(() => import("./views/auth/signup/SignUp"));
-const PanelLayout = lazy(() => import("./ui/layouts/dashboard/dash"));
+
+const AuthCallback = lazy(() => import("./features/auth/AuthCallback"));
+const AuthLayout = lazy(() => import("./features/ui/layouts/auth/auth"));
+const SignInPage = lazy(() => import("./features/auth/signin/SignIn"));
+const SignUpPage = lazy(() => import("./features/auth/signup/SignUp"));
+const PanelLayout = lazy(() => import("./features/ui/layouts/dashboard/dash"));
 const PrivateRoute = lazy(() => import("./contexts/PrivateRoute"));
+const MyApps = lazy(() => import("./features/myApps/MyApps"));
 
 const routes: RouteObject[] = [
   {
@@ -49,11 +49,7 @@ const routes: RouteObject[] = [
       },
       {
         path: "callback",
-        element: (
-          // <Suspense fallback={<AppLoader />}>
-            (<AuthCallback />)
-          // </Suspense>
-        ),
+        element: <AuthCallback />,
       },
       {
         path: "getstarted",
@@ -66,7 +62,7 @@ const routes: RouteObject[] = [
     ],
   },
   {
-    path: "/:tenant_name/:view/*", // Parent route for `view`
+    path: "/:tenant_name/app/*", // Multi-tenant base route
     element: (
       <Suspense fallback={<AppLoader />}>
         <AuthProvider>
@@ -78,20 +74,36 @@ const routes: RouteObject[] = [
     ),
     children: [
       {
-        path: "", // Child route for `params`
-        element: (
-          // <Suspense fallback={<AppLoader />}>
-            (<HandleDynamicView />)
-          // </Suspense>
-        ),
+        path: "",
+        element: <HandleDynamicView />,
       },
       {
-        path: ":params/*", // Child route for `params`
-        element: (
-          // <Suspense fallback={<AppLoader />}>
-            (<HandleDynamicView />)
-          // </Suspense>
-        ),
+        path: ":view/*",
+        element: <HandleDynamicView />,
+        children: [
+          {
+            path: ":params/*",
+            element: <HandleDynamicView />,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    path: "/myApps",
+    element: (
+      <Suspense fallback={<AppLoader />}>
+        <AuthProvider>
+          <PrivateRoute>
+            <PanelLayout />
+          </PrivateRoute>
+        </AuthProvider>
+      </Suspense>
+    ),
+    children: [
+      {
+        path: "",
+        element: <MyApps />,
       },
     ],
   },

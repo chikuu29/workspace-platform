@@ -11,7 +11,7 @@ import { login, logout } from "../app/slices/auth/authSlice";
 import { GETAPI } from "../app/api";
 import { fetchAppConfig } from "../app/slices/appConfig/appConfigSlice";
 import type { AppDispatch } from '../app/store';
-import Loader from "../ui/components/Loader/Loader";
+import Loader from "../features/components/Loader/Loader";
 import { startLoading, stopLoading } from "../app/slices/loader/appLoaderSlice";
 
 // Define user type
@@ -61,8 +61,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           return;
         }
 
-        let loginInfo:any={}
-        loginInfo['login_info']=JSON.parse(storedLoginInfo) || {};
+        let loginInfo: any = {}
+        loginInfo['login_info'] = JSON.parse(storedLoginInfo) || {};
         loginInfo.access_token = accessToken;
         loginInfo.success = true;
         loginInfo.isAuthenticated = true;
@@ -88,7 +88,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const setLoginAuthInfo = (loginData: any) => {
     console.log("Setting AUTH INFO FROM LOGIN:", loginData);
-    setAuthInfo((prevAuth:any) => ({ ...prevAuth, ...loginData }));
+    setAuthInfo((prevAuth: any) => ({ ...prevAuth, ...loginData }));
     setReloginRequired(false);
   };
 

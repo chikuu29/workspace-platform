@@ -22,12 +22,14 @@ const componentConfig: ComponentConfig = {
     },
     "myGym": {
         layout: () => import("@/theme/layouts/workspace"),
+
         GymView: () => import("@/features/modules/gym/GymView"),
-        AddMember: () => import("@/features/modules/gym/AddMember"),
+        // AddMember: () => import("@/features/modules/gym/AddMember"),
         Subscription: () => import("@/features/modules/gym/Subscription"),
         ListMember: () => import("@/features/modules/gym/Members")
     },
     "Default": {
+        workspacePage: () => import("@/core/WorkspacePage"),
         layout: () => import("@/theme/layouts/workspace"),
         myApps: () => import("@/features/myApps/MyApps"),
         pageNotFound: () => import("@/pages/NoPageFound"),

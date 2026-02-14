@@ -12,7 +12,7 @@ const HandleDynamicView = () => {
   const appName = searchParams.get("app") || "Default";
 
   const appConfig = componentConfig[appName];
-  console.log(view);
+  console.log("===APP CONFIG===", appConfig);
 
 
   // Safely access the component based on the view
@@ -25,6 +25,7 @@ const HandleDynamicView = () => {
       view in appConfig
     ) {
       try {
+        console.log("===VIEW===", appConfig[view]);
         return lazy(appConfig[view]);
       } catch (err) {
         console.error("Error loading component:", err);
@@ -50,8 +51,13 @@ const HandleDynamicView = () => {
 
 
   if (!Component) {
-
-    return <Navigate to="/pageNotFound" replace />;
+    // Fallback to Universal WorkspacePage
+    const WorkspacePage = lazy((componentConfig["Default"] as any)["workspacePage"]);
+    return (
+      <Suspense fallback={<AppLoader />}>
+        <WorkspacePage />
+      </Suspense>
+    );
   }
 
   return (

@@ -1,5 +1,8 @@
 {
     "id": "1",
+    "pageName": "AddMember",
+    "route": "AddMember",
+    "appName": "Gym",
     "appMeta": {
         "appName": "Gym",
         "viewName": "AddMember",

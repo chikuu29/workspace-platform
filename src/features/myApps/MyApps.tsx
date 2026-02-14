@@ -1,12 +1,13 @@
 import { Steps, Flex, Text, Box, Image, Breadcrumb } from "@chakra-ui/react";
-import { useColorMode, useColorModeValue } from "../../components/ui/color-mode";
+import { useColorMode, useColorModeValue } from "@/components/ui/color-mode";
+import React, { memo } from "react";
 import { useNavigate } from "react-router-dom";
-import * as dynamicFunctions from "../../script/myAppsScript";
-
 import { useSelector } from "react-redux";
-import { RootState } from "../../app/store";
-import ErrorComponent from "../../features/components/Error/ErrorComponent";
-// import Loader from "../../ui/components/Loader/Loader";
+import { RootState } from "@/app/store";
+import { APP_CONFIG_STATE } from "@/app/types/appConfigInterface";
+import AsyncLoadIcon from "@/utils/hooks/AsyncLoadIcon";
+import * as dynamicFunctions from "@/script/myAppsScript";
+import ErrorComponent from "@/features/ui/components/Error/ErrorComponent";
 
 export default function MyApps() {
   console.log("=====MYAPPS====");

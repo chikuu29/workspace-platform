@@ -1,17 +1,25 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import { visualizer } from 'rollup-plugin-visualizer';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 // import createVersionPlugin from './plugin/vite-plugin-version'
 import createVersionPlugin from './plugin/vite-plugin-version/index'; // Adjust the path as needed
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
   const env = loadEnv(mode, process.cwd());
   console.log("%c" + `===THIS A ${mode.toUpperCase()} MODE ===`, "color:green");
   console.log("===CONNECT TO === " + env.VITE_API_URL);
 
   return {
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'),
+      },
+    },
     plugins: [
       react(),
       visualizer({

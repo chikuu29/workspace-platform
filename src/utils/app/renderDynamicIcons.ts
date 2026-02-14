@@ -3,7 +3,7 @@ import { IconType } from "react-icons";
 // Create a function to dynamically import icons based on the prefix of the icon name
 const DynamicIcon = async (iconName: string): Promise<IconType> => {
   try {
-    // Check for Font Awesome icons
+    // Check for Flat Color icons
     if (iconName.startsWith("Fc")) {
       const iconModule = await import("react-icons/fc");
       const Icon = iconModule[iconName as keyof typeof iconModule] as IconType;
@@ -17,22 +17,27 @@ const DynamicIcon = async (iconName: string): Promise<IconType> => {
       if (Icon) return Icon;
     }
 
-    // Check for Chakra UI icons
-    if (iconName.startsWith("Icons")) {
-      const iconModule = await import("@chakra-ui/icons");
+    // Check for Remix icons
+    if (iconName.startsWith("Ri")) {
+      const iconModule = await import("react-icons/ri");
       const Icon = iconModule[iconName as keyof typeof iconModule] as IconType;
       if (Icon) return Icon;
     }
 
-    // Fallback icon if the requested one is not found
+    // Fallback icon if the requested one is not found or module fails to load
     const fallbackModule = await import("react-icons/fc");
     return fallbackModule.FcHighPriority as IconType;
 
   } catch (error) {
-    console.error("Failed to load icon:", error);
+    console.error("Failed to load icon:", error, "Requested:", iconName);
     // Return fallback icon in case of any error
-    const fallbackModule = await import("react-icons/fc");
-    return fallbackModule.FcHighPriority as IconType;
+    try {
+      const fallbackModule = await import("react-icons/fc");
+      return fallbackModule.FcHighPriority as IconType;
+    } catch (e) {
+      // Return a very basic component as an absolute fallback
+      return (() => null) as unknown as IconType;
+    }
   }
 };
 

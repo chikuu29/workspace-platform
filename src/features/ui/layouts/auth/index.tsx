@@ -1,7 +1,7 @@
 import { Steps, Box } from "@chakra-ui/react";
-import { useColorModeValue } from "../../../components/ui/color-mode";
+import { useColorModeValue } from "@/components/ui/color-mode";
 import { Navigate, Route, Routes } from "react-router-dom";
-import SignInPage from "../../../views/auth/signin/SignIn";
+import SignInPage from "@/features/auth/signin/SignIn";
 
 export default function Auth() {
 
@@ -26,7 +26,7 @@ export default function Auth() {
               path="/auth"
               element={<Navigate to="/auth/sign-in" replace />}
             />
-             <Route path="/auth/sign-in" element={<SignInPage />} />
+            <Route path="/auth/sign-in" element={<SignInPage />} />
             {/* <Route path="sign-in" element={<SignInPage />} /> */}
           </Routes>
         </Box>

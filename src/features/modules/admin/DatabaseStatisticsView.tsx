@@ -11,8 +11,12 @@ import {
   FaFile,
   FaCheckCircle,
 } from "react-icons/fa";
-import { GETAPI } from "../../../app/api";
-import Loader from "../../../features/components/Loader/Loader";
+import { useColorModeValue } from "@/components/ui/color-mode";
+import { useSelector } from "react-redux";
+import { RootState } from "@/app/store";
+import { APP_CONFIG_STATE } from "@/app/types/appConfigInterface";
+import { GETAPI } from "@/app/api";
+import Loader from "@/features/ui/components/Loader/Loader";
 
 const DatabaseStatistics = () => {
   const [report, setReport] = useState<any>({});

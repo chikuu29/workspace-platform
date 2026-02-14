@@ -1,4 +1,4 @@
-import GetStartedHero from "../../views/components/getStartedHero/getStartedHero";
+import GetStartedHero from "@/features/ui/components/getStartedHero/getStartedHero";
 
 export function Home() {
   return (

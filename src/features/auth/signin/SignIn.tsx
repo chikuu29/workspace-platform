@@ -27,31 +27,33 @@ import {
   useDisclosure,
   Field,
 } from "@chakra-ui/react";
-import { useColorModeValue } from "../../../components/ui/color-mode";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useColorModeValue } from "@/components/ui/color-mode";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { RiEyeCloseLine } from "react-icons/ri";
 import { useEffect, useRef, useState } from "react";
-import { HSeparator } from "../../../features/components/separator/Separator";
-import { publicAPI } from "../../../app/handlers/axiosHandlers";
+import { HSeparator } from "@/features/ui/components/separator/Separator";
+import { publicAPI } from "@/app/handlers/axiosHandlers";
 // import { AxiosError } from "axios";
-import { useAuth } from "../../../contexts/AuthProvider";
-import { useDispatch } from "react-redux";
-import { login } from "../../../app/slices/auth/authSlice";
-// import { GETAPI } from "../../../app/api";
-import { fetchAppConfig } from "../../../app/slices/appConfig/appConfigSlice";
-import { AppDispatch } from "../../../app/store";
-import Brand from "../../../features/components/Brand/Brand";
-// import { setAppConfig } from "../../../app/slices/appConfig/appConfigSlice";
+import { useAuth } from "@/contexts/AuthProvider";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "@/app/slices/auth/authSlice";
+// import { GETAPI } from "@/app/api";
+import { fetchAppConfig } from "@/app/slices/appConfig/appConfigSlice";
+import { AppDispatch, RootState } from "@/app/store";
+import Brand from "@/features/ui/components/Brand/Brand";
+import { ErrorSummary } from "@/components/common/ErrorSummary";
+import FixedPlugin from "@/features/ui/components/fixedPlugin/FixedPlugin";
+import Loader from "@/features/ui/components/Loader/Loader";
 
 import { motion } from "framer-motion";
-import { startLoading } from "../../../app/slices/loader/appLoaderSlice";
-import { POSTAPI } from "../../../app/api";
-import AppVersionAlert from "../../../features/components/alert/AppVersionAlert";
-import { AlertProps } from "../../../app/types/appConfigInterface";
+import { startLoading } from "@/app/slices/loader/appLoaderSlice";
+import { POSTAPI } from "@/app/api";
+import AppVersionAlert from "@/features/ui/components/alert/AppVersionAlert";
+import { AlertProps } from "@/app/types/appConfigInterface";
 import { SiAuthelia } from "react-icons/si";
-import { getOrCreateDeviceId } from "../../../utils/services/appServices";
+import { getOrCreateDeviceId } from "@/utils/services/appServices";
 const MotionText = motion(Text);
 
 const SignIn = () => {

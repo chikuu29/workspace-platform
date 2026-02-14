@@ -11,15 +11,15 @@ import {
   Portal,
 } from "@chakra-ui/react";
 
-import { useColorModeValue } from "../../../components/ui/color-mode";
+import { useColorModeValue } from "@/components/ui/color-mode";
 
 import SideNavMenuBuilder from "./SideNavMenuBuilder";
 import { MdMenu } from "react-icons/md";
 import Brand from "../Brand/Brand";
 // import { useState } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "../../../app/store";
-import { APP_CONFIG_STATE } from "../../../types/appConfigInterface";
+import { RootState } from "@/app/store";
+import { APP_CONFIG_STATE } from "@/app/types/appConfigInterface";
 
 export default function PanelSideBar(props: any) {
   const { showSidebar, togglesidebar, SHOW_SIDEBAR, ...rest } = props;
@@ -51,7 +51,7 @@ export default function PanelSideBar(props: any) {
         bg={sidebarBg}
         transition={variantChange}
         p={"0px"}
-  
+
         h="100vh"
         m={sidebarMargins}
         minH="100%"
@@ -82,7 +82,7 @@ export function SidebarResponsive(props: any) {
       display={{ base: "flex", md: "flex", xl: "none" }}
       alignItems="center"
       justifyContent={"center"}
-      
+
     >
       <Flex w="max-content" h="max-content" onClick={onOpen}>
         <IconButton aria-label="Menu" cursor="pointer" variant='outline'><Icon h="20px" w="20px" asChild><MdMenu /></Icon></IconButton>
@@ -128,7 +128,7 @@ export function SidebarResponsive(props: any) {
           </Drawer.Positioner>
 
         </Portal>
-</Drawer.Root>
+      </Drawer.Root>
     </Flex>
   );
 }

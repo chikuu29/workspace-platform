@@ -1,8 +1,8 @@
 import { Steps, Box, Flex, Avatar, Icon, Heading, HStack, Button, Text, Stack } from "@chakra-ui/react";
-import { useColorModeValue } from "../../../components/ui/color-mode";
+import { useColorModeValue } from "@/components/ui/color-mode";
 import { FaArrowRight, FaEye, FaUserAlt, FaUserCircle } from "react-icons/fa";
-import DynamicIcon from "../../../utils/app/renderStaticIcon";
-import LoadIcon from "../../../utils/hooks/LoadIcon";
+import DynamicIcon from "@/utils/app/renderStaticIcon";
+import LoadIcon from "@/utils/hooks/LoadIcon";
 import { MdOutlineArrowOutward } from "react-icons/md";
 
 const Members = () => {

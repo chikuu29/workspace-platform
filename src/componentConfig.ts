@@ -1,5 +1,4 @@
-import  { ComponentType } from "react";
-import { Subscription } from "rxjs";
+import { ComponentType } from "react";
 
 // Define the type for a lazy-loaded component
 type LazyComponent = () => Promise<{ default: ComponentType<any> }>;
@@ -17,18 +16,18 @@ interface ComponentConfig {
 // Define the componentConfig object
 const componentConfig: ComponentConfig = {
     "AdminModules": {
-        AdminModule: () => import("./views/modules/admin/AdminView"),
-        DatabaseStatistics: () => import("./views/modules/admin/DatabaseStatisticsView"),
+        AdminModule: () => import("@/features/modules/admin/AdminView"),
+        DatabaseStatistics: () => import("@/features/modules/admin/DatabaseStatisticsView"),
     },
     "myGym": {
-        GymView: () => import("./views/modules/gym/GymView"),
-        AddMember: () => import("./views/modules/gym/AddMember"),
-        Subscription: () => import("./views/modules/gym/Subscription"),
-        ListMember: () => import("./views/modules/gym/Members")
+        GymView: () => import("@/features/modules/gym/GymView"),
+        AddMember: () => import("@/features/modules/gym/AddMember"),
+        Subscription: () => import("@/features/modules/gym/Subscription"),
+        ListMember: () => import("@/features/modules/gym/Members")
     },
     "Default": {
-        myApps: () => import("./views/myApps/MyApps"),
-        pageNotFound: () => import("./pages/NoPageFound"),
+        myApps: () => import("@/features/myApps/MyApps"),
+        pageNotFound: () => import("@/pages/NoPageFound"),
     }
     // Add more mappings as needed
 };

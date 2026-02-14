@@ -70,10 +70,13 @@ import { motion } from "framer-motion";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { RiEyeCloseLine } from "react-icons/ri";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthProvider";
 import { useForm } from "react-hook-form";
-import { POSTAPI } from "../../../app/api";
-import AppOtp from "../../../features/components/auth/AppOtp";
-import { AlertProps } from "../../../app/types/appConfigInterface";
+import { POSTAPI } from "@/app/api";
+import AppOtp from "@/features/ui/components/auth/AppOtp";
+import { AlertProps } from "@/app/types/appConfigInterface";
+import { useSelector } from "react-redux";
+import { RootState } from "@/app/store";
 
 const MotionText = motion(Text);
 export default function SignUP() {

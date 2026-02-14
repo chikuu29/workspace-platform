@@ -1,8 +1,8 @@
-import { Steps, Box, Button, Flex, Radio, RadioGroup, Spacer, Stack, Field } from "@chakra-ui/react";
+import { Steps, Box, Button, Flex, RadioGroup, Spacer, Stack, Field } from "@chakra-ui/react";
 import { useColorModeValue } from "../../../components/ui/color-mode";
 import { useEffect, useState } from "react";
 import { FieldError, useFormContext, useWatch } from "react-hook-form";
-import { useScriptInstance } from "../../components/contexts/ScriptProvider";
+import { useScriptInstance } from "../../ui/components/contexts/ScriptProvider";
 import { FaTimes } from "react-icons/fa";
 import React from "react";
 
@@ -139,23 +139,25 @@ const RadioField = ({
                 flexWrap="wrap"
               >
                 {options.map((option) => (
-                  <Radio
+                  <RadioGroup.Item
                     key={option.value}
                     value={String(option.value)}
                     color="gray.600"
-                    // colorScheme="navy"
                     {...methods.register(name, {
                       required: required ? `${text} Field Is Required` : false,
                     })}
-                    onValueChange={(e: any) => {
-                      inputChanges(e);
-                      methods.setValue(name, e.target.value, {
-                        shouldValidate: true,
-                      });
-                    }}
                   >
-                    {option.label}
-                  </Radio>
+                    <RadioGroup.ItemHiddenInput
+                      onChange={(e) => {
+                        inputChanges(e);
+                        methods.setValue(name, e.target.value, {
+                          shouldValidate: true,
+                        });
+                      }}
+                    />
+                    <RadioGroup.ItemControl />
+                    <RadioGroup.ItemText fontWeight="medium">{option.label}</RadioGroup.ItemText>
+                  </RadioGroup.Item>
                 ))}
               </Stack>
 

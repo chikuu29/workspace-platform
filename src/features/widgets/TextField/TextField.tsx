@@ -3,7 +3,7 @@ import { useColorModeValue } from "../../../components/ui/color-mode";
 import { useEffect, useState } from "react";
 import React from "react";
 import { FieldError, useFormContext, useWatch } from "react-hook-form";
-import { useScriptInstance } from "../../components/contexts/ScriptProvider";
+import { useScriptInstance } from "../../ui/components/contexts/ScriptProvider";
 interface TEXTFIELD {
   name: string;
   text: string;
@@ -154,10 +154,10 @@ const TextField = ({
                 }),
               })}
               type={type}
-              variant="main"
+              variant="outline"
               id={name}
               placeholder={description}
-              onValueChange={(e) => {
+              onChange={(e) => {
                 inputChanges(e);
                 methods.setValue(name, e.target.value, {
                   shouldValidate: true,

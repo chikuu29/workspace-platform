@@ -16,16 +16,19 @@ interface ComponentConfig {
 // Define the componentConfig object
 const componentConfig: ComponentConfig = {
     "AdminModules": {
-        AdminModule: () => import("@/features/modules/admin/AdminView"),
+        layout: () => import("@/features/ui/layouts/workspace"),
+        home: () => import("@/features/modules/admin/AdminView"),
         DatabaseStatistics: () => import("@/features/modules/admin/DatabaseStatisticsView"),
     },
     "myGym": {
+        layout: () => import("@/features/ui/layouts/workspace"),
         GymView: () => import("@/features/modules/gym/GymView"),
         AddMember: () => import("@/features/modules/gym/AddMember"),
         Subscription: () => import("@/features/modules/gym/Subscription"),
         ListMember: () => import("@/features/modules/gym/Members")
     },
     "Default": {
+        layout: () => import("@/features/ui/layouts/workspace"),
         myApps: () => import("@/features/myApps/MyApps"),
         pageNotFound: () => import("@/pages/NoPageFound"),
     }

@@ -6,19 +6,12 @@ import {
   Input,
   useDisclosure,
   Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
   Image,
   IconButton,
   Text,
-  useToast,
   VStack,
   HStack,
   Heading,
-  TableContainer,
   Field,
   Dialog,
   Portal,
@@ -39,7 +32,7 @@ import {
 import { FcOldTimeCamera, FcStackOfPhotos, FcVideoCall } from "react-icons/fc";
 import { POSTAPI } from "../../../app/api";
 
-import { LuUploadCloud } from "react-icons/lu";
+import { LuUpload } from "react-icons/lu";
 
 interface UPLOAD {
   name: string;
@@ -76,7 +69,7 @@ const UploadField = ({
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const toast = useToast();
+  // const toast = useToast();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [liveCameraActive, setLiveCameraActive] = useState<boolean>(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -184,13 +177,7 @@ const UploadField = ({
 
     if (files.length > 0) {
       handleFileChange({ target: { files: files } } as any);
-      toast({
-        title: "Files added.",
-        description: `${files.length} file(s) added successfully.`,
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
+      console.log("Files added.", `${files.length} file(s) added successfully.`);
     }
   };
   const handleButtonClick = () => {
@@ -212,22 +199,9 @@ const UploadField = ({
     } catch (error) {
       setLiveCameraActive(false);
       if (error instanceof DOMException && error.name === "NotAllowedError") {
-        toast({
-          title: "Camera Access Denied",
-          description:
-            "We couldn't access your camera. Please enable camera permissions in your browser settings.",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
+        console.log("Camera Access Denied. We couldn't access your camera.");
       } else {
-        toast({
-          title: "Error",
-          description: "An error occurred while trying to access your camera.",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
+        console.log("Error. An error occurred while trying to access your camera.");
       }
     }
   };
@@ -366,7 +340,7 @@ const UploadField = ({
         </Field.Root>
       </Box>
       {/* Modal for file selection */}
-      <Dialog.Root open={isOpen} size='xl' placement='center' onOpenChange={e => {
+      <Dialog.Root open={open} size='xl' placement='center' onOpenChange={e => {
         if (!e.open) {
           onClose();
         }
@@ -428,7 +402,7 @@ const UploadField = ({
                             </Heading>
                             {/* Live video feed */}
 
-                            <Box autoPlay style={{ width: "100%", maxHeight: "400px" }} asChild><video ref={videoRef} /></Box>
+                            <Box style={{ width: "100%", maxHeight: "400px" }} asChild><video ref={videoRef} autoPlay /></Box>
                           </Box>
                         )}
 
@@ -502,7 +476,7 @@ const UploadField = ({
                   type="file"
                   accept={accept}
                   capture={capture}
-                  onValueChange={handleFileChange}
+                  onChange={handleFileChange}
                   multiple={multiple}
                   mt={4}
                   ref={fileInputRef}
@@ -737,7 +711,7 @@ const UploadField = ({
                     _hover={{
                       bgGradient: "linear(to-r, green.300, teal.400, blue.400)",
                       boxShadow: "xl",
-                    }}><LuUploadCloud />Confirm & Upload
+                    }}><LuUpload />Confirm & Upload
                   </Button>
                 )}
 

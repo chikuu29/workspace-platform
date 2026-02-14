@@ -3,10 +3,10 @@ import RunTimeWidgetRender from "./RunTimeWidget";
 import { FormProvider, useForm } from "react-hook-form";
 import { memo, useEffect, useState, forwardRef } from "react";
 import { GETAPI } from "../../app/api";
-import { ScriptProvider } from "../components/contexts/ScriptProvider";
-import Loader from "../components/Loader/Loader";
+import { ScriptProvider } from "../ui/components/contexts/ScriptProvider";
+import Loader from "../ui/components/Loader/Loader";
 
-const WidgetUIBuilder = forwardRef(({ formData = {}, ...rest }, ref) => {
+const WidgetUIBuilder = forwardRef<any, any>(({ formData = {}, ...rest }, ref) => {
   console.log("%c===Widget UI Builder===", "color:green");
   // const {WidgetSubmitRef,WidgetResetButtonRef}=ref
 
@@ -66,9 +66,8 @@ const WidgetUIBuilder = forwardRef(({ formData = {}, ...rest }, ref) => {
 
             {/* Skeleton for Form Helper Text */}
             <SkeletonText
-              lineClamp={1}
+              noOfLines={1}
               gap="4"
-              skeletonHeight="10px"
               width="50%"
             />
           </Box>

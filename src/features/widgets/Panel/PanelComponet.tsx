@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Steps, Box, Button, Collapsible, Text, Flex } from "@chakra-ui/react";
 import RunTimeWidgetRender from "../RunTimeWidget";
 
-import PanelNavBarAction from "../../components/navbar/AppNavBarAction";
+import PanelNavBarAction from "../../ui/components/navbar/NavbarActions";
 import { LuChevronDown, LuChevronUp } from 'react-icons/lu';
 interface PanelConfig {
   name: string;
@@ -38,7 +38,7 @@ const CollapsiblePanel: React.FC<PanelConfig> = ({
     <Box borderWidth="1px" borderRadius="lg" mb={4} overflow="hidden">
       <Button
         onClick={togglePanel}
-        variant="header"
+        variant="ghost"
         width="100%"
         // bg="navy.400"
         // bg="whiteAlpha.200"

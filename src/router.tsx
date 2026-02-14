@@ -3,7 +3,9 @@ import { Navigate, createBrowserRouter, RouteObject } from "react-router";
 import { Suspense, lazy } from "react";
 import { AppLoader } from "./features/ui/components/Loader/Loader";
 import HandleDynamicView from "./utils/app/HandleDynamicView";
+import DynamicLayout from "./utils/app/DynamicLayout";
 
+const PageNotFound = lazy(() => import("./pages/NoPageFound"));
 const AuthCallback = lazy(() => import("@/features/auth/AuthCallback"));
 const AuthLayout = lazy(() => import("@/features/ui/layouts/auth/auth"));
 const SignInPage = lazy(() => import("@/features/auth/signin/SignIn"));
@@ -67,7 +69,8 @@ const routes: RouteObject[] = [
       <Suspense fallback={<AppLoader />}>
         <AuthProvider>
           <PrivateRoute>
-            <WorkspaceLayout />
+            <DynamicLayout />
+            {/* <WorkspaceLayout /> */}
           </PrivateRoute>
         </AuthProvider>
       </Suspense>
@@ -109,7 +112,7 @@ const routes: RouteObject[] = [
   },
   {
     path: "*",
-    element: <Navigate to="/pageNotFound" replace />,
+    element: <PageNotFound />,
   },
 ];
 

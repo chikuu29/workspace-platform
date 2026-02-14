@@ -63,9 +63,10 @@ export default function MyApps() {
   };
 
   return (
-    <Box minH="100vh" bg={bgPage}>
+    <Box minH="100vh" bg={bgPage} borderRadius={[20, 20, 20, 20]}>
       {/* Sticky Header Section */}
       <Box
+        borderRadius={20}
         position="sticky"
         top="115px"
         zIndex={100}
@@ -77,45 +78,45 @@ export default function MyApps() {
         px={6}
         boxShadow="sm"
       >
-        <Container maxW="7xl">
-          <Flex justify="space-between" align="center" gap={4} wrap="wrap">
-            <Flex align="center" gap={3}>
-              <Center p={2} bg="brand.500" borderRadius="lg" color="white">
-                <Icon as={LuLayoutGrid} boxSize={5} />
-              </Center>
-              <VStack align="start" gap={0}>
-                <Text fontSize="lg" fontWeight="bold" lineHeight="1.2">
-                  My Applications
-                </Text>
-                <Text fontSize="xs" color="gray.500">
-                  Access your workspace tools
-                </Text>
-              </VStack>
-            </Flex>
-
-            <Box w={{ base: "100%", md: "400px" }}>
-              <InputGroup flex="1" startElement={<Icon as={LuSearch} color="gray.400" />}>
-                <Input
-                  placeholder="Search apps..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  bg={searchBg}
-                  borderRadius="full"
-                  border="1px solid"
-                  borderColor={useColorModeValue("gray.200", "whiteAlpha.200")}
-                  _focus={{
-                    borderColor: "brand.500",
-                    boxShadow: "0 0 0 1px var(--chakra-colors-brand-500)"
-                  }}
-                />
-              </InputGroup>
-            </Box>
+        {/* <Container maxW="7xl"> */}
+        <Flex justify="space-between" align="center" gap={4} wrap="wrap">
+          <Flex align="center" gap={3}>
+            <Center p={2} bg="brand.500" borderRadius="lg" color="white">
+              <Icon as={LuLayoutGrid} boxSize={5} />
+            </Center>
+            <VStack align="start" gap={0}>
+              <Text fontSize="lg" fontWeight="bold" lineHeight="1.2">
+                My Applications
+              </Text>
+              <Text fontSize="xs" color="gray.500">
+                Access your workspace tools
+              </Text>
+            </VStack>
           </Flex>
-        </Container>
+
+          <Box>
+            <InputGroup flex="1" startElement={<Icon as={LuSearch} color="gray.400" />}>
+              <Input
+                placeholder="Search apps..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                bg={searchBg}
+                borderRadius="full"
+                border="1px solid"
+                borderColor={useColorModeValue("gray.200", "whiteAlpha.200")}
+                _focus={{
+                  borderColor: "brand.500",
+                  boxShadow: "0 0 0 1px var(--chakra-colors-brand-500)"
+                }}
+              />
+            </InputGroup>
+          </Box>
+        </Flex>
+        {/* </Container> */}
       </Box>
 
       {/* Main Content */}
-      <Container maxW="7xl" py={8} px={6}>
+      <Box py={8} px={6}>
         {!error && (
           <>
             {filteredApps.length > 0 ? (
@@ -128,7 +129,7 @@ export default function MyApps() {
             )}
           </>
         )}
-      </Container>
+      </Box>
     </Box>
   );
 }

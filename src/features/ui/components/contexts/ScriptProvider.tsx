@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import loadScripts from "../../../utils/app/loadScript";
+import loadScripts from "@/utils/app/loadScript";
 import Loader from "../Loader/Loader";
 // Define the shape of your context
 interface DynamicImportContextType {
-  getScriptInstance:any[];
-  scriptFiles:string []
+  getScriptInstance: any[];
+  scriptFiles: string[]
   // scriptInstance: (scriptFiles: string[]) => Promise<any[]>;
 }
 
@@ -18,8 +18,8 @@ export const ScriptProvider: React.FC<{
   scriptFiles: string[];
 }> = ({ children, scriptFiles }) => {
   console.log("Script Provider", scriptFiles);
-  const [scriptInstance,setScriptInstance]=useState<any>(null)
-  const [loading,setLoading]=useState(true)
+  const [scriptInstance, setScriptInstance] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
   useEffect(() => {
     (async () => {
       console.log("Loading Script Instance");
@@ -36,11 +36,11 @@ export const ScriptProvider: React.FC<{
   if (loading) {
 
     return (
-      <Loader loaderText="Just a moment , we're getting things ready for you..."/>
+      <Loader loaderText="Just a moment , we're getting things ready for you..." />
     ); // Or a loading spinner
   }
   return (
-    <ScriptContext.Provider value={{ getScriptInstance:scriptInstance,scriptFiles:scriptFiles }}>
+    <ScriptContext.Provider value={{ getScriptInstance: scriptInstance, scriptFiles: scriptFiles }}>
       {!loading && children}
     </ScriptContext.Provider>
   );

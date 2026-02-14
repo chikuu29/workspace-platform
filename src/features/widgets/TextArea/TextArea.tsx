@@ -4,7 +4,7 @@ import { useColorModeValue } from "../../../components/ui/color-mode";
 
 import { memo, useEffect, useState } from "react";
 import { FieldError, useFormContext, useWatch } from "react-hook-form";
-import { useScriptInstance } from "../../components/contexts/ScriptProvider";
+import { useScriptInstance } from "../../ui/components/contexts/ScriptProvider";
 
 interface TEXTAREA {
   name: string;
@@ -154,10 +154,10 @@ const TextArea = ({
                 }),
               })}
               // required={required}
-              variant="main"
+              // variant="main"
               id={name}
               placeholder={description}
-              onValueChange={(e: any) => {
+              onChange={(e: any) => {
                 inputChanges(e);
                 methods.setValue(name, e.target.value, {
                   shouldValidate: true,

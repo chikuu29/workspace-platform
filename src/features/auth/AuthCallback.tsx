@@ -1,8 +1,5 @@
-import axios from "axios";
-import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-// import { useHistory } from 'react-router-dom';
-import { v4 as uuidv4 } from "uuid";
+import { useEffect } from "react";
+import { useNavigate } from "react-router";
 import { POSTAPI } from "../../app/api";
 import { getOrCreateDeviceId } from "../../utils/services/appServices";
 import { fetchAppConfig } from "../../app/slices/appConfig/appConfigSlice";
@@ -12,123 +9,84 @@ import { AppDispatch } from "../../app/store";
 import { useAuth } from "../../contexts/AuthProvider";
 
 const AuthCallback = () => {
-  //   const history = useHistory();
-  console.log("====CALLING AUTHCALLBACK===");
-
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const { setLoginAuthInfo } = useAuth();
+
+  // Constants for OAuth configuration
   const clientId = "work_space_platform";
   const clientSecret = "Demo@123";
-  // const tokenUrl = "https://myomspanel.onrender.com/api/oauth/token/";
-  const tokenUrl = "https://localhost:5173s/api/oauth/token/";
-  const dispatch = useDispatch<AppDispatch>();
-  const { loading, authInfo, setLoginAuthInfo } = useAuth();
+  const redirectUrl = "http://localhost:5173/auth/callback";
+
   useEffect(() => {
+    // 1. Extract the authorization code from URL parameters
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
-    console.log("code", code);
 
     if (code) {
       exchangeAuthorizationCode(code);
+    } else {
+      console.error("No authorization code found in URL");
+      navigate("/auth/login"); // Redirect back to login if no code
     }
   }, []);
 
   const exchangeAuthorizationCode = async (code: string) => {
     const deviceId = getOrCreateDeviceId();
 
-    try {
-      // Create URLSearchParams for x-www-form-urlencoded encoding
-      const formData = new URLSearchParams({
-        client_id: clientId,
-        client_secret: clientSecret,
-        grant_type: "authorization_code", // Correct value
-        code,
-        redirect_uri: "http://localhost:5173/auth/callback",
-        device_id: deviceId,
-      });
+    // 2. Prepare the payload for token exchange
+    const apiRequestData = {
+      client_id: clientId,
+      client_secret: clientSecret,
+      grant_type: "authorization_code",
+      code,
+      redirect_url: redirectUrl,
+      device_id: deviceId,
+    };
 
-      // Make POST request with proper headers
-      // const response = await axios.post(tokenUrl, formData, {
-      //   headers: {
-      //     "Cache-Control": "no-cache", // Cache-Control header is optional
-      //     "Content-Type": "application/x-www-form-urlencoded", // Required
-      //   },
-      // });
-      // console.log("resposce", response);
-
-      // // Store tokens in localStorage
-      // const { access_token, refresh_token } = response.data;
-      // localStorage.setItem("access_token", access_token);
-      // localStorage.setItem("refresh_token", refresh_token);
-      const apiRequestData = {
-        client_id: clientId,
-        client_secret: clientSecret,
-        grant_type: "authorization_code", // Correct value
-        code,
-        redirect_url: "http://localhost:5173/auth/callback",
-        device_id: deviceId,
-      };
-      POSTAPI({
-        path: "oauth/token",
-        data: apiRequestData,
-        isPrivateApi: true,
-      }).subscribe((res: any) => {
-        console.log(res);
+    // 3. call the API to exchange the code for tokens
+    POSTAPI({
+      path: "oauth/token",
+      data: apiRequestData,
+      isPrivateApi: true,
+    }).subscribe({
+      next: (res: any) => {
         if (res.success) {
+          // 4. Store tokens and user info in localStorage
           localStorage.setItem("access_token", res.access_token);
           localStorage.setItem("id_token", res.id_token);
           localStorage.setItem("login_info", JSON.stringify(res.login_info));
-          localStorage.setItem("tenant_name", res["login_info"]["tenant_name"]);
+          localStorage.setItem("tenant_name", res.login_info?.tenant_name);
           localStorage.setItem("authInfo", JSON.stringify(res));
-          // Ensure data is set before navigating
 
-          let loginInfo: any = {};
-          loginInfo["login_info"] = res.login_info || {};
-          loginInfo.access_token = res.access_token;
-          loginInfo.success = true;
-          loginInfo.isAuthenticated = true;
-          // loginInfo.login_info=storedLoginInfo
+          // 5. Construct the login info object for Redux state
+          const loginInfo = {
+            login_info: res.login_info || {},
+            access_token: res.access_token,
+            success: true,
+            isAuthenticated: true,
+          };
 
-          console.log("Login Info:", loginInfo);
-          setLoginAuthInfo(res["login_info"]);
+          // 6. Update application state
+          setLoginAuthInfo(res.login_info);
           dispatch(fetchAppConfig());
-          // setAuthInfo(loginInfo); // No need for unnecessary nesting
           dispatch(login(loginInfo));
-          navigate(`/${res["login_info"]["tenant_name"]}/myApps`);
 
+          // 7. Redirect to the main application area
+          navigate("/myApps");
+        } else {
+          console.error("Token exchange failed:", res.message);
+          navigate("/auth/login"); // Redirect on failure
         }
-      });
-
-      // Navigate to the next page
-      // navigate("/app/myApps");
-    } catch (error: any) {
-      console.error(
-        "Error exchanging authorization code:",
-        error.response?.data || error
-      );
-    }
+      },
+      error: (error: any) => {
+        console.error("Error exchanging authorization code:", error);
+        navigate("/auth/login"); // Redirect on error
+      }
+    });
   };
 
   return <div>Processing login...</div>;
-
-  // useEffect(() => {
-  //   // Extract query parameters
-  //   const query = new URLSearchParams(window.location.search);
-  //   const accessToken = query.get('accessToken');
-
-  //   if (accessToken) {
-  //     // Store the access token (e.g., in local storage or state management)
-  //     localStorage.setItem('accessToken', accessToken);
-
-  //     // Redirect to your application's main page or wherever necessary
-  //   //   history.push('/dashboard'); // Change to your desired route
-  //   } else {
-  //     // Handle missing access token (e.g., redirect to login page)
-  //     console.error('No access token received');
-  //   //   history.push('/login'); // Redirect to login page
-  //   }
-  // }, [history]);
-
-  // return <div>Loading...</div>; // Optional loading state
 };
 
 export default AuthCallback;

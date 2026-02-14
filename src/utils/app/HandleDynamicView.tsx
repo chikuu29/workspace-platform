@@ -1,6 +1,6 @@
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router";
 import { lazy, Suspense, useMemo } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate } from "react-router";
 import { AppLoader } from "@/features/ui/components/Loader/Loader";
 import componentConfig from "../../componentConfig"; // Adjust the path accordingly
 import React from "react";

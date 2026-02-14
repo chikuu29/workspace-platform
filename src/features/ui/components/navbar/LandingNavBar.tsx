@@ -12,9 +12,9 @@ import {
   useBreakpointValue,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useColorModeValue } from "../../../components/ui/color-mode";
+import { useColorModeValue } from "@/components/ui/color-mode";
 import { GrDocumentStore } from "react-icons/gr";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { LuChevronDown, LuChevronRight, LuMenu, LuX } from 'react-icons/lu';
 export default function WithSubnavigation() {
   const { open, onToggle } = useDisclosure();
@@ -37,7 +37,7 @@ export default function WithSubnavigation() {
           ml={{ base: -2 }}
           display={{ base: "flex", md: "none" }}
         >
-          <IconButton onClick={onToggle} variant={"ghost"} aria-label={"Toggle Navigation"}>{isOpen ? <Icon as={LuX} w={3} h={3} /> : <Icon as={LuMenu} w={5} h={5} />}</IconButton>
+          <IconButton onClick={onToggle} variant={"ghost"} aria-label={"Toggle Navigation"}>{open ? <Icon as={LuX} w={3} h={3} /> : <Icon as={LuMenu} w={5} h={5} />}</IconButton>
         </Flex>
         <Flex flex={{ base: 1 }} justify={{ base: "center", md: "start" }}>
           <Icon h="24px" w="24px" color="white" mr={2} asChild><GrDocumentStore /></Icon>
@@ -60,7 +60,7 @@ export default function WithSubnavigation() {
           direction={"row"}
           gap={6}
         >
-          <Button fontSize={"sm"} fontWeight={400} variant={"link"} asChild><Link to={"/auth/login"}>Sign In
+          <Button fontSize={"sm"} fontWeight={400} variant={"plain"} asChild><Link to={"/auth/login"}>Sign In
           </Link></Button>
           <Button
             display={{ base: "none", md: "inline-flex" }}
@@ -75,7 +75,7 @@ export default function WithSubnavigation() {
             </Link></Button>
         </Stack>
       </Flex>
-      <Collapsible.Root open={isOpen}>
+      <Collapsible.Root open={open}>
         <Collapsible.Content>
           <MobileNav />
         </Collapsible.Content>
@@ -208,13 +208,13 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
           {children && (
             <Icon
               transition={"all .25s ease-in-out"}
-              transform={isOpen ? "rotate(180deg)" : ""}
+              transform={open ? "rotate(180deg)" : ""}
               w={6}
               h={6}
               asChild><LuChevronDown /></Icon>
           )}
         </a></Box>
-      <Collapsible.Root open={isOpen} style={{ marginTop: "0!important" }}>
+      <Collapsible.Root open={open} style={{ marginTop: "0!important" }}>
         <Collapsible.Content>
           <Stack
             mt={2}

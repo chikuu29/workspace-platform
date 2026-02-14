@@ -1,6 +1,6 @@
 // src/PrivateRoute.tsx
 import React from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, useLocation } from "react-router";
 import { useAuth } from "./AuthProvider";
 import { GetNavMenuConfig } from "../utils/services/appServices";
 import Loader from "@/features/ui/components/Loader/Loader";

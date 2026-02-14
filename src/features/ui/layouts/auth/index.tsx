@@ -1,6 +1,6 @@
 import { Steps, Box } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router";
 import SignInPage from "@/features/auth/signin/SignIn";
 
 export default function Auth() {

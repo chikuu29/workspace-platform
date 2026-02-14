@@ -1,4 +1,4 @@
-import MyTable from "../../../features/components/Tables/MyTables";
+import MyTable from "@/features/ui/components/Tables/MyTables";
 
 
 import RevenuAnalytics from "./RevenuAnalytics";

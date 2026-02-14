@@ -1,7 +1,6 @@
 import { Steps, Box, Flex } from "@chakra-ui/react";
-import { Outlet } from "react-router-dom";
+import { Outlet } from "react-router";
 
-import FixedPlugin from "../../components/fixedPlugin/FixedPlugin";
 import { FullscreenButton } from "@/components/ui/fullscreen-button";
 import { ColorModeButton } from "@/components/ui/color-mode";
 

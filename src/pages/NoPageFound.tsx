@@ -1,8 +1,8 @@
 // NotFound.js
 import React from "react";
 import { Steps, Box, Heading, Text, Button } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
-// import { useHistory } from 'react-router-dom';
+import { Link } from "react-router";
+// import { useHistory } from 'react-router';
 
 const NoPageFound = () => {
   // const history = useHistory();
@@ -41,7 +41,7 @@ const NoPageFound = () => {
         color="white"
         variant="solid"
         asChild><Link to={'/myApps'}>Go to Home
-              </Link></Button>
+        </Link></Button>
     </Box>
   );
 };

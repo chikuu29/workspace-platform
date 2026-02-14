@@ -5,7 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useDispatch } from "react-redux";
 import { login, logout } from "@/app/slices/auth/authSlice";
 import { GETAPI } from "@/app/api";

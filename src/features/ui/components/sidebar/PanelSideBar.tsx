@@ -87,11 +87,7 @@ export function SidebarResponsive(props: any) {
       <Flex w="max-content" h="max-content" onClick={onOpen}>
         <IconButton aria-label="Menu" cursor="pointer" variant='outline'><Icon h="20px" w="20px" asChild><MdMenu /></Icon></IconButton>
       </Flex>
-      <Drawer.Root open={isOpen} placement={"left"} onOpenChange={e => {
-        if (!e.open) {
-          onClose();
-        }
-      }}>
+      <Drawer.Root open={open} placement={"start"} onOpenChange={(e) => (e.open ? onOpen() : onClose())}>
         <Portal>
 
           <Drawer.Positioner>

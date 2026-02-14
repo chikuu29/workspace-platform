@@ -14,7 +14,7 @@ import { Alert } from "@/components/ui/alert";
 import { Field } from "@/components/ui/field";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { POSTAPI } from "@/app/api";

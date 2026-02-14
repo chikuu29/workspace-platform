@@ -1,6 +1,6 @@
 import { Steps, Box, HStack, VStack, Text } from "@chakra-ui/react";
 import { useColorMode, useColorModeValue } from "@/components/ui/color-mode";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router";
 // import DashBoard from "@/features/dashboard/DashBoard";
 import * as dynamicFunctions from "@/script/myAppsScript";
 // import { IconType } from 'react-icons';

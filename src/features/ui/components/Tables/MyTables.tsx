@@ -1,12 +1,7 @@
 import {
   Steps,
   Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  TableContainer,
+
   Box,
   Button,
   Flex,
@@ -17,7 +12,7 @@ import {
   useBreakpointValue,
   Stack,
 } from "@chakra-ui/react";
-import { useColorModeValue } from "../../../components/ui/color-mode";
+import { useColorModeValue } from "@/components/ui/color-mode";
 import { FaPlus, FaFilter, FaEdit, FaEye, FaTrash } from "react-icons/fa";
 import { HSeparator } from "../separator/Separator";
 
@@ -62,7 +57,7 @@ function MyTable() {
           maxH="100vh"
           // overflow="hidden"
           overflowY="auto"
-          // overflowX="scroll" // Enable horizontal scrolling
+        // overflowX="scroll" // Enable horizontal scrolling
         >
           <Table.Root>
             {/* Ensures the table is wide enough for horizontal scrolling */}
@@ -161,18 +156,18 @@ function MyTable() {
               </Box>
               {/* Action Buttons Section */}
               <Stack direction="row" gap={4} mt={4}>
-              {/* View Button */}
-              <Button colorPalette="teal"><FaEye />View
-                              </Button>
+                {/* View Button */}
+                <Button colorPalette="teal"><FaEye />View
+                </Button>
 
-              {/* Edit Button */}
-              <Button colorPalette="blue"><FaEdit />Edit
-                              </Button>
+                {/* Edit Button */}
+                <Button colorPalette="blue"><FaEdit />Edit
+                </Button>
 
-              {/* Delete Button */}
-              <Button colorPalette="red"><FaTrash />Delete
-                              </Button>
-            </Stack>
+                {/* Delete Button */}
+                <Button colorPalette="red"><FaTrash />Delete
+                </Button>
+              </Stack>
             </Box>
           ))}
         </Box>

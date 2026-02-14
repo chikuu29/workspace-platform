@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router";
 import { AppDispatch, RootState } from "../../app/store";
 import { SET_APP_CONFIG_STATE } from "../../app/slices/appConfig/appConfigSlice";
 import { useEffect } from "react";

@@ -1,4 +1,4 @@
-import { Steps, Button, useDisclosure, Dialog, Portal, Icon } from "@chakra-ui/react";
+import { Button, useDisclosure, Dialog, Portal, Icon } from "@chakra-ui/react";
 import React, { useEffect, useRef } from "react";
 import { LuRepeat } from 'react-icons/lu';
 
@@ -26,16 +26,14 @@ const AppVersionAlert: React.FC<AppVersionInterface> = ({
 
   return (
     <Dialog.Root
-      open={isOpen}
+      open={open}
       initialFocusEl={() => cancelRef.current}
+      onOpenChange={(e) => {
+        if (!e.open) onClose();
+      }}
       closeOnInteractOutside={false}
-      placement='center'
-      role='alertdialog'
-      onOpenChange={e => {
-        if (!e.open) {
-          onClose();
-        }
-      }}>
+      role="alertdialog"
+    >
       <Portal>
 
         <Dialog.Backdrop>
@@ -43,34 +41,33 @@ const AppVersionAlert: React.FC<AppVersionInterface> = ({
             <div className="before"></div>
             <div className="after"></div>
           </div>
-          <Dialog.Positioner>
-            <Dialog.Content borderRadius={"15px"}>
-              <Dialog.Header
-                fontSize="lg"
-                fontWeight="bold"
-                color={"green"}
-                textAlign={"center"}
-                borderRadius={"15px"}
-              >
-                New Version Available
-              </Dialog.Header>
-              <Dialog.Body textAlign="center" fontWeight={100}>
-                A new version is available. You're currently running an older
-                version. Please refresh to update.
-              </Dialog.Body>
-              <Dialog.Footer>
-                <Button
-                  colorPalette="green"
-                  variant="outline"
-                  onClick={handleRefresh}
-                  ml={3}
-                  width="100%"><Icon as={LuRepeat} style={{ animation: "spin 2s linear infinite" }} />Refresh Now
-                                  </Button>
-              </Dialog.Footer>
-            </Dialog.Content>
-          </Dialog.Positioner>
         </Dialog.Backdrop>
-
+        <Dialog.Positioner>
+          <Dialog.Content borderRadius={"15px"}>
+            <Dialog.Header
+              fontSize="lg"
+              fontWeight="bold"
+              color={"green"}
+              textAlign={"center"}
+              borderRadius={"15px"}
+            >
+              New Version Available
+            </Dialog.Header>
+            <Dialog.Body textAlign="center" fontWeight={100}>
+              A new version is available. You're currently running an older
+              version. Please refresh to update.
+            </Dialog.Body>
+            <Dialog.Footer>
+              <Button
+                colorPalette="green"
+                variant="outline"
+                onClick={handleRefresh}
+                ml={3}
+                width="100%"><Icon as={LuRepeat} style={{ animation: "spin 2s linear infinite" }} />Refresh Now
+              </Button>
+            </Dialog.Footer>
+          </Dialog.Content>
+        </Dialog.Positioner>
       </Portal>
     </Dialog.Root>
   );

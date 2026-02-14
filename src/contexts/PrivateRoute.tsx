@@ -3,7 +3,7 @@ import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "./AuthProvider";
 import { GetNavMenuConfig } from "../utils/services/appServices";
-import Loader from "../features/components/Loader/Loader";
+import Loader from "@/features/ui/components/Loader/Loader";
 // import isAuthenticated from './auth';
 
 interface PrivateRouteProps {

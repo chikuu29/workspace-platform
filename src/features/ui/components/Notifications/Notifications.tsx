@@ -1,14 +1,15 @@
-import { Steps, Flex, Skeleton, Text, VStack } from "@chakra-ui/react";
+import { Flex, Skeleton, Text, VStack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { GETAPI } from "../../../app/api";
+import { GETAPI } from "@/app/api";
+import { MenuItem } from "@/components/ui/menu";
 
 export default function Notifications() {
-//   const notifications = [
-//     { id: 1, info: "You have a new message", aName: "Alice" },
-//     { id: 2, info: "Class starts at 6 PM", aName: "Gym" },
-//   ];
-  const [notifications,setNotifications]=useState<any[]>([])
-  const [loading,setLoading]=useState(true)
+  //   const notifications = [
+  //     { id: 1, info: "You have a new message", aName: "Alice" },
+  //     { id: 2, info: "Class starts at 6 PM", aName: "Gym" },
+  //   ];
+  const [notifications, setNotifications] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     setLoading(true)
@@ -21,14 +22,14 @@ export default function Notifications() {
     }).subscribe((res: any) => {
       console.log("%c ==== GETTING NOTIFICATION ===", "color:red", res);
       setLoading(false)
-      if(res.success && res.results){
+      if (res.success && res.results) {
         setNotifications(res["results"])
       }
     });
   }, []);
 
- 
-  if(loading){
+
+  if (loading) {
     return (
       <VStack gap={4}>
         <Skeleton height="20px" width="100%" />
@@ -44,6 +45,7 @@ export default function Notifications() {
         notifications.map((notification) => (
           <MenuItem
             key={notification.id}
+            value={notification.id.toString()}
             _hover={{ bg: "none" }}
             _focus={{ bg: "none" }}
             p="2"

@@ -1,4 +1,4 @@
-import { Steps, Avatar, Flex, Icon, Menu, Text, IconButton, Portal } from "@chakra-ui/react";
+import { Avatar, Flex, Icon, Menu, Text, IconButton, Portal } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
 // import { mode } from "@chakra-ui/theme-tools";
 import DarkModeLightMode from "../darkLightMode/DarkModeLightMode";
@@ -46,18 +46,13 @@ export default function PanelNavBarAction() {
       justifyContent={"end"}
       flexDirection="row"
     >
-      <Menu.Root>
-        <DarkModeLightMode
-          // marginEnd="7px"
-          // boxShadow={shadow}
-          cursor="pointer"
-          color={navbarIcon}
-        // borderRadius="8px"
-        />
-      </Menu.Root>
+      <DarkModeLightMode
+        cursor="pointer"
+        color={navbarIcon}
+      />
       <NotificationMenu />
       <Menu.Root>
-        <Menu.Trigger>
+        <Menu.Trigger asChild>
           <Avatar.Root
             boxShadow="rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px"
             _hover={{ cursor: "pointer" }}

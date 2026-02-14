@@ -1,4 +1,4 @@
-import { Steps, Box, Text, Flex, Icon, Popover, Stack, HStack, useBreakpointValue } from "@chakra-ui/react";
+import { Box, Text, Flex, Icon, Popover, Stack, HStack, useBreakpointValue } from "@chakra-ui/react";
 import { useColorMode, useColorModeValue } from "@/components/ui/color-mode";
 // import { APP_CONFIG_STATE } from "@/app/types/appConfigInterface";
 // import { RootState } from "@/app/store";

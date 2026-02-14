@@ -1,12 +1,12 @@
-import { Steps, VStack, Text } from "@chakra-ui/react";
-import { useColorModeValue } from "../../../components/ui/color-mode";
+import { VStack, Text } from "@chakra-ui/react";
+import { useColorModeValue } from "@/components/ui/color-mode";
 import React from "react";
 import MenuLink from "./components/MenuLink";
 import { HSeparator } from "../separator/Separator";
 
 import { useSelector } from "react-redux";
-import { RootState } from "../../../app/store";
-import { APP_CONFIG_STATE } from "../../../types/appConfigInterface";
+import { RootState } from "@/app/store";
+import { APP_CONFIG_STATE } from "@/app/types/appConfigInterface";
 // import { APP_STATE } from "../../../types/appConfigInterface";
 
 interface SideNavPropsType {
@@ -16,10 +16,10 @@ export default function SideNavMenuBuilder(props: SideNavPropsType) {
   console.log("%c ==== EXECUTE SIDENAVMENU BUILDER ====", "color:green");
   const { showFullSideBarMenu } = props;
   let textColor = useColorModeValue("secondaryGray.500", "white");
-  const {FEATURE}: APP_CONFIG_STATE = useSelector(
+  const { FEATURE }: APP_CONFIG_STATE = useSelector(
     (state: RootState) => state.app.AppConfigState
   );
-  if (FEATURE.length==0) {
+  if (FEATURE.length == 0) {
     console.log("NO FEATURE AVAILBLE");
     return null;
   }

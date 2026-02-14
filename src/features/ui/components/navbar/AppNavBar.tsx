@@ -1,13 +1,13 @@
-import { Steps, Box, Flex, Icon, IconButton } from "@chakra-ui/react";
+import { Box, Flex, Icon, IconButton } from "@chakra-ui/react";
 
-import { useColorMode, useColorModeValue } from "../../../components/ui/color-mode";
+import { useColorMode, useColorModeValue } from "@/components/ui/color-mode";
 
 import PanelNavBarAction from "./AppNavBarAction";
 import { MdMenu } from "react-icons/md";
 import { SidebarResponsive } from "../sidebar/PanelSideBar";
 import Brand from "../Brand/Brand";
 import TopNavMenuBuilder from "./TopNavMenuBuilder";
-import  { memo } from "react";
+import { memo } from "react";
 // import React from "react";
 interface AppNavType {
   DISPLAY_TYPE: any[];
@@ -49,7 +49,7 @@ const AppNav = ({
       minH="75px"
       justifyContent={{ xl: "center" }}
       mx="auto"
-    
+
       w="100%"
     >
       <Flex

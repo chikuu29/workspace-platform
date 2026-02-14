@@ -1,16 +1,15 @@
 import React from "react";
-import { useColorModeValue } from "../../../components/ui/color-mode";
+import { useColorModeValue } from "@/components/ui/color-mode";
 import {
-  Steps,
   Badge,
   Box,
   Flex,
   Icon,
   IconButton,
-  Menu,
   Text,
   useDisclosure,
   Portal,
+  Menu,
 } from "@chakra-ui/react";
 import { MdNotificationsNone } from "react-icons/md";
 import { HSeparator } from "../separator/Separator";
@@ -25,47 +24,60 @@ const NotificationMenu: React.FC = () => {
     // Here you could set notifications to an empty array or any logic you'd like
   };
   return (
-    <Menu.Root onOpen={onOpen} onClose={onClose}>
-      <IconButton aria-label={"Notifications"} variant='outline' asChild><Box position="relative">
-        <Icon boxSize={6} asChild><MdNotificationsNone /></Icon>
-        {notificationsCount > 0 && (
-          <Badge
-            position="absolute"
-            top="-19px"
-            right="-1px"
-            fontSize="0.7em"
-            colorPalette="red"
-            borderRadius="full"
-            boxSize="1.25rem"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-          >
-            {notificationsCount}
-          </Badge>
-        )}
-      </Box></IconButton>
-      {/* Render MenuList only when isOpen is true */}
-      {isOpen && (
-        <Portal><Menu.Positioner><Menu.Content>
-              <Flex justify="space-between" w="100%" mb="20px">
+    <Menu.Root
+      open={open}
+      onOpenChange={(e) => (e.open ? onOpen() : onClose())}
+    >
+      <Menu.Trigger asChild>
+        <IconButton aria-label="Notifications" variant="outline">
+          <Box position="relative">
+            <Icon boxSize={6} asChild>
+              <MdNotificationsNone />
+            </Icon>
+            {notificationsCount > 0 && (
+              <Badge
+                position="absolute"
+                top="-1rem"
+                right="-0.5rem"
+                fontSize="xs"
+                colorPalette="red"
+                borderRadius="full"
+                minW="1.25rem"
+                h="1.25rem"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                px={1}
+              >
+                {notificationsCount}
+              </Badge>
+            )}
+          </Box>
+        </IconButton>
+      </Menu.Trigger>
+      {open && (
+        <Portal>
+          <Menu.Positioner>
+            <Menu.Content p={4} minW="xs">
+              <Flex justify="space-between" align="center" w="100%" mb="4">
                 <Text fontSize="md" fontWeight="600">
                   Notifications
                 </Text>
                 <Text
                   fontSize="sm"
                   fontWeight="500"
-                  // color="blue.500"
-                  ms="auto"
+                  color="brand.500"
                   cursor="pointer"
                   onClick={handleMarkAllRead}
                 >
                   Mark all read
                 </Text>
               </Flex>
-              <HSeparator mb="5px" />
-              <Notifications></Notifications>
-            </Menu.Content></Menu.Positioner></Portal>
+              <HSeparator mb="2" />
+              <Notifications />
+            </Menu.Content>
+          </Menu.Positioner>
+        </Portal>
       )}
     </Menu.Root>
   );

@@ -2,7 +2,7 @@
 import { Steps, IconButton, Input, InputGroup, InputLeftElement, Icon } from "@chakra-ui/react";
 import { useColorModeValue } from "../../../../components/ui/color-mode";
 import { LuSearch } from 'react-icons/lu';
-export function SearchBar(props:any) {
+export function SearchBar(props: any) {
   // Pass the computed styles into the `__css` prop
   const { variant, background, children, placeholder, borderRadius, ...rest } =
     props;
@@ -11,7 +11,7 @@ export function SearchBar(props:any) {
   const inputBg = useColorModeValue("secondaryGray.300", "navy.900");
   const inputText = useColorModeValue("gray.700", "gray.100");
   return (
-    <InputGroup  w={{ base: "100%", md: "100%" }} {...rest}>
+    <InputGroup w={{ base: "100%", md: "100%" }} {...rest}>
       <InputLeftElement
         children={
           <IconButton

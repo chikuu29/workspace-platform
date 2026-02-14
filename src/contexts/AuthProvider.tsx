@@ -7,12 +7,12 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { login, logout } from "../app/slices/auth/authSlice";
-import { GETAPI } from "../app/api";
-import { fetchAppConfig } from "../app/slices/appConfig/appConfigSlice";
-import type { AppDispatch } from '../app/store';
-import Loader from "../features/components/Loader/Loader";
-import { startLoading, stopLoading } from "../app/slices/loader/appLoaderSlice";
+import { login, logout } from "@/app/slices/auth/authSlice";
+import { GETAPI } from "@/app/api";
+import { fetchAppConfig } from "@/app/slices/appConfig/appConfigSlice";
+import type { AppDispatch } from '@/app/store';
+import Loader from "@/features/ui/components/Loader/Loader";
+import { startLoading, stopLoading } from "@/app/slices/loader/appLoaderSlice";
 
 // Define user type
 interface User {

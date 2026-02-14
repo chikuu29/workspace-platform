@@ -19,7 +19,7 @@ const routes: RouteObject[] = [
   },
   {
     path: "/auth",
-    element: <Navigate to="sign-in" replace />,
+    element: <Navigate to="login" replace />,
   },
   {
     path: "/auth/*",
@@ -32,7 +32,7 @@ const routes: RouteObject[] = [
     ),
     children: [
       {
-        path: "sign-in",
+        path: "login",
         element: (
           <Suspense fallback={<AppLoader />}>
             <SignInPage />

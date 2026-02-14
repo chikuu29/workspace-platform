@@ -24,10 +24,10 @@ export default function Auth() {
           <Routes>
             <Route
               path="/auth"
-              element={<Navigate to="/auth/sign-in" replace />}
+              element={<Navigate to="/auth/login" replace />}
             />
-            <Route path="/auth/sign-in" element={<SignInPage />} />
-            {/* <Route path="sign-in" element={<SignInPage />} /> */}
+            <Route path="/auth/login" element={<SignInPage />} />
+            {/* <Route path="login" element={<SignInPage />} /> */}
           </Routes>
         </Box>
       ) : null}

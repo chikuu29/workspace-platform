@@ -25,7 +25,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
       ? redirection
         ? elseNavigation + `?redirect=${encodeURIComponent(location.pathname + location.search)}`
         : elseNavigation
-      : `/auth/sign-in?redirect=${encodeURIComponent(location.pathname + location.search)}`;
+      : `/auth/login?redirect=${encodeURIComponent(location.pathname + location.search)}`;
 
   const { authInfo, loading } = useAuth();
   console.log("auth", authInfo);

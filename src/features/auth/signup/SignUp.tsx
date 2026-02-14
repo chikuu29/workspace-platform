@@ -291,7 +291,7 @@ export default function SignUp() {
             </form>
             <Text mt={5} color={"gray.500"} fontWeight="400" fontSize="14px" textAlign={"center"}>
               Already Have An
-              <NavLink to="/auth/sign-in">
+              <NavLink to="/auth/login">
                 <Text as="span" ms="5px" fontWeight="600">Account</Text>
               </NavLink>
             </Text>

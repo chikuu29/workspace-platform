@@ -32,8 +32,9 @@ import { AlertProps } from "@/app/types/appConfigInterface";
 import { SiAuthelia } from "react-icons/si";
 import { getOrCreateDeviceId } from "@/utils/services/appServices";
 
-const MotionBox = motion(Box);
-const MotionStack = motion(Stack);
+const MotionBox = motion.create(Box);
+const MotionStack = motion.create(Stack);
+const MotionIcon = motion.create(Icon);
 
 const SignIn = () => {
     const [isNewVersionAvailable, setIsNewVersionAvailable] = useState<boolean>(false);
@@ -56,12 +57,6 @@ const SignIn = () => {
 
     const searchParams = new URLSearchParams(location.search);
     const redirectUrl = searchParams.get("redirect");
-
-    const textColor = useColorModeValue("navy.700", "white");
-    const textColorSecondary = "gray.400";
-    const textColorDetails = useColorModeValue("navy.700", "secondaryGray.600");
-    const textColorBrand = useColorModeValue("brand.500", "white");
-    const brandStars = useColorModeValue("brand.500", "brand.400");
     const googleBg = useColorModeValue("secondaryGray.300", "whiteAlpha.200");
     const googleText = useColorModeValue("navy.700", "white");
     const googleHover = { bg: useColorModeValue("gray.200", "whiteAlpha.300") };
@@ -228,12 +223,12 @@ const SignIn = () => {
                     >
                         <MotionBox variants={itemVariants}>
                             <Heading
-                                lineHeight={1.2}
+                                lineHeight={1.1}
                                 fontSize={{ base: "4xl", sm: "5xl", md: "6xl" }}
-                                fontWeight="800"
+                                fontWeight="900"
                                 letterSpacing="tight"
                             >
-                                Welcome to Our{" "}
+                                Unify Your{" "}
                                 <Text
                                     as="span"
                                     bgGradient="to-r"
@@ -241,32 +236,39 @@ const SignIn = () => {
                                     gradientTo="blue.500"
                                     bgClip="text"
                                 >
-                                    Platform!
+                                    Entire Business.
                                 </Text>
                             </Heading>
                         </MotionBox>
 
                         <MotionBox
                             variants={itemVariants}
-                            p={6}
-                            borderRadius="2xl"
-                            bg={useColorModeValue("whiteAlpha.600", "whiteAlpha.100")}
-                            backdropFilter="blur(10px)"
+                            p={8}
+                            borderRadius="3xl"
+                            bg={useColorModeValue("whiteAlpha.700", "whiteAlpha.100")}
+                            backdropFilter="blur(16px)"
                             border="1px solid"
                             borderColor={useColorModeValue("white", "whiteAlpha.200")}
-                            boxShadow="xl"
+                            boxShadow="2xl"
                         >
-                            <Text
-                                fontSize="lg"
-                                color={useColorModeValue("gray.600", "gray.300")}
-                                lineHeight="tall"
-                            >
-                                <Icon as={SiAuthelia} color="brand.400" mr={2} verticalAlign="middle" />
-                                We're excited to have you here! Sign in to access your
-                                personalized dashboard and explore all the features we offer.
-                                Manage all your business categories with just one app, all on a
-                                single dashboard.
-                            </Text>
+                            <Stack gap={4}>
+                                <Text
+                                    fontSize="xl"
+                                    fontWeight="600"
+                                    color={useColorModeValue("gray.800", "white")}
+                                >
+                                    Experience the next generation of productivity.
+                                </Text>
+                                <Text
+                                    fontSize="lg"
+                                    color={useColorModeValue("gray.600", "gray.400")}
+                                    lineHeight="tall"
+                                >
+                                    Every category of your business, unified in one powerful workspace.
+                                    Sign in to access your dashboard and manage operations with
+                                    unprecedented speed and security.
+                                </Text>
+                            </Stack>
                         </MotionBox>
                     </MotionStack>
 
@@ -285,34 +287,100 @@ const SignIn = () => {
                         w="full"
                         mx="auto"
                     >
-                        <Stack gap={2} mb={6}>
-                            <Heading size="xl" fontWeight="700">
-                                Sign In
-                                <Text as="span" color="brand.400">.</Text>
-                            </Heading>
-                            <Text color="gray.500" fontSize="md">
-                                Enter your credentials to access your account.
-                            </Text>
+                        <Stack gap={4} mb={10}>
+                            <Flex align="center" gap={3}>
+                                <Box h="2px" w="30px" bg="brand.400" borderRadius="full" />
+                                <Text
+                                    textTransform="uppercase"
+                                    fontSize="xs"
+                                    fontWeight="800"
+                                    color="brand.400"
+                                    letterSpacing="widest"
+                                >
+                                    Portal Access
+                                </Text>
+                            </Flex>
+
+                            <Stack gap={2}>
+                                <Heading
+                                    fontSize={{ base: "3xl", md: "4xl" }}
+                                    fontWeight="900"
+                                    letterSpacing="tight"
+                                    lineHeight="1"
+                                >
+                                    Sign In to <br />
+                                    <Text
+                                        as="span"
+                                        bgGradient="to-r"
+                                        gradientFrom="brand.400"
+                                        gradientTo="blue.600"
+                                        bgClip="text"
+                                    >
+                                        Workspace
+                                    </Text>
+                                    <Text as="span" color="brand.400">.</Text>
+                                </Heading>
+                                <Text color="gray.500" fontSize="lg" fontWeight="500" lineHeight="tall">
+                                    Secure enterprise access to manage <br />
+                                    all your business at one place.
+                                </Text>
+                            </Stack>
                         </Stack>
 
-                        <Button
-                            onClick={loginWithSso}
-                            variant="outline"
-                            h="56px"
-                            borderRadius="xl"
-                            fontWeight="600"
-                            fontSize="sm"
-                            bg={googleBg}
-                            color={googleText}
-                            _hover={googleHover}
-                            w="full"
-                            mb={4}
-                            transition="all 0.2s"
+                        <MotionBox
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
                         >
-                            <Icon as={SiAuthelia} w={5} h={5} me={3} />
-                            Continue with SSO
-                        </Button>
+                            <Button
+                                onClick={loginWithSso}
+                                variant={"premium" as any}
+                                size="lg"
+                                h="70px"
+                                borderRadius="2xl"
+                                w="full"
+                                mb={6}
+                                fontSize="lg"
+                                fontWeight="800"
+                                letterSpacing="tight"
+                                boxShadow="0 20px 40px -12px rgba(66, 42, 251, 0.4)"
+                            >
+                                <MotionBox
+                                    display="flex"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                    me={4}
+                                    animate={{
+                                        rotate: [0, 10, -10, 0],
+                                        scale: [1, 1.15, 1]
+                                    }}
+                                    transition={{
+                                        duration: 3,
+                                        repeat: Infinity,
+                                        ease: "easeInOut"
+                                    }}
+                                >
+                                    <Icon as={SiAuthelia} w={7} h={7} />
+                                </MotionBox>
+                                Continue with SSO
+                            </Button>
+                        </MotionBox>
 
+                        <Text
+                            color="gray.500"
+                            fontSize="xs"
+                            textAlign="center"
+                            fontWeight="600"
+                            textTransform="uppercase"
+                            letterSpacing="widest"
+                            mb={4}
+                        >
+                            Secure Enterprise Login
+                        </Text>
+
+                        {/* 
                         <Flex align="center" mb={6}>
                             <HSeparator flex="1" />
                             <Text color="gray.400" mx={4} fontSize="xs" fontWeight="bold" textTransform="uppercase">
@@ -412,6 +480,7 @@ const SignIn = () => {
                                 </Button>
                             </Stack>
                         </form>
+                        */}
 
                         <Text
                             mt={8}

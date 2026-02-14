@@ -60,8 +60,8 @@ export default function WithSubnavigation() {
           direction={"row"}
           gap={6}
         >
-          <Button fontSize={"sm"} fontWeight={400} variant={"link"} asChild><Link to={"/auth/sign-in"}>Sign In
-                      </Link></Button>
+          <Button fontSize={"sm"} fontWeight={400} variant={"link"} asChild><Link to={"/auth/login"}>Sign In
+          </Link></Button>
           <Button
             display={{ base: "none", md: "inline-flex" }}
             fontSize={"sm"}
@@ -71,8 +71,8 @@ export default function WithSubnavigation() {
             _hover={{
               bg: "pink.300",
             }}
-            asChild><Link to ={'/auth/getstarted'}>Setup Store
-                      </Link></Button>
+            asChild><Link to={'/auth/getstarted'}>Setup Store
+            </Link></Button>
         </Stack>
       </Flex>
       <Collapsible.Root open={isOpen}>
@@ -145,30 +145,30 @@ const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
       rounded={"md"}
       _hover={{ bg: useColorModeValue("pink.50", "gray.900") }}
       asChild><a href={href}>
-          <Stack direction={"row"} align={"center"}>
-            <Box>
-              <Text
-                transition={"all .3s ease"}
-                _groupHover={{ color: "pink.400" }}
-                fontWeight={500}
-              >
-                {label}
-              </Text>
-              <Text fontSize={"sm"}>{subLabel}</Text>
-            </Box>
-            <Flex
+        <Stack direction={"row"} align={"center"}>
+          <Box>
+            <Text
               transition={"all .3s ease"}
-              transform={"translateX(-10px)"}
-              opacity={0}
-              _groupHover={{ opacity: "100%", transform: "translateX(0)" }}
-              justify={"flex-end"}
-              align={"center"}
-              flex={1}
+              _groupHover={{ color: "pink.400" }}
+              fontWeight={500}
             >
-              <Icon color={"pink.400"} w={5} h={5} asChild><LuChevronRight /></Icon>
-            </Flex>
-          </Stack>
-        </a></Box>
+              {label}
+            </Text>
+            <Text fontSize={"sm"}>{subLabel}</Text>
+          </Box>
+          <Flex
+            transition={"all .3s ease"}
+            transform={"translateX(-10px)"}
+            opacity={0}
+            _groupHover={{ opacity: "100%", transform: "translateX(0)" }}
+            justify={"flex-end"}
+            align={"center"}
+            flex={1}
+          >
+            <Icon color={"pink.400"} w={5} h={5} asChild><LuChevronRight /></Icon>
+          </Flex>
+        </Stack>
+      </a></Box>
   );
 };
 
@@ -227,8 +227,8 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
             {children &&
               children.map((child) => (
                 <Box py={2} asChild><a key={child.label} href={child.href}>
-                    {child.label}
-                  </a></Box>
+                  {child.label}
+                </a></Box>
               ))}
           </Stack>
         </Collapsible.Content>
@@ -263,13 +263,13 @@ const NAV_ITEMS: Array<NavItem> = [
         subLabel: "An exclusive list for contract work",
         href: "#",
       },
-   
+
     ],
   },
   {
     label: "Grow",
     href: "#",
-  },   {
+  }, {
     label: "Fee & Commission",
     children: [
       {

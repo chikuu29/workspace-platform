@@ -68,7 +68,7 @@ export default function MyApps() {
       <Box
         borderRadius={20}
         position="sticky"
-        top="115px"
+        top="10px"
         zIndex={100}
         bg={bgHeader}
         backdropFilter="blur(12px)"

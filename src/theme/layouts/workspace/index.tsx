@@ -1,4 +1,4 @@
-import { Steps, Container, Flex, VStack } from "@chakra-ui/react";
+import { Steps, Container, Flex, VStack, Box } from "@chakra-ui/react";
 import Navbar from "@/features/ui/components/navbar/NavBar";
 import PanelSideBar from "@/features/ui/components/sidebar/PanelSideBar";
 import { memo, useState } from "react";
@@ -28,21 +28,19 @@ const workspace = () => {
         FEATURE={FEATURE}
         DISPLAY_TYPE={DISPLAY_TYPE}
       />
-      {/* Main Content */}
-      {/* <Flex flex="1" > */}
-      <PanelSideBar showSidebar={showSidebar} togglesidebar={toggleSidebar} />
-      {/* Main Content */}
-      <VStack flex="1" align="stretch" m={"1.7rem"}>
-        {/* <Container maxW="100%"> */}
-        <Outlet></Outlet>
-        {/* </Container> */}
-        <AppFooter />
-        <Flex position="fixed" flexDirection="column" bottom="30px" right="10" gap={3}>
-          <ColorModeButton />
-          <FullscreenButton />
-        </Flex>
-      </VStack>
-      {/* </Flex> */}
+      <Flex flex="1" overflow="hidden">
+        <PanelSideBar showSidebar={showSidebar} togglesidebar={toggleSidebar} h="100%" />
+        {/* Main Content */}
+        <Box flex="1" overflowY="auto" position="relative" zIndex={0}>
+          <VStack align="stretch" minH="calc(100vh - 150px)">
+            <Box p={"1.7rem"}>
+              <Outlet />
+            </Box>
+            <AppFooter />
+          </VStack>
+
+        </Box>
+      </Flex>
     </Flex>
   );
 }

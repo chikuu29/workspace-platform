@@ -52,10 +52,16 @@ export default function PanelSideBar(props: any) {
         transition={variantChange}
         p={"0px"}
 
-        h="100vh"
+        h="100%"
         m={sidebarMargins}
-        minH="100%"
+
         overflowX="hidden"
+        overflowY="auto"
+        css={{
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+        }}
       >
         <Flex
           direction="column"

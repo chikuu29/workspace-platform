@@ -1,5 +1,6 @@
-import { useColorModeValue } from "@/components/ui/color-mode";
-import { Box, Breadcrumb } from "@chakra-ui/react";
+import { ColorModeButton, useColorModeValue } from "@/components/ui/color-mode";
+import { FullscreenButton } from "@/components/ui/fullscreen-button";
+import { Box, Breadcrumb, Flex } from "@chakra-ui/react";
 import React, { forwardRef, useEffect, useState } from "react";
 import { LuHouse, LuShirt } from "react-icons/lu";
 import { RiHome9Line } from "react-icons/ri";
@@ -70,25 +71,19 @@ const Appbreadcurmb = forwardRef((props, ref) => {
 
   const bgColor = useColorModeValue("white", "dark.100");
   return (
-    <Box minH={"40px"}>
-      <Box
-        // top={"3.1rem"}
-        // top={"9%"}
-        // position={"fixed"}
-        // w={"30%"}
+    <Box minH={"40px"} w="100%">
+      <Flex
         bg={bgColor}
         zIndex={999}
-        p={"2"}
-        // boxShadow={"md"}
-        // border={'black'}
-        // borderRadius={'4xl'}
-        // display="inline-block"
-        borderTopRightRadius="sm"
-        borderBottomRightRadius="sm"
-        width="fit-content"
-        maxW="100%" // optional: prevents overflow
+        px={4}
+        py={2}
+        w="100%"
+        alignItems="center"
+        justifyContent="space-between"
+        borderTop="1px solid"
+        borderColor={useColorModeValue("gray.200", "whiteAlpha.100")}
       >
-        <Breadcrumb.Root ms={2} variant={"plain"} size={"sm"}>
+        <Breadcrumb.Root variant="plain" size="sm">
           <Breadcrumb.List>
             {config.map((c: ConfigItem, index) => {
               const isLast = index === config.length - 1;
@@ -97,7 +92,7 @@ const Appbreadcurmb = forwardRef((props, ref) => {
                   <Breadcrumb.Item
                     gap={1}
                     onClick={() => handleNavigate(c, isLast)}
-                    fontWeight="bold"
+                    fontWeight={isLast ? "bold" : "medium"}
                     cursor={isLast ? "default" : "pointer"}
                     _hover={!isLast ? { textDecoration: "underline" } : {}}
                     color={isLast ? "teal.500" : "fg.muted"}
@@ -110,7 +105,12 @@ const Appbreadcurmb = forwardRef((props, ref) => {
             })}
           </Breadcrumb.List>
         </Breadcrumb.Root>
-      </Box>
+
+        <Flex gap={2} alignItems="center">
+          <ColorModeButton />
+          <FullscreenButton />
+        </Flex>
+      </Flex>
     </Box>
   );
 });

@@ -63,18 +63,18 @@ export default function MyApps() {
   };
 
   return (
-    <Box minH="100vh" bg={bgPage} borderRadius={[20, 20, 20, 20]}>
+    <Box bg={bgPage} borderRadius={[20, 20, 20, 20]}>
       {/* Sticky Header Section */}
       <Box
         borderRadius={20}
         position="sticky"
-        top="10px"
+        top="-1px"
         zIndex={100}
         bg={bgHeader}
         backdropFilter="blur(12px)"
         borderBottom="1px solid"
         borderColor={useColorModeValue("gray.200", "whiteAlpha.100")}
-        py={4}
+        py={1}
         px={6}
         boxShadow="sm"
       >
@@ -116,7 +116,7 @@ export default function MyApps() {
       </Box>
 
       {/* Main Content */}
-      <Box py={8} px={6}>
+      <Box py={2} px={6}>
         {!error && (
           <>
             {filteredApps.length > 0 ? (

@@ -1,4 +1,6 @@
 export const colors = {
+
+
     brand: {
         100: { value: "#E9E3FF" },
         200: { value: "#422AFB" },
@@ -42,6 +44,7 @@ export const colors = {
         700: { value: "#707EAE" },
         800: { value: "#707EAE" },
         900: { value: "#1B2559" },
+        1: { value: "hsla(0, 0%, 100%, 0.65)" },
     },
     red: {
         100: { value: "#FEEFEE" },
@@ -85,5 +88,6 @@ export const colors = {
         800: { value: "#212121" },
         900: { value: "#171717" },
         950: { value: "#0d0d0d" },
-    }
+    },
+
 }

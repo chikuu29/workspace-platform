@@ -50,7 +50,7 @@ export default function PanelSideBar(props: any) {
         {...rest}
         bg={sidebarBg}
         transition={variantChange}
-        p={"0px"}
+        p={"5px"}
 
         h="100%"
         m={sidebarMargins}
@@ -66,8 +66,8 @@ export default function PanelSideBar(props: any) {
         <Flex
           direction="column"
           height="100%"
-          pt="25px"
-          px="16px"
+          // pt="25px"
+          // px="16px"
           borderRadius="30px"
         >
           <SideNavMenuBuilder showFullSideBarMenu={showSidebar} />

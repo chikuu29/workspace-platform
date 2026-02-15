@@ -35,7 +35,7 @@ export const FullscreenButton = (props: FullscreenButtonProps) => {
       onClick={toggleFullscreen}
       variant="outline"
       aria-label="Toggle Fullscreen"
-      size="md"
+      size="sm"
       // rounded="full"
       {...props}
     >

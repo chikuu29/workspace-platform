@@ -69,18 +69,19 @@ const Appbreadcurmb = forwardRef((props, ref) => {
 
   console.log("config", config);
 
-  const bgColor = useColorModeValue("white", "dark.100");
+  // const bgColor = useColorModeValue("white", "dark.100");
   return (
-    <Box minH={"40px"} w="100%">
+    <Box minH={"40px"} w="100%" >
       <Flex
-        bg={bgColor}
+        p={2}
+        // bg={bgColor}
         zIndex={999}
         // px={2}
         // py={2}
         w="100%"
         alignItems="center"
         justifyContent="space-between"
-        borderTop="1px solid"
+        // borderTop="1px solid"
         borderColor={useColorModeValue("gray.200", "whiteAlpha.100")}
       >
         <Breadcrumb.Root variant="plain" size="sm">
@@ -106,9 +107,9 @@ const Appbreadcurmb = forwardRef((props, ref) => {
           </Breadcrumb.List>
         </Breadcrumb.Root>
 
-        <Flex gap={2} alignItems="center">
-          <ColorModeButton />
-          <FullscreenButton />
+        <Flex gap={4} alignItems="center" >
+          <ColorModeButton variant="brand" />
+          <FullscreenButton variant="brand" />
         </Flex>
       </Flex>
     </Box>

@@ -59,15 +59,15 @@ export const buttonRecipe = defineRecipe({
                     bg: "brand.50",
                 },
             },
-            premium: {
-                bgGradient: "to-r",
-                gradientFrom: "brand.400",
-                gradientTo: "blue.500",
-                color: "white",
-                boxShadow: "0 4px 15px 0 rgba(116, 79, 247, 0.4)",
+            brand: {
+                // bgGradient: "to-r",
+                // gradientFrom: "brand.400",
+                // gradientTo: "brand.500",
+                // color: "white",
+                // boxShadow: "0 4px 15px 0 rgba(116, 79, 247, 0.4)",
                 _hover: {
-                    gradientFrom: "brand.500",
-                    gradientTo: "blue.600",
+                    // gradientFrom: "brand.500",
+                    // gradientTo: "brand.600",
                     transform: "translateY(-2px)",
                     boxShadow: "0 6px 20px 0 rgba(116, 79, 247, 0.5)",
                 },

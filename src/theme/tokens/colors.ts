@@ -91,3 +91,24 @@ export const colors = {
     },
 
 }
+
+export const semanticTokens = {
+    colors: {
+        text: {
+            default: {
+                value: { _light: "{colors.gray.800}", _dark: "hsla(0, 0%, 100%, 0.65)" }
+            },
+            muted: {
+                value: { _light: "{colors.secondaryGray.700}", _dark: "{colors.secondaryGray.400}" }
+            },
+            brand: {
+                value: { _light: "{colors.brand.500}", _dark: "{colors.brand.400}" }
+            }
+        },
+        bg: {
+            default: {
+                value: { _light: "white", _dark: "{colors.gray.950}" }
+            }
+        }
+    }
+}

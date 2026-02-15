@@ -106,9 +106,9 @@ export default function MenuLink(props: MenuLinkInterFace) {
       </Box>
       <Text
         ref={textRef}
-        fontSize="0.9rem"
+        // fontSize="0.9rem"
         fontWeight="500"
-        color={useColorModeValue("gray.700", "gray.200")}
+        color="text.default"
         whiteSpace="nowrap"
         overflow="hidden"
         textOverflow="ellipsis"
@@ -135,7 +135,7 @@ export default function MenuLink(props: MenuLinkInterFace) {
         fontSize="0.7rem"
         fontWeight="700"
         textAlign="center"
-        color={useColorModeValue("navy.700", "gray.300")}
+        color="text.default"
         w="full"
         px={1}
         whiteSpace="nowrap"

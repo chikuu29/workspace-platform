@@ -1,5 +1,5 @@
 import { createSystem, defaultConfig } from "@chakra-ui/react"
-import { colors } from "./tokens/colors"
+import { colors, semanticTokens } from "./tokens/colors"
 import { recipes } from "./recipes"
 
 export const system = createSystem(defaultConfig, {
@@ -7,13 +7,26 @@ export const system = createSystem(defaultConfig, {
         tokens: {
             colors
         },
+        semanticTokens,
         recipes,
-        textStyles: {},
+        // textStyles: {
+        //     body: {
+        //         value: {
+        //             fontSize: "sm",
+        //             // lineHeight: "tall",
+        //         },
+        //     },
+        // },
     },
     globalCss: {
         "html, body": {
             margin: 0,
             padding: 0,
+            color: "text.default",
+            bg: "bg.default",
+
+            fontWeight: "500",
+            fontFamily: "Inter, sans-serif",
         },
     }
 })

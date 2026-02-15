@@ -25,10 +25,9 @@ export default function SideNavMenuBuilder(props: SideNavPropsType) {
   }
   return (
     <VStack
-      gap={4}
-      //  align="stretch"
-      maxW={showFullSideBarMenu ? "200px" : "50px"}
-      align={showFullSideBarMenu ? "start" : "center"}
+      gap={3}
+      w="full"
+      align={showFullSideBarMenu ? "stretch" : "center"}
     >
       {FEATURE.map((menu: any, index: number) => (
         <React.Fragment key={index}>

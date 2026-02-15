@@ -30,12 +30,25 @@ interface MenuLinkInterFace {
   showFullSideBarMenu: boolean;
 }
 
+import { Tooltip } from "@/components/ui/tooltip";
+import { useRef, useState, useCallback } from "react";
+
 export default function MenuLink(props: MenuLinkInterFace) {
   const { menuConfig, showFullSideBarMenu } = props;
   const { colorMode } = useColorMode();
   const activeBg = useColorModeValue("#F4F7FE", "#171717");
   const hoverBg = useColorModeValue("secondaryGray.400", "whiteAlpha.200");
   const auth = useSelector((state: RootState) => state.auth);
+
+  const textRef = useRef<HTMLParagraphElement>(null);
+  const [isTruncated, setIsTruncated] = useState(false);
+
+  const checkTruncation = useCallback(() => {
+    if (textRef.current) {
+      const { scrollWidth, clientWidth } = textRef.current;
+      setIsTruncated(scrollWidth > clientWidth);
+    }
+  }, []);
 
   const tenant_name = auth?.loginInfo
     ? auth.loginInfo["tenant_name"]
@@ -68,64 +81,112 @@ export default function MenuLink(props: MenuLinkInterFace) {
 
   const commonProps = {
     align: "center",
+    justify: showFullSideBarMenu ? "flex-start" : "center",
     cursor: "pointer",
     w: "full",
-    p: 2,
-    borderRadius: "md",
+    minH: showFullSideBarMenu ? "45px" : "70px",
+    px: showFullSideBarMenu ? 4 : 0,
+    py: showFullSideBarMenu ? 2 : 2,
+    borderRadius: "12px",
+    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
     _hover: {
       bg: hoverBg,
+      transform: "translateX(4px)",
     },
+    _active: {
+      transform: "scale(0.98)",
+    },
+    onMouseEnter: checkTruncation,
   };
 
   const content = showFullSideBarMenu ? (
-    <HStack {...commonProps}>
-      {/* <Box as={AsyncLoadIcon(menuConfig.icon)} size="24px" /> */}
-      <AsyncLoadIcon iconName={menuConfig.icon} />
-      {/* <Box boxSize={"24px"} p={"0px"}><AsyncLoadIcon iconName={menuConfig.icon}/></Box> */}
-      <Text fontSize="0.8rem" fontWeight="600" truncate w="full">
+    <HStack {...commonProps} gap={3}>
+      <Box flexShrink={0} display="flex" alignItems="center" justifyContent="center">
+        <AsyncLoadIcon iconName={menuConfig.icon} />
+      </Box>
+      <Text
+        ref={textRef}
+        fontSize="0.9rem"
+        fontWeight="500"
+        color={useColorModeValue("gray.700", "gray.200")}
+        whiteSpace="nowrap"
+        overflow="hidden"
+        textOverflow="ellipsis"
+        w="full"
+      >
         {menuConfig.label}
       </Text>
     </HStack>
   ) : (
-    <VStack {...commonProps}>
-      {/* <Box as={AsyncLoadIcon(menuConfig.icon)} size="24px" /> */}
-      <AsyncLoadIcon iconName={menuConfig.icon} />
-      <Text fontSize="0.5rem" fontWeight="600" textAlign="center">
+    <VStack
+      {...commonProps}
+      _hover={{ ...commonProps._hover, transform: "none" }}
+      gap={1}
+      w="64px"
+      h="64px"
+      px={2}
+      mx="auto"
+    >
+      <Box display="flex" alignItems="center" justifyContent="center" h="24px">
+        <AsyncLoadIcon iconName={menuConfig.icon} />
+      </Box>
+      <Text
+        ref={textRef}
+        fontSize="0.7rem"
+        fontWeight="700"
+        textAlign="center"
+        color={useColorModeValue("navy.700", "gray.300")}
+        w="full"
+        px={1}
+        whiteSpace="nowrap"
+        overflow="hidden"
+        textOverflow="ellipsis"
+        lineHeight="1.2"
+      >
         {menuConfig.label}
       </Text>
     </VStack>
   );
+
+  const wrappedContent = (
+    <Tooltip
+      content={menuConfig.label}
+      showArrow
+      openDelay={500}
+      positioning={{ placement: showFullSideBarMenu ? "bottom" : "right" }}
+      disabled={!isTruncated}
+    >
+      {content}
+    </Tooltip>
+  );
+
   return menuConfig.path ? (
     menuConfig.target && menuConfig.target !== "" ? (
       <a
         href={`${tenant_name}/workspace/${menuConfig.target}`}
-        style={{ width: "100%" }}
-        target={`${tenant_name}/workspace/${menuConfig.target}`}
-        rel="noopener noreferrer" // Security recommendation
+        style={{ width: "100%", textDecoration: "none" }}
+        target="_blank"
+        rel="noopener noreferrer"
       >
-        {content}
+        {wrappedContent}
       </a>
     ) : (
-      // <Link to={menuConfig.path} style={{ width: "100%" }}>
-      //   {content}
-      // </Link>
-
-      (<NavLink
+      <NavLink
         to={`/${tenant_name}/workspace${menuConfig.path}`}
         style={({ isActive }) => ({
-          background: isActive ? activeBg : "unset",
-          borderRadius: "8px",
-          // border:isActive?"1px solid #FEEFEE":'unset',
-          // color: isActive ? "red" : "black",
-          textDecoration: "none", // Optional: to remove underline
+          width: "100%",
+          display: "block",
+          background: isActive ? activeBg : "transparent",
+          borderRadius: "12px",
+          textDecoration: "none",
         })}
       >
-        {content}
-      </NavLink>)
+        {wrappedContent}
+      </NavLink>
     )
   ) : (
-    <div style={{ width: "100%" }} onClick={handleClick}>
-      {content}
-    </div>
+    <Box w="full" onClick={handleClick}>
+      {wrappedContent}
+    </Box>
   );
 }

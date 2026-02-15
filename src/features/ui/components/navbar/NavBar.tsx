@@ -8,7 +8,7 @@ import Brand from "../Brand/Brand";
 import TopNavMenuBuilder from "./TopNavMenuBuilder";
 import { memo } from "react";
 import Appbreadcurmb from "./Appbreadcurmb";
-import { AiOutlineMenuUnfold } from "react-icons/ai";
+import { AiOutlineMenuUnfold, AiOutlineMenuFold } from "react-icons/ai";
 interface AppNavType {
   DISPLAY_TYPE: any;
   FEATURE: any[];
@@ -59,8 +59,9 @@ const Navbar = ({
                   size="sm"
                   color="gray.500"
                   borderRadius="full"
+                  _hover={{ bg: "transparent", color: "brand.500" }}
                 >
-                  <Icon as={AiOutlineMenuUnfold} boxSize={6} />
+                  <Icon as={rest.showSidebar ? AiOutlineMenuFold : AiOutlineMenuUnfold} boxSize={6} />
                 </IconButton>
               )}
               {FEATURE.length > 0 && <SidebarResponsive FEATURE_LIST={FEATURE} />}

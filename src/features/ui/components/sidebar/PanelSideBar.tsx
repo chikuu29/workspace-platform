@@ -45,30 +45,32 @@ export default function PanelSideBar(props: any) {
       minH="100%"
       p={"0px"}
       boxShadow={shadow}
+      transition="width 0.3s ease-in-out"
+      w={showSidebar ? "250px" : "80px"}
+      pt={2}
+      pb={2}
     >
       <Box
         {...rest}
         bg={sidebarBg}
-        transition={variantChange}
+        transition="all 0.3s ease-in-out"
         p={"5px"}
-
         h="100%"
         m={sidebarMargins}
-
         overflowX="hidden"
         overflowY="auto"
         css={{
           "&::-webkit-scrollbar": {
             display: "none",
           },
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
         }}
       >
         <Flex
           direction="column"
           height="100%"
-          // pt="25px"
-          // px="16px"
-          borderRadius="30px"
+          borderRadius="20px"
         >
           <SideNavMenuBuilder showFullSideBarMenu={showSidebar} />
         </Flex>

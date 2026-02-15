@@ -26,6 +26,7 @@ const workspace = () => {
     <Flex h="100vh" flexDirection="column">
       <Navbar
         togglesidebar={toggleSidebar}
+        showSidebar={showSidebar}
         FEATURE={FEATURE}
         DISPLAY_TYPE={DISPLAY_TYPE}
       />

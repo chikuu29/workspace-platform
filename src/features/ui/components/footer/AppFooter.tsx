@@ -22,7 +22,7 @@ const AppFooter = () => {
         alignItems={'center'}
         bottom="0"
         bg={navbarBg} // Replace with navbarBg
-        boxShadow={navbarShadow} // Replace with navbarShadow
+        // boxShadow={navbarShadow} // Replace with navbarShadow
         justifyContent={'center'}
       >
         <Flex

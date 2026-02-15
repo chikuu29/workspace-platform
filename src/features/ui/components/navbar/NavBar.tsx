@@ -56,10 +56,10 @@ const Navbar = ({
                   display={{ base: "none", xl: "flex" }}
                   onClick={togglesidebar}
                   variant="brand"
-                  // size="sm"
-                  // color="gray.500"
-                  // borderRadius="full"
-                  _hover={{ bg: "transparent", color: "brand.500" }}
+                // size="sm"
+                // color="gray.500"
+                // borderRadius="full"
+                // _hover={{ bg: "transparent", color: "brand.500" }}
                 >
                   <Icon as={rest.showSidebar ? AiOutlineMenuFold : AiOutlineMenuUnfold} boxSize={6} />
                 </IconButton>

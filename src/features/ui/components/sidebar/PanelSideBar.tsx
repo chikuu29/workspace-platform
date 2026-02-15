@@ -14,12 +14,14 @@ import {
 import { useColorModeValue } from "@/components/ui/color-mode";
 
 import SideNavMenuBuilder from "./SideNavMenuBuilder";
-import { MdMenu } from "react-icons/md";
+import { HiMenuAlt2 } from "react-icons/hi";
+import { LuX } from "react-icons/lu";
 import Brand from "../Brand/Brand";
 // import { useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/store";
 import { APP_CONFIG_STATE } from "@/app/types/appConfigInterface";
+import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
 
 export default function PanelSideBar(props: any) {
   const { showSidebar, togglesidebar, SHOW_SIDEBAR, ...rest } = props;
@@ -90,47 +92,58 @@ export function SidebarResponsive(props: any) {
       display={{ base: "flex", md: "flex", xl: "none" }}
       alignItems="center"
       justifyContent={"center"}
-
     >
       <Flex w="max-content" h="max-content" onClick={onOpen}>
-        <IconButton aria-label="Menu" cursor="pointer" variant='outline'><Icon h="20px" w="20px" asChild><MdMenu /></Icon></IconButton>
+        <IconButton aria-label="Menu" cursor="pointer" variant="brand">
+          {/* <Icon h="24px" w="24px" asChild> */}
+          <AiOutlineMenuUnfold />
+          {/* </Icon> */}
+        </IconButton>
       </Flex>
-      <Drawer.Root open={open} placement={"start"} onOpenChange={(e) => (e.open ? onOpen() : onClose())}>
+      <Drawer.Root
+        open={open}
+        placement={"start"}
+        onOpenChange={(e) => (e.open ? onOpen() : onClose())}
+      >
         <Portal>
-
           <Drawer.Positioner>
-            <Drawer.Content maxW="200px" bg={subbg}>
-              <Flex alignItems={"center"} justifyContent={"start"} gap={2} p={3} >
-                <Box paddingStart={3}>
-                  <IconButton
-                    // mb={2}
-                    aria-label="Menu"
-                    // variant="ghost"
-                    cursor="pointer"
-                    onClick={onClose}><Icon h="20px" w="20px" asChild><MdMenu /></Icon></IconButton>
-                </Box>
+            <Drawer.Content maxW="280px" bg={sidebarBg} h="100dvh">
+              <Flex alignItems={"center"} justifyContent={"space-between"} gap={2} p={4}>
                 <Box>
                   <Brand />
                 </Box>
+                <IconButton
+                  aria-label="Close Menu"
+
+                  variant="brand"
+                  onClick={onClose}
+                >
+
+                  <AiOutlineMenuFold />
+
+                </IconButton>
               </Flex>
               <Separator />
-              <Drawer.Body maxW="200px" px="0rem" pb="0">
-                <Flex
-                  direction="column"
-                  pt="25px"
-                  px="16px"
-                  borderRadius="30px"
-                  // p={{ pt: "0", px: "16px" }}
-                  bg={sidebarBg}
-                >
-                  <VStack gap={4} align="stretch" >
+              <Drawer.Body
+                px="0"
+                pb="0"
+                overflowY="auto"
+                css={{
+                  "&::-webkit-scrollbar": {
+                    display: "none",
+                  },
+                  scrollbarWidth: "none",
+                  msOverflowStyle: "none",
+                }}
+              >
+                <Flex direction="column" pt="10px" px="16px">
+                  <VStack gap={2} align="stretch">
                     <SideNavMenuBuilder showFullSideBarMenu={true} />
                   </VStack>
                 </Flex>
               </Drawer.Body>
             </Drawer.Content>
           </Drawer.Positioner>
-
         </Portal>
       </Drawer.Root>
     </Flex>

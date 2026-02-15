@@ -2,30 +2,9 @@ import { defineRecipe } from "@chakra-ui/react"
 
 export const buttonRecipe = defineRecipe({
     base: {
-        // display: "inline-flex",
-        // appearance: "none",
-        // alignItems: "center",
-        // justifyContent: "center",
-        // userSelect: "none",
-        // position: "relative",
-        // whiteSpace: "nowrap",
-        // verticalAlign: "middle",
-        // outline: "none",
-        // fontWeight: "600",
-        // lineHeight: "1.2",
+
         borderRadius: "md",
-        // transitionProperty: "common",
-        // transitionDuration: "moderate",
-        // _focusVisible: {
-        //     outline: "2px solid",
-        //     outlineColor: "brand.500",
-        //     outlineOffset: "2px",
-        // },
-        // _disabled: {
-        //     opacity: 0.5,
-        //     cursor: "not-allowed",
-        //     boxShadow: "none",
-        // },
+
     },
     variants: {
         variant: {
@@ -60,16 +39,15 @@ export const buttonRecipe = defineRecipe({
                 },
             },
             brand: {
-                // bgGradient: "to-r",
-                // gradientFrom: "brand.400",
-                // gradientTo: "brand.500",
+                // bg: { _light: "brand.500", _dark: "brand.400" },
                 // color: "white",
-                // boxShadow: "0 4px 15px 0 rgba(116, 79, 247, 0.4)",
+
+                // borderRadius: "full",
+                // boxShadow: "0 4px 15px 0 rgba(111, 93, 255, 0.4)",
                 _hover: {
-                    // gradientFrom: "brand.500",
-                    // gradientTo: "brand.600",
+                    // bg: { _light: "brand.600", _dark: "brand.500" },
                     transform: "translateY(-2px)",
-                    boxShadow: "0 6px 20px 0 rgba(116, 79, 247, 0.5)",
+                    boxShadow: "0 6px 20px 0 rgba(111, 93, 255, 0.5)",
                 },
                 _active: {
                     transform: "translateY(0)",

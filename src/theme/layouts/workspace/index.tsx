@@ -9,6 +9,7 @@ import { RootState } from "@/app/store";
 import AppFooter from "@/features/ui/components/footer/AppFooter";
 import { ColorModeButton } from "@/components/ui/color-mode";
 import { FullscreenButton } from "@/components/ui/fullscreen-button";
+import Appbreadcurmb from "@/features/ui/components/navbar/Appbreadcurmb";
 
 const workspace = () => {
   console.log("%c====EXECUTE DASHBOARD LAYOUT=====", "color:white");
@@ -28,14 +29,16 @@ const workspace = () => {
         FEATURE={FEATURE}
         DISPLAY_TYPE={DISPLAY_TYPE}
       />
-      <Flex flex="1" overflow="hidden">
+      <Flex flex="1" overflow="hidden" gap={2}>
         <PanelSideBar showSidebar={showSidebar} togglesidebar={toggleSidebar} h="100%" />
         {/* Main Content */}
-        <Box flex="1" overflowY="auto" position="relative" zIndex={0}>
+        <Box flex="1" overflowY="auto" position="relative" zIndex={0} p={2}>
           <VStack align="stretch" minH="calc(100vh - 150px)">
-            <Box p={"1.7rem"}>
-              <Outlet />
-            </Box>
+
+            <Appbreadcurmb />
+
+            <Outlet />
+
             <AppFooter />
           </VStack>
 

@@ -8,7 +8,7 @@ import Brand from "../Brand/Brand";
 import TopNavMenuBuilder from "./TopNavMenuBuilder";
 import { memo } from "react";
 import Appbreadcurmb from "./Appbreadcurmb";
-
+import { AiOutlineMenuUnfold } from "react-icons/ai";
 interface AppNavType {
   DISPLAY_TYPE: any;
   FEATURE: any[];
@@ -26,30 +26,25 @@ const Navbar = ({
 
   const bgColor = useColorModeValue("white", 'gray.950');
   return (
-    <Box minH="115px" bg={bgColor}>
+    <Box minH="5.5rem" bg={bgColor}>
       <Box
         w="100%"
         boxShadow="md"
         position="fixed"
-        // position="sticky"
-        // top="1"
-        // left="0"
+
         zIndex={999}
-        // minH="75px"
-        // position="fixed"
+
         top="0"
         left="0"
         bg={bgColor}>
         <Flex
           w="100%"
-          // zIndex={999}
+
           p={2}
           align={"center"}
           justify={"space-between"}
-        // px={4}
-        //  position="fixed"
-        // boxShadow="md"
-        // {...rest}
+
+          {...rest}
         >
 
           <Flex alignItems="center" gap={4}>
@@ -65,7 +60,7 @@ const Navbar = ({
                   color="gray.500"
                   borderRadius="full"
                 >
-                  <Icon as={MdMenu} boxSize={6} />
+                  <Icon as={AiOutlineMenuUnfold} boxSize={6} />
                 </IconButton>
               )}
               {FEATURE.length > 0 && <SidebarResponsive FEATURE_LIST={FEATURE} />}
@@ -86,7 +81,7 @@ const Navbar = ({
           <PanelNavBarAction />
         </Flex>
 
-        <Appbreadcurmb />
+
       </Box>
     </Box>
   );

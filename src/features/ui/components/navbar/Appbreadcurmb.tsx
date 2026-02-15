@@ -75,8 +75,8 @@ const Appbreadcurmb = forwardRef((props, ref) => {
       <Flex
         bg={bgColor}
         zIndex={999}
-        px={4}
-        py={2}
+        // px={2}
+        // py={2}
         w="100%"
         alignItems="center"
         justifyContent="space-between"
@@ -97,7 +97,7 @@ const Appbreadcurmb = forwardRef((props, ref) => {
                     _hover={!isLast ? { textDecoration: "underline" } : {}}
                     color={isLast ? "teal.500" : "fg.muted"}
                   >
-                    {index === 0 && <RiHome9Line color="teal.500" />} {c.label}
+                    {c.label}
                   </Breadcrumb.Item>
                   {!isLast && <Breadcrumb.Separator />}
                 </React.Fragment>

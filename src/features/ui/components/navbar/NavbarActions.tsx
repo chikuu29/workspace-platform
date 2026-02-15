@@ -41,18 +41,8 @@ export default function NavbarActions() {
       <Menu.Root positioning={{ placement: "bottom-end" }}>
         <Menu.Trigger asChild>
           <IconButton
-            // variant="unstyled"
             aria-label="User Profile"
-            w="40px"
-            h="40px"
-            rounded="full"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            outline="none"
-            transition="transform 0.2s"
-            _hover={{ transform: "scale(1.1)", cursor: "pointer" }}
-            _active={{ transform: "scale(0.95)" }}
+            variant="brand"
           >
             <Avatar.Root size="sm">
               <Avatar.Fallback name={userName} colorPalette={'yellow'} fontWeight="bold" />

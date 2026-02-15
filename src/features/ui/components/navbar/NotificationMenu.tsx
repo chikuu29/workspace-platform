@@ -29,7 +29,7 @@ const NotificationMenu: React.FC = () => {
       onOpenChange={(e) => (e.open ? onOpen() : onClose())}
     >
       <Menu.Trigger asChild>
-        <IconButton aria-label="Notifications" variant="outline" size={"sm"}>
+        <IconButton aria-label="Notifications" variant="brand" >
           <Box position="relative">
             <Icon boxSize={6} asChild>
               <MdNotificationsNone />

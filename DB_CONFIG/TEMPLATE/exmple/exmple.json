@@ -1,5 +1,8 @@
 {
     "id": "1",
+    "pageName": "AddMember",
+    "route": "AddMember",
+    "appName": "myGym",
     "appMeta": {
         "appName": "Gym",
         "viewName": "AddMember",
@@ -20,9 +23,14 @@
         ],
         "postScript": "documentPostScript"
     },
+    "UI_TYPE": {
+        "type": "FORM_VIEW",
+        "title": "Create New Member",
+        "description": "",
+        "target": "widgets"
+    },
     "UI_VIEW": {
         "schema": {
-            "viewType": "se",
             "widgets": [
                 {
                     "name": "memberName",

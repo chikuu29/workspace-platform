@@ -26,142 +26,55 @@
     "UI_TYPE": {
         "type": "SECTION_VIEW",
         "title": "Member Onboarding",
-        "description": "Fill in the details below to register a new member into our fitness community.",
+        "description": "Register new members with a premium, guided experience.",
         "target": "sections"
     },
     "UI_VIEW": {
         "schema": {
             "sections": [
                 {
-                    "title": "Personal",
-                    "description": "Personal Information",
-                    "iconName": "MdBadge",
-                    "style": {
-                        "backgroundColor": "#f5f5f5",
-                        "color": "#333",
-                        "borderColor": "#ccc"
-                    },
+                    "title": "Registration Flow",
+                    "description": "Sequential steps to complete member enrollment.",
+                    "iconName": "LuUserPlus",
                     "tabs": [
                         {
-                            "title": "Personal",
-                            "description": "Personal Information",
-                            "iconName": "MdBadge",
-                            "style": {
-                                "backgroundColor": "#f5f5f5",
-                                "color": "#333",
-                                "borderColor": "#ccc"
-                            },
+                            "title": "Personal Details",
+                            "description": "Basic identification and contact information.",
+                            "iconName": "LuUser",
                             "widgets": [
                                 {
                                     "name": "memberName",
-                                    "text": "Member Name",
-                                    "description": "Enter the member's name",
-                                    "type": "text",
-                                    "disabled": false,
-                                    "required": true,
-                                    "maxLength": 20,
-                                    "minLength": 5,
-                                    "hidden": false,
+                                    "text": "Full Name",
+                                    "description": "Enter member's legal name as per ID",
                                     "widget": "textField",
-                                    "outLineBorder": true,
-                                    "listeners": {
-                                        "change": {
-                                            "methodName": "onChangeMemberName",
-                                            "param": "value"
-                                        }
-                                    }
+                                    "oneLiner": true,
+                                    "required": true,
+                                    "maxLength": 50
                                 },
                                 {
                                     "name": "memberEmail",
-                                    "text": "Member Email",
-                                    "description": "Enter the member's email",
+                                    "text": "Email Address",
+                                    "description": "Used for membership alerts and newsletters",
                                     "type": "email",
-                                    "disabled": false,
-                                    "hidden": false,
-                                    "widget": "textField"
-                                },
-                                {
-                                    "name": "memberPhone",
-                                    "text": "Member Phone",
-                                    "description": "Enter the member's phone number",
-                                    "type": "tel",
-                                    "disabled": false,
-                                    "hidden": false,
                                     "widget": "textField",
+                                    "oneLiner": true,
                                     "required": true
                                 },
                                 {
-                                    "name": "memberDOB",
-                                    "text": "Date of Birth",
-                                    "description": "Select the member's date of birth",
-                                    "type": "date",
-                                    "disabled": false,
-                                    "hidden": false,
-                                    "widget": "textField"
-                                },
-                                {
-                                    "name": "memberAddress",
-                                    "text": "Address",
-                                    "description": "Enter the member's address",
-                                    "type": "text",
-                                    "disabled": false,
-                                    "hidden": false,
-                                    "widget": "textAreaField"
-                                },
-                                {
-                                    "name": "memberCity",
-                                    "text": "City",
-                                    "description": "Enter the city of residence",
-                                    "type": "text",
-                                    "disabled": false,
-                                    "hidden": false,
-                                    "widget": "textField"
-                                },
-                                {
-                                    "name": "memberState",
-                                    "text": "State/Province",
-                                    "description": "Enter the member's state or province",
-                                    "type": "text",
-                                    "disabled": false,
-                                    "hidden": false,
-                                    "widget": "textField"
-                                },
-                                {
-                                    "name": "memberZip",
-                                    "text": "Postal Code",
-                                    "description": "Enter the postal code",
-                                    "type": "text",
-                                    "disabled": false,
-                                    "hidden": false,
-                                    "widget": "textField"
-                                },
-                                {
-                                    "name": "memberEmergencyContact",
-                                    "text": "Emergency Contact Name",
-                                    "description": "Enter the emergency contact's name",
-                                    "type": "text",
-                                    "disabled": false,
-                                    "hidden": false,
-                                    "widget": "textField"
-                                },
-                                {
-                                    "name": "memberEmergencyPhone",
-                                    "text": "Emergency Contact Phone",
-                                    "description": "Enter the emergency contact's phone number",
+                                    "name": "memberPhone",
+                                    "text": "Phone Number",
+                                    "description": "Primary contact number for SMS updates",
                                     "type": "tel",
-                                    "disabled": false,
-                                    "hidden": false,
                                     "widget": "textField",
+                                    "oneLiner": true,
                                     "required": true
                                 },
                                 {
                                     "name": "memberGender",
                                     "text": "Gender",
-                                    "description": "Select the member's gender",
-                                    "type": "text",
-                                    "disabled": false,
-                                    "hidden": false,
+                                    "description": "Select the member's gender for facilities allocation",
                                     "widget": "radioField",
+                                    "oneLiner": true,
                                     "options": [
                                         {
                                             "label": "Male",
@@ -175,211 +88,116 @@
                                             "label": "Other",
                                             "value": "other"
                                         }
-                                    ],
-                                    "defaultValue": ""
-                                },
-                                {
-                                    "name": "memberProfilePicture",
-                                    "text": "Upload Document",
-                                    "description": "Upload a document or image for verification",
-                                    "type": "file",
-                                    "accept": "image/*",
-                                    "s3Config": {},
-                                    "defaultApiConfig": {
-                                        "uploadURL": "app/upload"
-                                    },
-                                    "disabled": false,
-                                    "hidden": false,
-                                    "liveCameraAllow": true,
-                                    "widget": "uploadField",
-                                    "capture": "environment",
-                                    "required": true,
-                                    "multiple": false,
-                                    "maxFileSize": 5000000
-                                },
-                                {
-                                    "name": "viewPanel",
-                                    "text": "View Time",
-                                    "hidden": false,
-                                    "isOpen": true,
-                                    "widget": "panel",
-                                    "widgets": [
-                                        {
-                                            "name": "onboardingStepper",
-                                            "widget": "stepper",
-                                            "activeStep": 1,
-                                            "steps": [
-                                                {
-                                                    "title": "Registration"
-                                                },
-                                                {
-                                                    "title": "Verification"
-                                                },
-                                                {
-                                                    "title": "Approval"
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            "name": "statsGrid",
-                                            "widget": "grid",
-                                            "columns": 2,
-                                            "widgets": [
-                                                {
-                                                    "name": "totalMembers",
-                                                    "widget": "kpi",
-                                                    "label": "Total Members",
-                                                    "value": "1,204",
-                                                    "helpText": "+24% this month"
-                                                },
-                                                {
-                                                    "name": "activeMembers",
-                                                    "widget": "kpi",
-                                                    "label": "Active Members",
-                                                    "value": "890",
-                                                    "helpText": "74% retention"
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            "name": "recentActivityTable",
-                                            "widget": "kpiTable",
-                                            "headers": [
-                                                "Date",
-                                                "Activity",
-                                                "Status"
-                                            ],
-                                            "data": [
-                                                {
-                                                    "date": "2024-02-14",
-                                                    "activity": "New Signup",
-                                                    "status": "Pending"
-                                                },
-                                                {
-                                                    "date": "2024-02-13",
-                                                    "activity": "Payment",
-                                                    "status": "Completed"
-                                                }
-                                            ]
-                                        }
                                     ]
+                                },
+                                {
+                                    "name": "memberAddress",
+                                    "text": "Residential Address",
+                                    "description": "Current permanent residence details",
+                                    "widget": "textAreaField",
+                                    "oneLiner": true,
+                                    "required": false
                                 }
                             ]
                         },
                         {
-                            "title": "Payment",
-                            "description": "Payment Information",
-                            "iconName": "MdAccountBalanceWallet",
-                            "style": {
-                                "backgroundColor": "#f5f5f5",
-                                "color": "#333",
-                                "borderColor": "#ccc"
-                            },
+                            "title": "Membership Plan",
+                            "description": "Configure subscription and fitness goals.",
+                            "iconName": "LuActivity",
                             "widgets": [
                                 {
-                                    "name": "memberName",
-                                    "text": "Member Name",
-                                    "description": "Enter the member's name",
-                                    "type": "text",
-                                    "disabled": false,
-                                    "required": true,
-                                    "maxLength": 20,
-                                    "minLength": 5,
-                                    "hidden": false,
-                                    "widget": "textField",
-                                    "outLineBorder": true,
-                                    "listeners": {
-                                        "change": {
-                                            "methodName": "onChangeMemberName",
-                                            "param": "value"
+                                    "name": "planType",
+                                    "text": "Select Plan",
+                                    "description": "Choose the membership duration that best fits your schedule",
+                                    "widget": "radioField",
+                                    "oneLiner": true,
+                                    "options": [
+                                        {
+                                            "label": "Monthly",
+                                            "value": "monthly"
+                                        },
+                                        {
+                                            "label": "Quarterly",
+                                            "value": "quarterly"
+                                        },
+                                        {
+                                            "label": "Annual",
+                                            "value": "annual"
+                                        },
+                                        {
+                                            "label": "Trial",
+                                            "value": "trial"
                                         }
-                                    }
+                                    ],
+                                    "required": true
+                                },
+                                {
+                                    "name": "joiningDate",
+                                    "text": "Joining Date",
+                                    "description": "Select the official start date of the membership",
+                                    "type": "date",
+                                    "widget": "textField",
+                                    "oneLiner": true,
+                                    "required": true
+                                },
+                                {
+                                    "name": "fitnessGoals",
+                                    "text": "Fitness Objectives",
+                                    "description": "What is the member aiming to achieve? (e.g., Weight loss, Muscle gain)",
+                                    "widget": "textAreaField",
+                                    "oneLiner": true
                                 }
                             ]
-                        }
-                    ]
-                },
-                {
-                    "title": "Membership",
-                    "description": "Membership Information",
-                    "iconName": "Membership",
-                    "style": {
-                        "backgroundColor": "#f5f5f5",
-                        "color": "#333",
-                        "borderColor": "#ccc"
-                    },
-                    "tabs": [
+                        },
                         {
-                            "title": "Membership",
-                            "description": "Membership Information",
-                            "iconName": "MdBadge",
-                            "style": {
-                                "backgroundColor": "#f5f5f5",
-                                "color": "#333",
-                                "borderColor": "#ccc"
-                            },
+                            "title": "Verification",
+                            "description": "Security documents and profile setup.",
+                            "iconName": "LuShieldCheck",
                             "widgets": [
                                 {
-                                    "name": "memberName",
-                                    "text": "Member Name",
-                                    "description": "Enter the member's name",
-                                    "type": "text",
-                                    "disabled": false,
+                                    "name": "idProof",
+                                    "text": "Government ID Proof",
+                                    "description": "Upload a valid passport, driver's license, or national ID",
+                                    "widget": "uploadField",
+                                    "oneLiner": true,
                                     "required": true,
-                                    "maxLength": 20,
-                                    "minLength": 5,
-                                    "hidden": false,
-                                    "widget": "textField",
-                                    "outLineBorder": true,
-                                    "listeners": {
-                                        "change": {
-                                            "methodName": "onChangeMemberName",
-                                            "param": "value"
-                                        }
+                                    "liveCameraAllow": true,
+                                    "defaultApiConfig": {
+                                        "uploadURL": "app/upload"
                                     }
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "title": "Payment",
-                    "description": "Payment Information",
-                    "iconName": "MdAccountBalanceWallet",
-                    "style": {
-                        "backgroundColor": "#f5f5f5",
-                        "color": "#333",
-                        "borderColor": "#ccc"
-                    },
-                    "tabs": [
-                        {
-                            "title": "Payment",
-                            "description": "Payment Information",
-                            "iconName": "MdAccountBalanceWallet",
-                            "style": {
-                                "backgroundColor": "#f5f5f5",
-                                "color": "#333",
-                                "borderColor": "#ccc"
-                            },
-                            "widgets": [
+                                },
                                 {
-                                    "name": "memberName",
-                                    "text": "Member Name",
-                                    "description": "Enter the member's name",
-                                    "type": "text",
-                                    "disabled": false,
-                                    "required": true,
-                                    "maxLength": 20,
-                                    "minLength": 5,
-                                    "hidden": false,
-                                    "widget": "textField",
-                                    "outLineBorder": true,
-                                    "listeners": {
-                                        "change": {
-                                            "methodName": "onChangeMemberName",
-                                            "param": "value"
-                                        }
+                                    "name": "profilePic",
+                                    "text": "Profile Photo",
+                                    "description": "A clear facial photo for the membership card",
+                                    "widget": "uploadField",
+                                    "oneLiner": true,
+                                    "liveCameraAllow": true,
+                                    "accept": "image/*",
+                                    "defaultApiConfig": {
+                                        "uploadURL": "app/upload"
                                     }
+                                },
+                                {
+                                    "name": "paymentMode",
+                                    "text": "Payment Mode",
+                                    "description": "Preferred method for subscription renewal",
+                                    "widget": "radioField",
+                                    "oneLiner": true,
+                                    "options": [
+                                        {
+                                            "label": "Cash",
+                                            "value": "cash"
+                                        },
+                                        {
+                                            "label": "Credit Card",
+                                            "value": "card"
+                                        },
+                                        {
+                                            "label": "UPI / Digital",
+                                            "value": "upi"
+                                        }
+                                    ]
                                 }
                             ]
                         }
@@ -388,12 +206,5 @@
             ]
         }
     },
-    "active": true,
-    "truncated": false,
-    "theme": "default",
-    "language": "en",
-    "isHtmlSanitizeRequired": false,
-    "securityEnabled": true,
-    "handlers": [],
-    "mobileView": {}
+    "active": true
 }

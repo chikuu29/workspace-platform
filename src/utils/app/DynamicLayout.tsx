@@ -1,7 +1,7 @@
 // components/layouts/DynamicLayout.tsx
 import React, { Suspense, useMemo } from "react";
 import { lazy } from "react";
-import { useSearchParams } from "react-router";
+import { useParams, useSearchParams } from "react-router";
 import componentConfig from "../../componentConfig";
 import { Skeleton, VStack } from "@chakra-ui/react";
 const LayoutSkeleton = () => (
@@ -15,9 +15,12 @@ const LayoutSkeleton = () => (
 const FallbackLayout = () => <div>Layout not found</div>;
 
 const DynamicLayout: React.FC = () => {
+  const { appCode } = useParams();
   const [searchParams] = useSearchParams();
-  const appName = searchParams.get("app") || "Default";
-  const appConfig = componentConfig[appName];
+  const appParam = searchParams.get("app");
+
+  const appName = useMemo(() => appCode || appParam || "Default", [appCode, appParam]);
+  const appConfig = useMemo(() => componentConfig[appName], [appName]);
 
   const LayoutComponent = useMemo(() => {
     if (

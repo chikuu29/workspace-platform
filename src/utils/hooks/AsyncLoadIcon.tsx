@@ -22,7 +22,9 @@ const AsyncLoadIcon = React.memo(({ iconName }: { iconName: string }) => {
   )
   return (
     <Suspense fallback={<Spinner size="sm" />}>
-      <Box size="24px" asChild><IconComponent /></Box>
+      <Box boxSize="24px">
+        <IconComponent />
+      </Box>
     </Suspense>
   );
 });

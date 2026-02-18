@@ -1,7 +1,7 @@
 import { ColorModeButton, useColorModeValue } from "@/components/ui/color-mode";
 import { FullscreenButton } from "@/components/ui/fullscreen-button";
 import { Box, Breadcrumb, Flex } from "@chakra-ui/react";
-import React, { forwardRef, useEffect, useState } from "react";
+import React, { forwardRef, useEffect, useState, useMemo } from "react";
 import { LuHouse, LuShirt } from "react-icons/lu";
 import { RiHome9Line } from "react-icons/ri";
 import {
@@ -16,12 +16,11 @@ interface ConfigItem {
   label: string;
 }
 const Appbreadcurmb = forwardRef((props, ref) => {
-  console.log("===CALLING Appbreadcurmb===");
-  const { view, secondaryView } = useParams(); // Access the `view` and `params` from the URL
+  const { appCode, view, secondaryView } = useParams();
   const [searchParams] = useSearchParams();
-  const appName = searchParams.get("app") || "Default";
+  const appParam = searchParams.get("app");
+  const appName = useMemo(() => appCode || appParam || "Default", [appCode, appParam]);
   const { pathname } = useLocation();
-  console.log("pathname", pathname);
 
   const navigate = useNavigate();
 
@@ -34,34 +33,43 @@ const Appbreadcurmb = forwardRef((props, ref) => {
   useEffect(() => {
     const newConfig: ConfigItem[] = [{ path: "/myApps", label: "Home" }];
 
-    if (!view) {
+    if (!view && !appCode) {
       newConfig.push({ path: "#", label: "MyApps" });
     } else {
+      // Base App Breadcrumb
+      const appBasePath = appCode ? `/app/${appCode}/home` : `/?app=${appName}`;
       newConfig.push({
-        path: `${pathname}?app=${appName}`.replace(view, "home"),
+        path: `${pathname.split("/workspace")[0]}/workspace${appBasePath}`,
         label: appName,
       });
-      if (view != "home") {
+
+      if (view && view !== "home") {
         if (secondaryView) {
-          // console.log(pathname.split("/").slice(0, 3).join("/"));
+          const viewPath = appCode ? `/app/${appCode}/${view}` : `/${view}?app=${appName}`;
           newConfig.push({
-            path: `${pathname.split("/").slice(0, 3).join("/")}?app=${appName}`,
+            path: `${pathname.split("/workspace")[0]}/workspace${viewPath}`,
             label: view,
           });
         } else {
-          newConfig.push({ path: `${pathname}?app=${appName}`, label: view });
+          const viewPath = appCode ? `/app/${appCode}/${view}` : `/${view}?app=${appName}`;
+          newConfig.push({
+            path: `${pathname.split("/workspace")[0]}/workspace${viewPath}`,
+            label: view
+          });
         }
       }
+
       if (secondaryView) {
+        const secondaryPath = appCode ? `/app/${appCode}/${view}/${secondaryView}` : `/${view}/${secondaryView}?app=${appName}`;
         newConfig.push({
-          path: `${pathname}?app=${appName}`,
+          path: `${pathname.split("/workspace")[0]}/workspace${secondaryPath}`,
           label: secondaryView,
         });
       }
     }
 
     setConfig(newConfig);
-  }, [pathname, view, appName]);
+  }, [pathname, view, secondaryView, appName, appCode]);
 
   const handleNavigate = (c: ConfigItem, isLast: boolean) => {
     if (!isLast) navigate(c.path);

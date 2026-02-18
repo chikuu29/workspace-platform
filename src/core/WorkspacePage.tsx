@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react"
-import { useParams, useNavigate } from "react-router"
+import { useEffect, useState, useMemo } from "react"
+import { useParams, useNavigate, useSearchParams } from "react-router"
 import ViewRenderer from "./renderer/ViewRenderer"
 import { GETAPI } from "@/app/api"
 import { Box, Container, HStack, Stack, VStack } from "@chakra-ui/react"
@@ -28,12 +28,12 @@ const LoadingState = () => (
 
 const WorkspacePage = () => {
     console.log("========WorkspacePage========s")
-    const { tenant, view: UITemplateID } = useParams()
+    const { tenant, appCode, view: UITemplateID } = useParams()
     const navigate = useNavigate()
-    console.log("page", useParams())
-    console.log("UITemplateID", UITemplateID)
-    const searchParams = new URLSearchParams(location.search)
-    const app = searchParams.get("app")
+    const [searchParams] = useSearchParams()
+    const appParam = searchParams.get("app")
+
+    const app = useMemo(() => appCode || appParam, [appCode, appParam])
     const [config, setConfig] = useState(null)
 
     useEffect(() => {

@@ -31,7 +31,7 @@ interface MenuLinkInterFace {
 }
 
 import { Tooltip } from "@/components/ui/tooltip";
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useMemo } from "react";
 
 export default function MenuLink(props: MenuLinkInterFace) {
   const { menuConfig, showFullSideBarMenu } = props;
@@ -53,7 +53,7 @@ export default function MenuLink(props: MenuLinkInterFace) {
   const tenant_name = auth?.loginInfo
     ? auth.loginInfo["tenant_name"]
     : "GHOST_TENANT";
-  console.log("===TENANT NAME===", tenant_name);
+  // console.log("===TENANT NAME===", tenant_name);
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -160,10 +160,23 @@ export default function MenuLink(props: MenuLinkInterFace) {
     </Tooltip>
   );
 
+  const navigationPath = useMemo(() => {
+    if (!menuConfig.path) return "";
+    // Remove leading slash from path if it exists to avoid double slashes when joining
+    const cleanPath = menuConfig.path.startsWith("/") ? menuConfig.path.substring(1) : menuConfig.path;
+    return `/${tenant_name}/workspace/${cleanPath}`;
+  }, [tenant_name, menuConfig.path]);
+
+  const targetUrl = useMemo(() => {
+    if (!menuConfig.target) return "";
+    const cleanTarget = menuConfig.target.startsWith("/") ? menuConfig.target.substring(1) : menuConfig.target;
+    return `/${tenant_name}/workspace/${cleanTarget}`;
+  }, [tenant_name, menuConfig.target]);
+
   return menuConfig.path ? (
     menuConfig.target && menuConfig.target !== "" ? (
       <a
-        href={`${tenant_name}/workspace/${menuConfig.target}`}
+        href={targetUrl}
         style={{ width: "100%", textDecoration: "none" }}
         target="_blank"
         rel="noopener noreferrer"
@@ -172,7 +185,7 @@ export default function MenuLink(props: MenuLinkInterFace) {
       </a>
     ) : (
       <NavLink
-        to={`/${tenant_name}/workspace${menuConfig.path}`}
+        to={navigationPath}
         style={({ isActive }) => ({
           width: "100%",
           display: "block",

@@ -1,67 +1,54 @@
-import { useLocation, useParams, useSearchParams } from "react-router";
-import { lazy, Suspense, useMemo } from "react";
-import { Navigate } from "react-router";
+import React, { lazy, Suspense, useMemo } from "react";
+import { useParams, useSearchParams } from "react-router";
 import { AppLoader } from "@/features/ui/components/Loader/Loader";
-import componentConfig from "@/componentConfig"; // Adjust the path accordingly
-import React from "react";
+import componentConfig from "@/componentConfig";
+
+// Cache for lazy components to prevent re-creation and unmounting
+const componentCache = new Map<string, React.LazyExoticComponent<any>>();
+const getLazyComponent = (importFn: any, key: string) => {
+  if (!componentCache.has(key)) {
+    componentCache.set(key, lazy(importFn));
+  }
+  return componentCache.get(key);
+};
 
 const HandleDynamicView = () => {
-  console.log("===HANDLE DYNAMIC VIEW===");
-  const { view, secondaryView } = useParams(); // Access the `view` and `params` from the URL
+  const { appCode, view, params } = useParams(); // Access params from the URL
   const [searchParams] = useSearchParams();
-  const appName = searchParams.get("app") || "Default";
+  const appParam = searchParams.get("app");
 
-  const appConfig = componentConfig[appName];
-  console.log("===APP CONFIG===", appConfig);
+  const appName = useMemo(() => appCode || appParam || "Default", [appCode, appParam]);
 
+  const appConfig = useMemo(() => componentConfig[appName], [appName]);
 
   // Safely access the component based on the view
   const Component = useMemo(() => {
-    if (
-      !secondaryView &&
-      view &&
-      appConfig &&
-      typeof appConfig === "object" &&
-      view in appConfig
-    ) {
-      try {
-        console.log("===VIEW===", appConfig[view]);
-        return lazy(appConfig[view]);
-      } catch (err) {
-        console.error("Error loading component:", err);
-        return null;
-      }
-    } else if (
-      secondaryView &&
-      view &&
-      appConfig &&
-      typeof appConfig === "object" &&
-      secondaryView in appConfig
-    ) {
+    if (!appConfig || typeof appConfig !== "object") return null;
 
-      try {
-        return lazy(appConfig[secondaryView]);
-      } catch (err) {
-        console.error("Error loading component:", err);
-        return null;
-      }
+    // Use view as primary and params as secondary if needed
+    if (view && view in appConfig) {
+      const cacheKey = `${appName}-${view}`;
+      return getLazyComponent(appConfig[view], cacheKey);
     }
-  }, [view, secondaryView, appConfig]);
+    return null;
+  }, [view, appConfig, appName]);
+
   // If the component doesn't exist, redirect to the 404 page
-
-
   if (!Component) {
     // Fallback to Universal WorkspacePage
-    const WorkspacePage = lazy((componentConfig["Default"] as any)["workspacePage"]);
+    const WorkspacePage = getLazyComponent((componentConfig["Default"] as any)["workspacePage"], "Default-workspacePage");
     return (
       <Suspense fallback={<AppLoader />}>
-        <WorkspacePage />
+        {WorkspacePage && <WorkspacePage />}
       </Suspense>
     );
   }
 
+  // Use a more unique key that includes app, view and any additional path parameters
+  const uniqueKey = `${appName}-${view || "home"}-${params || "base"}`;
+
   return (
-    <Suspense fallback={<AppLoader />} key={`${appName}-${view}-${secondaryView || "default"}`}>
+    <Suspense fallback={<AppLoader />} key={uniqueKey}>
       <Component /> {/* Render the lazy-loaded component */}
     </Suspense>
   );

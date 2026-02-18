@@ -7,7 +7,7 @@
                 "id": "ADMIN_MODULES",
                 "hidden": false,
                 "name": "Admin Module",
-                "target": "/AdminModule?app=AdminModules",
+                "target": "/app/AdminModules/AdminModule",
                 "actions": {
                     "onClick": ""
                 },
@@ -24,7 +24,7 @@
                 "id": "MYOMSSYSTEM",
                 "hidden": true,
                 "name": "OMS SYSTEM",
-                "target": "/MyOMS?app=MyOMS",
+                "target": "/app/MyOMS/MyOMS",
                 "actions": {
                     "onClick": ""
                 },
@@ -41,7 +41,7 @@
                 "id": "MY_GYM",
                 "hidden": false,
                 "name": "MY GYM",
-                "target": "/GymView?app=myGym",
+                "target": "/app/myGym/GymView",
                 "actions": {
                     "onClick": ""
                 },
@@ -63,13 +63,13 @@
                     {
                         "label": "Home",
                         "icon": "FcHome",
-                        "path": "/AdminModule?app=AdminModules",
+                        "path": "/app/AdminModules/AdminModule",
                         "isMaster": true
                     },
                     {
                         "label": "DB INFO",
                         "icon": "FaDatabase",
-                        "path": "/DatabaseStatistics?app=AdminModules",
+                        "path": "/app/AdminModules/DatabaseStatistics",
                         "isMaster": true
                     },
                     {
@@ -80,7 +80,7 @@
                             {
                                 "label": "List Members",
                                 "icon": "FcTodoList",
-                                "path": "/DatabaseStatistics?app=AdminModules"
+                                "path": "/app/AdminModules/DatabaseStatistics"
                             }
                         ]
                     }
@@ -122,13 +122,13 @@
                 ]
             },
             "myGym": {
-                "SHOW_SIDE_NAV_MENU": false,
+                "SHOW_SIDE_NAV_MENU": true,
                 "SHOW_TOP_NAV_MENU": true,
                 "MENU": [
                     {
                         "label": "Home",
                         "icon": "FcHome",
-                        "path": "/GymView?app=myGym",
+                        "path": "/app/myGym/GymView",
                         "isMaster": true
                     },
                     {
@@ -139,17 +139,17 @@
                             {
                                 "label": "List Members",
                                 "icon": "FcTodoList",
-                                "path": "/ListMember?app=myGym"
+                                "path": "/app/myGym/ListMember"
                             },
                             {
                                 "label": "Add Member",
                                 "icon": "FcPlus",
-                                "path": "/AddMember?app=myGym"
+                                "path": "/app/myGym/AddMember"
                             },
                             {
                                 "label": "Member Check-In",
                                 "icon": "FcCheckmark",
-                                "path": "/MembserCheckIn?app=myGym"
+                                "path": "/app/myGym/MembserCheckIn"
                             }
                         ]
                     },
@@ -227,12 +227,12 @@
                             {
                                 "label": "Subscription Plans",
                                 "icon": "FcPlanner",
-                                "path": "/Subscription?app=myGym"
+                                "path": "/app/myGym/Subscription"
                             },
                             {
                                 "label": "Payment History",
                                 "icon": "FcList",
-                                "path": "/PaymentsHistory?app=myGym"
+                                "path": "/app/myGym/PaymentsHistory"
                             }
                         ]
                     }

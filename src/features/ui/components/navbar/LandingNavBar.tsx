@@ -40,7 +40,9 @@ export default function WithSubnavigation() {
           <IconButton onClick={onToggle} variant={"ghost"} aria-label={"Toggle Navigation"}>{open ? <Icon as={LuX} w={3} h={3} /> : <Icon as={LuMenu} w={5} h={5} />}</IconButton>
         </Flex>
         <Flex flex={{ base: 1 }} justify={{ base: "center", md: "start" }}>
-          <Icon h="24px" w="24px" color="white" mr={2} asChild><GrDocumentStore /></Icon>
+          <Icon h="24px" w="24px" color="white" mr={2}>
+            <GrDocumentStore />
+          </Icon>
           <Text
             textAlign={useBreakpointValue({ base: "center", md: "left" })}
             fontFamily={"heading"}
@@ -165,7 +167,9 @@ const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
             align={"center"}
             flex={1}
           >
-            <Icon color={"pink.400"} w={5} h={5} asChild><LuChevronRight /></Icon>
+            <Icon color={"pink.400"} w={5} h={5}>
+              <LuChevronRight />
+            </Icon>
           </Flex>
         </Stack>
       </a></Box>
@@ -211,7 +215,9 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
               transform={open ? "rotate(180deg)" : ""}
               w={6}
               h={6}
-              asChild><LuChevronDown /></Icon>
+            >
+              <LuChevronDown />
+            </Icon>
           )}
         </a></Box>
       <Collapsible.Root open={open} style={{ marginTop: "0!important" }}>

@@ -71,7 +71,6 @@ interface MenuLinkInterFace {
   menuConfig: any;
 }
 const NavItem = ({ menuConfig, ...rest }: MenuLinkInterFace) => {
-  console.log("===Calling NavaItem===");
 
   const { colorMode } = useColorMode();
   // console.log("hii", menuConfig);

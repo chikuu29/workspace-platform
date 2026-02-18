@@ -31,7 +31,7 @@ const NotificationMenu: React.FC = () => {
       <Menu.Trigger asChild>
         <IconButton aria-label="Notifications" variant="brand" >
           <Box position="relative">
-            <Icon boxSize={6} asChild>
+            <Icon boxSize={6}>
               <MdNotificationsNone />
             </Icon>
             {notificationsCount > 0 && (

@@ -80,7 +80,7 @@ const MemberCard = ({ name, membership, visits, image, id }: any) => (
         {"member.membership"}
       </Text>
       <Stack direction="row" align="center" gap={1} mt={1}>
-        <Icon color="gray.500" w={3} h={3} asChild><FaUserAlt /></Icon>
+        <Icon color="gray.500" w={3} h={3}><FaUserAlt /></Icon>
         <Text fontSize="xs" color="gray.500">
           {visits} Visits
         </Text>

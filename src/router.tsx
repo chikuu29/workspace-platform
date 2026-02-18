@@ -81,6 +81,22 @@ const routes: RouteObject[] = [
         element: <HandleDynamicView />,
       },
       {
+        path: "app/:appCode",
+        element: <HandleDynamicView />,
+        children: [
+          {
+            path: ":view/*",
+            element: <HandleDynamicView />,
+            children: [
+              {
+                path: ":params/*",
+                element: <HandleDynamicView />,
+              },
+            ],
+          },
+        ],
+      },
+      {
         path: ":view/*",
         element: <HandleDynamicView />,
         children: [

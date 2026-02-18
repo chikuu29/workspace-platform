@@ -11,7 +11,6 @@ import { ComponentRegistry } from "../registry/ComponentRegistry";
 
 
 
-
 interface WidgetConfig {
   name: string;
   text: string;
@@ -33,47 +32,72 @@ interface RunTimeWidgetRendererProps {
   }>;
 }
 
-const RunTimeWidgetRender: React.FC<any> = React.memo(({ configs, ...rest }) => {
-  console.log("====Calling RunTimeWidgetRender===");
-  const { scriptFiles, ...styles } = rest
-  const { errors } = useFormState()
-  if (!configs) return null;
+const RunTimeWidgetRender: React.FC<any> = React.memo(({ configs, tabs, ...rest }) => {
+  const { errors } = useFormState();
+
+  // If tabs are provided at this level, render the TabsWidget directly
+  if (tabs && tabs.length > 0) {
+    const TabsWidgetComponent = ComponentRegistry.get("tabs");
+    if (TabsWidgetComponent) {
+      return <TabsWidgetComponent tabs={tabs} {...rest} />;
+    }
+  }
+
+  if (!configs || !Array.isArray(configs)) return null;
+
   return (
     <>
-      {configs.map((widgetConfig: any) => (
-        <Box key={widgetConfig.name} {...styles}>
-          {/* Added key here */}
-          {(() => {
-            switch (widgetConfig.widget) {
-              case "textField":
-                return <TextField {...widgetConfig} errors={errors[widgetConfig.name]} />;
-              case "textAreaField":
-                return <TextArea {...widgetConfig} errors={errors[widgetConfig.name]} />;
-              case "uploadField":
-                return <UploadField {...widgetConfig} errors={errors[widgetConfig.name]} />;
-              case "panel":
-                return (
-                  <CollapsiblePanel
-                    {...widgetConfig}
-                    {...rest}
-                    widgets={widgetConfig.widgets || []}
+      {configs.map((widgetConfig: any) => {
+        // If the widget itself has tabs, we should render them
+        if (widgetConfig.tabs && widgetConfig.tabs.length > 0) {
+          const TabsWidgetComponent = ComponentRegistry.get("tabs");
+          if (TabsWidgetComponent) {
+            return (
+              <Box key={widgetConfig.name || "tabs-container"} {...rest}>
+                <TabsWidgetComponent tabs={widgetConfig.tabs} {...rest} />
+              </Box>
+            );
+          }
+        }
 
-                  />
-                );
-              case "radioField":
-                return <RadioField {...widgetConfig} {...rest} errors={errors[widgetConfig.name]} />
-              default:
-                const RegisteredComponent = ComponentRegistry.get(widgetConfig.widget);
-                if (RegisteredComponent) {
-                  return <RegisteredComponent {...widgetConfig} {...rest} errors={errors[widgetConfig.name]} widgets={widgetConfig.widgets} />;
-                }
-                return null; // Handle unknown widget types gracefully
-            }
-          })()}
-          {/* IIFE to execute the switch statement */}
-        </Box>
-      ))}
-
+        return (
+          <Box key={widgetConfig.name} {...rest}>
+            {(() => {
+              switch (widgetConfig.widget) {
+                case "textField":
+                  return <TextField {...widgetConfig} errors={errors[widgetConfig.name]} />;
+                case "textAreaField":
+                  return <TextArea {...widgetConfig} errors={errors[widgetConfig.name]} />;
+                case "uploadField":
+                  return <UploadField {...widgetConfig} errors={errors[widgetConfig.name]} />;
+                case "panel":
+                  return (
+                    <CollapsiblePanel
+                      {...widgetConfig}
+                      {...rest}
+                      widgets={widgetConfig.widgets || []}
+                    />
+                  );
+                case "radioField":
+                  return <RadioField {...widgetConfig} {...rest} errors={errors[widgetConfig.name]} />;
+                default:
+                  const RegisteredComponent = ComponentRegistry.get(widgetConfig.widget);
+                  if (RegisteredComponent) {
+                    return (
+                      <RegisteredComponent
+                        {...widgetConfig}
+                        {...rest}
+                        errors={errors[widgetConfig.name]}
+                        widgets={widgetConfig.widgets}
+                      />
+                    );
+                  }
+                  return null;
+              }
+            })()}
+          </Box>
+        );
+      })}
     </>
   );
 });

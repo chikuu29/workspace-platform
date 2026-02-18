@@ -26,99 +26,13 @@ import {
     StepsNextTrigger,
     StepsPrevTrigger,
 } from "@/components/ui/steps";
-import {
-    RadioCardRoot,
-    RadioCardItem,
-    RadioCardLabel,
-} from "@/components/ui/radio-card";
-import { Field } from "@/components/ui/field";
-import {
-    SelectRoot,
-    SelectTrigger,
-    SelectValueText,
-    SelectContent,
-    SelectItem,
-} from "@/components/ui/select";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { createListCollection } from "@chakra-ui/react";
+import { FormProvider, useForm } from "react-hook-form";
+import RunTimeWidgetRender from "../widgets/RunTimeWidget";
+import "../widgets"; // Ensure all widgets are registered
+import { ScriptProvider } from "@/features/ui/components/contexts/ScriptProvider";
 
-// Static collections moved outside to prevent recreation
-const genderCollection = createListCollection({
-    items: [
-        { label: "Male", value: "male" },
-        { label: "Female", value: "female" },
-        { label: "Other", value: "other" },
-    ],
-});
-
-const trainerCollection = createListCollection({
-    items: [
-        { label: "Sarah Connor", value: "1" },
-        { label: "Mike Mentzer", value: "2" },
-        { label: "Dorian Yates", value: "3" },
-    ],
-});
-
-// Memoized Individual Widget Renderer
-const WidgetRenderer = memo(({ widget, value, onChange }: any) => {
-    // console.log(`Rendering Widget: ${widget.name}`);
-
-    switch (widget.widget) {
-        case "textField":
-            return (
-                <Field label={widget.text} required={widget.required}>
-                    <Input
-                        placeholder={widget.description}
-                        value={value || ""}
-                        onChange={(e) => onChange(widget.name, e.target.value)}
-                    />
-                </Field>
-            );
-        case "selectField":
-            // Fallback to genderCollection for demo if not provided
-            const collection = widget.name === "gender" ? genderCollection : trainerCollection;
-            return (
-                <Field label={widget.text} required={widget.required}>
-                    <SelectRoot
-                        size="md"
-                        collection={collection}
-                        value={[value]}
-                        onValueChange={(e) => onChange(widget.name, e.value[0])}
-                    >
-                        <SelectTrigger>
-                            <SelectValueText placeholder={widget.description} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {collection.items.map((item) => (
-                                <SelectItem item={item} key={item.value}>
-                                    {item.label}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </SelectRoot>
-                </Field>
-            );
-        default:
-            return null;
-    }
-});
-
-// Memoized Step Content Renderer
-const StepContentRenderer = memo(({ widgets, formData, updateField }: any) => {
-    // console.log("Rendering StepContentRenderer");
-    return (
-        <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap="6">
-            {widgets.map((widget: any) => (
-                <WidgetRenderer
-                    key={widget.name}
-                    widget={widget}
-                    value={formData[widget.name]}
-                    onChange={updateField}
-                />
-            ))}
-        </Grid>
-    );
-});
+// Gender and Trainer collections are no longer needed here as they are handled by specialized widgets or the template
 
 const SectionView = ({ config }: any) => {
     const sidebarBg = useColorModeValue("white", "gray.950");
@@ -129,10 +43,14 @@ const SectionView = ({ config }: any) => {
 
     const [step, setStep] = React.useState(0);
 
-    // Dynamic sections from config
     const sections = useMemo(() => {
         return config?.UI_VIEW?.schema?.sections || [];
     }, [config]);
+
+    const scriptFiles = useMemo(() => {
+        return config?.scripts?.files || [];
+    }, [config]);
+
 
     // Icon mapping
     const getIcon = (name: string) => {
@@ -144,24 +62,10 @@ const SectionView = ({ config }: any) => {
         }
     };
 
-    // Initialize formData dynamically
-    const initialFormData = useMemo(() => {
-        const data: any = {};
-        sections.forEach((section: any) => {
-            section.tabs?.forEach((tab: any) => {
-                tab.widgets?.forEach((widget: any) => {
-                    data[widget.name] = "";
-                });
-            });
-        });
-        return data;
-    }, [sections]);
-
-    const [formData, setFormData] = React.useState(initialFormData);
-
-    const updateField = useCallback((field: string, value: any) => {
-        setFormData((prev: any) => ({ ...prev, [field]: value }));
-    }, []);
+    const methods = useForm({
+        mode: "onChange",
+        defaultValues: {},
+    });
 
     const handleStepChange = useCallback((e: any) => {
         setStep(e.step);
@@ -169,8 +73,13 @@ const SectionView = ({ config }: any) => {
 
     const handleReset = useCallback(() => {
         setStep(0);
-        setFormData(initialFormData);
-    }, [initialFormData]);
+        methods.reset();
+    }, [methods]);
+
+    const onFormSubmit = (data: any) => {
+        console.log("SectionView Form Submitted:", data);
+        setStep(sections.length);
+    };
 
     if (!sections.length) return null;
 
@@ -244,23 +153,28 @@ const SectionView = ({ config }: any) => {
 
                         {/* Middle Section: Content */}
                         <Box p={{ base: "6", md: "10" }} flex="1">
-                            {sections.map((section: any, index: number) => (
-                                <StepsContent key={index} index={index}>
-                                    <Stack gap="6">
-                                        <HStack gap="2" pb="4" borderBottom="1px solid" borderColor={separatorColor}>
-                                            <Icon as={getIcon(section.iconName)} color="blue.500" boxSize="5" />
-                                            <Heading size="md" fontWeight="bold">{section.description}</Heading>
-                                        </HStack>
+                            <FormProvider {...methods}>
+                                <form onSubmit={methods.handleSubmit(onFormSubmit)}>
+                                    <ScriptProvider scriptFiles={scriptFiles}>
+                                        {sections.map((section: any, index: number) => (
+                                            <StepsContent key={index} index={index}>
+                                                <Stack gap="6">
+                                                    {/* <HStack gap="2" pb="4" borderBottom="1px solid" borderColor={separatorColor}>
+                                                    <Icon as={getIcon(section.iconName)} color="blue.500" boxSize="5" />
+                                                    <Heading size="md" fontWeight="bold">{section.description}</Heading>
+                                                </HStack> */}
 
-                                        {/* Render widgets from the first tab (skipping tabs layer) */}
-                                        <StepContentRenderer
-                                            widgets={section.tabs?.[0]?.widgets || []}
-                                            formData={formData}
-                                            updateField={updateField}
-                                        />
-                                    </Stack>
-                                </StepsContent>
-                            ))}
+                                                    {/* Render tabs/widgets dynamically using RunTimeWidgetRender */}
+                                                    <RunTimeWidgetRender
+                                                        configs={section.widgets}
+                                                        tabs={section.tabs}
+                                                    />
+                                                </Stack>
+                                            </StepsContent>
+                                        ))}
+                                    </ScriptProvider>
+                                </form>
+                            </FormProvider>
 
                             {/* Success State */}
                             {step === sections.length && (
@@ -312,7 +226,14 @@ const SectionView = ({ config }: any) => {
                                                 </Button>
                                             </StepsNextTrigger>
                                         ) : (
-                                            <Button variant="brand" size="lg" px={{ base: "8", md: "12" }} shadow="lg" onClick={() => setStep(sections.length)} w={{ base: "full", sm: "auto" }}>
+                                            <Button
+                                                variant="brand"
+                                                size="lg"
+                                                px={{ base: "8", md: "12" }}
+                                                shadow="lg"
+                                                onClick={methods.handleSubmit(onFormSubmit)}
+                                                w={{ base: "full", sm: "auto" }}
+                                            >
                                                 Complete
                                             </Button>
                                         )}

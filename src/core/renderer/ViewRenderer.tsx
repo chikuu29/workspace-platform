@@ -3,6 +3,7 @@ import React from "react";
 import { Text } from "@chakra-ui/react";
 import { ViewRegistry } from "../registry/ViewRegistry";
 import "../views";
+import "../widgets"; // Ensure all widgets are registered globally
 
 const ViewRenderer = ({ config }: { config: any }) => {
 

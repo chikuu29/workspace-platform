@@ -8,6 +8,7 @@ import Grid from './Grid';
 import StepperWidget from './Stepper';
 import KPITile from './KPITile';
 import KPITable from './KPITable';
+import TabsWidget from './TabsWidget';
 
 // Register widgets
 ComponentRegistry.register('textField', TextField);
@@ -19,5 +20,6 @@ ComponentRegistry.register('grid', Grid);
 ComponentRegistry.register('stepper', StepperWidget);
 ComponentRegistry.register('kpi', KPITile);
 ComponentRegistry.register('kpiTable', KPITable);
+ComponentRegistry.register('tabs', TabsWidget);
 
-export { TextField, RadioField, TextArea, UploadField, CollapsiblePanel, Grid, StepperWidget, KPITile, KPITable };
+export { TextField, RadioField, TextArea, UploadField, CollapsiblePanel, Grid, StepperWidget, KPITile, KPITable, TabsWidget };

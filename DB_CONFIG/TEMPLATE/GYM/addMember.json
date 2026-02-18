@@ -265,6 +265,37 @@
                                     ]
                                 }
                             ]
+                        },
+                        {
+                            "title": "Payment",
+                            "description": "Payment Information",
+                            "iconName": "MdAccountBalanceWallet",
+                            "style": {
+                                "backgroundColor": "#f5f5f5",
+                                "color": "#333",
+                                "borderColor": "#ccc"
+                            },
+                            "widgets": [
+                                {
+                                    "name": "memberName",
+                                    "text": "Member Name",
+                                    "description": "Enter the member's name",
+                                    "type": "text",
+                                    "disabled": false,
+                                    "required": true,
+                                    "maxLength": 20,
+                                    "minLength": 5,
+                                    "hidden": false,
+                                    "widget": "textField",
+                                    "outLineBorder": true,
+                                    "listeners": {
+                                        "change": {
+                                            "methodName": "onChangeMemberName",
+                                            "param": "value"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     ]
                 },

@@ -1,26 +1,27 @@
-import { Steps, Box, Flex, Input, Field } from "@chakra-ui/react";
+import { Box, Flex, Input, Field, Text } from "@chakra-ui/react";
 import { useColorModeValue } from "../../components/ui/color-mode";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, memo, useCallback } from "react";
 import React from "react";
 import { FieldError, useFormContext, useWatch } from "react-hook-form";
 import { useScriptInstance } from "../../features/ui/components/contexts/ScriptProvider";
+
 interface TEXTFIELD {
   name: string;
   text: string;
   required?: boolean;
   description?: string;
   type?: string;
-  disabled?: boolean; // Optional property
-  hidden?: boolean; // Optional property
-  widget?: string; // Optional property
-  oneLiner?: boolean; // Optional property
+  disabled?: boolean;
+  hidden?: boolean;
+  widget?: string;
+  oneLiner?: boolean;
   outLineBorder?: boolean;
   maxLength?: number;
   minLength?: number;
   listeners?: {
     change?: {
-      methodName: string; // Name of the method to call
-      param: string; // Parameter to pass to the method
+      methodName: string;
+      param: string;
     };
     [key: string]: any;
   };
@@ -31,7 +32,7 @@ const TextField = ({
   name,
   text,
   description,
-  type = "string",
+  type = "text",
   disabled = false,
   hidden = false,
   widget,
@@ -44,8 +45,7 @@ const TextField = ({
   errors,
 }: TEXTFIELD) => {
   if (hidden) return null;
-  console.log("===EXECUTE TextField===");
-  // If hidden is true, do not render anything
+
   const [dynamicMethods, setDynamicMethods] = useState<any>({});
   const { getScriptInstance, scriptFiles } = useScriptInstance();
 
@@ -53,6 +53,8 @@ const TextField = ({
     const loadDynamicMethods = async () => {
       try {
         const methods = getScriptInstance[0];
+        if (!methods) return;
+
         const filteredMethods = Object.keys(listeners).reduce(
           (acc: any, key: any) => {
             const methodName = listeners[key]["methodName"];
@@ -65,133 +67,133 @@ const TextField = ({
         );
         setDynamicMethods(filteredMethods);
       } catch (error) {
-        console.error("%c Error loading scripts:", "color:red", error);
+        console.error("Error loading scripts:", error);
       }
     };
     loadDynamicMethods();
-  }, [getScriptInstance]);
+  }, [getScriptInstance, listeners]);
+
   const methods = useFormContext();
   const control = methods.control;
 
+  const value = useWatch({
+    control,
+    name,
+  });
+
   const inputChanges = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const methodName = listeners[event.type]
-      ? listeners[event.type]["methodName"]
-      : "";
+    const methodName = listeners[event.type]?.methodName;
     const method = dynamicMethods[methodName];
-    if (methodName) {
-      if (method && typeof method === "function") {
-        method(methods, {
-          name,
-          value: event.target.value,
-          text,
-          description,
-          type,
-          disabled,
-          widget,
-          oneLiner,
-          outLineBorder,
-          listeners,
-        });
-      } else {
-        console.log(
-          `%c ====CHECK YOUR METHOD NAME ${methodName}() NOT FOUND IN ${scriptFiles} ==== `,
-          "color:red"
-        );
-      }
+    if (method && typeof method === "function") {
+      method(methods, {
+        name,
+        value: event.target.value,
+        text,
+        description,
+        type,
+        disabled,
+        widget,
+        oneLiner,
+        outLineBorder,
+        listeners,
+      });
     }
   };
 
-  var styles: any = {
-    direction: "column",
-    align: "flex-start",
-  };
+  const handleInputChange = React.useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      await inputChanges(event);
+      methods.setValue(name, event.target.value, { shouldValidate: true });
+    },
+    [inputChanges, methods, name]
+  );
 
-  if (oneLiner) {
-    styles = {
-      direction: { base: "column", md: "row" },
-      align: "center",
-    };
-  }
+  const labelWidth = oneLiner ? { base: "full", md: "35%" } : "full";
+  const inputWidth = oneLiner ? { base: "full", md: "65%" } : "full";
 
   return (
     <Box
-      m={2}
-      p={3}
-      bg={useColorModeValue("white", "gray.950")}
-      {...(outLineBorder && {
-        boxShadow: "2xl",
-        borderRadius: "lg",
-        borderWidth: "2px",
-      })}
+      w="full"
+      py={2}
+      px={1}
+      transition="all 0.2s"
     >
-      <Field.Root invalid={!!errors} required={required}>
-        <Flex gap={1} {...styles}>
-          <Field.Label
-            htmlFor={name}
-            m={0}
-            width={{ base: "100%", md: "30%" }}
-            fontSize={{ base: "sm", md: "md" }} // Responsive font size
-            fontWeight="bold" // Bold text
-            color="gray.600"
-          >
-            {text}
-          </Field.Label>
-          <Flex direction="column" width="100%">
+      <Field.Root invalid={!!errors} required={required} disabled={disabled}>
+        <Flex
+          direction={oneLiner ? { base: "column", md: "row" } : "column"}
+          align={oneLiner ? { base: "stretch", md: "center" } : "stretch"}
+          gap={oneLiner ? 4 : 2}
+          w="full"
+        >
+          {text && (
+            <Box w={labelWidth}>
+              <Field.Label
+                htmlFor={name}
+                fontSize="sm"
+                fontWeight="semibold"
+                color="fg.muted"
+                transition="color 0.2s"
+                _invalid={{ color: "red.500" }}
+                mb={oneLiner ? 0 : 1}
+              >
+                {text}
+              </Field.Label>
+              {description && !oneLiner && (
+                <Text fontSize="xs" color="fg.subtle" mb={1}>
+                  {description}
+                </Text>
+              )}
+            </Box>
+          )}
+
+          <Box w={inputWidth} position="relative">
             <Input
               {...methods.register(name, {
-                required: required ? `${text} Field Is Required` : false,
-                ...(maxLength && {
-                  maxLength: {
-                    value: maxLength,
-                    message: `Maximum length is ${maxLength}`,
-                  },
-                }),
-                ...(minLength && {
-                  minLength: {
-                    value: minLength,
-                    message: `Minimun length is ${minLength}`,
-                  },
-                }),
+                required: required ? `${text} is required` : false,
+                maxLength: maxLength ? { value: maxLength, message: `Max length is ${maxLength}` } : undefined,
+                minLength: minLength ? { value: minLength, message: `Min length is ${minLength}` } : undefined,
               })}
               type={type}
-              variant="outline"
               id={name}
-              placeholder={description}
-              onChange={(e) => {
-                inputChanges(e);
-                methods.setValue(name, e.target.value, {
-                  shouldValidate: true,
-                });
+              placeholder={oneLiner ? description : ""}
+              size="md"
+              variant="outline"
+              disabled={disabled}
+              bg={useColorModeValue("white", "whiteAlpha.50")}
+              borderRadius="lg"
+              borderWidth="1.5px"
+              borderColor={useColorModeValue("gray.200", "whiteAlpha.200")}
+              _hover={{
+                borderColor: useColorModeValue("gray.300", "whiteAlpha.400"),
               }}
-              {...(outLineBorder && {
-                boxShadow: "md",
-                borderRadius: "lg",
-                borderWidth: "2px",
-              })}
+              _focus={{
+                borderColor: "blue.500",
+                boxShadow: "0 0 0 1px rgba(66, 153, 225, 0.6)",
+                bg: useColorModeValue("white", "whiteAlpha.100"),
+              }}
+              _invalid={{
+                borderColor: "red.500",
+                boxShadow: "0 0 0 1px rgba(229, 62, 62, 0.6)",
+              }}
+              transition="all 0.2s"
+              onChange={handleInputChange}
             />
-            {/* Display current input length and max length */}
-            <Flex alignItems={"center"} justify={"space-between"}>
+
+            <Flex justify="flex-end" mt={1} gap={4}>
               {maxLength && (
-                <Field.HelperText
-                  fontSize="sm"
-                  color={!!errors ? "red.500" : "gray.500"}
-                  fontWeight={"600"}
-                  mt={1}
-                >
-                  {useWatch({
-                    control,
-                    name,
-                  })?.length || 0}
-                  /{maxLength}
-                </Field.HelperText>
+                <Text fontSize="2xs" fontWeight="medium" color={value?.length > maxLength ? "red.500" : "fg.subtle"}>
+                  {value?.length || 0} / {maxLength}
+                </Text>
               )}
-              <Field.ErrorText>{errors?.message?.toString()}</Field.ErrorText>
+              <Field.ErrorText fontSize="xs" color="red.500" fontWeight="medium">
+                {errors?.message?.toString()}
+              </Field.ErrorText>
             </Flex>
-          </Flex>
+          </Box>
         </Flex>
       </Field.Root>
     </Box>
   );
 };
 
-export default React.memo(TextField);
+export default memo(TextField);

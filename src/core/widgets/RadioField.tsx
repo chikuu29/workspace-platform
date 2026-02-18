@@ -1,9 +1,9 @@
-import { Steps, Box, Button, Flex, RadioGroup, Spacer, Stack, Field } from "@chakra-ui/react";
+import { Box, Flex, RadioGroup, Stack, Field, Text, Button, IconButton } from "@chakra-ui/react";
 import { useColorModeValue } from "../../components/ui/color-mode";
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo, useCallback } from "react";
 import { FieldError, useFormContext, useWatch } from "react-hook-form";
 import { useScriptInstance } from "../../features/ui/components/contexts/ScriptProvider";
-import { FaTimes } from "react-icons/fa";
+import { LuX } from "react-icons/lu";
 import React from "react";
 
 interface RADIO {
@@ -23,6 +23,7 @@ interface RADIO {
     };
     [key: string]: any;
   };
+  description?: string;
   errors: FieldError;
 }
 
@@ -36,24 +37,32 @@ const RadioField = ({
   required = false,
   oneLiner = false,
   outLineBorder = true,
+  description,
   listeners = {},
   errors,
 }: RADIO) => {
   if (hidden) return null;
-  console.log("===EXECUTE RadioField===");
+
   const [dynamicMethods, setDynamicMethods] = useState<any>({});
-  const { getScriptInstance, scriptFiles } = useScriptInstance();
+  const { getScriptInstance } = useScriptInstance();
   const methods = useFormContext();
+
+  const value = useWatch({
+    name,
+    control: methods.control,
+  });
 
   useEffect(() => {
     const loadDynamicMethods = async () => {
       try {
-        const methods = getScriptInstance[0];
+        const methodsInstance = getScriptInstance[0];
+        if (!methodsInstance) return;
+
         const filteredMethods = Object.keys(listeners).reduce(
           (acc: any, key: any) => {
             const methodName = listeners[key]["methodName"];
-            if (methods[methodName]) {
-              acc[methodName] = methods[methodName];
+            if (methodsInstance[methodName]) {
+              acc[methodName] = methodsInstance[methodName];
             }
             return acc;
           },
@@ -61,18 +70,16 @@ const RadioField = ({
         );
         setDynamicMethods(filteredMethods);
       } catch (error) {
-        console.error("%c Error loading scripts:", "color:red", error);
+        console.error("Error loading scripts:", error);
       }
     };
     loadDynamicMethods();
-  }, [getScriptInstance]);
+  }, [getScriptInstance, listeners]);
 
   const inputChanges = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const methodName = listeners[event.type]
-      ? listeners[event.type]["methodName"]
-      : "";
+    const methodName = listeners[event.type]?.methodName;
     const method = dynamicMethods[methodName];
-    if (methodName && method && typeof method === "function") {
+    if (method && typeof method === "function") {
       method(methods, {
         name,
         value: event.target.value,
@@ -86,96 +93,139 @@ const RadioField = ({
   };
 
   const clearSelection = () => {
-    console.log(methods.getValues());
     methods.setValue(name, "", { shouldValidate: true });
   };
 
-  return (
-    <Box
-      m={2}
-      p={3}
-      {...(outLineBorder && {
-        boxShadow: "2xl",
-        borderRadius: "lg",
-        borderWidth: "2px",
-      })}
-      bg={useColorModeValue("white", "gray.950")}
-    >
-      <Field.Root
-        invalid={!!errors}
-        required={required}
-        disabled={disabled}
-      >
-        <Flex gap={1} direction="column" align="flex-start">
-          <Field.Label
-            htmlFor={name}
-            m={0}
-            width={{ base: "100%", md: "30%" }}
-            fontSize={{ base: "sm", md: "md" }}
-            fontWeight="bold"
-            color="gray.600"
-          >
-            {text}
-          </Field.Label>
-          <RadioGroup.Root
-            width={"100%"}
-            id={name}
-            disabled={disabled}
-            value={String(useWatch({
-              name,
-            }))}
-            color="gray.600">
-            <Flex direction="row" align="center" gap={2} width="100%">
-              <Stack
-                flex="1"
-                direction="row"
-                bg={useColorModeValue("white", "gray.950")}
-                {...(outLineBorder && {
-                  boxShadow: "sm",
-                  borderRadius: "lg",
-                  borderWidth: "2px",
-                })}
-                p="2"
-                flexWrap="wrap"
-              >
-                {options.map((option) => (
-                  <RadioGroup.Item
-                    key={option.value}
-                    value={String(option.value)}
-                    color="gray.600"
-                    {...methods.register(name, {
-                      required: required ? `${text} Field Is Required` : false,
-                    })}
-                  >
-                    <RadioGroup.ItemHiddenInput
-                      onChange={(e) => {
-                        inputChanges(e);
-                        methods.setValue(name, e.target.value, {
-                          shouldValidate: true,
-                        });
-                      }}
-                    />
-                    <RadioGroup.ItemControl />
-                    <RadioGroup.ItemText fontWeight="medium">{option.label}</RadioGroup.ItemText>
-                  </RadioGroup.Item>
-                ))}
-              </Stack>
+  const handleRadioChange = React.useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      await inputChanges(e);
+      methods.setValue(name, e.target.value, { shouldValidate: true });
+    },
+    [inputChanges, methods, name]
+  );
 
-              <Button
-                onClick={clearSelection}
-                // colorScheme="red"
-                variant="outline"
-                aria-label="Clear"
+  const labelWidth = oneLiner ? { base: "full", md: "35%" } : "full";
+  const contentWidth = oneLiner ? { base: "full", md: "65%" } : "full";
+
+  const selectedBg = useColorModeValue("blue.50", "blue.900/40");
+  const selectedBorder = useColorModeValue("blue.500", "blue.400");
+
+  return (
+    <Box w="full" py={2} px={1}>
+      <Field.Root invalid={!!errors} required={required} disabled={disabled}>
+        <Flex
+          direction={oneLiner ? { base: "column", md: "row" } : "column"}
+          align={oneLiner ? { base: "stretch", md: "center" } : "stretch"}
+          gap={oneLiner ? 4 : 2}
+          w="full"
+        >
+          {text && (
+            <Box w={labelWidth}>
+              <Field.Label
+                htmlFor={name}
+                fontSize="sm"
+                fontWeight="semibold"
+                color="fg.muted"
+                transition="color 0.2s"
+                _invalid={{ color: "red.500" }}
+                mb={oneLiner ? 0 : 1}
               >
-                <FaTimes />
-              </Button>
-            </Flex>
-          </RadioGroup.Root>
-          <Field.ErrorText>{errors?.message?.toString()}</Field.ErrorText>
+                {text}
+              </Field.Label>
+              {description && (
+                <Text fontSize="xs" color="fg.subtle" mb={oneLiner ? 0 : 1}>
+                  {description}
+                </Text>
+              )}
+            </Box>
+          )}
+
+          <Box w={contentWidth}>
+            <RadioGroup.Root
+              width="full"
+              id={name}
+              disabled={disabled}
+              value={String(value || "")}
+            >
+              <Flex direction="column" gap={3}>
+                <Stack
+                  direction="row"
+                  gap={3}
+                  flexWrap="wrap"
+                  w="full"
+                  align="center"
+                >
+                  {options.map((option) => {
+                    const isSelected = String(value) === String(option.value);
+                    return (
+                      <RadioGroup.Item
+                        key={option.value}
+                        value={String(option.value)}
+                        position="relative"
+                        px={4}
+                        py={2}
+                        borderRadius="lg"
+                        borderWidth="1.5px"
+                        borderColor={isSelected ? selectedBorder : useColorModeValue("gray.200", "whiteAlpha.200")}
+                        bg={isSelected ? selectedBg : useColorModeValue("white", "whiteAlpha.50")}
+                        _hover={{
+                          borderColor: isSelected ? selectedBorder : useColorModeValue("gray.300", "whiteAlpha.400"),
+                          bg: isSelected ? selectedBg : useColorModeValue("gray.50", "whiteAlpha.100")
+                        }}
+                        transition="all 0.2s"
+                        cursor="pointer"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        minW="110px"
+                        flex="1"
+                        {...methods.register(name, {
+                          required: required ? `${text} is required` : false,
+                        })}
+                      >
+                        <RadioGroup.ItemHiddenInput
+                          onChange={handleRadioChange}
+                        />
+                        {/* Custom indicator can be added here if needed, but card look is cleaner without the dot */}
+                        <Box display="none">
+                          <RadioGroup.ItemControl />
+                        </Box>
+                        <RadioGroup.ItemText
+                          fontWeight="semibold"
+                          fontSize="sm"
+                          color={isSelected ? "blue.600" : "fg.muted"}
+                          _dark={{ color: isSelected ? "blue.300" : "gray.400" }}
+                        >
+                          {option.label}
+                        </RadioGroup.ItemText>
+                      </RadioGroup.Item>
+                    );
+                  })}
+
+                  {value && (
+                    <IconButton
+                      size="xs"
+                      variant="ghost"
+                      aria-label="Clear selection"
+                      onClick={clearSelection}
+                      color="fg.muted"
+                      _hover={{ bg: "red.50", color: "red.500" }}
+                      _dark={{ _hover: { bg: "red.900/30", color: "red.400" } }}
+                    >
+                      <LuX />
+                    </IconButton>
+                  )}
+                </Stack>
+                <Field.ErrorText fontSize="xs" color="red.500" fontWeight="medium">
+                  {errors?.message?.toString()}
+                </Field.ErrorText>
+              </Flex>
+            </RadioGroup.Root>
+          </Box>
         </Flex>
       </Field.Root>
     </Box>
   );
 };
 
-export default React.memo(RadioField);
+export default memo(RadioField);

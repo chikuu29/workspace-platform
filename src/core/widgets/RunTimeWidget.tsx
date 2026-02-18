@@ -64,22 +64,6 @@ const RunTimeWidgetRender: React.FC<any> = React.memo(({ configs, tabs, ...rest 
           <Box key={widgetConfig.name} {...rest}>
             {(() => {
               switch (widgetConfig.widget) {
-                case "textField":
-                  return <TextField {...widgetConfig} errors={errors[widgetConfig.name]} />;
-                case "textAreaField":
-                  return <TextArea {...widgetConfig} errors={errors[widgetConfig.name]} />;
-                case "uploadField":
-                  return <UploadField {...widgetConfig} errors={errors[widgetConfig.name]} />;
-                case "panel":
-                  return (
-                    <CollapsiblePanel
-                      {...widgetConfig}
-                      {...rest}
-                      widgets={widgetConfig.widgets || []}
-                    />
-                  );
-                case "radioField":
-                  return <RadioField {...widgetConfig} {...rest} errors={errors[widgetConfig.name]} />;
                 default:
                   const RegisteredComponent = ComponentRegistry.get(widgetConfig.widget);
                   if (RegisteredComponent) {

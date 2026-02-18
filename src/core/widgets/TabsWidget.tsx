@@ -29,12 +29,13 @@ const TabsWidget: React.FC<TabsWidgetProps> = ({ tabs, defaultValue, ...rest }) 
     const defaultTabValue = defaultValue || tabs[0].title;
 
     return (
-        <TabsRoot defaultValue={defaultTabValue} variant="subtle" colorPalette="blue" w="full">
+        <TabsRoot defaultValue={defaultTabValue} variant="subtle" colorPalette="blue" >
             <TabsList
                 bg="bg.muted"
                 p="1"
                 borderRadius="lg"
                 display="flex"
+                w="fit-content"
                 overflowX="auto"
                 css={{
                     '&::-webkit-scrollbar': { display: 'none' },
@@ -46,9 +47,8 @@ const TabsWidget: React.FC<TabsWidgetProps> = ({ tabs, defaultValue, ...rest }) 
                     <TabsTrigger
                         key={tab.title}
                         value={tab.title}
-                        flex="1"
                         py="2"
-                        px="4"
+                        px="6"
                         borderRadius="md"
                         _selected={{
                             bg: "bg.panel",

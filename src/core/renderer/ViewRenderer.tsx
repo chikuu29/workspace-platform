@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Text } from "@chakra-ui/react";
 import { ViewRegistry } from "../registry/ViewRegistry";
 import "../views";
@@ -13,7 +14,7 @@ const ViewRenderer = ({ config }: { config: any }) => {
             <Text>UI_TYPE is not defined</Text>
         </>
     }
-    const { type, ...RESTUI_TYPE } = UI_TYPE;
+    const { type, ...restUIConfig } = UI_TYPE;
 
     if (type === "") {
         return <>
@@ -24,7 +25,7 @@ const ViewRenderer = ({ config }: { config: any }) => {
 
     if (Component) {
         return (
-            <Component {...RESTUI_TYPE} {...rest} />
+            <Component config={config} />
         );
     }
 
@@ -34,4 +35,4 @@ const ViewRenderer = ({ config }: { config: any }) => {
     </>
 };
 
-export default ViewRenderer;
+export default React.memo(ViewRenderer);

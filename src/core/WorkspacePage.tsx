@@ -27,6 +27,7 @@ const LoadingState = () => (
 )
 
 const WorkspacePage = () => {
+    console.log("========WorkspacePage========s")
     const { tenant, view: UITemplateID } = useParams()
     const navigate = useNavigate()
     console.log("page", useParams())
@@ -37,7 +38,6 @@ const WorkspacePage = () => {
 
     useEffect(() => {
         const getUITemplate = async () => {
-            console.log("Calling GetUITemplate");
             GETAPI({
                 path: `app/ui_template`,
                 params: {
@@ -47,7 +47,6 @@ const WorkspacePage = () => {
                 isPrivateApi: true,
                 enableCache: false,
             }).subscribe(async (res: any) => {
-                console.log(res);
                 if (res.success && res["result"].length > 0) {
                     setConfig(res["result"][0]);
                 } else {

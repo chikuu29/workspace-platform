@@ -35,7 +35,7 @@
                 {
                     "title": "Registration Flow",
                     "description": "Sequential steps to complete member enrollment.",
-                    "iconName": "LuUserPlus",
+                    "iconName": "LuContact",
                     "tabs": [
                         {
                             "title": "Personal Details",

@@ -10,9 +10,29 @@ const DynamicIcon = async (iconName: string): Promise<IconType> => {
       if (Icon) return Icon;
     }
 
+    if (iconName.startsWith("Lu")) {
+      const iconModule = await import("react-icons/lu");
+      const Icon = iconModule[iconName as keyof typeof iconModule] as IconType;
+      if (Icon) return Icon;
+    }
+
     // Check for Feather icons
     if (iconName.startsWith("Fi")) {
       const iconModule = await import("react-icons/fi");
+      const Icon = iconModule[iconName as keyof typeof iconModule] as IconType;
+      if (Icon) return Icon;
+    }
+
+    // Check for Material Design icons
+    if (iconName.startsWith("Md")) {
+      const iconModule = await import("react-icons/md");
+      const Icon = iconModule[iconName as keyof typeof iconModule] as IconType;
+      if (Icon) return Icon;
+    }
+
+    // Check for Font Awesome icons
+    if (iconName.startsWith("Fa")) {
+      const iconModule = await import("react-icons/fa");
       const Icon = iconModule[iconName as keyof typeof iconModule] as IconType;
       if (Icon) return Icon;
     }
@@ -29,7 +49,6 @@ const DynamicIcon = async (iconName: string): Promise<IconType> => {
     return fallbackModule.FcHighPriority as IconType;
 
   } catch (error) {
-    console.error("Failed to load icon:", error, "Requested:", iconName);
     // Return fallback icon in case of any error
     try {
       const fallbackModule = await import("react-icons/fc");

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Steps, Box, Button, Collapsible, Text, Flex } from "@chakra-ui/react";
-import RunTimeWidgetRender from "./RunTimeWidget";
+import RunTimeWidgetRender from "../renderer/RunTimeWidget";
 
 import PanelNavBarAction from "../../features/ui/components/navbar/NavbarActions";
 import { LuChevronDown, LuChevronUp } from 'react-icons/lu';

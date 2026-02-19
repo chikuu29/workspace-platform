@@ -1,5 +1,5 @@
 import React from 'react';
-import { ComponentRenderer } from './ComponentRenderer';
+import RunTimeWidget from './RunTimeWidget';
 import { FormProvider, useForm } from 'react-hook-form';
 
 interface UIEngineProps {

@@ -1,6 +1,6 @@
 import "./index";
 import { Steps, Box, Button, Skeleton, SkeletonText } from "@chakra-ui/react";
-import RunTimeWidgetRender from "./RunTimeWidget";
+import RunTimeWidgetRender from "../renderer/RunTimeWidget";
 import { FormProvider, useForm } from "react-hook-form";
 import { memo, useEffect, useState, forwardRef } from "react";
 import { GETAPI } from "../../app/api";

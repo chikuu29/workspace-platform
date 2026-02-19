@@ -9,7 +9,7 @@ import { LuHeart, LuActivity, LuShieldCheck } from "react-icons/lu";
  */
 const AppFooter = () => {
   const currentYear = new Date().getFullYear();
-  const footerBg = useColorModeValue("white/80", "rgba(15, 23, 42, 0.6)");
+  const footerBg = useColorModeValue("white", "rgba(15, 23, 42, 0.9)");
   const borderColor = useColorModeValue("gray.100", "whiteAlpha.100");
   const textColor = useColorModeValue("gray.500", "whiteAlpha.500");
   const activeTextColor = useColorModeValue("gray.800", "white");
@@ -21,15 +21,13 @@ const AppFooter = () => {
       h="14"
       borderTop="1px solid"
       borderColor={borderColor}
-      bg={useColorModeValue("white", "bg.default")}
+      bg={footerBg}
       px="8"
-      position="fixed"
-      bottom="0"
+      position="relative"
       zIndex="sticky"
     >
       <Flex
         h="full"
-
         maxW="1440px"
         mx="auto"
         justifyContent="space-between"

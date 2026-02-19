@@ -16,7 +16,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FormProvider, useForm } from "react-hook-form";
 import PremiumStepper from "../widgets/PremiumStepper";
 import { LuArrowRight, LuArrowLeft, LuCheck } from "react-icons/lu";
-import RunTimeWidgetRender from "../widgets/RunTimeWidget";
+import RunTimeWidgetRender from "../renderer/RunTimeWidget";
 import "../widgets"; // Ensure all widgets are registered
 import { ScriptProvider } from "../../features/ui/components/contexts/ScriptProvider";
 

@@ -3,7 +3,7 @@ import { Box, HStack, Text, VStack, Heading } from "@chakra-ui/react";
 import { TabsRoot, TabsList, TabsTrigger, TabsContent, TabsIndicator } from "@/components/ui/tabs";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { motion, AnimatePresence } from "framer-motion";
-import RunTimeWidgetRender from "./RunTimeWidget";
+import RunTimeWidgetRender from "../renderer/RunTimeWidget";
 import AsyncLoadIcon from "@/utils/hooks/AsyncLoadIcon";
 
 interface TabConfig {

@@ -23,11 +23,44 @@
         ],
         "postScript": "documentPostScript"
     },
+    "ACTIONS": {
+        "BUTTONS": [
+            {
+                "name": "Draft",
+                "text": "Draft",
+                "iconName": "LuSave",
+                "widget": "button",
+                "styles": {
+                    "variant": "outline"
+                },
+                "hidden": true,
+                "oneLiner": true,
+                "required": true,
+                "event": "draft"
+            },
+            {
+                "name": "submit",
+                "text": "Submit",
+                "iconName": "LuSave",
+                "hidden": false,
+                "widget": "button",
+                "event": "submit",
+                "styles": {
+                    "variant": "outline"
+                },
+                "oneLiner": true,
+                "required": true
+            }
+        ]
+    },
     "UI_TYPE": {
         "type": "FORM_VIEW",
         "title": "Member Onboarding",
         "description": "Register new members with a premium, guided experience.",
-        "target": "forms"
+        "target": "forms",
+        "layoutStyles": {
+            "p": 4
+        }
     },
     "UI_VIEW": {
         "schema": {

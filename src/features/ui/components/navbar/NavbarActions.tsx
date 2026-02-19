@@ -2,7 +2,7 @@ import { Avatar, Box, Flex, Icon, IconButton, Menu, Portal, Text, VStack } from 
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useSelector } from "react-redux";
-import { FiLogOut, FiSettings, FiUser, FiHelpCircle } from "react-icons/fi";
+import { FiLogOut, FiSettings, FiUser, FiHelpCircle, FiRefreshCw } from "react-icons/fi";
 import React from "react";
 import NotificationMenu from "./NotificationMenu";
 
@@ -36,6 +36,17 @@ export default function NavbarActions() {
       flexDirection="row"
       gap={4}
     >
+      <IconButton
+        aria-label="Refresh Page"
+        variant="brand"
+        color={iconColor}
+        _hover={{ bg: itemHoverBg, color: "brand.500" }}
+        onClick={() => window.location.reload()}
+      // borderRadius="full"
+      >
+        <Icon as={FiRefreshCw} boxSize={4} />
+      </IconButton>
+
       <NotificationMenu />
 
       <Menu.Root positioning={{ placement: "bottom-end" }}>

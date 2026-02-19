@@ -120,7 +120,7 @@ const SectionView = ({ config }: any) => {
                                     <Box minH="300px">
                                         {step < sections.length ? (
                                             <>
-                                                {(!sections[step].tabs || sections[step].tabs.length === 0) && (
+                                                {/* {(!sections[step].tabs || sections[step].tabs.length === 0) && (
                                                     <Box p={{ base: "6", md: "10" }} borderBottom="1px solid" borderColor={separatorColor}>
                                                         <VStack align="start" gap="2">
                                                             <Heading size="xl" fontWeight="bold" color={textColor}>
@@ -131,7 +131,7 @@ const SectionView = ({ config }: any) => {
                                                             </Text>
                                                         </VStack>
                                                     </Box>
-                                                )}
+                                                )} */}
                                                 <Box p={(!sections[step].tabs || sections[step].tabs.length === 0) ? { base: "6", md: "10" } : "0"}>
                                                     <RunTimeWidgetRender
                                                         configs={sections[step].widgets}

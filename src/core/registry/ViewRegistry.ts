@@ -4,7 +4,7 @@ type ViewComponent = React.FC<any>;
 
 export enum ViewType {
     SECTION_VIEW = "SECTION_VIEW",
-
+    FORM_VIEW = "FORM_VIEW",
 }
 
 class Registry {

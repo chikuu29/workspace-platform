@@ -1,45 +1,30 @@
-import React, { useMemo, useCallback, memo } from "react";
+import React, { useMemo, useCallback } from "react";
 import {
     Box,
     Flex,
     Heading,
     Icon,
-    Stack,
     Text,
     VStack,
     HStack,
-    Grid,
-    Input,
     Button,
+    Circle,
     Badge,
 } from "@chakra-ui/react";
-import {
-    MdBadge,
-    MdCardMembership,
-    MdAccountBalanceWallet,
-} from "react-icons/md";
-import {
-    StepsRoot,
-    StepsList,
-    StepsItem,
-    StepsContent,
-    StepsNextTrigger,
-    StepsPrevTrigger,
-} from "@/components/ui/steps";
-import { useColorModeValue } from "@/components/ui/color-mode";
 import { FormProvider, useForm } from "react-hook-form";
+import PremiumStepper from "../widgets/PremiumStepper";
+import { LuArrowRight, LuArrowLeft, LuCheck } from "react-icons/lu";
 import RunTimeWidgetRender from "../widgets/RunTimeWidget";
 import "../widgets"; // Ensure all widgets are registered
-import { ScriptProvider } from "@/features/ui/components/contexts/ScriptProvider";
-
-// Gender and Trainer collections are no longer needed here as they are handled by specialized widgets or the template
+import { ScriptProvider } from "../../features/ui/components/contexts/ScriptProvider";
 
 const SectionView = ({ config }: any) => {
-    const sidebarBg = useColorModeValue("white", "gray.950");
-    const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
-    const hoverBg = useColorModeValue("gray.50", "whiteAlpha.50");
-    const separatorColor = useColorModeValue("gray.100", "whiteAlpha.100");
-    const successBg = useColorModeValue("green.50", "green.900/30");
+    // Premium dark theme constants (matches Figma palette)
+    const pageBg = "#0F172A"; // Deep navy
+    const cardBg = "rgba(15, 23, 42, 0.8)";
+    const borderColor = "rgba(56, 189, 248, 0.1)";
+    const separatorColor = "rgba(255, 255, 255, 0.05)";
+    const accentColor = "#3B82F6"; // Vibrant blue
 
     const [step, setStep] = React.useState(0);
 
@@ -51,25 +36,16 @@ const SectionView = ({ config }: any) => {
         return config?.scripts?.files || [];
     }, [config]);
 
-
-    // Icon mapping
-    const getIcon = (name: string) => {
-        switch (name) {
-            case "MdBadge": return MdBadge;
-            case "MdCardMembership": return MdCardMembership;
-            case "MdAccountBalanceWallet": return MdAccountBalanceWallet;
-            default: return MdBadge;
-        }
-    };
-
     const methods = useForm({
         mode: "onChange",
         defaultValues: {},
     });
 
-    const handleStepChange = useCallback((e: any) => {
-        setStep(e.step);
-    }, []);
+    const handleStepChange = useCallback((newStep: number) => {
+        if (newStep >= 0 && newStep < sections.length) {
+            setStep(newStep);
+        }
+    }, [sections.length]);
 
     const handleReset = useCallback(() => {
         setStep(0);
@@ -84,8 +60,25 @@ const SectionView = ({ config }: any) => {
     if (!sections.length) return null;
 
     return (
-        <Box>
-            <Box mx="auto" px={{ base: "4", md: "8" }}>
+        <Box
+            minH="100vh"
+            bg={pageBg}
+            color="white"
+            py={{ base: "8", md: "12" }}
+            position="relative"
+            m="-6" // Overcome default padding if any to fill screen
+            px="6"
+        >
+            <Box mx="auto" maxW="5xl">
+                {/* 1. Project Title */}
+                {/* <HStack mb="8" gap="3">
+                    <Box bg={accentColor} p="2" rounded="lg" shadow={`0 0 15px ${accentColor}66`}>
+                        <Icon as={LuArrowRight} color="white" boxSize="5" />
+                    </Box>
+                    <Heading size="lg" fontWeight="extrabold" letterSpacing="tight">
+                        {config.UI_TYPE?.title || "Project Wizard"}
+                    </Heading>
+                </HStack> */}
                 <VStack mb={{ base: "8", md: "16" }} textAlign="center" gap="4">
                     <Badge variant="subtle" colorPalette="blue" px="3" py="1" rounded="full" textTransform="uppercase" fontSize="10px" letterSpacing="widest">
                         {config.UI_TYPE?.title || "Registration Flow"}
@@ -102,151 +95,130 @@ const SectionView = ({ config }: any) => {
                     </VStack>
                 </VStack>
 
-                <StepsRoot step={step} onStepChange={handleStepChange} count={sections.length} variant="subtle" colorPalette="blue" >
-                    <Box
-                        bg={sidebarBg}
-                        rounded="2xl"
-                        shadow="xl"
-                        border="1px solid"
-                        borderColor={borderColor}
-                        overflow="hidden"
-                        display="flex"
-                        flexDirection="column"
-                    >
-                        {/* Header Section: StepsList */}
-                        <Box
-                            borderBottom="1px solid"
-                            borderColor={separatorColor}
-                            bg={useColorModeValue("gray.50/50", "whiteAlpha.100")}
-                            overflowX="auto"
-                            css={{
-                                '&::-webkit-scrollbar': { display: 'none' },
-                                msOverflowStyle: 'none',
-                                scrollbarWidth: 'none',
-                            }}
-                        >
-                            <StepsList
-                                gap="0"
-                                p="0"
-                                borderBottom="none"
-                                flexWrap="nowrap"
-                                minW="max-content"
-                            >
-                                {sections.map((section: any, index: number) => (
-                                    <StepsItem
-                                        key={index}
-                                        index={index}
-                                        title={section.title}
-                                        icon={<Icon as={getIcon(section.iconName)} />}
-                                        flexShrink={0}
-                                        triggerProps={{
-                                            cursor: "pointer",
-                                            _hover: { bg: hoverBg },
-                                            px: { base: "6", md: "8" },
-                                            py: "4",
-                                            rounded: "none",
-                                        }}
-                                    />
-                                ))}
-                            </StepsList>
-                        </Box>
+                {/* 2. Premium Stepper (Outside the card) */}
+                <Box mb="12">
+                    <PremiumStepper
+                        activeStep={step}
+                        steps={sections}
+                        onStepChange={handleStepChange}
+                    />
+                </Box>
 
-                        {/* Middle Section: Content */}
-                        <Box p={{ base: "6", md: "10" }} flex="1">
-                            <FormProvider {...methods}>
-                                <form onSubmit={methods.handleSubmit(onFormSubmit)}>
-                                    <ScriptProvider scriptFiles={scriptFiles}>
-                                        {sections.map((section: any, index: number) => (
-                                            <StepsContent key={index} index={index}>
-                                                <Stack gap="6">
-                                                    {/* <HStack gap="2" pb="4" borderBottom="1px solid" borderColor={separatorColor}>
-                                                    <Icon as={getIcon(section.iconName)} color="blue.500" boxSize="5" />
-                                                    <Heading size="md" fontWeight="bold">{section.description}</Heading>
-                                                </HStack> */}
-
-                                                    {/* Render tabs/widgets dynamically using RunTimeWidgetRender */}
-                                                    <RunTimeWidgetRender
-                                                        configs={section.widgets}
-                                                        tabs={section.tabs}
-                                                    />
-                                                </Stack>
-                                            </StepsContent>
-                                        ))}
-                                    </ScriptProvider>
-                                </form>
-                            </FormProvider>
-
-                            {/* Success State */}
-                            {step === sections.length && (
-                                <VStack gap="6" py="10">
-                                    <Box
-                                        w="20"
-                                        h="20"
-                                        rounded="full"
-                                        bg={successBg}
-                                        display="flex"
-                                        alignItems="center"
-                                        justifyContent="center"
-                                        color="green.500"
-                                    >
-                                        <Icon as={MdBadge} boxSize="10" />
-                                    </Box>
-                                    <VStack gap="2">
-                                        <Heading size="lg">Success!</Heading>
-                                        <Text color="fg.muted">Process completed successfully.</Text>
-                                    </VStack>
-                                    <Button variant="brand" onClick={handleReset}>
-                                        Restart
-                                    </Button>
-                                </VStack>
-                            )}
-                        </Box>
-
-                        {/* Footer Section: Action Buttons */}
-                        {step < sections.length && (
-                            <Box p="4" borderTop="1px solid" borderColor={separatorColor} bg={useColorModeValue("white", "gray.950")}>
-                                <Flex direction={{ base: "column-reverse", sm: "row" }} justify="space-between" align="center" gap="4">
-                                    <Box w={{ base: "full", sm: "auto" }}>
-                                        {step > 0 && (
-                                            <StepsPrevTrigger asChild>
-                                                <Button variant="ghost" size="lg" px={{ base: "4", md: "8" }} w={{ base: "full", sm: "auto" }}>
-                                                    Back
-                                                </Button>
-                                            </StepsPrevTrigger>
-                                        )}
-                                    </Box>
-                                    <HStack gap="4" w={{ base: "full", sm: "auto" }} justify={{ base: "space-between", sm: "flex-end" }}>
-                                        <Text fontSize="sm" color="fg.muted" fontWeight="medium">
-                                            Step {step + 1} of {sections.length}
-                                        </Text>
-                                        {step < sections.length - 1 ? (
-                                            <StepsNextTrigger asChild>
-                                                <Button variant="brand" size="lg" px={{ base: "8", md: "12" }} shadow="md" w={{ base: "full", sm: "auto" }}>
-                                                    Continue
-                                                </Button>
-                                            </StepsNextTrigger>
-                                        ) : (
-                                            <Button
-                                                variant="brand"
-                                                size="lg"
-                                                px={{ base: "8", md: "12" }}
-                                                shadow="lg"
-                                                onClick={methods.handleSubmit(onFormSubmit)}
-                                                w={{ base: "full", sm: "auto" }}
-                                            >
-                                                Complete
-                                            </Button>
-                                        )}
-                                    </HStack>
-                                </Flex>
-                            </Box>
-                        )}
+                {/* 3. Main Content Card */}
+                <Box
+                    bg={cardBg}
+                    rounded="3xl"
+                    shadow="2xl"
+                    border="1px solid"
+                    borderColor={borderColor}
+                    overflow="hidden"
+                    backdropFilter="blur(10px)"
+                    position="relative"
+                >
+                    {/* Header: Dynamic Section Title */}
+                    <Box p={{ base: "6", md: "10" }} borderBottom="1px solid" borderColor={separatorColor}>
+                        <VStack align="start" gap="2">
+                            <Heading size="xl" fontWeight="bold">
+                                {sections[step]?.title || "Configuration"}
+                            </Heading>
+                            <Text color="whiteAlpha.600" fontSize="md">
+                                {sections[step]?.description || "Configure the core parameters for your initiatives."}
+                            </Text>
+                        </VStack>
                     </Box>
-                </StepsRoot>
 
-                <Text mt="8" textAlign="center" fontSize="xs" color="fg.muted">
-                    Security Policy: All data is encrypted and handled securely.
-                </Text>
+                    {/* Content Area */}
+                    <Box p={{ base: "6", md: "10" }}>
+                        <FormProvider {...methods}>
+                            <form onSubmit={methods.handleSubmit(onFormSubmit)}>
+                                <ScriptProvider scriptFiles={scriptFiles}>
+                                    <Box minH="300px">
+                                        {step < sections.length ? (
+                                            <RunTimeWidgetRender
+                                                configs={sections[step].widgets}
+                                                tabs={sections[step].tabs}
+                                            />
+                                        ) : (
+                                            /* Success State */
+                                            <VStack gap="6" py="10">
+                                                <Circle size="20" bg="green.500/20" color="green.500" border="2px solid" borderColor="green.500">
+                                                    <LuCheck size="40" />
+                                                </Circle>
+                                                <VStack gap="2">
+                                                    <Heading size="lg">Success!</Heading>
+                                                    <Text color="whiteAlpha.600">Configuration completed successfully.</Text>
+                                                </VStack>
+                                                <Button
+                                                    bg={accentColor}
+                                                    color="white"
+                                                    _hover={{ bg: "blue.600" }}
+                                                    onClick={handleReset}
+                                                    size="lg"
+                                                    px="10"
+                                                >
+                                                    Restart
+                                                </Button>
+                                            </VStack>
+                                        )}
+                                    </Box>
+                                </ScriptProvider>
+                            </form>
+                        </FormProvider>
+                    </Box>
+
+                    {/* Footer: Premium Action Buttons */}
+                    {step < sections.length && (
+                        <Box p="6" bg="rgba(255,255,255,0.02)" borderTop="1px solid" borderColor={separatorColor}>
+                            <Flex justify="space-between" align="center">
+                                <Button
+                                    variant="outline"
+                                    color="whiteAlpha.700"
+                                    borderColor="whiteAlpha.200"
+                                    _hover={{ bg: "whiteAlpha.100", color: "white" }}
+                                    onClick={() => handleStepChange(step - 1)}
+                                    disabled={step === 0}
+                                    size="lg"
+                                    px="8"
+                                    rounded="xl"
+                                >
+                                    <HStack gap="2">
+                                        <LuArrowLeft />
+                                        <Text>Previous</Text>
+                                    </HStack>
+                                </Button>
+
+                                <Button
+                                    bg={accentColor}
+                                    color="white"
+                                    _hover={{ bg: "blue.600", transform: "translateY(-1px)" }}
+                                    _active={{ transform: "translateY(0)" }}
+                                    size="lg"
+                                    px="12"
+                                    rounded="xl"
+                                    shadow={`0 10px 20px ${accentColor}44`}
+                                    onClick={step === sections.length - 1 ? methods.handleSubmit(onFormSubmit) : () => handleStepChange(step + 1)}
+                                >
+                                    <HStack gap="2">
+                                        <Text>{step === sections.length - 1 ? "Complete" : "Next Step"}</Text>
+                                        <LuArrowRight />
+                                    </HStack>
+                                </Button>
+                            </Flex>
+                        </Box>
+                    )}
+                </Box>
+
+                {/* Secure Badge */}
+                <Flex mt="8" justify="center" align="center" gap="6" color="whiteAlpha.400" fontSize="xs">
+                    <HStack gap="1">
+                        <Icon as={LuCheck} />
+                        <Text>Secure encrypted session</Text>
+                    </HStack>
+                    <HStack gap="1">
+                        <Icon as={LuCheck} />
+                        <Text>Changes autosaved</Text>
+                    </HStack>
+                </Flex>
             </Box>
         </Box>
     );

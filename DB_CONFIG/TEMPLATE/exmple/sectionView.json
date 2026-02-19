@@ -63,13 +63,20 @@
                                     "minLength": 5,
                                     "hidden": false,
                                     "widget": "textField",
-                                    "outLineBorder": true,
-                                    "listeners": {
-                                        "change": {
-                                            "methodName": "onChangeMemberName",
-                                            "param": "value"
-                                        }
-                                    }
+                                    "events": {
+                                        "change": [
+                                            {
+                                                "actions": [
+                                                    {
+                                                        "type": "runScript",
+                                                        "script": "onChangeMemberName",
+                                                        "args": "value"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "outLineBorder": true
                                 },
                                 {
                                     "name": "memberEmail",
@@ -78,7 +85,20 @@
                                     "type": "email",
                                     "disabled": false,
                                     "hidden": false,
-                                    "widget": "textField"
+                                    "widget": "textField",
+                                    "events": {
+                                        "change": [
+                                            {
+                                                "actions": [
+                                                    {
+                                                        "type": "runScript",
+                                                        "script": "onChangeMemberEmail",
+                                                        "args": "value"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
                                 },
                                 {
                                     "name": "memberPhone",
@@ -287,13 +307,7 @@
                                     "minLength": 5,
                                     "hidden": false,
                                     "widget": "textField",
-                                    "outLineBorder": true,
-                                    "listeners": {
-                                        "change": {
-                                            "methodName": "onChangeMemberName",
-                                            "param": "value"
-                                        }
-                                    }
+                                    "outLineBorder": true
                                 }
                             ]
                         }
@@ -330,13 +344,7 @@
                                     "minLength": 5,
                                     "hidden": false,
                                     "widget": "textField",
-                                    "outLineBorder": true,
-                                    "listeners": {
-                                        "change": {
-                                            "methodName": "onChangeMemberName",
-                                            "param": "value"
-                                        }
-                                    }
+                                    "outLineBorder": true
                                 }
                             ]
                         }
@@ -373,13 +381,7 @@
                                     "minLength": 5,
                                     "hidden": false,
                                     "widget": "textField",
-                                    "outLineBorder": true,
-                                    "listeners": {
-                                        "change": {
-                                            "methodName": "onChangeMemberName",
-                                            "param": "value"
-                                        }
-                                    }
+                                    "outLineBorder": true
                                 }
                             ]
                         }
@@ -416,13 +418,7 @@
                                     "minLength": 5,
                                     "hidden": false,
                                     "widget": "textField",
-                                    "outLineBorder": true,
-                                    "listeners": {
-                                        "change": {
-                                            "methodName": "onChangeMemberName",
-                                            "param": "value"
-                                        }
-                                    }
+                                    "outLineBorder": true
                                 },
                                 {
                                     "name": "memberEmail",
@@ -640,13 +636,7 @@
                                     "minLength": 5,
                                     "hidden": false,
                                     "widget": "textField",
-                                    "outLineBorder": true,
-                                    "listeners": {
-                                        "change": {
-                                            "methodName": "onChangeMemberName",
-                                            "param": "value"
-                                        }
-                                    }
+                                    "outLineBorder": true
                                 }
                             ]
                         }
@@ -683,13 +673,7 @@
                                     "minLength": 5,
                                     "hidden": false,
                                     "widget": "textField",
-                                    "outLineBorder": true,
-                                    "listeners": {
-                                        "change": {
-                                            "methodName": "onChangeMemberName",
-                                            "param": "value"
-                                        }
-                                    }
+                                    "outLineBorder": true
                                 }
                             ]
                         }
@@ -726,13 +710,7 @@
                                     "minLength": 5,
                                     "hidden": false,
                                     "widget": "textField",
-                                    "outLineBorder": true,
-                                    "listeners": {
-                                        "change": {
-                                            "methodName": "onChangeMemberName",
-                                            "param": "value"
-                                        }
-                                    }
+                                    "outLineBorder": true
                                 }
                             ]
                         }
@@ -769,13 +747,7 @@
                                     "minLength": 5,
                                     "hidden": false,
                                     "widget": "textField",
-                                    "outLineBorder": true,
-                                    "listeners": {
-                                        "change": {
-                                            "methodName": "onChangeMemberName",
-                                            "param": "value"
-                                        }
-                                    }
+                                    "outLineBorder": true
                                 },
                                 {
                                     "name": "memberEmail",
@@ -993,13 +965,7 @@
                                     "minLength": 5,
                                     "hidden": false,
                                     "widget": "textField",
-                                    "outLineBorder": true,
-                                    "listeners": {
-                                        "change": {
-                                            "methodName": "onChangeMemberName",
-                                            "param": "value"
-                                        }
-                                    }
+                                    "outLineBorder": true
                                 }
                             ]
                         }
@@ -1036,13 +1002,7 @@
                                     "minLength": 5,
                                     "hidden": false,
                                     "widget": "textField",
-                                    "outLineBorder": true,
-                                    "listeners": {
-                                        "change": {
-                                            "methodName": "onChangeMemberName",
-                                            "param": "value"
-                                        }
-                                    }
+                                    "outLineBorder": true
                                 }
                             ]
                         }
@@ -1079,13 +1039,7 @@
                                     "minLength": 5,
                                     "hidden": false,
                                     "widget": "textField",
-                                    "outLineBorder": true,
-                                    "listeners": {
-                                        "change": {
-                                            "methodName": "onChangeMemberName",
-                                            "param": "value"
-                                        }
-                                    }
+                                    "outLineBorder": true
                                 }
                             ]
                         }

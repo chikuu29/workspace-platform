@@ -2,8 +2,8 @@ import { Box, Flex, RadioGroup, Stack, Field, Text, Button, IconButton } from "@
 import { useColorModeValue } from "../../components/ui/color-mode";
 import { useEffect, useState, memo, useCallback } from "react";
 import { FieldError, useFormContext, useWatch } from "react-hook-form";
-import { useScriptInstance } from "../../features/ui/components/contexts/ScriptProvider";
 import { LuX } from "react-icons/lu";
+import { ruleEngine } from "../engine/logicEngine";
 import React from "react";
 
 interface RADIO {
@@ -16,13 +16,7 @@ interface RADIO {
   required?: boolean;
   oneLiner?: boolean;
   outLineBorder?: boolean;
-  listeners?: {
-    change?: {
-      methodName: string;
-      param: string;
-    };
-    [key: string]: any;
-  };
+  events?: any; // Add events prop
   description?: string;
   errors: FieldError;
 }
@@ -38,13 +32,11 @@ const RadioField = ({
   oneLiner = false,
   outLineBorder = true,
   description,
-  listeners = {},
+  events,
   errors,
 }: RADIO) => {
   if (hidden) return null;
 
-  const [dynamicMethods, setDynamicMethods] = useState<any>({});
-  const { getScriptInstance } = useScriptInstance();
   const methods = useFormContext();
 
   const value = useWatch({
@@ -52,56 +44,23 @@ const RadioField = ({
     control: methods.control,
   });
 
-  useEffect(() => {
-    const loadDynamicMethods = async () => {
-      try {
-        const methodsInstance = getScriptInstance[0];
-        if (!methodsInstance) return;
-
-        const filteredMethods = Object.keys(listeners).reduce(
-          (acc: any, key: any) => {
-            const methodName = listeners[key]["methodName"];
-            if (methodsInstance[methodName]) {
-              acc[methodName] = methodsInstance[methodName];
-            }
-            return acc;
-          },
-          {}
-        );
-        setDynamicMethods(filteredMethods);
-      } catch (error) {
-        console.error("Error loading scripts:", error);
-      }
-    };
-    loadDynamicMethods();
-  }, [getScriptInstance, listeners]);
-
-  const inputChanges = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const methodName = listeners[event.type]?.methodName;
-    const method = dynamicMethods[methodName];
-    if (method && typeof method === "function") {
-      method(methods, {
-        name,
-        value: event.target.value,
-        text,
-        disabled,
-        oneLiner,
-        outLineBorder,
-        listeners,
-      });
+  const clearSelection = () => {
+    console.log("clearSelection");
+    methods.setValue(name, "", { shouldValidate: true });
+    if (events) {
+      ruleEngine.processEvents(events, "", 'change', methods);
     }
   };
 
-  const clearSelection = () => {
-    methods.setValue(name, "", { shouldValidate: true });
-  };
-
   const handleRadioChange = React.useCallback(
-    async (e: React.ChangeEvent<HTMLInputElement>) => {
-      await inputChanges(e);
-      methods.setValue(name, e.target.value, { shouldValidate: true });
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = e.target.value;
+      methods.setValue(name, newValue, { shouldValidate: true });
+      if (events) {
+        ruleEngine.processEvents(events, newValue, 'change', methods);
+      }
     },
-    [inputChanges, methods, name]
+    [methods, name, events]
   );
 
   const labelWidth = oneLiner ? { base: "full", md: "35%" } : "full";

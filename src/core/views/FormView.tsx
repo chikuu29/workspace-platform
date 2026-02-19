@@ -13,12 +13,12 @@ import {
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { motion, AnimatePresence } from "framer-motion";
-import { FormProvider, useForm } from "react-hook-form";
 import { LuCheck, LuSave } from "react-icons/lu";
-import RunTimeWidgetRender from "../renderer/RunTimeWidget";
+import { UIEngine } from "../renderer/UIEngine";
 import "../widgets"; // Ensure all widgets are registered
-import { ScriptProvider } from "../../features/ui/components/contexts/ScriptProvider";
 import AsyncLoadIcon from "@/utils/hooks/AsyncLoadIcon";
+import { useFormStore } from "../store/useFormStore";
+
 
 /**
  * FormView
@@ -30,57 +30,59 @@ const FormView = ({ config }: any) => {
     const layoutStyles = config?.UI_TYPE?.layoutStyles || {};
     // Premium adaptive theme colors
     const cardBg = useColorModeValue("white", "rgba(15, 23, 42, 0.8)");
-    const textColor = useColorModeValue("gray.800", "white");
-    const mutedTextColor = useColorModeValue("gray.600", "whiteAlpha.600");
     const borderColor = useColorModeValue("gray.200", "rgba(56, 189, 248, 0.1)");
-    const accentColor = "#3B82F6"; // Vibrant blue
+    const headingColor = useColorModeValue("blue.600", "white");
+    const codeBg = useColorModeValue("gray.50", "gray.900");
+    const formValues = useFormStore(state => state.values);
 
     const tabs = useMemo(() => {
         return config?.UI_VIEW?.schema?.forms?.tabs || [];
     }, [config]);
 
     const actions = useMemo(() => {
-        return config?.ACTIONS?.BUTTONS || [];
+        const buttons = config?.ACTIONS?.ACTION_BUTTONS || config?.ACTIONS?.BUTTONS || [];
+        const showSave = config?.ACTIONS?.showSaveButton;
+
+        if (showSave) {
+            const saveBtn = {
+                name: "save_submit_generated",
+                text: "Save",
+                iconName: "LuSave",
+                event: "submit",
+                position: "top",
+                styles: {
+                    variant: "solid",
+                    colorPalette: "blue"
+                }
+            };
+            return [...buttons, saveBtn];
+        }
+        return buttons;
     }, [config]);
 
-    const scriptFiles = useMemo(() => {
-        return config?.scripts?.files || [];
-    }, [config]);
-
-    const methods = useForm({
-        mode: "onChange",
-        defaultValues: {},
-    });
 
 
+    const [submittedData, setSubmittedData] = React.useState<any>(null);
+    const formId = "active-form-view";
 
     const onFormSubmit = (data: any) => {
         console.log("FormView Submitted:", data);
-
+        setSubmittedData(data);
     };
 
     const handleAction = (button: any) => {
-        if (button.event === "submit") {
-            methods.handleSubmit(onFormSubmit)();
-        } else {
-            console.log(`Action triggered: ${button.event}`, methods.getValues());
-            // Potential for draft saving etc.
+        console.log("Action triggered:", button);
+        if (button.event !== "submit") {
+            // Handle other actions
+            setSubmittedData(null); // Reset on other actions if needed
         }
     };
-
-    const handleReset = useCallback(() => {
-
-        methods.reset();
-    }, [methods]);
 
     if (!tabs.length) return null;
 
     return (
-        <Box
-            py={{ base: "8", md: "8" }}
-            position="relative"
-        >
-            <Box  {...layoutStyles}>
+        <Box py={{ base: "8", md: "8" }} position="relative">
+            <Box {...layoutStyles}>
                 <Flex
                     direction={{ base: "column", md: "row" }}
                     justify="space-between"
@@ -93,36 +95,36 @@ const FormView = ({ config }: any) => {
                             {config.UI_TYPE?.title || "Data Entry"}
                         </Badge>
                         <VStack gap="1" align="start">
-                            <Heading size={{ base: "xl", md: "2xl" }} fontWeight="extrabold" letterSpacing="tight" color={useColorModeValue("blue.600", "white")}>
+                            <Heading size={{ base: "xl", md: "2xl" }} fontWeight="extrabold" letterSpacing="tight" color={headingColor}>
                                 {config.UI_TYPE?.title || "Information Portal"}
                             </Heading>
-
                         </VStack>
                     </VStack>
 
-
                     <HStack gap="4">
-                        {actions.map((btn: any, idx: number) => (
-                            <Button
-                                key={btn.name || idx}
-                                onClick={() => handleAction(btn)}
-                                _active={{ transform: "translateY(0)" }}
-                                display={btn.hidden ? "none" : "flex"}
-                                {...btn?.styles}
-                            >
-                                <HStack gap="2">
-                                    <Text fontWeight="bold">{btn.text}</Text>
-                                    {btn.iconName && (
-                                        <Box>
-                                            <AsyncLoadIcon iconName={btn.iconName} />
-                                        </Box>
-                                    )}
-                                </HStack>
-                            </Button>
-                        ))}
-
+                        {actions.map((btn: any, idx: number) => {
+                            const isSubmit = btn.event === 'submit';
+                            return (btn.position === 'top' || !btn.position) && (
+                                <Button
+                                    key={btn.name || idx}
+                                    onClick={isSubmit ? undefined : () => handleAction(btn)}
+                                    type={isSubmit ? "submit" : "button"}
+                                    form={isSubmit ? formId : undefined}
+                                    display={btn.hidden ? "none" : "flex"}
+                                    {...btn?.styles}
+                                >
+                                    <HStack gap="2">
+                                        <Text fontWeight="bold">{btn.text}</Text>
+                                        {btn.iconName && (
+                                            <Box>
+                                                <AsyncLoadIcon iconName={btn.iconName} />
+                                            </Box>
+                                        )}
+                                    </HStack>
+                                </Button>
+                            );
+                        })}
                     </HStack>
-
                 </Flex>
 
                 {/* Main Content Card */}
@@ -136,31 +138,51 @@ const FormView = ({ config }: any) => {
                     backdropFilter="blur(10px)"
                     position="relative"
                 >
-                    <FormProvider {...methods}>
-                        <form onSubmit={methods.handleSubmit(onFormSubmit)}>
-                            <ScriptProvider scriptFiles={scriptFiles}>
-                                <AnimatePresence mode="wait">
+                    <UIEngine
+                        config={tabs}
+                        tabs={tabs}
+                        initialData={formValues}
+                        onSubmit={onFormSubmit}
+                        formId={formId}
+                    >
+                        <AnimatePresence mode="wait">
+                            {/* RunTimeWidget handled internally */}
+                        </AnimatePresence>
 
-                                    <motion.div
-                                        key="form-content"
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -20 }}
-                                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                        <HStack gap="4" p="4" justify="flex-end">
+                            {actions.map((btn: any, idx: number) => (
+                                (btn.position === 'bottom') && (
+                                    <Button
+                                        key={`bottom-${idx}`}
+                                        type="button"
+                                        onClick={() => handleAction(btn)}
+                                        display={btn.hidden ? "none" : "flex"}
+                                        {...btn?.styles}
                                     >
-                                        {/* We pass tabs directly to RunTimeWidgetRender which handles the TabsWidget */}
-                                        <RunTimeWidgetRender
-                                            configs={[]}
-                                            tabs={tabs}
-                                        />
-
-                                    </motion.div>
-
-                                </AnimatePresence>
-                            </ScriptProvider>
-                        </form>
-                    </FormProvider>
+                                        <HStack gap="2">
+                                            <Text fontWeight="bold">{btn.text}</Text>
+                                            {btn.iconName && (
+                                                <Box>
+                                                    <AsyncLoadIcon iconName={btn.iconName} />
+                                                </Box>
+                                            )}
+                                        </HStack>
+                                    </Button>
+                                )
+                            ))}
+                        </HStack>
+                    </UIEngine>
                 </Box>
+
+                {/* Submitted Data Display */}
+                {submittedData && (
+                    <Box mt={8} p={6} bg={cardBg} rounded="xl" shadow="lg" border="1px solid" borderColor={borderColor}>
+                        <Heading size="lg" mb={4} color="green.500">Submission Successful</Heading>
+                        <Box as="pre" overflowX="auto" p={4} bg={codeBg} rounded="md" fontSize="sm">
+                            {JSON.stringify(submittedData, null, 2)}
+                        </Box>
+                    </Box>
+                )}
             </Box>
         </Box>
     );

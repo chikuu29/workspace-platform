@@ -3,7 +3,8 @@ import { useColorModeValue } from "../../components/ui/color-mode";
 import { useEffect, useState, useMemo, memo, useCallback } from "react";
 import React from "react";
 import { FieldError, useFormContext, useWatch } from "react-hook-form";
-import { useScriptInstance } from "../../features/ui/components/contexts/ScriptProvider";
+
+import { ruleEngine } from "../engine/logicEngine";
 
 interface TEXTFIELD {
   name: string;
@@ -18,14 +19,10 @@ interface TEXTFIELD {
   outLineBorder?: boolean;
   maxLength?: number;
   minLength?: number;
-  listeners?: {
-    change?: {
-      methodName: string;
-      param: string;
-    };
-    [key: string]: any;
-  };
+  events?: any; // Add events prop
   errors: FieldError;
+  pattern?: string;
+  patternMessage?: string;
 }
 
 const TextField = ({
@@ -39,39 +36,15 @@ const TextField = ({
   oneLiner = false,
   outLineBorder = true,
   required = false,
-  listeners = {},
+  events,
   maxLength,
   minLength,
   errors,
+  pattern, // Add pattern
+  patternMessage, // Add patternMessage
 }: TEXTFIELD) => {
   if (hidden) return null;
-
-  const [dynamicMethods, setDynamicMethods] = useState<any>({});
-  const { getScriptInstance, scriptFiles } = useScriptInstance();
-
-  useEffect(() => {
-    const loadDynamicMethods = async () => {
-      try {
-        const methods = getScriptInstance[0];
-        if (!methods) return;
-
-        const filteredMethods = Object.keys(listeners).reduce(
-          (acc: any, key: any) => {
-            const methodName = listeners[key]["methodName"];
-            if (methods[methodName]) {
-              acc[methodName] = methods[methodName];
-            }
-            return acc;
-          },
-          {}
-        );
-        setDynamicMethods(filteredMethods);
-      } catch (error) {
-        console.error("Error loading scripts:", error);
-      }
-    };
-    loadDynamicMethods();
-  }, [getScriptInstance, listeners]);
+  const props = { pattern, patternMessage }; // Create props object for useMemo
 
   const methods = useFormContext();
   const control = methods.control;
@@ -81,35 +54,32 @@ const TextField = ({
     name,
   });
 
-  const inputChanges = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const methodName = listeners[event.type]?.methodName;
-    const method = dynamicMethods[methodName];
-    if (method && typeof method === "function") {
-      method(methods, {
-        name,
-        value: event.target.value,
-        text,
-        description,
-        type,
-        disabled,
-        widget,
-        oneLiner,
-        outLineBorder,
-        listeners,
-      });
-    }
-  };
-
   const handleInputChange = React.useCallback(
-    async (event: React.ChangeEvent<HTMLInputElement>) => {
-      await inputChanges(event);
-      methods.setValue(name, event.target.value, { shouldValidate: true });
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = event.target.value;
+      // methods.setValue(name, newValue, { shouldValidate: true }); // Handled by RHF onChange now
+      if (events) {
+        ruleEngine.processEvents(events, newValue, 'change', methods);
+      }
     },
-    [inputChanges, methods, name]
+    [methods, name, events]
   );
 
   const labelWidth = oneLiner ? { base: "full", md: "35%" } : "full";
   const inputWidth = oneLiner ? { base: "full", md: "65%" } : "full";
+
+  const patternValue = useMemo(() => {
+    if (props.pattern) {
+      try {
+        // If pattern is a string like "^[0-9]+$", convert to RegExp
+        return new RegExp(props.pattern);
+      } catch (e) {
+        console.error("Invalid pattern regex", props.pattern);
+        return undefined;
+      }
+    }
+    return undefined;
+  }, [props.pattern]);
 
   return (
     <Box
@@ -147,37 +117,47 @@ const TextField = ({
           )}
 
           <Box w={inputWidth} position="relative">
-            <Input
-              {...methods.register(name, {
+            {(() => {
+              const { onChange, ...restRegister } = methods.register(name, {
                 required: required ? `${text} is required` : false,
                 maxLength: maxLength ? { value: maxLength, message: `Max length is ${maxLength}` } : undefined,
                 minLength: minLength ? { value: minLength, message: `Min length is ${minLength}` } : undefined,
-              })}
-              type={type}
-              id={name}
-              placeholder={oneLiner ? description : ""}
-              size="md"
-              variant="outline"
-              disabled={disabled}
-              bg={useColorModeValue("white", "whiteAlpha.50")}
-              borderRadius="lg"
-              borderWidth="1.5px"
-              borderColor={useColorModeValue("gray.200", "whiteAlpha.200")}
-              _hover={{
-                borderColor: useColorModeValue("gray.300", "whiteAlpha.400"),
-              }}
-              _focus={{
-                borderColor: "blue.500",
-                boxShadow: "0 0 0 1px rgba(66, 153, 225, 0.6)",
-                bg: useColorModeValue("white", "whiteAlpha.100"),
-              }}
-              _invalid={{
-                borderColor: "red.500",
-                boxShadow: "0 0 0 1px rgba(229, 62, 62, 0.6)",
-              }}
-              transition="all 0.2s"
-              onChange={handleInputChange}
-            />
+                pattern: patternValue ? { value: patternValue, message: props.patternMessage || "Invalid format" } : undefined
+              });
+
+              return (
+                <Input
+                  {...restRegister}
+                  type={type}
+                  id={name}
+                  placeholder={oneLiner ? description : ""}
+                  size="md"
+                  variant="outline"
+                  disabled={disabled}
+                  bg={useColorModeValue("white", "whiteAlpha.50")}
+                  borderRadius="lg"
+                  borderWidth="1.5px"
+                  borderColor={useColorModeValue("gray.200", "whiteAlpha.200")}
+                  _hover={{
+                    borderColor: useColorModeValue("gray.300", "whiteAlpha.400"),
+                  }}
+                  _focus={{
+                    borderColor: "blue.500",
+                    boxShadow: "0 0 0 1px rgba(66, 153, 225, 0.6)",
+                    bg: useColorModeValue("white", "whiteAlpha.100"),
+                  }}
+                  _invalid={{
+                    borderColor: "red.500",
+                    boxShadow: "0 0 0 1px rgba(229, 62, 62, 0.6)",
+                  }}
+                  transition="all 0.2s"
+                  onChange={(e) => {
+                    onChange(e); // Call RHF's onChange
+                    handleInputChange(e); // Call our custom logic for rules
+                  }}
+                />
+              );
+            })()}
 
             <Flex justify="flex-end" mt={1} gap={4}>
               {maxLength && (

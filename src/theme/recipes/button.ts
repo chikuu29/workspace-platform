@@ -9,10 +9,10 @@ export const buttonRecipe = defineRecipe({
     variants: {
         variant: {
             solid: {
-                bg: "brand.500",
-                color: "white",
+                // bg: "brand.500",
+                // color: "white",
                 _hover: {
-                    bg: "brand.600",
+                    // bg: "brand.600",
                     transform: "translateY(-1px)",
                     boxShadow: "lg",
                 },

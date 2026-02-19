@@ -3,7 +3,8 @@ import { useColorModeValue } from "../../components/ui/color-mode";
 import { memo, useEffect, useState, useMemo, useCallback } from "react";
 import React from "react";
 import { FieldError, useFormContext, useWatch } from "react-hook-form";
-import { useScriptInstance } from "../../features/ui/components/contexts/ScriptProvider";
+
+import { ruleEngine } from "../engine/logicEngine";
 
 interface TEXTAREA {
   name: string;
@@ -17,13 +18,7 @@ interface TEXTAREA {
   outLineBorder?: boolean;
   maxLength?: number;
   minLength?: number;
-  listeners?: {
-    change?: {
-      methodName: string;
-      param: string;
-    };
-    [key: string]: any;
-  };
+  events?: any; // Add events prop
   errors: FieldError;
 }
 
@@ -37,39 +32,12 @@ const TextArea = ({
   oneLiner = false,
   required = false,
   outLineBorder = true,
-  listeners = {},
+  events,
   maxLength,
   minLength,
   errors,
 }: TEXTAREA) => {
   if (hidden) return null;
-
-  const [dynamicMethods, setDynamicMethods] = useState<any>({});
-  const { getScriptInstance, scriptFiles } = useScriptInstance();
-
-  useEffect(() => {
-    const loadDynamicMethods = async () => {
-      try {
-        const methods = getScriptInstance[0];
-        if (!methods) return;
-
-        const filteredMethods = Object.keys(listeners).reduce(
-          (acc: any, key: any) => {
-            const methodName = listeners[key]["methodName"];
-            if (methods[methodName]) {
-              acc[methodName] = methods[methodName];
-            }
-            return acc;
-          },
-          {}
-        );
-        setDynamicMethods(filteredMethods);
-      } catch (error) {
-        console.error("Error loading scripts:", error);
-      }
-    };
-    loadDynamicMethods();
-  }, [getScriptInstance, listeners]);
 
   const methods = useFormContext();
   const control = methods.control;
@@ -79,30 +47,15 @@ const TextArea = ({
     name,
   });
 
-  const inputChanges = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const methodName = listeners[event.type]?.methodName;
-    const method = dynamicMethods[methodName];
-    if (method && typeof method === "function") {
-      method(methods, {
-        name,
-        value: event.target.value,
-        text,
-        description,
-        disabled,
-        widget,
-        oneLiner,
-        outLineBorder,
-        listeners,
-      });
-    }
-  };
-
   const handleTextAreaChange = React.useCallback(
-    async (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-      await inputChanges(event as any);
-      methods.setValue(name, event.target.value, { shouldValidate: true });
+    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const newValue = event.target.value;
+      methods.setValue(name, newValue, { shouldValidate: true });
+      if (events) {
+        ruleEngine.processEvents(events, newValue, 'change', methods);
+      }
     },
-    [inputChanges, methods, name]
+    [methods, name, events]
   );
 
   const labelWidth = oneLiner ? { base: "full", md: "35%" } : "full";

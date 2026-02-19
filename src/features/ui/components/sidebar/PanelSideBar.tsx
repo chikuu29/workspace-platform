@@ -103,7 +103,7 @@ export function SidebarResponsive(props: any) {
       >
         <Portal>
           <Drawer.Positioner>
-            <Drawer.Content maxW="280px" bg={sidebarBg} h="100dvh">
+            <Drawer.Content maxW="280px" h="100dvh">
               <Flex alignItems={"center"} justifyContent={"space-between"} gap={2} p={4}>
                 <Box>
                   <Brand />

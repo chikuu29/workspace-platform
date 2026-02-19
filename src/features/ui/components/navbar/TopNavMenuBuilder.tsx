@@ -115,7 +115,7 @@ const NavItem = ({ menuConfig, ...rest }: MenuLinkInterFace) => {
             </Popover.Trigger>
 
             <Popover.Positioner>
-              <Popover.Content border={0} boxShadow={"xl"} p={4} rounded={"xl"} minW={"sm"} bg={bg}>
+              <Popover.Content border={0} boxShadow={"xl"} p={4} rounded={"xl"} minW={"sm"} >
                 <Stack>
                   {menuConfig.menu.map((child: any, index: number) => (
                     // <DesktopSubNav key={child} subMenu={child} />

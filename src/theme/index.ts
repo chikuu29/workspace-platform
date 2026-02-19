@@ -27,7 +27,17 @@ export const system = createSystem(defaultConfig, {
 
             fontWeight: "500",
             fontFamily: "Inter, sans-serif",
+            "&::-webkit-scrollbar": {
+                display: "none",
+            },
+            "scrollbarWidth": "none",
         },
+        "*": {
+            "&::-webkit-scrollbar": {
+                display: "none",
+            },
+            "scrollbarWidth": "none",
+        }
     }
 })
 

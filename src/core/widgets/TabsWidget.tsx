@@ -1,6 +1,7 @@
 import React from "react";
-import { Box, HStack, Icon, Text } from "@chakra-ui/react";
+import { Box, HStack, Text, VStack, Heading } from "@chakra-ui/react";
 import { TabsRoot, TabsList, TabsTrigger, TabsContent, TabsIndicator } from "@/components/ui/tabs";
+import { useColorModeValue } from "@/components/ui/color-mode";
 import RunTimeWidgetRender from "./RunTimeWidget";
 import AsyncLoadIcon from "@/utils/hooks/AsyncLoadIcon";
 
@@ -20,55 +21,72 @@ interface TabsWidgetProps {
 
 /**
  * TabsWidget
- * Renders dynamic tabs, each containing its own nested widgets.
+ * Renders dynamic tabs with a premium, modern design matching the Project Wizard aesthetic.
  */
 const TabsWidget: React.FC<TabsWidgetProps> = ({ tabs, defaultValue, ...rest }) => {
     if (!tabs || tabs.length === 0) return null;
 
+    // Premium adaptive theme colors
+    const activeColor = "#3B82F6"; // Vibrant blue
+    const inactiveColor = useColorModeValue("gray.500", "whiteAlpha.600");
+    const textColor = useColorModeValue("gray.800", "white");
+    const mutedTextColor = useColorModeValue("gray.600", "whiteAlpha.600");
+    const borderColor = useColorModeValue("gray.100", "whiteAlpha.100");
+    const headerBg = useColorModeValue("gray.50/50", "white/5");
+
     // Use the first tab title as default value if not provided
     const defaultTabValue = defaultValue || tabs[0].title;
 
+    // Create a unique key for the tabs set to force re-mounting (and thus selection reset) when the tabs change
+    const tabsKey = React.useMemo(() => tabs.map(t => t.title).join('-'), [tabs]);
+
     return (
-        <TabsRoot defaultValue={defaultTabValue} variant="subtle" colorPalette="blue" >
-            <TabsList
-                bg="bg.muted"
-                p="1"
-                borderRadius="lg"
-                display="flex"
-                w="fit-content"
-                overflowX="auto"
-                css={{
-                    '&::-webkit-scrollbar': { display: 'none' },
-                    msOverflowStyle: 'none',
-                    scrollbarWidth: 'none',
-                }}
-            >
-                {tabs.map((tab) => (
-                    <TabsTrigger
-                        key={tab.title}
-                        value={tab.title}
-                        py="2"
-                        px="6"
-                        borderRadius="md"
-                        _selected={{
-                            bg: "bg.panel",
-                            shadow: "sm",
-                        }}
-                    >
-                        <HStack gap="2">
-                            {tab.iconName && (
-                                <Box boxSize="4">
-                                    <AsyncLoadIcon iconName={tab.iconName} />
-                                </Box>
-                            )}
-                            <Text fontSize="sm" fontWeight="semibold">{tab.title}</Text>
-                        </HStack>
-                    </TabsTrigger>
-                ))}
-            </TabsList>
+        <TabsRoot key={tabsKey} defaultValue={defaultTabValue} variant="plain" w="full">
+            <Box borderBottom="1px solid" borderColor={borderColor} bg={headerBg} px={{ base: "6", md: "12" }} p={4}>
+                <TabsList gap="16" borderBottom="none">
+                    {tabs.map((tab) => (
+                        <TabsTrigger
+                            key={tab.title}
+                            value={tab.title}
+                            py="5"
+                            px="4"
+                            fontSize="sm"
+                            fontWeight="bold"
+                            color={inactiveColor}
+                            _selected={{ color: activeColor }}
+                            _hover={{ color: activeColor }}
+                            transition="all 0.2s"
+                            position="relative"
+                        >
+                            <HStack gap="2">
+                                {/* {tab.iconName && (
+                                    <Box boxSize="4" color={useColorModeValue("gray.400", "whiteAlpha.400")}>
+                                        <AsyncLoadIcon iconName={tab.iconName} />
+                                    </Box>
+                                )} */}
+                                <Text>{tab.title}</Text>
+                            </HStack>
+                        </TabsTrigger>
+                    ))}
+                    <TabsIndicator
+                        height="4px"
+                        bg={activeColor}
+                        roundedTop="full"
+                        bottom="0"
+                    />
+                </TabsList>
+            </Box>
 
             {tabs.map((tab) => (
-                <TabsContent key={tab.title} value={tab.title} mt="4">
+                <TabsContent key={tab.title} value={tab.title} px={{ base: "6", md: "12" }} py="10">
+                    <VStack align="start" gap="2" mb="8">
+                        <Heading size="xl" fontWeight="bold" color={textColor}>
+                            {tab.headerTitle || `Configure ${tab.title}`}
+                        </Heading>
+                        <Text color={mutedTextColor} fontSize="md">
+                            {tab.description || "Define the core parameters for your initiatives."}
+                        </Text>
+                    </VStack>
                     <RunTimeWidgetRender
                         configs={tab.widgets}
                         {...rest}

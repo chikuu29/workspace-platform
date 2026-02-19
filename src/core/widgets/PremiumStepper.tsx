@@ -9,6 +9,7 @@ import {
     IconButton,
 } from "@chakra-ui/react";
 import { LuCheck, LuChevronLeft, LuChevronRight } from "react-icons/lu";
+import { useColorModeValue } from "@/components/ui/color-mode";
 
 interface Step {
     title: string;
@@ -30,6 +31,14 @@ const PremiumStepper: React.FC<PremiumStepperProps> = ({
     steps,
     onStepChange,
 }) => {
+    // Context-aware colors
+    const inactiveCircleBg = useColorModeValue("gray.100", "whiteAlpha.100");
+    const inactiveCircleColor = useColorModeValue("gray.500", "whiteAlpha.400");
+    const inactiveLabelColor = useColorModeValue("gray.500", "whiteAlpha.400");
+    const navBtnColor = useColorModeValue("gray.600", "whiteAlpha.600");
+    const navBtnHoverBg = useColorModeValue("gray.100", "whiteAlpha.100");
+    const lineBg = useColorModeValue("gray.200", "whiteAlpha.200");
+
     return (
         <Flex align="center" justify="center" w="full" py="8" gap="4">
             {/* Left Navigation Arrow */}
@@ -39,8 +48,8 @@ const PremiumStepper: React.FC<PremiumStepperProps> = ({
                 rounded="full"
                 disabled={activeStep === 0}
                 onClick={() => onStepChange(activeStep - 1)}
-                color="whiteAlpha.600"
-                _hover={{ color: "white", bg: "whiteAlpha.100" }}
+                color={navBtnColor}
+                _hover={{ color: useColorModeValue("blue.600", "white"), bg: navBtnHoverBg }}
             >
                 <LuChevronLeft />
             </IconButton>
@@ -56,15 +65,15 @@ const PremiumStepper: React.FC<PremiumStepperProps> = ({
                             <VStack gap="3" position="relative" zIndex="1" flex="1">
                                 <Circle
                                     size="10"
-                                    bg={isActive ? "blue.500" : isCompleted ? "green.500" : "whiteAlpha.100"}
-                                    color={isActive || isCompleted ? "white" : "whiteAlpha.400"}
+                                    bg={isActive ? "blue.500" : isCompleted ? "green.500" : inactiveCircleBg}
+                                    color={isActive || isCompleted ? "white" : inactiveCircleColor}
                                     border="1px solid"
                                     borderColor={isActive ? "blue.400" : isCompleted ? "green.400" : "transparent"}
-                                    shadow={isActive ? "0 0 20px rgba(59, 130, 246, 0.5)" : "none"}
+                                    shadow={isActive ? (useColorModeValue("0 0 15px rgba(59, 130, 246, 0.3)", "0 0 20px rgba(59, 130, 246, 0.5)")) : "none"}
                                     cursor="pointer"
                                     onClick={() => onStepChange(index)}
                                     transition="all 0.3s"
-                                    _hover={{ transform: "scale(1.1)" }}
+                                    _hover={{ transform: "scale(1.1)", bg: isActive ? "blue.600" : isCompleted ? "green.600" : useColorModeValue("gray.200", "whiteAlpha.200") }}
                                 >
                                     {isCompleted ? (
                                         <LuCheck size="18" />
@@ -77,7 +86,7 @@ const PremiumStepper: React.FC<PremiumStepperProps> = ({
                                 <Text
                                     fontSize="xs"
                                     fontWeight="bold"
-                                    color={isActive ? "blue.400" : isCompleted ? "green.400" : "whiteAlpha.400"}
+                                    color={isActive ? "blue.500" : isCompleted ? "green.500" : inactiveLabelColor}
                                     textTransform="uppercase"
                                     letterSpacing="wider"
                                     textAlign="center"
@@ -92,7 +101,7 @@ const PremiumStepper: React.FC<PremiumStepperProps> = ({
                                 <Box
                                     flex="1"
                                     h="1px"
-                                    bg="whiteAlpha.200"
+                                    bg={lineBg}
                                     mt="-8" // Align with circle center (approx)
                                     position="relative"
                                     mx="-4"
@@ -120,8 +129,8 @@ const PremiumStepper: React.FC<PremiumStepperProps> = ({
                 rounded="full"
                 disabled={activeStep === steps.length - 1}
                 onClick={() => onStepChange(activeStep + 1)}
-                color="whiteAlpha.600"
-                _hover={{ color: "white", bg: "whiteAlpha.100" }}
+                color={navBtnColor}
+                _hover={{ color: useColorModeValue("blue.600", "white"), bg: navBtnHoverBg }}
             >
                 <LuChevronRight />
             </IconButton>

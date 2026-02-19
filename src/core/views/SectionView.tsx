@@ -22,7 +22,6 @@ import { ScriptProvider } from "../../features/ui/components/contexts/ScriptProv
 
 const SectionView = ({ config }: any) => {
     // Premium adaptive theme colors
-    const pageBg = useColorModeValue("gray.50", "#0F172A");
     const cardBg = useColorModeValue("white", "rgba(15, 23, 42, 0.8)");
     const textColor = useColorModeValue("gray.800", "white");
     const mutedTextColor = useColorModeValue("gray.600", "whiteAlpha.600");
@@ -73,7 +72,7 @@ const SectionView = ({ config }: any) => {
             m="-6" // Overcome default padding if any to fill screen
             px="6"
         >
-            <Box mx="auto" maxW="5xl">
+            <Box mx="auto" maxW="7xl">
 
                 <VStack mb={{ base: "8", md: "16" }} textAlign="center" gap="4">
                     <Badge variant="subtle" colorPalette="blue" px="3" py="1" rounded="full" textTransform="uppercase" fontSize="10px" letterSpacing="widest">
@@ -127,26 +126,14 @@ const SectionView = ({ config }: any) => {
                                         <ScriptProvider scriptFiles={scriptFiles}>
                                             <Box minH="300px">
                                                 {step < sections.length ? (
-                                                    <>
-                                                        {/* {(!sections[step].tabs || sections[step].tabs.length === 0) && (
-                                                            <Box p={{ base: "6", md: "10" }} borderBottom="1px solid" borderColor={separatorColor}>
-                                                                <VStack align="start" gap="2">
-                                                                    <Heading size="xl" fontWeight="bold" color={textColor}>
-                                                                        {sections[step]?.title || "Configuration"}
-                                                                    </Heading>
-                                                                    <Text color={mutedTextColor} fontSize="md">
-                                                                        {sections[step]?.description || "Configure the core parameters for your initiatives."}
-                                                                    </Text>
-                                                                </VStack>
-                                                            </Box>
-                                                        )} */}
-                                                        <Box p={(!sections[step].tabs || sections[step].tabs.length === 0) ? { base: "6", md: "10" } : "0"}>
-                                                            <RunTimeWidgetRender
-                                                                configs={sections[step].widgets}
-                                                                tabs={sections[step].tabs}
-                                                            />
-                                                        </Box>
-                                                    </>
+
+                                                    <Box p={(!sections[step].tabs || sections[step].tabs.length === 0) ? { base: "6", md: "10" } : "0"}>
+                                                        <RunTimeWidgetRender
+                                                            configs={sections[step].widgets}
+                                                            tabs={sections[step].tabs}
+                                                        />
+                                                    </Box>
+
                                                 ) : (
                                                     /* Success State */
                                                     <VStack gap="6" py="10">

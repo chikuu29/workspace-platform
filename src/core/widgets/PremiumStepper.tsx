@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
     Box,
     HStack,
@@ -25,12 +25,17 @@ interface PremiumStepperProps {
 /**
  * PremiumStepper
  * A high-end horizontal stepper designed to match the "Project Wizard" figma aesthetic.
+ * Now features conditional navigation arrows based on overflow.
  */
 const PremiumStepper: React.FC<PremiumStepperProps> = ({
     activeStep,
     steps,
     onStepChange,
 }) => {
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const [showLeftArrow, setShowLeftArrow] = useState(false);
+    const [showRightArrow, setShowRightArrow] = useState(false);
+
     // Context-aware colors
     const inactiveCircleBg = useColorModeValue("gray.100", "whiteAlpha.100");
     const inactiveCircleColor = useColorModeValue("gray.500", "whiteAlpha.400");
@@ -39,22 +44,90 @@ const PremiumStepper: React.FC<PremiumStepperProps> = ({
     const navBtnHoverBg = useColorModeValue("gray.100", "whiteAlpha.100");
     const lineBg = useColorModeValue("gray.200", "whiteAlpha.200");
 
-    return (
-        <Flex align="center" justify="center" w="full" py="8" gap="4">
-            {/* Left Navigation Arrow */}
-            <IconButton
-                aria-label="Previous step"
-                variant="ghost"
-                rounded="full"
-                disabled={activeStep === 0}
-                onClick={() => onStepChange(activeStep - 1)}
-                color={navBtnColor}
-                _hover={{ color: useColorModeValue("blue.600", "white"), bg: navBtnHoverBg }}
-            >
-                <LuChevronLeft />
-            </IconButton>
+    const checkOverflow = () => {
+        const container = scrollContainerRef.current;
+        if (container) {
+            const hasOverflow = container.scrollWidth > container.clientWidth;
+            if (hasOverflow) {
+                setShowLeftArrow(container.scrollLeft > 0);
+                setShowRightArrow(
+                    container.scrollLeft < container.scrollWidth - container.clientWidth - 10
+                );
+            } else {
+                setShowLeftArrow(false);
+                setShowRightArrow(false);
+            }
+        }
+    };
 
-            <HStack gap="0" flex="1" maxW="4xl" justify="space-between" position="relative">
+    useEffect(() => {
+        checkOverflow();
+        window.addEventListener("resize", checkOverflow);
+        return () => window.removeEventListener("resize", checkOverflow);
+    }, [steps]);
+
+    // Auto-scroll to active step
+    useEffect(() => {
+        const container = scrollContainerRef.current;
+        if (container) {
+            const activeStepElement = container.children[activeStep * 2] as HTMLElement; // *2 because of fragments/wrappers
+            if (activeStepElement) {
+                const scrollLeft = activeStepElement.offsetLeft - container.clientWidth / 2 + activeStepElement.clientWidth / 2;
+                container.scrollTo({ left: scrollLeft, behavior: "smooth" });
+            }
+        }
+        checkOverflow();
+    }, [activeStep]);
+
+    const handleScroll = (direction: "left" | "right") => {
+        const container = scrollContainerRef.current;
+        if (container) {
+            const scrollAmount = container.clientWidth * 0.8;
+            container.scrollBy({
+                left: direction === "left" ? -scrollAmount : scrollAmount,
+                behavior: "smooth",
+            });
+            setTimeout(checkOverflow, 400); // Check after animation
+        }
+    };
+
+    return (
+        <Flex align="center" justify="center" w="full" py="8" borderRadius={"xl"} position="relative" px="10"
+            bg={useColorModeValue("gray.50/50", "white/5")}>
+            {/* Left Navigation Arrow */}
+            <Box position="absolute" left="0" zIndex="2">
+                <IconButton
+                    aria-label="Previous steps"
+                    variant="ghost"
+                    rounded="full"
+                    opacity={showLeftArrow ? 1 : 0}
+                    visibility={showLeftArrow ? "visible" : "hidden"}
+                    onClick={() => handleScroll("left")}
+                    color={navBtnColor}
+                    _hover={{ color: useColorModeValue("blue.600", "white"), bg: navBtnHoverBg }}
+                    transition="all 0.2s"
+                >
+                    <LuChevronLeft />
+                </IconButton>
+            </Box>
+
+            <HStack
+                ref={scrollContainerRef}
+                p={3}
+                // bg={"red"}
+                borderRadius={"full"}
+                gap="0"
+                flex="1"
+                maxW="7xl"
+                overflowX="auto"
+                css={{
+                    "&::-webkit-scrollbar": { display: "none" },
+                    msOverflowStyle: "none",
+                    scrollbarWidth: "none",
+                }}
+                onScroll={checkOverflow}
+                position="relative"
+            >
                 {steps.map((step, index) => {
                     const isCompleted = index < activeStep;
                     const isActive = index === activeStep;
@@ -62,7 +135,7 @@ const PremiumStepper: React.FC<PremiumStepperProps> = ({
 
                     return (
                         <React.Fragment key={index}>
-                            <VStack gap="3" position="relative" zIndex="1" flex="1">
+                            <VStack gap="3" position="relative" zIndex="1" minW="120px" flex="1">
                                 <Circle
                                     size="10"
                                     bg={isActive ? "blue.500" : isCompleted ? "green.500" : inactiveCircleBg}
@@ -104,6 +177,7 @@ const PremiumStepper: React.FC<PremiumStepperProps> = ({
                                     bg={lineBg}
                                     mt="-8" // Align with circle center (approx)
                                     position="relative"
+                                    minW="20px"
                                     mx="-4"
                                 >
                                     <Box
@@ -123,17 +197,21 @@ const PremiumStepper: React.FC<PremiumStepperProps> = ({
             </HStack>
 
             {/* Right Navigation Arrow */}
-            <IconButton
-                aria-label="Next step"
-                variant="ghost"
-                rounded="full"
-                disabled={activeStep === steps.length - 1}
-                onClick={() => onStepChange(activeStep + 1)}
-                color={navBtnColor}
-                _hover={{ color: useColorModeValue("blue.600", "white"), bg: navBtnHoverBg }}
-            >
-                <LuChevronRight />
-            </IconButton>
+            <Box position="absolute" right="0" zIndex="2">
+                <IconButton
+                    aria-label="Next steps"
+                    variant="ghost"
+                    rounded="full"
+                    opacity={showRightArrow ? 1 : 0}
+                    visibility={showRightArrow ? "visible" : "hidden"}
+                    onClick={() => handleScroll("right")}
+                    color={navBtnColor}
+                    _hover={{ color: useColorModeValue("blue.600", "white"), bg: navBtnHoverBg }}
+                    transition="all 0.2s"
+                >
+                    <LuChevronRight />
+                </IconButton>
+            </Box>
         </Flex>
     );
 };

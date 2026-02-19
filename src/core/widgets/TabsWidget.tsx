@@ -2,6 +2,7 @@ import React from "react";
 import { Box, HStack, Text, VStack, Heading } from "@chakra-ui/react";
 import { TabsRoot, TabsList, TabsTrigger, TabsContent, TabsIndicator } from "@/components/ui/tabs";
 import { useColorModeValue } from "@/components/ui/color-mode";
+import { motion, AnimatePresence } from "framer-motion";
 import RunTimeWidgetRender from "./RunTimeWidget";
 import AsyncLoadIcon from "@/utils/hooks/AsyncLoadIcon";
 
@@ -78,19 +79,29 @@ const TabsWidget: React.FC<TabsWidgetProps> = ({ tabs, defaultValue, ...rest }) 
             </Box>
 
             {tabs.map((tab) => (
-                <TabsContent key={tab.title} value={tab.title} px={{ base: "6", md: "12" }} py="10">
-                    <VStack align="start" gap="2" mb="8">
-                        <Heading size="xl" fontWeight="bold" color={textColor}>
-                            {tab.headerTitle || `Configure ${tab.title}`}
-                        </Heading>
-                        <Text color={mutedTextColor} fontSize="md">
-                            {tab.description || "Define the core parameters for your initiatives."}
-                        </Text>
-                    </VStack>
-                    <RunTimeWidgetRender
-                        configs={tab.widgets}
-                        {...rest}
-                    />
+                <TabsContent key={tab.title} value={tab.title} px={{ base: "6", md: "12" }} py="10" position="relative">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={tab.title}
+                            initial={{ opacity: 0, y: -25, filter: "blur(4px)" }}
+                            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                            exit={{ opacity: 0, y: 15, filter: "blur(4px)" }}
+                            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                        >
+                            <VStack align="start" gap="2" mb="8">
+                                <Heading size="xl" fontWeight="bold" color={textColor}>
+                                    {tab.headerTitle || `Configure ${tab.title}`}
+                                </Heading>
+                                <Text color={mutedTextColor} fontSize="md">
+                                    {tab.description || "Define the core parameters for your initiatives."}
+                                </Text>
+                            </VStack>
+                            <RunTimeWidgetRender
+                                configs={tab.widgets}
+                                {...rest}
+                            />
+                        </motion.div>
+                    </AnimatePresence>
                 </TabsContent>
             ))}
         </TabsRoot>

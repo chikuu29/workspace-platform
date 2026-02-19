@@ -12,6 +12,7 @@ import {
     Badge,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
+import { motion, AnimatePresence } from "framer-motion";
 import { FormProvider, useForm } from "react-hook-form";
 import PremiumStepper from "../widgets/PremiumStepper";
 import { LuArrowRight, LuArrowLeft, LuCheck } from "react-icons/lu";
@@ -99,115 +100,124 @@ const SectionView = ({ config }: any) => {
                     />
                 </Box>
 
-                {/* 3. Main Content Card */}
-                <Box
-                    bg={cardBg}
-                    rounded="3xl"
-                    shadow="xl"
-                    border="1px solid"
-                    borderColor={borderColor}
-                    overflow="hidden"
-                    backdropFilter="blur(10px)"
-                    position="relative"
-                >
-
-
-                    {/* Content Area */}
-                    <Box>
-                        <FormProvider {...methods}>
-                            <form onSubmit={methods.handleSubmit(onFormSubmit)}>
-                                <ScriptProvider scriptFiles={scriptFiles}>
-                                    <Box minH="300px">
-                                        {step < sections.length ? (
-                                            <>
-                                                {/* {(!sections[step].tabs || sections[step].tabs.length === 0) && (
-                                                    <Box p={{ base: "6", md: "10" }} borderBottom="1px solid" borderColor={separatorColor}>
-                                                        <VStack align="start" gap="2">
-                                                            <Heading size="xl" fontWeight="bold" color={textColor}>
-                                                                {sections[step]?.title || "Configuration"}
-                                                            </Heading>
-                                                            <Text color={mutedTextColor} fontSize="md">
-                                                                {sections[step]?.description || "Configure the core parameters for your initiatives."}
-                                                            </Text>
+                {/* 3. Main Content Card with holistic animation */}
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={step}
+                        initial={{ opacity: 0, y: -40, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                        style={{ width: '100%' }}
+                    >
+                        <Box
+                            bg={cardBg}
+                            rounded="3xl"
+                            shadow="xl"
+                            border="1px solid"
+                            borderColor={borderColor}
+                            overflow="hidden"
+                            backdropFilter="blur(10px)"
+                            position="relative"
+                        >
+                            {/* Content Area */}
+                            <Box>
+                                <FormProvider {...methods}>
+                                    <form onSubmit={methods.handleSubmit(onFormSubmit)}>
+                                        <ScriptProvider scriptFiles={scriptFiles}>
+                                            <Box minH="300px">
+                                                {step < sections.length ? (
+                                                    <>
+                                                        {/* {(!sections[step].tabs || sections[step].tabs.length === 0) && (
+                                                            <Box p={{ base: "6", md: "10" }} borderBottom="1px solid" borderColor={separatorColor}>
+                                                                <VStack align="start" gap="2">
+                                                                    <Heading size="xl" fontWeight="bold" color={textColor}>
+                                                                        {sections[step]?.title || "Configuration"}
+                                                                    </Heading>
+                                                                    <Text color={mutedTextColor} fontSize="md">
+                                                                        {sections[step]?.description || "Configure the core parameters for your initiatives."}
+                                                                    </Text>
+                                                                </VStack>
+                                                            </Box>
+                                                        )} */}
+                                                        <Box p={(!sections[step].tabs || sections[step].tabs.length === 0) ? { base: "6", md: "10" } : "0"}>
+                                                            <RunTimeWidgetRender
+                                                                configs={sections[step].widgets}
+                                                                tabs={sections[step].tabs}
+                                                            />
+                                                        </Box>
+                                                    </>
+                                                ) : (
+                                                    /* Success State */
+                                                    <VStack gap="6" py="10">
+                                                        <Circle size="20" bg="green.500/20" color="green.500" border="2px solid" borderColor="green.500">
+                                                            <LuCheck size="40" />
+                                                        </Circle>
+                                                        <VStack gap="2">
+                                                            <Heading size="lg" color={textColor}>Success!</Heading>
+                                                            <Text color={mutedTextColor}>Configuration completed successfully.</Text>
                                                         </VStack>
-                                                    </Box>
-                                                )} */}
-                                                <Box p={(!sections[step].tabs || sections[step].tabs.length === 0) ? { base: "6", md: "10" } : "0"}>
-                                                    <RunTimeWidgetRender
-                                                        configs={sections[step].widgets}
-                                                        tabs={sections[step].tabs}
-                                                    />
-                                                </Box>
-                                            </>
-                                        ) : (
-                                            /* Success State */
-                                            <VStack gap="6" py="10">
-                                                <Circle size="20" bg="green.500/20" color="green.500" border="2px solid" borderColor="green.500">
-                                                    <LuCheck size="40" />
-                                                </Circle>
-                                                <VStack gap="2">
-                                                    <Heading size="lg" color={textColor}>Success!</Heading>
-                                                    <Text color={mutedTextColor}>Configuration completed successfully.</Text>
-                                                </VStack>
-                                                <Button
-                                                    bg={accentColor}
-                                                    color="white"
-                                                    _hover={{ bg: "blue.600" }}
-                                                    onClick={handleReset}
-                                                    size="lg"
-                                                    px="10"
-                                                >
-                                                    Restart
-                                                </Button>
-                                            </VStack>
-                                        )}
-                                    </Box>
-                                </ScriptProvider>
-                            </form>
-                        </FormProvider>
-                    </Box>
+                                                        <Button
+                                                            bg={accentColor}
+                                                            color="white"
+                                                            _hover={{ bg: "blue.600" }}
+                                                            onClick={handleReset}
+                                                            size="lg"
+                                                            px="10"
+                                                        >
+                                                            Restart
+                                                        </Button>
+                                                    </VStack>
+                                                )}
+                                            </Box>
+                                        </ScriptProvider>
+                                    </form>
+                                </FormProvider>
+                            </Box>
 
-                    {/* Footer: Premium Action Buttons */}
-                    {step < sections.length && (
-                        <Box p="6" bg="rgba(255,255,255,0.02)" borderTop="1px solid" borderColor={separatorColor}>
-                            <Flex justify="space-between" align="center">
-                                <Button
-                                    variant="outline"
-                                    color={mutedTextColor}
-                                    borderColor={borderColor}
-                                    _hover={{ bg: useColorModeValue("gray.50", "whiteAlpha.100"), color: textColor }}
-                                    onClick={() => handleStepChange(step - 1)}
-                                    disabled={step === 0}
-                                    size="lg"
-                                    px="8"
-                                    rounded="xl"
-                                >
-                                    <HStack gap="2">
-                                        <LuArrowLeft />
-                                        <Text>Previous</Text>
-                                    </HStack>
-                                </Button>
+                            {/* Footer: Premium Action Buttons */}
+                            {step < sections.length && (
+                                <Box p="6" bg="rgba(255,255,255,0.02)" borderTop="1px solid" borderColor={separatorColor}>
+                                    <Flex justify="space-between" align="center">
+                                        <Button
+                                            variant="outline"
+                                            color={mutedTextColor}
+                                            borderColor={borderColor}
+                                            _hover={{ bg: useColorModeValue("gray.50", "whiteAlpha.100"), color: textColor }}
+                                            onClick={() => handleStepChange(step - 1)}
+                                            disabled={step === 0}
+                                            size="lg"
+                                            px="8"
+                                            rounded="xl"
+                                        >
+                                            <HStack gap="2">
+                                                <LuArrowLeft />
+                                                <Text>Previous</Text>
+                                            </HStack>
+                                        </Button>
 
-                                <Button
-                                    bg={accentColor}
-                                    color="white"
-                                    _hover={{ bg: "blue.600", transform: "translateY(-1px)" }}
-                                    _active={{ transform: "translateY(0)" }}
-                                    size="lg"
-                                    px="12"
-                                    rounded="xl"
-                                    shadow={`0 10px 20px ${accentColor}44`}
-                                    onClick={step === sections.length - 1 ? methods.handleSubmit(onFormSubmit) : () => handleStepChange(step + 1)}
-                                >
-                                    <HStack gap="2">
-                                        <Text>{step === sections.length - 1 ? "Complete" : "Next Step"}</Text>
-                                        <LuArrowRight />
-                                    </HStack>
-                                </Button>
-                            </Flex>
+                                        <Button
+                                            bg={accentColor}
+                                            color="white"
+                                            _hover={{ bg: "blue.600", transform: "translateY(-1px)" }}
+                                            _active={{ transform: "translateY(0)" }}
+                                            size="lg"
+                                            px="12"
+                                            rounded="xl"
+                                            shadow={`0 10px 20px ${accentColor}44`}
+                                            onClick={step === sections.length - 1 ? methods.handleSubmit(onFormSubmit) : () => handleStepChange(step + 1)}
+                                        >
+                                            <HStack gap="2">
+                                                <Text>{step === sections.length - 1 ? "Complete" : "Next Step"}</Text>
+                                                <LuArrowRight />
+                                            </HStack>
+                                        </Button>
+                                    </Flex>
+                                </Box>
+                            )}
                         </Box>
-                    )}
-                </Box>
+                    </motion.div>
+                </AnimatePresence>
 
                 {/* Secure Badge & Footer Links */}
                 <Flex mt="8" justify="space-between" align="center" direction={{ base: "column", md: "row" }} gap="4" color={mutedTextColor} fontSize="xs">

@@ -75,9 +75,7 @@
                                 "type": "email",
                                 "widget": "textField",
                                 "oneLiner": true,
-                                "required": true,
-                                "pattern": "^[^@]+@[^@]+\\.[^@]+$",
-                                "patternMessage": "Invalid email address"
+                                "required": true
                             },
                             {
                                 "name": "memberPhone",
@@ -86,9 +84,7 @@
                                 "type": "tel",
                                 "widget": "textField",
                                 "oneLiner": true,
-                                "required": true,
-                                "pattern": "^\\d{10}$",
-                                "patternMessage": "Phone number must be exactly 10 digits"
+                                "required": true
                             },
                             {
                                 "name": "memberGender",
@@ -109,35 +105,7 @@
                                         "label": "Other",
                                         "value": "other"
                                     }
-                                ],
-                                "events": {
-                                    "change": [
-                                        {
-                                            "condition": "value == 'male'",
-                                            "actions": [
-                                                {
-                                                    "type": "show",
-                                                    "target": "militaryService"
-                                                }
-                                            ],
-                                            "elseActions": [
-                                                {
-                                                    "type": "hide",
-                                                    "target": "militaryService"
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            },
-                            {
-                                "name": "militaryService",
-                                "text": "Military Service Details",
-                                "description": "Please provide details of your service.",
-                                "widget": "textAreaField",
-                                "oneLiner": true,
-                                "hidden": true,
-                                "required": false
+                                ]
                             },
                             {
                                 "name": "memberAddress",
@@ -203,16 +171,6 @@
                         "description": "Security documents and profile setup.",
                         "iconName": "LuShieldCheck",
                         "widgets": [
-                            {
-                                "name": "password",
-                                "text": "Password",
-                                "description": "Create a secure password",
-                                "type": "password",
-                                "widget": "textField",
-                                "oneLiner": true,
-                                "required": true,
-                                "minLength": 6
-                            },
                             {
                                 "name": "idProof",
                                 "text": "Government ID Proof",

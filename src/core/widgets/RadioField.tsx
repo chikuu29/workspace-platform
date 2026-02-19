@@ -81,7 +81,6 @@ const RadioField = ({
           {text && (
             <Box w={labelWidth}>
               <Field.Label
-                htmlFor={name}
                 fontSize="sm"
                 fontWeight="semibold"
                 color="fg.muted"

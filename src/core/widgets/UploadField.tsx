@@ -207,6 +207,7 @@ const UploadField = ({
           {text && (
             <Box w={labelWidth}>
               <Field.Label
+                htmlFor={name}
                 fontSize="sm"
                 fontWeight="semibold"
                 color="fg.muted"
@@ -227,6 +228,7 @@ const UploadField = ({
           <Box w={contentWidth}>
             <Flex gap={2} align="center">
               <Input
+                id={name}
                 onClick={onOpen}
                 flex="1"
                 value={uploadedFiles.length > 0 ? `${uploadedFiles.length} file(s) uploaded` : ""}

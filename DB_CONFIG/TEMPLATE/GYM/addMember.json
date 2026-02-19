@@ -23,187 +23,203 @@
         ],
         "postScript": "documentPostScript"
     },
+    "ACTIONS": {
+        "showSaveButton": true,
+        "ACTION_BUTTONS": [
+            {
+                "name": "Draft",
+                "text": "Draft",
+                "iconName": "LuSave",
+                "widget": "button",
+                "styles": {
+                    "variant": "outline"
+                },
+                "hidden": true,
+                "oneLiner": true,
+                "required": true,
+                "event": "draft"
+            }
+        ]
+    },
     "UI_TYPE": {
-        "type": "SECTION_VIEW",
+        "type": "FORM_VIEW",
         "title": "Member Onboarding",
         "description": "Register new members with a premium, guided experience.",
-        "target": "sections"
+        "target": "forms",
+        "layoutStyles": {
+            "p": 4
+        }
     },
     "UI_VIEW": {
         "schema": {
-            "sections": [
-                {
-                    "title": "Registration Flow",
-                    "description": "Sequential steps to complete member enrollment.",
-                    "iconName": "LuContact",
-                    "tabs": [
-                        {
-                            "title": "Personal Details",
-                            "description": "Basic identification and contact information.",
-                            "iconName": "LuUser",
-                            "widgets": [
-                                {
-                                    "name": "memberName",
-                                    "text": "Full Name",
-                                    "description": "Enter member's legal name as per ID",
-                                    "widget": "textField",
-                                    "oneLiner": true,
-                                    "required": true,
-                                    "maxLength": 50
-                                },
-                                {
-                                    "name": "memberEmail",
-                                    "text": "Email Address",
-                                    "description": "Used for membership alerts and newsletters",
-                                    "type": "email",
-                                    "widget": "textField",
-                                    "oneLiner": true,
-                                    "required": true
-                                },
-                                {
-                                    "name": "memberPhone",
-                                    "text": "Phone Number",
-                                    "description": "Primary contact number for SMS updates",
-                                    "type": "tel",
-                                    "widget": "textField",
-                                    "oneLiner": true,
-                                    "required": true
-                                },
-                                {
-                                    "name": "memberGender",
-                                    "text": "Gender",
-                                    "description": "Select the member's gender for facilities allocation",
-                                    "widget": "radioField",
-                                    "oneLiner": true,
-                                    "options": [
-                                        {
-                                            "label": "Male",
-                                            "value": "male"
-                                        },
-                                        {
-                                            "label": "Female",
-                                            "value": "female"
-                                        },
-                                        {
-                                            "label": "Other",
-                                            "value": "other"
-                                        }
-                                    ]
-                                },
-                                {
-                                    "name": "memberAddress",
-                                    "text": "Residential Address",
-                                    "description": "Current permanent residence details",
-                                    "widget": "textAreaField",
-                                    "oneLiner": true,
-                                    "required": false
-                                }
-                            ]
-                        },
-                        {
-                            "title": "Membership Plan",
-                            "description": "Configure subscription and fitness goals.",
-                            "iconName": "LuActivity",
-                            "widgets": [
-                                {
-                                    "name": "planType",
-                                    "text": "Select Plan",
-                                    "description": "Choose the membership duration that best fits your schedule",
-                                    "widget": "radioField",
-                                    "oneLiner": true,
-                                    "options": [
-                                        {
-                                            "label": "Monthly",
-                                            "value": "monthly"
-                                        },
-                                        {
-                                            "label": "Quarterly",
-                                            "value": "quarterly"
-                                        },
-                                        {
-                                            "label": "Annual",
-                                            "value": "annual"
-                                        },
-                                        {
-                                            "label": "Trial",
-                                            "value": "trial"
-                                        }
-                                    ],
-                                    "required": true
-                                },
-                                {
-                                    "name": "joiningDate",
-                                    "text": "Joining Date",
-                                    "description": "Select the official start date of the membership",
-                                    "type": "date",
-                                    "widget": "textField",
-                                    "oneLiner": true,
-                                    "required": true
-                                },
-                                {
-                                    "name": "fitnessGoals",
-                                    "text": "Fitness Objectives",
-                                    "description": "What is the member aiming to achieve? (e.g., Weight loss, Muscle gain)",
-                                    "widget": "textAreaField",
-                                    "oneLiner": true
-                                }
-                            ]
-                        },
-                        {
-                            "title": "Verification",
-                            "description": "Security documents and profile setup.",
-                            "iconName": "LuShieldCheck",
-                            "widgets": [
-                                {
-                                    "name": "idProof",
-                                    "text": "Government ID Proof",
-                                    "description": "Upload a valid passport, driver's license, or national ID",
-                                    "widget": "uploadField",
-                                    "oneLiner": true,
-                                    "required": true,
-                                    "liveCameraAllow": true,
-                                    "defaultApiConfig": {
-                                        "uploadURL": "app/upload"
+            "forms": {
+                "tabs": [
+                    {
+                        "title": "Personal Details",
+                        "description": "Basic identification and contact information.",
+                        "iconName": "LuUser",
+                        "widgets": [
+                            {
+                                "name": "memberName",
+                                "text": "Full Name",
+                                "description": "Enter member's legal name as per ID",
+                                "widget": "textField",
+                                "oneLiner": true,
+                                "required": true,
+                                "maxLength": 50
+                            },
+                            {
+                                "name": "memberEmail",
+                                "text": "Email Address",
+                                "description": "Used for membership alerts and newsletters",
+                                "type": "email",
+                                "widget": "textField",
+                                "oneLiner": true,
+                                "required": true
+                            },
+                            {
+                                "name": "memberPhone",
+                                "text": "Phone Number",
+                                "description": "Primary contact number for SMS updates",
+                                "type": "tel",
+                                "widget": "textField",
+                                "oneLiner": true,
+                                "required": true
+                            },
+                            {
+                                "name": "memberGender",
+                                "text": "Gender",
+                                "description": "Select the member's gender for facilities allocation",
+                                "widget": "radioField",
+                                "oneLiner": true,
+                                "options": [
+                                    {
+                                        "label": "Male",
+                                        "value": "male"
+                                    },
+                                    {
+                                        "label": "Female",
+                                        "value": "female"
+                                    },
+                                    {
+                                        "label": "Other",
+                                        "value": "other"
                                     }
-                                },
-                                {
-                                    "name": "profilePic",
-                                    "text": "Profile Photo",
-                                    "description": "A clear facial photo for the membership card",
-                                    "widget": "uploadField",
-                                    "oneLiner": true,
-                                    "liveCameraAllow": true,
-                                    "accept": "image/*",
-                                    "defaultApiConfig": {
-                                        "uploadURL": "app/upload"
+                                ]
+                            },
+                            {
+                                "name": "memberAddress",
+                                "text": "Residential Address",
+                                "description": "Current permanent residence details",
+                                "widget": "textAreaField",
+                                "oneLiner": true,
+                                "required": false
+                            }
+                        ]
+                    },
+                    {
+                        "title": "Membership Plan",
+                        "description": "Configure subscription and fitness goals.",
+                        "iconName": "LuActivity",
+                        "widgets": [
+                            {
+                                "name": "planType",
+                                "text": "Select Plan",
+                                "description": "Choose the membership duration that best fits your schedule",
+                                "widget": "radioField",
+                                "oneLiner": true,
+                                "options": [
+                                    {
+                                        "label": "Monthly",
+                                        "value": "monthly"
+                                    },
+                                    {
+                                        "label": "Quarterly",
+                                        "value": "quarterly"
+                                    },
+                                    {
+                                        "label": "Annual",
+                                        "value": "annual"
+                                    },
+                                    {
+                                        "label": "Trial",
+                                        "value": "trial"
                                     }
-                                },
-                                {
-                                    "name": "paymentMode",
-                                    "text": "Payment Mode",
-                                    "description": "Preferred method for subscription renewal",
-                                    "widget": "radioField",
-                                    "oneLiner": true,
-                                    "options": [
-                                        {
-                                            "label": "Cash",
-                                            "value": "cash"
-                                        },
-                                        {
-                                            "label": "Credit Card",
-                                            "value": "card"
-                                        },
-                                        {
-                                            "label": "UPI / Digital",
-                                            "value": "upi"
-                                        }
-                                    ]
+                                ],
+                                "required": true
+                            },
+                            {
+                                "name": "joiningDate",
+                                "text": "Joining Date",
+                                "description": "Select the official start date of the membership",
+                                "type": "date",
+                                "widget": "textField",
+                                "oneLiner": true,
+                                "required": true
+                            },
+                            {
+                                "name": "fitnessGoals",
+                                "text": "Fitness Objectives",
+                                "description": "What is the member aiming to achieve? (e.g., Weight loss, Muscle gain)",
+                                "widget": "textAreaField",
+                                "oneLiner": true
+                            }
+                        ]
+                    },
+                    {
+                        "title": "Verification",
+                        "description": "Security documents and profile setup.",
+                        "iconName": "LuShieldCheck",
+                        "widgets": [
+                            {
+                                "name": "idProof",
+                                "text": "Government ID Proof",
+                                "description": "Upload a valid passport, driver's license, or national ID",
+                                "widget": "uploadField",
+                                "oneLiner": true,
+                                "required": true,
+                                "liveCameraAllow": true,
+                                "defaultApiConfig": {
+                                    "uploadURL": "app/upload"
                                 }
-                            ]
-                        }
-                    ]
-                }
-            ]
+                            },
+                            {
+                                "name": "profilePic",
+                                "text": "Profile Photo",
+                                "description": "A clear facial photo for the membership card",
+                                "widget": "uploadField",
+                                "oneLiner": true,
+                                "liveCameraAllow": true,
+                                "accept": "image/*",
+                                "defaultApiConfig": {
+                                    "uploadURL": "app/upload"
+                                }
+                            },
+                            {
+                                "name": "paymentMode",
+                                "text": "Payment Mode",
+                                "description": "Preferred method for subscription renewal",
+                                "widget": "radioField",
+                                "oneLiner": true,
+                                "options": [
+                                    {
+                                        "label": "Cash",
+                                        "value": "cash"
+                                    },
+                                    {
+                                        "label": "Credit Card",
+                                        "value": "card"
+                                    },
+                                    {
+                                        "label": "UPI / Digital",
+                                        "value": "upi"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
         }
     },
     "active": true

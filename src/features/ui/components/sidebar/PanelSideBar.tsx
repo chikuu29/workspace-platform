@@ -14,8 +14,7 @@ import {
 import { useColorModeValue } from "@/components/ui/color-mode";
 
 import SideNavMenuBuilder from "./SideNavMenuBuilder";
-import { HiMenuAlt2 } from "react-icons/hi";
-import { LuX } from "react-icons/lu";
+
 import Brand from "../Brand/Brand";
 // import { useState } from "react";
 import { useSelector } from "react-redux";
@@ -26,14 +25,11 @@ import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
 export default function PanelSideBar(props: any) {
   const { showSidebar, togglesidebar, SHOW_SIDEBAR, ...rest } = props;
 
-  console.log("showSidebar", showSidebar);
 
-  let variantChange = "0.2s linear";
   let shadow = useColorModeValue(
     "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;",
     "unset"
   );
-  let sidebarBg = useColorModeValue("white", "gray.950");
 
   let sidebarMargins = "0px";
   const { DISPLAY_TYPE, FEATURE }: APP_CONFIG_STATE = useSelector(
@@ -54,7 +50,7 @@ export default function PanelSideBar(props: any) {
     >
       <Box
         {...rest}
-        bg={sidebarBg}
+
         transition="all 0.3s ease-in-out"
         p={"5px"}
         h="100%"

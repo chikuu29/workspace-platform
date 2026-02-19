@@ -63,14 +63,14 @@ export default function MyApps() {
   };
 
   return (
-    <Box bg={bgPage} borderRadius={[20, 20, 20, 20]}>
+    <Box borderRadius={[20, 20, 20, 20]}>
       {/* Sticky Header Section */}
       <Box
         borderRadius={20}
         position="sticky"
         top="-1px"
         zIndex={100}
-        bg={bgHeader}
+        // bg={bgHeader}
         backdropFilter="blur(12px)"
         borderBottom="1px solid"
         borderColor={useColorModeValue("gray.200", "whiteAlpha.100")}
@@ -161,11 +161,12 @@ const AppItem: React.FC<AppItemProps> = ({
       direction="column"
       align="center"
       justify="center"
-      bg={bgCard}
+      // bg={bgCard}
       p={6}
       border="1px solid"
       borderColor={borderColor}
       borderRadius="2xl"
+      boxShadow={'md'}
       cursor="pointer"
       position="relative"
       transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"

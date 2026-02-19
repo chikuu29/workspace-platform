@@ -24,9 +24,9 @@ const Navbar = ({
   ...rest
 }: AppNavType & any) => {
 
-  const bgColor = useColorModeValue("white", 'gray.950');
+
   return (
-    <Box minH="5.5rem" bg={bgColor}>
+    <Box minH="5.5rem">
       <Box
         w="100%"
         boxShadow="md"
@@ -36,7 +36,7 @@ const Navbar = ({
 
         top="0"
         left="0"
-        bg={bgColor}>
+      >
         <Flex
           w="100%"
 

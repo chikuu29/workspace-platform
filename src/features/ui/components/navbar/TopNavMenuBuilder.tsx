@@ -72,7 +72,7 @@ interface MenuLinkInterFace {
 }
 const NavItem = ({ menuConfig, ...rest }: MenuLinkInterFace) => {
 
-  const { colorMode } = useColorMode();
+
   // console.log("hii", menuConfig);
   let bg = useColorModeValue("white", "gray.950");
   const hoverBg = useColorModeValue("secondaryGray.400", "whiteAlpha.200");
@@ -85,10 +85,7 @@ const NavItem = ({ menuConfig, ...rest }: MenuLinkInterFace) => {
       borderRadius="md"
       role="group"
       cursor="pointer"
-      // _hover={{
-      //   bg: "cyan.400",
-      //   color: "white",
-      // }}
+
       {...rest}
     >
       {/* {menuConfig.menu && ( */}

@@ -148,20 +148,7 @@ const Appbreadcurmb = forwardRef((props, ref) => {
             <ColorModeButton variant="ghost" size="sm" rounded="lg" />
             <FullscreenButton variant="ghost" size="sm" rounded="lg" />
           </Flex>
-          <Box
-            w="24px"
-            h="24px"
-            bg="blue.500"
-            rounded="full"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            cursor="pointer"
-            transition="transform 0.2s"
-            _hover={{ transform: "scale(1.1)" }}
-          >
-            <Text fontSize="10px" fontWeight="bold" color="white">JS</Text>
-          </Box>
+
         </HStack>
       </Flex>
     </Box>

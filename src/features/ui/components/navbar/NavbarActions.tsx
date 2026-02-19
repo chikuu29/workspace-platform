@@ -17,8 +17,7 @@ export default function NavbarActions() {
   const iconColor = useColorModeValue("gray.500", "gray.400");
 
   // Premium Layout Styles
-  const menuBg = useColorModeValue("rgba(255, 255, 255, 0.9)", "rgba(26, 32, 44, 0.9)");
-  const menuBorder = useColorModeValue("white", "whiteAlpha.200");
+
   const shadow = useColorModeValue(
     "0px 18px 40px rgba(112, 144, 176, 0.2)",
     "0px 18px 40px rgba(0, 0, 0, 0.4)"
@@ -39,10 +38,10 @@ export default function NavbarActions() {
       <IconButton
         aria-label="Refresh Page"
         variant="brand"
-        color={iconColor}
-        _hover={{ bg: itemHoverBg, color: "brand.500" }}
+
+
         onClick={() => window.location.reload()}
-      // borderRadius="full"
+
       >
         <Icon as={FiRefreshCw} boxSize={4} />
       </IconButton>
@@ -65,12 +64,12 @@ export default function NavbarActions() {
           <Menu.Positioner>
             <Menu.Content
               minW="240px"
-              bg={menuBg}
+              // bg={menuBg}
               backdropFilter="blur(16px)"
               borderRadius="2xl"
               boxShadow={shadow}
               border="1px solid"
-              borderColor={menuBorder}
+              // borderColor={menuBorder}
               p={2}
               zIndex={1500}
               css={{ transformOrigin: "top right" }}

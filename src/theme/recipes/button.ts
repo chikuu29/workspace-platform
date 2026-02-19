@@ -40,10 +40,7 @@ export const buttonRecipe = defineRecipe({
             },
             brand: {
                 // bg: { _light: "brand.500", _dark: "brand.400" },
-                // color: "white",
-
-                // borderRadius: "full",
-                // boxShadow: "0 4px 15px 0 rgba(111, 93, 255, 0.4)",
+                color: "brand.500",
                 _hover: {
                     // bg: { _light: "brand.600", _dark: "brand.500" },
                     transform: "translateY(-2px)",

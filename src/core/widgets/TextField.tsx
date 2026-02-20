@@ -78,8 +78,12 @@ const TextField = ({
         return undefined;
       }
     }
+    if (type === "email") {
+      // Standard email regex
+      return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    }
     return undefined;
-  }, [props.pattern]);
+  }, [props.pattern, type]);
 
   return (
     <Box
@@ -122,7 +126,10 @@ const TextField = ({
                 required: mandatory ? `${text} is required` : false,
                 maxLength: maxLength ? { value: maxLength, message: `Max length is ${maxLength}` } : undefined,
                 minLength: minLength ? { value: minLength, message: `Min length is ${minLength}` } : undefined,
-                pattern: patternValue ? { value: patternValue, message: props.patternMessage || "Invalid format" } : undefined
+                pattern: patternValue ? {
+                  value: patternValue,
+                  message: props.patternMessage || (type === "email" ? "Invalid email address" : "Invalid format")
+                } : undefined
               });
 
               return (

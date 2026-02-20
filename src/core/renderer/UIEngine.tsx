@@ -14,9 +14,12 @@ import {
     DialogRoot,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { Button, Text, VStack, Box, Icon, Flex } from "@chakra-ui/react";
+import { Button, Text, VStack, Box, Icon, Flex, Circle, Badge, HStack } from "@chakra-ui/react";
+import { useColorModeValue } from "@/components/ui/color-mode";
+import { motion } from "framer-motion";
 import { useState } from 'react';
 import { FiAlertCircle } from "react-icons/fi";
+import { LuCornerDownRight } from "react-icons/lu";
 
 interface UIEngineProps {
     config: any[]; // Array of widget configs
@@ -28,6 +31,8 @@ interface UIEngineProps {
 }
 
 export const UIEngine: React.FC<UIEngineProps> = ({ config, initialData = {}, onSubmit, children, formId, ...rest }) => {
+    console.log("===RENDER UI ENGINE===");
+
     const initialize = useFormStore(state => state.initialize);
     const setFieldValue = useFormStore(state => state.setFieldValue);
 
@@ -66,48 +71,141 @@ export const UIEngine: React.FC<UIEngineProps> = ({ config, initialData = {}, on
     };
 
     const [alertOpen, setAlertOpen] = useState(false);
-    const [alertMessage, setAlertMessage] = useState<string[]>([]);
+    const [groupedErrors, setGroupedErrors] = useState<Record<string, string[]>>({});
 
     const onError = (errors: any) => {
         const store = useFormStore.getState();
-        const messages = Object.entries(errors).map(([name, err]: [string, any]) => {
+        const groups: Record<string, string[]> = {};
+
+        Object.entries(errors).forEach(([name, err]: [string, any]) => {
             const widget = store.metadata[name];
+            const tabName = widget?.tabName || "General";
             const label = widget?.text || widget?.label || name;
-            return `${label}: ${err.message}`;
+
+            if (!groups[tabName]) {
+                groups[tabName] = [];
+            }
+            groups[tabName].push(`${label}: ${err.message}`);
         });
-        setAlertMessage(messages);
+
+        setGroupedErrors(groups);
         setAlertOpen(true);
     };
 
     return (
         <FormProvider {...methods}>
-            <form id={formId} onSubmit={methods.handleSubmit(handleFormSubmit, onError)}>
+            <form id={formId} noValidate onSubmit={methods.handleSubmit(handleFormSubmit, onError)}>
                 <RunTimeWidget configs={config} {...rest} />
                 {children}
 
-                <DialogRoot open={alertOpen} onOpenChange={(e) => setAlertOpen(e.open)} placement="center" motionPreset="slide-in-bottom" >
-                    <DialogContent rounded="2xl" overflow="hidden" border="1px solid" borderColor="red.100">
-                        <DialogHeader>
-                            <Flex align="center" gap={3}>
-                                <Box bg="red.50" p={2} rounded="full">
-                                    <Icon as={FiAlertCircle} color="red.500" boxSize={6} />
-                                </Box>
-                                <DialogTitle fontSize="lg" fontWeight="bold">Validation Failed</DialogTitle>
+                <DialogRoot open={alertOpen} onOpenChange={(e) => setAlertOpen(e.open)} placement="center" motionPreset="scale" >
+                    <DialogContent
+                        rounded={{ base: "2xl", md: "3xl" }}
+                        overflow="hidden"
+                        border="1px solid"
+                        borderColor={useColorModeValue("red.100", "whiteAlpha.200")}
+                        shadow="2xl"
+                        bg={useColorModeValue("rgba(255, 255, 255, 0.8)", "rgba(15, 23, 42, 0.8)")}
+                        backdropFilter="blur(20px)"
+                        maxW={{ base: "95vw", md: "500px" }}
+                    >
+                        <DialogHeader pb={4} pt={6} px={6}>
+                            <Flex align="center" gap={4}>
+                                <motion.div
+
+                                    initial={{ scale: 0, boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)" }}
+                                    animate={{ scale: 1, boxShadow: "0px 10px 20px rgba(239, 68, 68, 0.2)" }}
+                                    transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                                >
+                                    <Circle
+
+                                        size="12"
+                                        bgGradient="linear(to-br, red.400, red.600)"
+                                        // color="white"
+                                        shadow="lg"
+                                    >
+                                        <Icon as={FiAlertCircle} boxSize={6} />
+                                    </Circle>
+                                </motion.div>
+                                <VStack align="start" gap={0}>
+                                    <DialogTitle fontSize="xl" fontWeight="900" letterSpacing="tight" color={useColorModeValue("red.700", "red.400")}>
+                                        Validation Required
+                                    </DialogTitle>
+                                    <Text fontSize="xs" fontWeight="medium" color={useColorModeValue("gray.500", "whiteAlpha.600")}>
+                                        Some fields need your attention
+                                    </Text>
+                                </VStack>
                             </Flex>
                         </DialogHeader>
-                        <DialogBody>
-                            <VStack align="stretch" gap={3}>
-                                <Text fontSize="sm" color="gray.500" fontWeight="700">Please correct the following errors before proceeding:</Text>
-                                {alertMessage.map((msg, idx) => (
-                                    <Box key={idx} p={3} bg="red.50" rounded="xl" border="1px solid" borderColor="red.100">
-                                        <Text color="red.700" fontSize="sm" fontWeight="medium">{msg}</Text>
-                                    </Box>
+
+                        <DialogBody maxH="50vh" overflowY="auto" py={2} px={6}>
+                            <VStack align="stretch" gap={6} py={2}>
+                                {Object.entries(groupedErrors).map(([tab, msgs], idx) => (
+                                    <motion.div
+                                        key={tab}
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: idx * 0.1 + 0.2 }}
+                                    >
+                                        <VStack align="stretch" gap={3}>
+                                            <HStack gap={3}>
+                                                <Badge
+                                                    variant="solid"
+                                                    bgGradient="linear(to-r, red.500, red.600)"
+                                                    // color="white"
+                                                    px={3}
+                                                    py={1}
+                                                    // rounded="full"
+                                                    fontSize="10px"
+                                                    fontWeight="bold"
+                                                    textTransform="uppercase"
+                                                    letterSpacing="wider"
+                                                >
+                                                    {tab}
+                                                </Badge>
+                                                <Box flex="1" h="1px" bg={useColorModeValue("red.50", "whiteAlpha.100")} />
+                                            </HStack>
+                                            <VStack align="stretch" gap={2} pl={1}>
+                                                {msgs.map((msg, mIdx) => (
+                                                    <motion.div
+                                                        key={mIdx}
+                                                        initial={{ opacity: 0, y: 10 }}
+                                                        animate={{ opacity: 1, y: 0 }}
+                                                        transition={{ delay: idx * 0.1 + mIdx * 0.05 + 0.3 }}
+                                                    >
+                                                        <HStack align="start" gap={3} p={3} rounded="xl" bg={useColorModeValue("red.50/50", "whiteAlpha.50")} border="1px solid" borderColor={useColorModeValue("red.100/50", "transparent")}>
+                                                            <Circle size="1.5" bg="red.500" mt={2} />
+                                                            <Text color={useColorModeValue("gray.800", "gray.200")} fontSize="sm" fontWeight="600" lineHeight="tall">
+                                                                {msg}
+                                                            </Text>
+                                                        </HStack>
+                                                    </motion.div>
+                                                ))}
+                                            </VStack>
+                                        </VStack>
+                                    </motion.div>
                                 ))}
                             </VStack>
                         </DialogBody>
-                        <DialogFooter>
-                            <Button size="lg" width="full" variant="solid" onClick={() => setAlertOpen(false)}>
-                                Acknowledge & Fix
+
+                        <DialogFooter bg={useColorModeValue("gray.50/50", "whiteAlpha.50")} borderTop="1px solid" borderColor={useColorModeValue("gray.100", "whiteAlpha.100")} p={6}>
+                            <Button
+                                size="lg"
+                                width="full"
+                                bgGradient="linear(to-r, red.500, red.600)"
+                                _hover={{ bgGradient: "linear(to-r, red.600, red.700)", transform: "translateY(-1px)", shadow: "xl" }}
+                                _active={{ transform: "translateY(0px)" }}
+                                transition="all 0.2s"
+                                onClick={() => setAlertOpen(false)}
+                                rounded="xl"
+                                shadow="lg"
+                                fontWeight="800"
+                                fontSize="md"
+                            >
+                                <HStack gap={2}>
+                                    <Text>Acknowledge & Fix</Text>
+                                    <Icon as={LuCornerDownRight} />
+                                </HStack>
                             </Button>
                         </DialogFooter>
                         <DialogCloseTrigger />

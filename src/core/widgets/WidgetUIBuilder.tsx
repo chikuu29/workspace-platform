@@ -80,7 +80,7 @@ const WidgetUIBuilder = forwardRef<any, any>(({ formData = {}, ...rest }, ref) =
   return (
     <>
       <FormProvider {...methods}>
-        <form onSubmit={methods.handleSubmit(onSubmit)}>
+        <form noValidate onSubmit={methods.handleSubmit(onSubmit)}>
           <ScriptProvider scriptFiles={scriptFiles}>
             <RunTimeWidgetRender
               configs={UITempate}

@@ -9,7 +9,7 @@ import { ruleEngine } from "../engine/logicEngine";
 interface TEXTAREA {
   name: string;
   text: string;
-  required: boolean;
+  mandatory: boolean;
   description?: string;
   disabled?: boolean;
   hidden?: boolean;
@@ -30,7 +30,7 @@ const TextArea = ({
   hidden = false,
   widget,
   oneLiner = false,
-  required = false,
+  mandatory = false,
   outLineBorder = true,
   events,
   maxLength,
@@ -68,7 +68,7 @@ const TextArea = ({
       px={1}
       transition="all 0.2s"
     >
-      <Field.Root invalid={!!errors} required={required} disabled={disabled}>
+      <Field.Root invalid={!!errors} required={mandatory} disabled={disabled}>
         <Flex
           direction={oneLiner ? { base: "column", md: "row" } : "column"}
           align={oneLiner ? { base: "stretch", md: "flex-start" } : "stretch"}
@@ -99,7 +99,7 @@ const TextArea = ({
           <Box w={inputWidth} position="relative">
             <Textarea
               {...methods.register(name, {
-                required: required ? `${text} is required` : false,
+                required: mandatory ? `${text} is required` : false,
                 maxLength: maxLength ? { value: maxLength, message: `Max length is ${maxLength}` } : undefined,
                 minLength: minLength ? { value: minLength, message: `Min length is ${minLength}` } : undefined,
               })}

@@ -36,7 +36,7 @@ interface UPLOAD {
   accept?: string;
   disabled?: boolean;
   hidden?: boolean;
-  required?: boolean;
+  mandatory?: boolean;
   capture?: "user" | "environment";
   liveCameraAllow?: boolean;
   errors: FieldError;
@@ -52,7 +52,7 @@ const UploadField = ({
   accept = "image/*",
   disabled = false,
   hidden = false,
-  required = false,
+  mandatory = false,
   capture = "environment",
   liveCameraAllow = false,
   multiple = false,
@@ -197,7 +197,7 @@ const UploadField = ({
 
   return (
     <Box w="full" py={2} px={1}>
-      <Field.Root invalid={!!errors} required={required} disabled={disabled}>
+      <Field.Root invalid={!!errors} required={mandatory} disabled={disabled}>
         <Flex
           direction={oneLiner ? { base: "column", md: "row" } : "column"}
           align={oneLiner ? { base: "stretch", md: "center" } : "stretch"}

@@ -34,6 +34,9 @@ const FormView = ({ config }: any) => {
     const headingColor = useColorModeValue("blue.600", "white");
     const codeBg = useColorModeValue("gray.50", "gray.900");
     const formValues = useFormStore(state => state.values);
+    console.log("formValues", formValues);
+
+
 
     const tabs = useMemo(() => {
         return config?.UI_VIEW?.schema?.forms?.tabs || [];
@@ -51,7 +54,7 @@ const FormView = ({ config }: any) => {
                 event: "submit",
                 position: "top",
                 styles: {
-                    variant: "solid",
+                    variant: "outline",
                     colorPalette: "blue"
                 }
             };
@@ -63,7 +66,7 @@ const FormView = ({ config }: any) => {
 
 
     const [submittedData, setSubmittedData] = React.useState<any>(null);
-    const formId = "active-form-view";
+    const formId = React.useId();
 
     const onFormSubmit = (data: any) => {
         console.log("FormView Submitted:", data);
@@ -129,7 +132,7 @@ const FormView = ({ config }: any) => {
 
                 {/* Main Content Card */}
                 <Box
-                    bg={cardBg}
+                    // bg={cardBg}
                     rounded="3xl"
                     shadow="xl"
                     border="1px solid"
@@ -149,7 +152,7 @@ const FormView = ({ config }: any) => {
                             {/* RunTimeWidget handled internally */}
                         </AnimatePresence>
 
-                        <HStack gap="4" p="4" justify="flex-end">
+                        {/* <HStack gap="4" p="4" justify="flex-end">
                             {actions.map((btn: any, idx: number) => (
                                 (btn.position === 'bottom') && (
                                     <Button
@@ -170,7 +173,7 @@ const FormView = ({ config }: any) => {
                                     </Button>
                                 )
                             ))}
-                        </HStack>
+                        </HStack> */}
                     </UIEngine>
                 </Box>
 

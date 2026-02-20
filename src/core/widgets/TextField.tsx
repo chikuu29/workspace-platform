@@ -9,7 +9,7 @@ import { ruleEngine } from "../engine/logicEngine";
 interface TEXTFIELD {
   name: string;
   text: string;
-  required?: boolean;
+  mandatory: boolean;
   description?: string;
   type?: string;
   disabled?: boolean;
@@ -35,7 +35,7 @@ const TextField = ({
   widget,
   oneLiner = false,
   outLineBorder = true,
-  required = false,
+  mandatory = false,
   events,
   maxLength,
   minLength,
@@ -88,7 +88,7 @@ const TextField = ({
       px={1}
       transition="all 0.2s"
     >
-      <Field.Root invalid={!!errors} required={required} disabled={disabled}>
+      <Field.Root invalid={!!errors} required={mandatory} disabled={disabled}>
         <Flex
           direction={oneLiner ? { base: "column", md: "row" } : "column"}
           align={oneLiner ? { base: "stretch", md: "center" } : "stretch"}
@@ -119,7 +119,7 @@ const TextField = ({
           <Box w={inputWidth} position="relative">
             {(() => {
               const { onChange, ...restRegister } = methods.register(name, {
-                required: required ? `${text} is required` : false,
+                required: mandatory ? `${text} is required` : false,
                 maxLength: maxLength ? { value: maxLength, message: `Max length is ${maxLength}` } : undefined,
                 minLength: minLength ? { value: minLength, message: `Min length is ${minLength}` } : undefined,
                 pattern: patternValue ? { value: patternValue, message: props.patternMessage || "Invalid format" } : undefined

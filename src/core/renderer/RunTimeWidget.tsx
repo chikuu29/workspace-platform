@@ -62,7 +62,7 @@ const RunTimeWidgetRender: React.FC<any> = React.memo(({ configs, tabs, ...rest 
                         {...widgetConfig}
                         {...rest}
                         {...props}
-                        required={props.mandatory ?? widgetConfig.required}
+                        mandatory={props.mandatory ?? widgetConfig.mandatory ?? widgetConfig.required}
                         errors={errors[widgetConfig.name]}
                         widgets={widgetConfig.widgets}
                       />

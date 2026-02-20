@@ -13,7 +13,7 @@ interface RADIO {
   disabled?: boolean;
   hidden?: boolean;
   defaultValue?: string;
-  required?: boolean;
+  mandatory?: boolean;
   oneLiner?: boolean;
   outLineBorder?: boolean;
   events?: any; // Add events prop
@@ -28,7 +28,7 @@ const RadioField = ({
   disabled = false,
   hidden = false,
   defaultValue = "",
-  required = false,
+  mandatory = false,
   oneLiner = false,
   outLineBorder = true,
   description,
@@ -71,7 +71,7 @@ const RadioField = ({
 
   return (
     <Box w="full" py={2} px={1}>
-      <Field.Root invalid={!!errors} required={required} disabled={disabled}>
+      <Field.Root invalid={!!errors} required={mandatory} disabled={disabled}>
         <Flex
           direction={oneLiner ? { base: "column", md: "row" } : "column"}
           align={oneLiner ? { base: "stretch", md: "center" } : "stretch"}
@@ -138,7 +138,7 @@ const RadioField = ({
                         minW="110px"
                         flex="1"
                         {...methods.register(name, {
-                          required: required ? `${text} is required` : false,
+                          required: mandatory ? `${text} is required` : false,
                         })}
                       >
                         <RadioGroup.ItemHiddenInput

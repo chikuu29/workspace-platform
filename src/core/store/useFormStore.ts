@@ -40,7 +40,7 @@ export const useFormStore = create<FormState>((set, get) => ({
         const uiProps: Record<string, WidgetProps> = {};
         const metadata: Record<string, any> = {};
 
-        const processWidgets = (widgets: any[]) => {
+        const processWidgets = (widgets: any[], currentTabName: string = "General") => {
             widgets.forEach((w: any) => {
                 // Only set default if not already present AND name exists
                 if (w.name) {
@@ -51,15 +51,19 @@ export const useFormStore = create<FormState>((set, get) => ({
                     uiProps[w.name] = {
                         hidden: w.hidden === true,
                         disabled: w.disabled === true,
-                        mandatory: w.required === true,
+                        mandatory: (w.mandatory === true || w.required === true),
                     };
-                    metadata[w.name] = w;
+                    metadata[w.name] = { ...w, tabName: currentTabName };
                 }
 
-                if (w.widgets) processWidgets(w.widgets);
+                if (w.widgets) {
+                    // If 'w' has a 'title' (like a tab) and no 'widget' type, it's likely a container/tab
+                    const nextTabName = (!w.widget && (w.title || w.name)) ? (w.title || w.name) : currentTabName;
+                    processWidgets(w.widgets, nextTabName);
+                }
                 if (w.tabs) {
                     w.tabs.forEach((t: any) => {
-                        if (t.widgets) processWidgets(t.widgets);
+                        if (t.widgets) processWidgets(t.widgets, t.title || t.name || currentTabName);
                     });
                 }
             });

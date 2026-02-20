@@ -34,15 +34,13 @@ const workspace = () => {
         <PanelSideBar showSidebar={showSidebar} togglesidebar={toggleSidebar} h="100%" />
         {/* Main Content */}
         <Box flex="1" overflowY="auto" position="relative" zIndex={0} p={2}>
-          <VStack align="stretch" minH="calc(100vh - 150px)">
-
-            <Appbreadcurmb />
-
-            <Outlet />
-
+          <Flex flexDirection="column" minH="100%">
+            <VStack align="stretch" flex="1" gap={4}>
+              <Appbreadcurmb />
+              <Outlet />
+            </VStack>
             <AppFooter />
-          </VStack>
-
+          </Flex>
         </Box>
       </Flex>
     </Flex>

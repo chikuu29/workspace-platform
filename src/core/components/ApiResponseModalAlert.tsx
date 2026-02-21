@@ -2,12 +2,12 @@ import React, { useEffect, useMemo } from "react";
 import { Badge, Box, Button, Text, VStack, Circle, HStack, Progress } from "@chakra-ui/react";
 import {
   DialogBody,
-  DialogCloseTrigger,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogRoot,
 } from "@/components/ui/dialog";
+import { CloseButton } from "@/components/ui/close-button";
 import { motion } from "framer-motion";
 import { LuCircleCheck, LuCircleX, LuTriangleAlert, LuInfo } from "react-icons/lu";
 import { useColorModeValue } from "@/components/ui/color-mode";
@@ -62,6 +62,12 @@ const ApiResponseModalAlert: React.FC = () => {
   const borderColor = useColorModeValue("secondaryGray.200", "whiteAlpha.200");
   const textMuted = useColorModeValue("secondaryGray.700", "secondaryGray.400");
   const surfaceBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
+  const progressTrackBg = useColorModeValue("secondaryGray.200", "whiteAlpha.200");
+  const iconSurfaceBg = useColorModeValue("white", "navy.800");
+  const titleColor = useColorModeValue("secondaryGray.900", "white");
+  const closeBtnBg = useColorModeValue("whiteAlpha.900", "blackAlpha.400");
+  const closeBtnBorder = useColorModeValue("gray.200", "whiteAlpha.300");
+  const closeBtnHoverBg = useColorModeValue("gray.100", "whiteAlpha.300");
   const gradientTop = useColorModeValue(
     "linear-gradient(100deg, rgba(66,42,251,0.12) 0%, rgba(57,101,255,0.10) 55%, rgba(1,181,116,0.08) 100%)",
     "linear-gradient(100deg, rgba(66,42,251,0.28) 0%, rgba(54,82,186,0.24) 55%, rgba(1,181,116,0.20) 100%)"
@@ -100,7 +106,20 @@ const ApiResponseModalAlert: React.FC = () => {
         backdropFilter="blur(20px)"
       >
         <DialogHeader p={0} position="relative">
-          <DialogCloseTrigger />
+          <CloseButton
+            position="absolute"
+            top="3"
+            right="3"
+            zIndex={5}
+            bg={closeBtnBg}
+            border="1px solid"
+            borderColor={closeBtnBorder}
+            borderRadius="full"
+            boxShadow="sm"
+            _hover={{ bg: closeBtnHoverBg }}
+            onClick={handleClose}
+            aria-label="Close alert"
+          />
           <Progress.Root
             value={payload.autoClose ? 100 : 0}
             size="xs"
@@ -109,7 +128,7 @@ const ApiResponseModalAlert: React.FC = () => {
             animated={payload.autoClose}
             visibility={payload.autoClose ? "visible" : "hidden"}
           >
-            <Progress.Track bg={useColorModeValue("secondaryGray.200", "whiteAlpha.200")}>
+            <Progress.Track bg={progressTrackBg}>
               <Progress.Range />
             </Progress.Track>
           </Progress.Root>
@@ -129,7 +148,7 @@ const ApiResponseModalAlert: React.FC = () => {
                 animate={{ scale: 1, opacity: 1, y: 0 }}
                 transition={{ duration: 0.28, ease: "easeOut" }}
                 size="64px"
-                bg={useColorModeValue("white", "navy.800")}
+                bg={iconSurfaceBg}
                 color={`${config.palette}.500`}
                 border="1px solid"
                 borderColor={`${config.palette}.500/40`}
@@ -152,7 +171,7 @@ const ApiResponseModalAlert: React.FC = () => {
                 >
                   {payload.type}
                 </Badge>
-                <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="900" letterSpacing="tight" color={useColorModeValue("secondaryGray.900", "white")}>
+                <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="900" letterSpacing="tight" color={titleColor}>
                   {payload.title}
                 </Text>
               </VStack>
@@ -180,7 +199,7 @@ const ApiResponseModalAlert: React.FC = () => {
           )}
         </DialogBody>
 
-        <DialogFooter px={{ base: 6, md: 8 }} pb={{ base: 6, md: 7 }} pt={2}>
+        <DialogFooter px={{ base: 6, md: 8 }} pb={{ base: 6, md: 7 }} pt={2} w="full">
           <Button
             w="full"
             size="lg"

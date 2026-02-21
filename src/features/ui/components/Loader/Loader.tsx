@@ -118,6 +118,7 @@ const Loader = memo(() => {
     "rgba(15, 23, 42, 0.92)"
   );
   const textColor = useColorModeValue("gray.700", "whiteAlpha.800");
+  const cardBorderColor = useColorModeValue("gray.100", "whiteAlpha.100");
 
   if (!active) return null;
 
@@ -142,7 +143,7 @@ const Loader = memo(() => {
           minW="280px"
           boxShadow="0 20px 60px rgba(0,0,0,0.3)"
           border="1px solid"
-          borderColor={useColorModeValue("gray.100", "whiteAlpha.100")}
+          borderColor={cardBorderColor}
           css={{ animation: "loader-fade-in 0.3s ease-out" }}
         >
           <VStack gap={5}>
@@ -175,6 +176,7 @@ export const AppLoader = memo(() => {
   const [progress, setProgress] = useState(0);
   const textColor = useColorModeValue("gray.600", "whiteAlpha.700");
   const subtleText = useColorModeValue("gray.400", "whiteAlpha.400");
+  const progressTrackBg = useColorModeValue("gray.100", "whiteAlpha.100");
 
   // Simulate non-linear progress for a more natural feel
   useEffect(() => {
@@ -245,7 +247,7 @@ export const AppLoader = memo(() => {
           >
             <Progress.Track
               borderRadius="full"
-              bg={useColorModeValue("gray.100", "whiteAlpha.100")}
+              bg={progressTrackBg}
             >
               <Progress.Range
                 borderRadius="full"

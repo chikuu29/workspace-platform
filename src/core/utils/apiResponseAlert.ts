@@ -1,10 +1,4 @@
-export type AppAlertStatus = "success" | "error" | "warning" | "info";
-
-export interface AppAlertPayload {
-  status: AppAlertStatus;
-  title: string;
-  description?: string;
-}
+import type { ApiResponseModalConfig } from "@/core/store/useApiResponseModalStore";
 
 export interface ApiExecutionResult {
   success: boolean;
@@ -41,7 +35,7 @@ const extractErrorDescription = (error: any): string | undefined => {
 export const buildApiResponseAlert = (
   result: ApiExecutionResult,
   options: BuildApiAlertOptions = {}
-): AppAlertPayload => {
+): ApiResponseModalConfig => {
   const {
     successMessage,
     errorMessage,
@@ -52,14 +46,19 @@ export const buildApiResponseAlert = (
 
   if (result?.success) {
     return {
-      status: "success",
+      type: "success",
       title: successMessage || result.message || defaultSuccessMessage,
+      autoClose: true,
+      duration: 2200,
     };
   }
 
+  const statusCode = result?.error?.response?.status || result?.data?.statusCode;
+  const type = statusCode === 401 || statusCode === 403 ? "warning" : "error";
+
   return {
-    status: "error",
+    type,
     title: errorMessage || result?.message || defaultErrorMessage,
-    description: includeErrorDescription ? extractErrorDescription(result?.error || result?.data) : undefined,
+    message: includeErrorDescription ? extractErrorDescription(result?.error || result?.data) : undefined,
   };
 };

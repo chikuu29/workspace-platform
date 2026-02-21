@@ -16,8 +16,6 @@ import "../widgets";
 import AsyncLoadIcon from "@/utils/hooks/AsyncLoadIcon";
 import { useFormStore } from "../store/useFormStore";
 import { appEventRegistry } from "../registry/AppEventRegistry";
-import { AppAlertPayload, buildApiResponseAlert } from "@/core/utils/apiResponseAlert";
-import ApiResponseModalAlert from "@/core/components/ApiResponseModalAlert";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/app/slices/loader/appLoaderSlice";
 
@@ -57,8 +55,6 @@ const FormView = ({ config }: any) => {
     }, [config]);
 
     const [submittedData, setSubmittedData] = React.useState<any>(null);
-    const [actionFeedback, setActionFeedback] = React.useState<AppAlertPayload | null>(null);
-    const [isResponseModalOpen, setIsResponseModalOpen] = React.useState(false);
     const [isEventInProgress, setIsEventInProgress] = React.useState(false);
     const [pendingEventName, setPendingEventName] = React.useState<string | null>(null);
     const formId = React.useId();
@@ -82,14 +78,6 @@ const FormView = ({ config }: any) => {
                 payload,
                 config
             );
-
-            const alertPayload = buildApiResponseAlert(result, {
-                defaultSuccessMessage: "Action completed successfully.",
-                defaultErrorMessage: "Action failed. Please try again.",
-            });
-
-            setActionFeedback(alertPayload);
-            setIsResponseModalOpen(true);
 
             return result;
         } finally {
@@ -184,21 +172,7 @@ const FormView = ({ config }: any) => {
                     </UIEngine>
                 </Box>
 
-                {submittedData && (
-                    <Box mt={8} p={6} bg={cardBg} rounded="xl" shadow="lg" border="1px solid" borderColor={borderColor}>
-                        <Heading size="lg" mb={4} color="green.500">Submission Successful</Heading>
-                        <Box as="pre" overflowX="auto" p={4} bg={codeBg} rounded="md" fontSize="sm">
-                            {JSON.stringify(submittedData, null, 2)}
-                        </Box>
-                    </Box>
-                )}
             </Box>
-
-            <ApiResponseModalAlert
-                payload={actionFeedback}
-                open={isResponseModalOpen}
-                onClose={() => setIsResponseModalOpen(false)}
-            />
         </Box>
     );
 };

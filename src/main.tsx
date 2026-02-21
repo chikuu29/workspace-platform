@@ -9,12 +9,14 @@ import { AuthProvider } from "./contexts/AuthProvider.tsx";
 import { Provider } from "react-redux";
 import { store } from "./app/store.ts";
 import Loader from "./features/ui/components/Loader/Loader.tsx";
+import ApiResponseModalAlert from "./core/components/ApiResponseModalAlert.tsx";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ChakraProvider>
       {/* <AuthProvider> */}
       <Provider store={store} >
         <Loader></Loader>
+        <ApiResponseModalAlert />
         <App />
       </Provider>
       {/* </AuthProvider> */}

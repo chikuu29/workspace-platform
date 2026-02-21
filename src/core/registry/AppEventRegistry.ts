@@ -1,5 +1,7 @@
 import { firstValueFrom } from "rxjs";
 import { APIRequest } from "@/app/api";
+import { useApiResponseModalStore } from "@/core/store/useApiResponseModalStore";
+import { buildApiResponseAlert } from "@/core/utils/apiResponseAlert";
 
 export interface AppActionEventConfig {
   api?: {
@@ -69,11 +71,21 @@ class AppEventRegistry {
       };
     }
 
-    return handler(eventConfig, {
+    const result = await handler(eventConfig, {
       eventName,
       payload,
       templateConfig,
     });
+
+    if (handlerKey === "API_REQUEST") {
+      const modalConfig = buildApiResponseAlert(result, {
+        successMessage: eventConfig.successMessage,
+        errorMessage: eventConfig.errorMessage,
+      });
+      useApiResponseModalStore.getState().openModal(modalConfig);
+    }
+
+    return result;
   }
 }
 

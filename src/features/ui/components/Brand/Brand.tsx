@@ -33,7 +33,7 @@ export default function Brand() {
           src="/assets/icons/logo.png"
           alt="Workspace Logo"
 
-          h="40px"
+          h="48px"
           w="auto"
           objectFit="contain"
         />

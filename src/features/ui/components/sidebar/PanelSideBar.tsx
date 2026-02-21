@@ -1,122 +1,141 @@
 import {
-  Steps,
   Box,
   Flex,
   Drawer,
-  Icon,
-  useDisclosure,
   IconButton,
   VStack,
   Separator,
   Portal,
 } from "@chakra-ui/react";
-
 import { useColorModeValue } from "@/components/ui/color-mode";
-
 import SideNavMenuBuilder from "./SideNavMenuBuilder";
-
 import Brand from "../Brand/Brand";
-// import { useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/store";
 import { APP_CONFIG_STATE } from "@/app/types/appConfigInterface";
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
+import { useSidebar } from "@/contexts/SidebarContext";
+import React, { useCallback } from "react";
+import { useLocation } from "react-router";
+import { useEffect } from "react";
 
-export default function PanelSideBar(props: any) {
-  const { showSidebar, togglesidebar, SHOW_SIDEBAR, ...rest } = props;
+/**
+ * PanelSideBar
+ * Desktop sidebar with smooth collapse animation and icon-only mode.
+ * Consumes SidebarContext — no props needed.
+ */
+const PanelSideBar = () => {
+  const { isCollapsed } = useSidebar();
 
-
-  let shadow = useColorModeValue(
-    "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;",
-    "unset"
+  const shadow = useColorModeValue(
+    "rgba(60, 64, 67, 0.15) 1px 0px 3px 0px",
+    "none"
   );
 
-  let sidebarMargins = "0px";
   const { DISPLAY_TYPE, FEATURE }: APP_CONFIG_STATE = useSelector(
     (state: RootState) => state.app.AppConfigState
   );
 
-  if (!DISPLAY_TYPE?.SHOW_SIDE_NAV_MENU || FEATURE.length == 0) return null;
+  // Don't render if no sidebar menu should be shown
+  if (!DISPLAY_TYPE?.SHOW_SIDE_NAV_MENU || FEATURE.length === 0) return null;
+
   return (
     <Box
-      display={{ base: "none", sm: "none", xl: "block" }}
+      as="nav"
+      role="navigation"
+      aria-label="Sidebar navigation"
+      display={{ base: "none", xl: "block" }}
       minH="100%"
-      p={"0px"}
       boxShadow={shadow}
-      transition="width 0.3s ease-in-out"
-      w={showSidebar ? "250px" : "80px"}
-      pt={2}
-      pb={2}
+      transition="width 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
+      w={isCollapsed ? "78px" : "260px"}
+      bg="bg.default"
+      borderRight="1px solid"
+      borderColor={useColorModeValue("gray.100", "whiteAlpha.50")}
+      flexShrink={0}
     >
       <Box
-        {...rest}
-
-        transition="all 0.3s ease-in-out"
-        p={"5px"}
         h="100%"
-        m={sidebarMargins}
+        p="6px"
         overflowX="hidden"
         overflowY="auto"
-        css={{
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
-        }}
       >
-        <Flex
-          direction="column"
-          height="100%"
-          borderRadius="20px"
-        >
-          <SideNavMenuBuilder showFullSideBarMenu={showSidebar} />
+        <Flex direction="column" height="100%" borderRadius="20px">
+          <SideNavMenuBuilder showFullSideBarMenu={!isCollapsed} />
         </Flex>
       </Box>
     </Box>
   );
-}
+};
 
-// FUNCTIONS
-export function SidebarResponsive(props: any) {
-  const { DISPLAY_TYPE, FEATURE, ...rest } = props;
-  let sidebarBg = useColorModeValue("white", "gray.950");
-  let subbg = useColorModeValue("secondaryGray.100", "gray.800");
-  const { open, onOpen, onClose } = useDisclosure();
+export default React.memo(PanelSideBar);
+
+/**
+ * SidebarResponsive
+ * Mobile drawer version of the sidebar. Opens/closes via SidebarContext.
+ * Auto-closes on route change for seamless navigation.
+ */
+export function SidebarResponsive() {
+  const { isMobileOpen, openMobile, closeMobile } = useSidebar();
+  const location = useLocation();
+
+  // Auto-close drawer on route change
+  useEffect(() => {
+    closeMobile();
+  }, [location.pathname, closeMobile]);
+
+  const handleOpenChange = useCallback(
+    (e: { open: boolean }) => {
+      if (e.open) {
+        openMobile();
+      } else {
+        closeMobile();
+      }
+    },
+    [openMobile, closeMobile]
+  );
+
   return (
     <Flex
       display={{ base: "flex", md: "flex", xl: "none" }}
       alignItems="center"
-      justifyContent={"center"}
+      justifyContent="center"
     >
-      <Flex w="max-content" h="max-content" onClick={onOpen}>
-        <IconButton aria-label="Menu" cursor="pointer" variant="brand">
-          {/* <Icon h="24px" w="24px" asChild> */}
-          <AiOutlineMenuUnfold />
-          {/* </Icon> */}
-        </IconButton>
-      </Flex>
+      <IconButton
+        aria-label="Open menu"
+        cursor="pointer"
+        variant="ghost"
+        size="sm"
+        borderRadius="xl"
+        onClick={openMobile}
+      >
+        <AiOutlineMenuUnfold size={20} />
+      </IconButton>
+
       <Drawer.Root
-        open={open}
-        placement={"start"}
-        onOpenChange={(e) => (e.open ? onOpen() : onClose())}
+        open={isMobileOpen}
+        placement="start"
+        onOpenChange={handleOpenChange}
       >
         <Portal>
+          <Drawer.Backdrop />
           <Drawer.Positioner>
-            <Drawer.Content maxW="280px" h="100dvh">
-              <Flex alignItems={"center"} justifyContent={"space-between"} gap={2} p={4}>
-                <Box>
-                  <Brand />
-                </Box>
+            <Drawer.Content maxW="280px" h="100dvh" bg="bg.default">
+              <Flex
+                alignItems="center"
+                justifyContent="space-between"
+                gap={2}
+                p={4}
+              >
+                <Brand />
                 <IconButton
                   aria-label="Close Menu"
-
-                  variant="brand"
-                  onClick={onClose}
+                  variant="ghost"
+                  size="sm"
+                  borderRadius="xl"
+                  onClick={closeMobile}
                 >
-
-                  <AiOutlineMenuFold />
-
+                  <AiOutlineMenuFold size={20} />
                 </IconButton>
               </Flex>
               <Separator />
@@ -125,16 +144,13 @@ export function SidebarResponsive(props: any) {
                 pb="0"
                 overflowY="auto"
                 css={{
-                  "&::-webkit-scrollbar": {
-                    display: "none",
-                  },
+                  "&::-webkit-scrollbar": { display: "none" },
                   scrollbarWidth: "none",
-                  msOverflowStyle: "none",
                 }}
               >
                 <Flex direction="column" pt="10px" px="16px">
                   <VStack gap={2} align="stretch">
-                    <SideNavMenuBuilder showFullSideBarMenu={true} />
+                    <SideNavMenuBuilder showFullSideBarMenu />
                   </VStack>
                 </Flex>
               </Drawer.Body>

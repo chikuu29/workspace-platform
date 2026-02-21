@@ -14,7 +14,6 @@ interface TopNavPropsType {
   //   showFullSideBarMenu: boolean;
 }
 const TopNavMenuBuilder = (props: TopNavPropsType) => {
-  console.log("===CALLING NAVMENUBUILDER===");
   const isPhoneScreen = useBreakpointValue({ base: true, md: false });
   const { colorMode } = useColorMode();
   const scrollbarThumbBg = useColorModeValue("secondaryGray.400", "whiteAlpha.200");
@@ -74,7 +73,6 @@ const NavItem = ({ menuConfig, ...rest }: MenuLinkInterFace) => {
 
 
   // console.log("hii", menuConfig);
-  let bg = useColorModeValue("white", "gray.950");
   const hoverBg = useColorModeValue("secondaryGray.400", "whiteAlpha.200");
 
   return (
@@ -115,7 +113,7 @@ const NavItem = ({ menuConfig, ...rest }: MenuLinkInterFace) => {
             </Popover.Trigger>
 
             <Popover.Positioner>
-              <Popover.Content border={0} boxShadow={"xl"} p={4} rounded={"xl"} minW={"sm"} >
+              <Popover.Content border={0} boxShadow={"xl"} p={4} rounded={"xl"} minW={"sm"} bg="bg.default">
                 <Stack>
                   {menuConfig.menu.map((child: any, index: number) => (
                     // <DesktopSubNav key={child} subMenu={child} />

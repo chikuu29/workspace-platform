@@ -81,4 +81,4 @@ const NotificationMenu: React.FC = () => {
   );
 };
 
-export default NotificationMenu;
+export default React.memo(NotificationMenu);

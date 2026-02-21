@@ -101,6 +101,7 @@
                                 "description": "Select the member's gender for facilities allocation",
                                 "widget": "radioField",
                                 "oneLiner": true,
+                                "enableClear": true,
                                 "options": [
                                     {
                                         "label": "Male",
@@ -161,10 +162,19 @@
                                 "name": "joiningDate",
                                 "text": "Joining Date",
                                 "description": "Select the official start date of the membership",
-                                "type": "date",
-                                "widget": "textField",
+                                "widget": "dateField",
                                 "oneLiner": true,
-                                "required": true
+                                "required": true,
+                                "enableClear": true
+                            },
+                            {
+                                "name": "appointmentTime",
+                                "text": "Appointment Slot",
+                                "description": "Schedule your first orientation session",
+                                "widget": "dateAndTimeField",
+                                "oneLiner": true,
+                                "required": true,
+                                "enableClear": true
                             },
                             {
                                 "name": "fitnessGoals",
@@ -210,6 +220,7 @@
                                 "description": "Preferred method for subscription renewal",
                                 "widget": "radioField",
                                 "oneLiner": true,
+                                "enableClear": true,
                                 "options": [
                                     {
                                         "label": "Cash",

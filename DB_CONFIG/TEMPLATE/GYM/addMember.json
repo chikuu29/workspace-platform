@@ -25,6 +25,24 @@
     },
     "ACTIONS": {
         "showSaveButton": true,
+        "event": {
+            "draft": {
+                "api": {
+                    "url": "app/draft",
+                    "method": "POST"
+                },
+                "successMessage": "Membership details saved as draft!",
+                "errorMessage": "Failed to save draft. Please try again."
+            },
+            "submit": {
+                "api": {
+                    "url": "gym/addMember",
+                    "method": "POST"
+                },
+                "successMessage": "Membership registration successful!",
+                "errorMessage": "Registration failed. Please check the details and try again."
+            }
+        },
         "ACTION_BUTTONS": [
             {
                 "name": "Draft",

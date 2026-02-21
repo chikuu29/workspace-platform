@@ -33,9 +33,13 @@ export const buttonRecipe = defineRecipe({
             },
             ghost: {
                 bg: "transparent",
-                color: "brand.500",
+                // color: "brand.500",
                 _hover: {
                     bg: "brand.50",
+                
+                    // bg: { _light: "brand.600", _dark: "brand.500" },
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 6px 20px 0 rgba(111, 93, 255, 0.5)",
                 },
             },
             brand: {

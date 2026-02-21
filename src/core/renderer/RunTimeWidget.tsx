@@ -1,7 +1,7 @@
 import React from "react";
 import { Box } from "@chakra-ui/react";
 import { useFormState, useFormContext } from "react-hook-form";
-import { ComponentRegistry } from "../registry/ComponentRegistry";
+import { WidgetRegistry } from "../registry/WidgetRegistry";
 import { useFormStore } from "../store/useFormStore";
 
 const RunTimeWidgetRender: React.FC<any> = React.memo(({ configs, tabs, ...rest }) => {
@@ -22,7 +22,7 @@ const RunTimeWidgetRender: React.FC<any> = React.memo(({ configs, tabs, ...rest 
 
   // If tabs are provided at this level, render the TabsWidget directly
   if (tabs && tabs.length > 0) {
-    const TabsWidgetComponent = ComponentRegistry.get("tabs");
+    const TabsWidgetComponent = WidgetRegistry.get("tabs");
     if (TabsWidgetComponent) {
       return <TabsWidgetComponent tabs={tabs} {...rest} />;
     }
@@ -40,7 +40,7 @@ const RunTimeWidgetRender: React.FC<any> = React.memo(({ configs, tabs, ...rest 
 
         // If the widget itself has tabs, we should render them
         if (widgetConfig.tabs && widgetConfig.tabs.length > 0) {
-          const TabsWidgetComponent = ComponentRegistry.get("tabs");
+          const TabsWidgetComponent = WidgetRegistry.get("tabs");
           if (TabsWidgetComponent) {
             return (
               <Box key={widgetConfig.name || "tabs-container"} {...rest}>
@@ -55,7 +55,7 @@ const RunTimeWidgetRender: React.FC<any> = React.memo(({ configs, tabs, ...rest 
             {(() => {
               switch (widgetConfig.widget) {
                 default:
-                  const RegisteredComponent = ComponentRegistry.get(widgetConfig.widget);
+                  const RegisteredComponent = WidgetRegistry.get(widgetConfig.widget);
                   if (RegisteredComponent) {
                     return (
                       <RegisteredComponent
@@ -79,4 +79,5 @@ const RunTimeWidgetRender: React.FC<any> = React.memo(({ configs, tabs, ...rest 
 });
 
 export default RunTimeWidgetRender;
+
 

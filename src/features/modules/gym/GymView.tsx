@@ -36,7 +36,7 @@ const GymView = memo(() => {
     const subscription = GETAPI({
       path: "app/ui_template",
       params: {
-        pageName: "GymDashboard",
+        pageName: "gymHomePage",
         appName: "myGym"
       },
       isPrivateApi: true,
@@ -65,7 +65,7 @@ const GymView = memo(() => {
     return (
       <FallbackRenderer
         reason="TEMPLATE_NOT_FOUND"
-        type="GymDashboard"
+        type="gymHomePage"
       />
     );
   }

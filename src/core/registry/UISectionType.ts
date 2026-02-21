@@ -1,0 +1,18 @@
+export enum UISectionType {
+  KPI_SECTION = "KPI_SECTION",
+  TABLE_SECTION = "TABLE_SECTION",
+  FILTER_SECTION = "FILTER_SECTION",
+  CHART_SECTION = "CHART_SECTION",
+  GRID_LAYOUT = "GRID_LAYOUT",
+  FORM_SECTION = "FORM_SECTION",
+  ACTION_SECTION = "ACTION_SECTION"
+}
+
+export type UISectionTypeValue = `${UISectionType}`;
+
+export const UI_TYPE_ALIASES: Record<string, UISectionTypeValue> = {
+  TABLE_VIEW: UISectionType.TABLE_SECTION,
+  CHART_VIEW: UISectionType.CHART_SECTION,
+  ACTION_BUTTON: UISectionType.ACTION_SECTION,
+  KPI_CARD: UISectionType.KPI_SECTION,
+};

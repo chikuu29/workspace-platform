@@ -1,12 +1,12 @@
 {
   "id": "3",
-  "pageName": "GymDashboard",
-  "route": "GymDashboard",
+  "pageName": "gymHomePage",
+  "route": "gymHomePage",
   "appName": "myGym",
   "active": true,
   "appMeta": {
     "appName": "Gym",
-    "viewName": "GymDashboard",
+    "viewName": "gymHomePage",
     "viewId": "3",
     "version": "2.0.0",
     "owner": "Suryanarayan Biswal",
@@ -16,350 +16,235 @@
     "type": "GRID_VIEW",
     "title": "Gym Operations Dashboard",
     "description": "Operational command center for members, staff and performance.",
-    "target": "dashboard",
+    "target": "grids",
     "layoutStyles": {
-      "p": 4
+      "templateColumns": "repeat(2, minmax(0, 1fr))",
+      "gap": "6"
     }
-  },
-  "title": "Gym Operations Dashboard",
-  "layout": {
-    "maxW": "1600px",
-    "contentPadding": {
-      "base": 4,
-      "md": 8
-    },
-    "sectionGap": 8
-  },
-  "dataSource": {
-    "dashboardKpis": {
-      "type": "inline",
-      "data": [
-        {
-          "label": "Revenue",
-          "value": "$45,231.89",
-          "helpText": "+20.1% from last month",
-          "trend": "up",
-          "colorPalette": "blue",
-          "subKpis": [
-            {
-              "label": "Membership",
-              "value": "$32,100"
-            },
-            {
-              "label": "PT Sessions",
-              "value": "$13,131"
-            }
-          ]
-        },
-        {
-          "label": "Members",
-          "value": "1,234",
-          "helpText": "+12 new today",
-          "trend": "up",
-          "colorPalette": "green",
-          "subKpis": [
-            {
-              "label": "Active",
-              "value": "892"
-            },
-            {
-              "label": "Inactive",
-              "value": "342"
-            }
-          ]
-        },
-        {
-          "label": "Trainers",
-          "value": "48",
-          "helpText": "8 currently in session",
-          "trend": "neutral",
-          "colorPalette": "orange",
-          "subKpis": [
-            {
-              "label": "Visitors",
-              "value": "126"
-            },
-            {
-              "label": "Front Desk",
-              "value": "15"
-            }
-          ]
-        }
-      ]
-    },
-    "memberActivityTable": {
-      "type": "api",
-      "api": {
-        "path": "gym/members/activities",
-        "method": "GET",
-        "params": {
-          "tenantId": "{{tenantId}}",
-          "page": 1,
-          "pageSize": 50
-        }
-      },
-      "fallbackData": [
-        {
-          "id": "M001",
-          "name": "John Doe",
-          "plan": "Annual Platinum",
-          "trainer": "Alex",
-          "status": "Active",
-          "lastVisit": "2 hours ago"
-        },
-        {
-          "id": "M002",
-          "name": "Jane Smith",
-          "plan": "Monthly Basic",
-          "trainer": "Sarah",
-          "status": "Active",
-          "lastVisit": "5 hours ago"
-        },
-        {
-          "id": "M003",
-          "name": "Robert Brown",
-          "plan": "6-Month Flex",
-          "trainer": "Alex",
-          "status": "Inactive",
-          "lastVisit": "3 days ago"
-        },
-        {
-          "id": "M004",
-          "name": "Alice Wilson",
-          "plan": "Annual Platinum",
-          "trainer": "Michael",
-          "status": "Active",
-          "lastVisit": "1 hour ago"
-        },
-        {
-          "id": "M005",
-          "name": "Chris Evans",
-          "plan": "Monthly Basic",
-          "trainer": "Sarah",
-          "status": "Active",
-          "lastVisit": "Just now"
-        },
-        {
-          "id": "M006",
-          "name": "Emma Stone",
-          "plan": "Annual Platinum",
-          "trainer": "Michael",
-          "status": "Active",
-          "lastVisit": "1 day ago"
-        }
-      ]
-    },
-    "revenueAnalytics": {
-      "type": "inline",
-      "data": [
-        {
-          "month": "Jan",
-          "revenue": 28120,
-          "members": 1012
-        },
-        {
-          "month": "Feb",
-          "revenue": 31980,
-          "members": 1098
-        },
-        {
-          "month": "Mar",
-          "revenue": 45231,
-          "members": 1234
-        }
-      ]
-    }
-  },
-  "actions": {
-    "memberTableActions": [
-      {
-        "label": "Edit Member",
-        "icon": "FcSettings",
-        "event": "EDIT_MEMBER",
-        "colorPalette": "blue"
-      },
-      {
-        "label": "Freeze Membership",
-        "icon": "FcDataProtection",
-        "event": "FREEZE_MEMBER",
-        "colorPalette": "orange",
-        "requiresConfirm": true,
-        "confirmMessage": "Freeze this membership temporarily?"
-      },
-      {
-        "label": "Delete",
-        "icon": "FcDeleteDatabase",
-        "event": "DELETE_MEMBER",
-        "isDanger": true,
-        "requiresConfirm": true,
-        "confirmMessage": "Delete this member record?"
-      }
-    ],
-    "dashboardHeaderActions": [
-      {
-        "label": "Add Member",
-        "event": "NAV_ADD_MEMBER",
-        "colorPalette": "blue"
-      },
-      {
-        "label": "Export Report",
-        "event": "EXPORT_REPORT",
-        "colorPalette": "gray"
-      }
-    ]
   },
   "UI_VIEW": {
     "schema": {
-      "sections": [
-      {
-        "id": "kpi-summary",
-        "UI_TYPE": "KPI_CARD",
-        "title": "Gym Snapshot",
-        "dataSource": "dashboardKpis",
-        "props": {
-          "columns": {
-            "base": 1,
-            "md": 2,
-            "lg": 3,
-            "xl": 3
-          }
-        }
-      },
-      {
-        "id": "member-activity-table",
-        "UI_TYPE": "TABLE_VIEW",
-        "title": "Recent Member Activities",
-        "dataSource": "memberActivityTable",
-        "actionRef": "memberTableActions",
-        "props": {
-          "columns": [
+      "grids": [
+        {
+          "title": "Key Performance Indicators",
+          "UI_TYPE": "KPI_SECTION",
+          "KPIS": [
             {
-              "label": "ID",
-              "key": "id",
-              "width": "90px",
-              "textAlign": "center"
-            },
-            {
-              "label": "Member Name",
-              "key": "name",
-              "width": "220px",
-              "isSortable": true
-            },
-            {
-              "label": "Plan",
-              "key": "plan",
-              "width": "160px",
-              "isSortable": true,
-              "isSearchable": true
-            },
-            {
-              "label": "Assigned Trainer",
-              "key": "trainer",
-              "width": "180px",
-              "isSearchable": true
-            },
-            {
-              "label": "Status",
-              "key": "status",
-              "width": "120px",
-              "textAlign": "center",
-              "isSortable": true,
-              "isStatus": true,
-              "isSearchable": true
-            },
-            {
-              "label": "Last Visit",
-              "key": "lastVisit",
-              "width": "150px",
-              "isSortable": true
-            }
-          ],
-          "filters": [
-            {
-              "UI_TYPE": "FILTER_SECTION",
-              "key": "status",
-              "type": "select",
-              "label": "Status",
-              "options": [
+              "label": "Revenue",
+              "value": "$45,231.89",
+              "helpText": "+20.1% from last month",
+              "trend": "up",
+              "widget": "KPI_CARD",
+              "styles": {
+                "backgroundColor": "#E6F7FF",
+                "textColor": "#1890FF"
+              },
+              "colorPalette": "blue",
+              "subKpis": [
                 {
-                  "label": "All",
-                  "value": "all"
+                  "label": "Membership",
+                  "value": "$32,100"
                 },
                 {
+                  "label": "PT Sessions",
+                  "value": "$13,131"
+                }
+              ]
+            },
+            {
+              "label": "Members",
+              "value": "1,234",
+              "helpText": "+12 new today",
+              "trend": "up",
+              "widget": "KPI_CARD",
+              "styles": {
+                "backgroundColor": "#E6F7FF",
+                "textColor": "#1890FF"
+              },
+              "colorPalette": "green",
+              "subKpis": [
+                {
                   "label": "Active",
-                  "value": "Active"
+                  "value": "892"
                 },
                 {
                   "label": "Inactive",
-                  "value": "Inactive"
+                  "value": "342"
                 }
               ]
             },
             {
-              "UI_TYPE": "FILTER_SECTION",
-              "key": "plan",
-              "type": "select",
-              "label": "Plan",
-              "options": [
+              "label": "Trainers",
+              "value": "48",
+              "helpText": "8 currently in session",
+              "trend": "neutral",
+              "widget": "KPI_CARD",
+              "styles": {
+                "backgroundColor": "#FFF4E5",
+                "textColor": "#FF7F50"
+              },
+              "colorPalette": "orange",
+              "subKpis": [
                 {
-                  "label": "All",
-                  "value": "all"
+                  "label": "Visitors",
+                  "value": "126"
                 },
                 {
-                  "label": "Annual Platinum",
-                  "value": "Annual Platinum"
-                },
-                {
-                  "label": "Monthly Basic",
-                  "value": "Monthly Basic"
-                },
-                {
-                  "label": "6-Month Flex",
-                  "value": "6-Month Flex"
-                }
-              ]
-            }
-          ],
-          "pagination": {
-            "enabled": true,
-            "pageSize": 10
-          }
-        }
-      },
-      {
-        "id": "analytics-overview",
-        "UI_TYPE": "CHART_VIEW",
-        "title": "Analytics",
-        "dataSource": "revenueAnalytics",
-        "props": {
-          "components": [
-            {
-              "id": "revenue-line",
-              "componentKey": "RevenuAnalytics",
-              "title": "Revenue vs Members",
-              "chartType": "line",
-              "xKey": "month",
-              "series": [
-                {
-                  "key": "revenue",
-                  "label": "Revenue"
-                },
-                {
-                  "key": "members",
-                  "label": "Members"
+                  "label": "Front Desk",
+                  "value": "15"
                 }
               ]
             }
           ]
+        },
+        {
+          "id": "member-activity-table",
+          "UI_TYPE": "TABLE_VIEW",
+          "title": "Recent Member Activities",
+          "TABLES": {
+            "apis": {
+              "loadData": {
+                "path": "gym/members/activities",
+                "method": "GET",
+                "params": {
+                  "tenantId": "{{tenantId}}",
+                  "page": 1,
+                  "pageSize": 50
+                }
+              }
+            },
+            "SETTINGS": {
+              "columns": [
+                {
+                  "label": "ID",
+                  "key": "id",
+                  "width": "90px",
+                  "textAlign": "center"
+                },
+                {
+                  "label": "Member Name",
+                  "key": "name",
+                  "width": "220px",
+                  "isSortable": true
+                },
+                {
+                  "label": "Plan",
+                  "key": "plan",
+                  "width": "160px",
+                  "isSortable": true,
+                  "isSearchable": true
+                },
+                {
+                  "label": "Assigned Trainer",
+                  "key": "trainer",
+                  "width": "180px",
+                  "isSearchable": true
+                },
+                {
+                  "label": "Status",
+                  "key": "status",
+                  "width": "120px",
+                  "textAlign": "center",
+                  "isSortable": true,
+                  "isStatus": true,
+                  "isSearchable": true
+                },
+                {
+                  "label": "Last Visit",
+                  "key": "lastVisit",
+                  "width": "150px",
+                  "isSortable": true
+                }
+              ],
+              "filters": [
+                {
+                  "UI_TYPE": "FILTER_SECTION",
+                  "key": "status",
+                  "type": "select",
+                  "label": "Status",
+                  "options": [
+                    {
+                      "label": "All",
+                      "value": "all"
+                    },
+                    {
+                      "label": "Active",
+                      "value": "Active"
+                    },
+                    {
+                      "label": "Inactive",
+                      "value": "Inactive"
+                    }
+                  ]
+                },
+                {
+                  "UI_TYPE": "FILTER_SECTION",
+                  "key": "plan",
+                  "type": "select",
+                  "label": "Plan",
+                  "options": [
+                    {
+                      "label": "All",
+                      "value": "all"
+                    },
+                    {
+                      "label": "Annual Platinum",
+                      "value": "Annual Platinum"
+                    },
+                    {
+                      "label": "Monthly Basic",
+                      "value": "Monthly Basic"
+                    },
+                    {
+                      "label": "6-Month Flex",
+                      "value": "6-Month Flex"
+                    }
+                  ]
+                }
+              ],
+              "pagination": {
+                "enabled": true,
+                "pageSize": 10
+              }
+            },
+            "events": {
+              "EDIT_MEMBER": {
+                "type": "NAVIGATE",
+                "target": "EditMember",
+                "params": {
+                  "memberId": "{{selectedRow.id}}"
+                }
+              },
+              "FREEZE_MEMBER": {
+                "type": "API_CALL",
+                "api": {
+                  "path": "gym/members/freeze",
+                  "method": "POST",
+                  "body": {
+                    "memberId": "{{selectedRow.id}}"
+                  }
+                },
+                "onSuccess": {
+                  "type": "REFRESH_DATA"
+                }
+              },
+              "DELETE_MEMBER": {
+                "type": "API_CALL",
+                "api": {
+                  "path": "gym/members/delete",
+                  "method": "DELETE",
+                  "body": {
+                    "memberId": "{{selectedRow.id}}"
+                  }
+                },
+                "onSuccess": {
+                  "type": "REFRESH_DATA"
+                }
+              }
+            }
+          }
         }
-      },
-      {
-        "id": "dashboard-actions",
-        "UI_TYPE": "ACTION_BUTTON",
-        "actionRef": "dashboardHeaderActions"
-      }
       ]
     }
   }
 }
-

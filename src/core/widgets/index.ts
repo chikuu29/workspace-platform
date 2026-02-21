@@ -1,4 +1,4 @@
-import { ComponentRegistry } from '../registry/ComponentRegistry';
+import { WidgetRegistry } from '../registry/WidgetRegistry';
 import TextField from './TextField';
 import RadioField from './RadioField';
 import TextArea from './TextArea';
@@ -13,17 +13,18 @@ import DateField from './DateField';
 import DateTimeField from './DateTimeField';
 
 // Register widgets
-ComponentRegistry.register('textField', TextField);
-ComponentRegistry.register('radioField', RadioField);
-ComponentRegistry.register('textAreaField', TextArea);
-ComponentRegistry.register('uploadField', UploadField);
-ComponentRegistry.register('panel', CollapsiblePanel);
-ComponentRegistry.register('grid', Grid);
-ComponentRegistry.register('stepper', StepperWidget);
-ComponentRegistry.register('kpi', KPITile);
-ComponentRegistry.register('kpiTable', KPITable);
-ComponentRegistry.register('tabs', TabsWidget);
-ComponentRegistry.register('dateField', DateField);
-ComponentRegistry.register('dateAndTimeField', DateTimeField);
+WidgetRegistry.register('textField', TextField);
+WidgetRegistry.register('radioField', RadioField);
+WidgetRegistry.register('textAreaField', TextArea);
+WidgetRegistry.register('uploadField', UploadField);
+WidgetRegistry.register('panel', CollapsiblePanel);
+WidgetRegistry.register('grid', Grid);
+WidgetRegistry.register('stepper', StepperWidget);
+WidgetRegistry.register('kpi', KPITile);
+WidgetRegistry.register('kpiTable', KPITable);
+WidgetRegistry.register('tabs', TabsWidget);
+WidgetRegistry.register('dateField', DateField);
+WidgetRegistry.register('dateAndTimeField', DateTimeField);
 
 export { TextField, RadioField, TextArea, UploadField, CollapsiblePanel, Grid, StepperWidget, KPITile, KPITable, TabsWidget, DateField, DateTimeField };
+

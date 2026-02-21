@@ -21,4 +21,4 @@ class Registry {
     }
 }
 
-export const ComponentRegistry = new Registry();
+export const WidgetRegistry = new Registry();

@@ -3,51 +3,44 @@ import {
     Box,
     Flex,
     Heading,
-    Icon,
     Text,
     VStack,
     HStack,
     Button,
-    Circle,
     Badge,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { motion, AnimatePresence } from "framer-motion";
-import { LuCheck, LuSave } from "react-icons/lu";
 import { UIEngine } from "../renderer/UIEngine";
-import "../widgets"; // Ensure all widgets are registered
+import "../widgets";
 import AsyncLoadIcon from "@/utils/hooks/AsyncLoadIcon";
 import { useFormStore } from "../store/useFormStore";
+import { appEventRegistry } from "../registry/AppEventRegistry";
+import { Alert } from "@/components/ui/alert";
 
+interface FormActionFeedback {
+    status: "success" | "error";
+    message: string;
+}
 
-/**
- * FormView
- * Renders a tab-based form layout with a premium aesthetic.
- * Specifically designed for UI_TYPE.type === "FORM_VIEW"
- */
 const FormView = ({ config }: any) => {
-    console.log("FormView Config:", config);
     const layoutStyles = config?.UI_TYPE?.layoutStyles || {};
-    // Premium adaptive theme colors
     const cardBg = useColorModeValue("white", "rgba(15, 23, 42, 0.8)");
     const borderColor = useColorModeValue("gray.200", "rgba(56, 189, 248, 0.1)");
     const headingColor = useColorModeValue("blue.600", "white");
     const codeBg = useColorModeValue("gray.50", "gray.900");
     const formValues = useFormStore(state => state.values);
-    console.log("formValues", formValues);
 
+    const tabs = useMemo(() => config?.UI_VIEW?.schema?.forms?.tabs || [], [config]);
 
+    const actionEventConfig = useMemo(() => config?.ACTIONS?.event || {}, [config]);
 
-    const tabs = useMemo(() => {
-        return config?.UI_VIEW?.schema?.forms?.tabs || [];
-    }, [config]);
-
-    const actions = useMemo(() => {
+    const actionButtons = useMemo(() => {
         const buttons = config?.ACTIONS?.ACTION_BUTTONS || config?.ACTIONS?.BUTTONS || [];
         const showSave = config?.ACTIONS?.showSaveButton;
 
         if (showSave) {
-            const saveBtn = {
+            const submitButton = {
                 name: "save_submit_generated",
                 text: "Save",
                 iconName: "LuSave",
@@ -58,28 +51,62 @@ const FormView = ({ config }: any) => {
                     colorPalette: "blue"
                 }
             };
-            return [...buttons, saveBtn];
+            return [...buttons, submitButton];
         }
+
         return buttons;
     }, [config]);
 
-
-
     const [submittedData, setSubmittedData] = React.useState<any>(null);
+    const [actionFeedback, setActionFeedback] = React.useState<FormActionFeedback | null>(null);
+    const [isEventInProgress, setIsEventInProgress] = React.useState(false);
+    const [pendingEventName, setPendingEventName] = React.useState<string | null>(null);
     const formId = React.useId();
 
-    const onFormSubmit = (data: any) => {
-        console.log("FormView Submitted:", data);
-        setSubmittedData(data);
-    };
-
-    const handleAction = (button: any) => {
-        console.log("Action triggered:", button);
-        if (button.event !== "submit") {
-            // Handle other actions
-            setSubmittedData(null); // Reset on other actions if needed
+    const executeFormEvent = useCallback(async (eventName: string, payload: any) => {
+        if (isEventInProgress) {
+            return {
+                success: false,
+                message: "Please wait, an action is already in progress.",
+            };
         }
-    };
+
+        setIsEventInProgress(true);
+        setPendingEventName(eventName);
+
+        try {
+            const result = await appEventRegistry.executeEvent(
+                eventName,
+                actionEventConfig?.[eventName],
+                payload,
+                config
+            );
+
+            setActionFeedback({
+                status: result.success ? "success" : "error",
+                message: result.message,
+            });
+
+            return result;
+        } finally {
+            setIsEventInProgress(false);
+            setPendingEventName(null);
+        }
+    }, [actionEventConfig, config, isEventInProgress]);
+
+    const handleFormSubmit = useCallback(async (data: any) => {
+        if (isEventInProgress) return;
+        const result = await executeFormEvent("submit", data);
+        if (result.success) {
+            setSubmittedData(data);
+        }
+    }, [executeFormEvent, isEventInProgress]);
+
+    const handleActionButtonClick = useCallback(async (button: any) => {
+        if (!button?.event || button.event === "submit" || isEventInProgress) return;
+
+        await executeFormEvent(button.event, formValues);
+    }, [executeFormEvent, formValues, isEventInProgress]);
 
     if (!tabs.length) return null;
 
@@ -105,15 +132,17 @@ const FormView = ({ config }: any) => {
                     </VStack>
 
                     <HStack gap="4">
-                        {actions.map((btn: any, idx: number) => {
-                            const isSubmit = btn.event === 'submit';
+                        {actionButtons.map((btn: any, idx: number) => {
+                            const isSubmit = btn.event === "submit";
                             return (
                                 <Button
                                     key={btn.name || idx}
-                                    onClick={isSubmit ? undefined : () => handleAction(btn)}
+                                    onClick={isSubmit ? undefined : () => handleActionButtonClick(btn)}
                                     type={isSubmit ? "submit" : "button"}
                                     form={isSubmit ? formId : undefined}
                                     display={btn.hidden ? "none" : "flex"}
+                                    loading={isEventInProgress && pendingEventName === btn.event}
+                                    disabled={isEventInProgress}
                                     {...btn?.styles}
                                 >
                                     <HStack gap="2">
@@ -130,9 +159,16 @@ const FormView = ({ config }: any) => {
                     </HStack>
                 </Flex>
 
-                {/* Main Content Card */}
+                {actionFeedback && (
+                    <Alert
+                        status={actionFeedback.status as any}
+                        title={actionFeedback.message}
+                        mb={4}
+                        rounded="xl"
+                    />
+                )}
+
                 <Box
-                    // bg={cardBg}
                     rounded="3xl"
                     shadow="xl"
                     border="1px solid"
@@ -145,39 +181,13 @@ const FormView = ({ config }: any) => {
                         config={tabs}
                         tabs={tabs}
                         initialData={formValues}
-                        onSubmit={onFormSubmit}
+                        onSubmit={handleFormSubmit}
                         formId={formId}
                     >
-                        <AnimatePresence mode="wait">
-                            {/* RunTimeWidget handled internally */}
-                        </AnimatePresence>
-
-                        {/* <HStack gap="4" p="4" justify="flex-end">
-                            {actions.map((btn: any, idx: number) => (
-                                (btn.position === 'bottom') && (
-                                    <Button
-                                        key={`bottom-${idx}`}
-                                        type="button"
-                                        onClick={() => handleAction(btn)}
-                                        display={btn.hidden ? "none" : "flex"}
-                                        {...btn?.styles}
-                                    >
-                                        <HStack gap="2">
-                                            <Text fontWeight="bold">{btn.text}</Text>
-                                            {btn.iconName && (
-                                                <Box>
-                                                    <AsyncLoadIcon iconName={btn.iconName} />
-                                                </Box>
-                                            )}
-                                        </HStack>
-                                    </Button>
-                                )
-                            ))}
-                        </HStack> */}
+                        <AnimatePresence mode="wait" />
                     </UIEngine>
                 </Box>
 
-                {/* Submitted Data Display */}
                 {submittedData && (
                     <Box mt={8} p={6} bg={cardBg} rounded="xl" shadow="lg" border="1px solid" borderColor={borderColor}>
                         <Heading size="lg" mb={4} color="green.500">Submission Successful</Heading>
@@ -192,3 +202,4 @@ const FormView = ({ config }: any) => {
 };
 
 export default FormView;
+

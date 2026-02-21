@@ -25,7 +25,7 @@
     },
     "ACTIONS": {
         "showSaveButton": true,
-        "event": {
+        "events": {
             "draft": {
                 "api": {
                     "url": "app/draft",

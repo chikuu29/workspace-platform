@@ -72,6 +72,16 @@ export const UIEngine: React.FC<UIEngineProps> = ({ config, initialData = {}, on
 
     const [alertOpen, setAlertOpen] = useState(false);
     const [groupedErrors, setGroupedErrors] = useState<Record<string, string[]>>({});
+    const dialogBorderColor = useColorModeValue("red.100", "whiteAlpha.200");
+    const dialogBg = useColorModeValue("rgba(255, 255, 255, 0.8)", "rgba(15, 23, 42, 0.8)");
+    const titleColor = useColorModeValue("red.700", "red.400");
+    const subtitleColor = useColorModeValue("gray.500", "whiteAlpha.600");
+    const dividerColor = useColorModeValue("red.50", "whiteAlpha.100");
+    const itemBg = useColorModeValue("red.50/50", "whiteAlpha.50");
+    const itemBorderColor = useColorModeValue("red.100/50", "transparent");
+    const itemTextColor = useColorModeValue("gray.800", "gray.200");
+    const footerBg = useColorModeValue("gray.50/50", "whiteAlpha.50");
+    const footerBorderColor = useColorModeValue("gray.100", "whiteAlpha.100");
 
     const onError = (errors: any) => {
         const store = useFormStore.getState();
@@ -103,9 +113,9 @@ export const UIEngine: React.FC<UIEngineProps> = ({ config, initialData = {}, on
                         rounded={{ base: "2xl", md: "3xl" }}
                         overflow="hidden"
                         border="1px solid"
-                        borderColor={useColorModeValue("red.100", "whiteAlpha.200")}
+                        borderColor={dialogBorderColor}
                         shadow="2xl"
-                        bg={useColorModeValue("rgba(255, 255, 255, 0.8)", "rgba(15, 23, 42, 0.8)")}
+                        bg={dialogBg}
                         backdropFilter="blur(20px)"
                         maxW={{ base: "95vw", md: "500px" }}
                     >
@@ -128,10 +138,10 @@ export const UIEngine: React.FC<UIEngineProps> = ({ config, initialData = {}, on
                                     </Circle>
                                 </motion.div>
                                 <VStack align="start" gap={0}>
-                                    <DialogTitle fontSize="xl" fontWeight="900" letterSpacing="tight" color={useColorModeValue("red.700", "red.400")}>
+                                    <DialogTitle fontSize="xl" fontWeight="900" letterSpacing="tight" color={titleColor}>
                                         Validation Required
                                     </DialogTitle>
-                                    <Text fontSize="xs" fontWeight="medium" color={useColorModeValue("gray.500", "whiteAlpha.600")}>
+                                    <Text fontSize="xs" fontWeight="medium" color={subtitleColor}>
                                         Some fields need your attention
                                     </Text>
                                 </VStack>
@@ -163,7 +173,7 @@ export const UIEngine: React.FC<UIEngineProps> = ({ config, initialData = {}, on
                                                 >
                                                     {tab}
                                                 </Badge>
-                                                <Box flex="1" h="1px" bg={useColorModeValue("red.50", "whiteAlpha.100")} />
+                                                <Box flex="1" h="1px" bg={dividerColor} />
                                             </HStack>
                                             <VStack align="stretch" gap={2} pl={1}>
                                                 {msgs.map((msg, mIdx) => (
@@ -173,9 +183,9 @@ export const UIEngine: React.FC<UIEngineProps> = ({ config, initialData = {}, on
                                                         animate={{ opacity: 1, y: 0 }}
                                                         transition={{ delay: idx * 0.1 + mIdx * 0.05 + 0.3 }}
                                                     >
-                                                        <HStack align="start" gap={3} p={3} rounded="xl" bg={useColorModeValue("red.50/50", "whiteAlpha.50")} border="1px solid" borderColor={useColorModeValue("red.100/50", "transparent")}>
+                                                        <HStack align="start" gap={3} p={3} rounded="xl" bg={itemBg} border="1px solid" borderColor={itemBorderColor}>
                                                             <Circle size="1.5" bg="red.500" mt={2} />
-                                                            <Text color={useColorModeValue("gray.800", "gray.200")} fontSize="sm" fontWeight="600" lineHeight="tall">
+                                                            <Text color={itemTextColor} fontSize="sm" fontWeight="600" lineHeight="tall">
                                                                 {msg}
                                                             </Text>
                                                         </HStack>
@@ -188,7 +198,7 @@ export const UIEngine: React.FC<UIEngineProps> = ({ config, initialData = {}, on
                             </VStack>
                         </DialogBody>
 
-                        <DialogFooter bg={useColorModeValue("gray.50/50", "whiteAlpha.50")} borderTop="1px solid" borderColor={useColorModeValue("gray.100", "whiteAlpha.100")} p={6}>
+                        <DialogFooter bg={footerBg} borderTop="1px solid" borderColor={footerBorderColor} p={6}>
                             <Button
                                 size="lg"
                                 width="full"

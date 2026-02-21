@@ -1,38 +1,50 @@
-import Dexie from 'dexie';
+import Dexie, { Table } from 'dexie';
 
-// Initialize Dexie database
-const db = new Dexie('APICacheDB');
-db.version(1).stores({
-    cache: 'key, data, expiresAt'
-});
-
-interface CacheEntry {
+interface CacheEntry<T = unknown> {
     key: string;
-    data: any;
+    data: T;
     expiresAt: number;
 }
 
-// Save data to IndexedDB with expiration time
-const saveToCache = async (key: string, data: any, ttl: number) => {
-    const expiresAt = Date.now() + ttl * 1000; // Calculate expiration time
-    await db.table<CacheEntry>('cache').put({ key, data, expiresAt });
+class APICacheDB extends Dexie {
+    cache!: Table<CacheEntry, string>;
+
+    constructor() {
+        super('APICacheDB');
+        this.version(1).stores({
+            cache: 'key, expiresAt',
+        });
+    }
+}
+
+const db = new APICacheDB();
+
+const saveToCache = async <T = unknown>(key: string, data: T, ttlSeconds: number): Promise<void> => {
+    const safeTTL = Math.max(0, ttlSeconds);
+    const expiresAt = Date.now() + safeTTL * 1000;
+    await db.cache.put({ key, data, expiresAt });
 };
 
-// Get data from IndexedDB and check if it's still valid
-const getFromCache = async (key: string) => {
-    const cachedEntry:any = await db.table<CacheEntry>('cache').get(key);
-    if (cachedEntry && cachedEntry.expiresAt > Date.now()) {
-        return cachedEntry.data;
-    } else {
+const getFromCache = async <T = unknown>(key: string): Promise<T | null> => {
+    const cachedEntry = await db.cache.get(key);
+
+    if (!cachedEntry) return null;
+
+    if (cachedEntry.expiresAt <= Date.now()) {
+        await db.cache.delete(key);
         return null;
     }
+
+    return cachedEntry.data as T;
 };
 
-// Remove expired cache entries
-const removeExpiredCache = async () => {
+const removeExpiredCache = async (): Promise<void> => {
     const now = Date.now();
-    await db.table<CacheEntry>('cache').where('expiresAt').below(now).delete();
+    await db.cache.where('expiresAt').belowOrEqual(now).delete();
 };
 
+const clearCache = async (): Promise<void> => {
+    await db.cache.clear();
+};
 
-export {saveToCache,getFromCache,removeExpiredCache}
+export { saveToCache, getFromCache, removeExpiredCache, clearCache };

@@ -34,6 +34,7 @@ const Navbar = () => {
     "rgba(15, 23, 42, 0.88)"
   );
   const borderColor = useColorModeValue("gray.100", "whiteAlpha.100");
+  const iconHoverBg = useColorModeValue("gray.100", "whiteAlpha.100");
 
   // Memoize the sidebar toggle icon to prevent re-creation
   const ToggleIcon = useMemo(
@@ -77,7 +78,7 @@ const Navbar = () => {
                   variant="ghost"
                   size="md"
                   borderRadius="xl"
-                  _hover={{ bg: useColorModeValue("gray.100", "whiteAlpha.100") }}
+                  _hover={{ bg: iconHoverBg }}
                   transition="all 0.2s"
                 >
                   <ToggleIcon size={20} />

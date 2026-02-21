@@ -82,6 +82,10 @@ const Appbreadcurmb = forwardRef((props, ref) => {
   const activeColor = useColorModeValue("blue.600", "blue.400");
   const inactiveColor = useColorModeValue("gray.500", "whiteAlpha.500");
   const hoverBg = useColorModeValue("gray.100", "whiteAlpha.100");
+  const borderColorValue = useColorModeValue("gray.100", "whiteAlpha.100");
+  const bgValue = useColorModeValue("white/90", "rgba(15, 23, 42, 0.9)");
+  const controlsBg = useColorModeValue("gray.50", "whiteAlpha.50");
+  const controlsBorder = useColorModeValue("gray.100", "whiteAlpha.100");
 
   return (
     <Box
@@ -89,8 +93,8 @@ const Appbreadcurmb = forwardRef((props, ref) => {
       w="100%"
       px="6"
       borderBottom="1px solid"
-      borderColor={useColorModeValue("gray.100", "whiteAlpha.100")}
-      bg={useColorModeValue("white/90", "rgba(15, 23, 42, 0.9)")}
+      borderColor={borderColorValue}
+      bg={bgValue}
       backdropFilter="blur(12px)"
       position="sticky"
       top="0"
@@ -140,10 +144,10 @@ const Appbreadcurmb = forwardRef((props, ref) => {
         <HStack gap="3">
           <Flex
             p="1"
-            bg={useColorModeValue("gray.50", "whiteAlpha.50")}
+            bg={controlsBg}
             rounded="xl"
             border="1px solid"
-            borderColor={useColorModeValue("gray.100", "whiteAlpha.100")}
+            borderColor={controlsBorder}
           >
             <ColorModeButton variant="ghost" size="sm" rounded="lg" />
             <FullscreenButton variant="ghost" size="sm" rounded="lg" />

@@ -18,18 +18,21 @@ import { Link } from "react-router";
 import { LuChevronDown, LuChevronRight, LuMenu, LuX } from 'react-icons/lu';
 export default function WithSubnavigation() {
   const { open, onToggle } = useDisclosure();
+  const navColor = useColorModeValue("gray.600", "white");
+  const borderColor = useColorModeValue("gray.200", "gray.900");
+  const brandColor = useColorModeValue("gray.800", "white");
 
   return (
     <Box>
       <Flex
         // bg={useColorModeValue("white", "gray.800")}
-        color={useColorModeValue("gray.600", "white")}
+        color={navColor}
         minH={"60px"}
         py={{ base: 2 }}
         px={{ base: 4 }}
         borderBottom={1}
         borderStyle={"solid"}
-        borderColor={useColorModeValue("gray.200", "gray.900")}
+        borderColor={borderColor}
         align={"center"}
       >
         <Flex
@@ -46,7 +49,7 @@ export default function WithSubnavigation() {
           <Text
             textAlign={useBreakpointValue({ base: "center", md: "left" })}
             fontFamily={"heading"}
-            color={useColorModeValue("gray.800", "white")}
+            color={brandColor}
           >
             myOMS
           </Text>
@@ -139,13 +142,14 @@ const DesktopNav = () => {
 };
 
 const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
+  const hoverBg = useColorModeValue("pink.50", "gray.900");
   return (
     <Box
       role={"group"}
       display={"block"}
       p={2}
       rounded={"md"}
-      _hover={{ bg: useColorModeValue("pink.50", "gray.900") }}
+      _hover={{ bg: hoverBg }}
       asChild><a href={href}>
         <Stack direction={"row"} align={"center"}>
           <Box>
@@ -177,9 +181,10 @@ const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
 };
 
 const MobileNav = () => {
+  const bg = useColorModeValue("white", "gray.800");
   return (
     <Stack
-      bg={useColorModeValue("white", "gray.800")}
+      bg={bg}
       p={4}
       display={{ md: "none" }}
     >
@@ -192,6 +197,8 @@ const MobileNav = () => {
 
 const MobileNavItem = ({ label, children, href }: NavItem) => {
   const { open, onToggle } = useDisclosure();
+  const textColor = useColorModeValue("gray.600", "gray.200");
+  const borderColor = useColorModeValue("gray.200", "gray.700");
 
   return (
     <Stack gap={4} onClick={children && onToggle}>
@@ -205,7 +212,7 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
         asChild><a href={href ?? "#"}>
           <Text
             fontWeight={600}
-            color={useColorModeValue("gray.600", "gray.200")}
+            color={textColor}
           >
             {label}
           </Text>
@@ -227,7 +234,7 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
             pl={4}
             borderLeft={1}
             borderStyle={"solid"}
-            borderColor={useColorModeValue("gray.200", "gray.700")}
+            borderColor={borderColor}
             align={"start"}
           >
             {children &&

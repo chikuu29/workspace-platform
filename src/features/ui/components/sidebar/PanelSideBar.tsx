@@ -36,6 +36,8 @@ const PanelSideBar = () => {
     (state: RootState) => state.app.AppConfigState
   );
 
+  const borderColor = useColorModeValue("gray.100", "whiteAlpha.50");
+
   // Don't render if no sidebar menu should be shown
   if (!DISPLAY_TYPE?.SHOW_SIDE_NAV_MENU || FEATURE.length === 0) return null;
 
@@ -51,7 +53,7 @@ const PanelSideBar = () => {
       w={isCollapsed ? "78px" : "260px"}
       bg="bg.default"
       borderRight="1px solid"
-      borderColor={useColorModeValue("gray.100", "whiteAlpha.50")}
+      borderColor={borderColor}
       flexShrink={0}
     >
       <Box

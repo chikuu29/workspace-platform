@@ -41,7 +41,7 @@
                 "id": "MY_GYM",
                 "hidden": false,
                 "name": "MY GYM",
-                "target": "/app/myGym/GymView",
+                "target": "/app/myGym/home",
                 "actions": {
                     "onClick": ""
                 },

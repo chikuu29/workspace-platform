@@ -65,7 +65,7 @@ const NavbarActions = () => {
         size="sm"
         borderRadius="xl"
         onClick={handleRefresh}
-        _hover={{ bg: useColorModeValue("gray.100", "whiteAlpha.100") }}
+        _hover={{ bg: itemHoverBg }}
       >
         <Icon as={FiRefreshCw} boxSize={4} />
       </IconButton>
@@ -75,7 +75,7 @@ const NavbarActions = () => {
         variant="ghost"
         size="sm"
         borderRadius="xl"
-        _hover={{ bg: useColorModeValue("gray.100", "whiteAlpha.100") }}
+        _hover={{ bg: itemHoverBg }}
       />
 
       {/* Notifications */}
@@ -89,7 +89,7 @@ const NavbarActions = () => {
             variant="ghost"
             size="sm"
             borderRadius="xl"
-            _hover={{ bg: useColorModeValue("gray.100", "whiteAlpha.100") }}
+            _hover={{ bg: itemHoverBg }}
           >
             <Avatar.Root size="sm">
               <Avatar.Fallback

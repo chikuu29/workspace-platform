@@ -1,10 +1,14 @@
 import React from "react";
 import { Box, Text, SimpleGrid, HStack, Heading } from "@chakra-ui/react";
 import { WidgetRegistry } from "@/core/registry/WidgetRegistry";
-import KPITile from "@/core/widgets/KPITile";
+
 import type { SectionRendererProps } from "./types";
+import { log } from "node:console";
 
 const KPISectionRenderer: React.FC<SectionRendererProps> = ({ component, resolveData }) => {
+  console.log("Rendering KPISection with component:", component);
+  console.log("Data source:", resolveData);
+
   const records = component.dataSource ? resolveData(component.dataSource) : (component.KPIS || []);
   const columns = component.uiConfig?.columns || { base: 1, md: 2, lg: 3 };
 
@@ -16,6 +20,7 @@ const KPISectionRenderer: React.FC<SectionRendererProps> = ({ component, resolve
     };
     return aliases[rawWidget] || rawWidget;
   };
+  
 
   return (
     <Box {...(component.layout || {})}>

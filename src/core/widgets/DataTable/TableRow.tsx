@@ -15,9 +15,6 @@ interface TableRowProps<T> {
     index: number;
 }
 
-/**
- * SmartBadge (Premium version with subtle glow and gradients)
- */
 const SmartBadge = ({ value }: { value: any }) => {
     const val = String(value).toLowerCase();
     const colorMap: Record<string, string> = {
@@ -32,9 +29,9 @@ const SmartBadge = ({ value }: { value: any }) => {
     };
 
     let colorPalette = "gray";
-    for (const [key, c] of Object.entries(colorMap)) {
+    for (const [key, colorName] of Object.entries(colorMap)) {
         if (val.includes(key)) {
-            colorPalette = c;
+            colorPalette = colorName;
             break;
         }
     }
@@ -60,63 +57,83 @@ const SmartBadge = ({ value }: { value: any }) => {
 
 /**
  * TableRow
- * Enhanced with motion entry and hover selection accents.
+ * Animated body row with sticky first column and status badge rendering.
  */
 function TableRowComponent<T>({ row, columns, actions, borderColor, index }: TableRowProps<T>) {
-    const hoverBg = useColorModeValue("blue.50/40", "whiteAlpha.100");
+    const hoverBg = useColorModeValue("blue.50/35", "whiteAlpha.100");
     const textColor = useColorModeValue("gray.700", "whiteAlpha.900");
-    const cellBorderColor = useColorModeValue("gray.50/50", "whiteAlpha.50");
+    const cellBorderColor = useColorModeValue("gray.100", "whiteAlpha.200");
+    const zebraBg = useColorModeValue(index % 2 === 0 ? "white" : "gray.50", index % 2 === 0 ? "transparent" : "whiteAlpha.50");
 
     return (
         <MotionRow
-            initial={{ opacity: 0, y: 10 }}
+            role="group"
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.03 }}
+            transition={{ duration: 0.22, delay: Math.min(index * 0.02, 0.2) }}
             _hover={{ bg: hoverBg }}
+            bg={zebraBg}
             position="relative"
-            cursor="pointer"
         >
-            {columns.map((col, cIdx) => (
-                <Table.Cell
-                    key={String(col.key)}
-                    textAlign={col.textAlign || "left"}
-                    py={4}
-                    px={6}
-                    fontSize="13px"
-                    fontWeight="600"
-                    borderColor={cellBorderColor}
-                    color={textColor}
-                    position="relative"
-                >
-                    {/* Selection Accent on the first cell */}
-                    {cIdx === 0 && (
-                        <Box
-                            position="absolute"
-                            left={0}
-                            top={0}
-                            bottom={0}
-                            width="2px"
-                            bg="blue.500"
-                            opacity={0}
-                            transition="opacity 0.2s"
-                            _groupHover={{ opacity: 1 }}
-                        />
-                    )}
+            {columns.map((col, cIdx) => {
+                const rawValue = row[col.key as keyof T];
+                const normalizedValue = rawValue ?? "-";
+                const shouldRenderBadge = col.isStatus || String(col.key).toLowerCase().includes("status") || String(col.key).toLowerCase().includes("plan");
 
-                    {col.renderComponent ? (
-                        col.renderComponent(row[col.key as keyof T], row)
-                    ) : col.isStatus || String(col.key).toLowerCase().includes('status') || String(col.key).toLowerCase().includes('plan') ? (
-                        <SmartBadge value={String(row[col.key as keyof T])} />
-                    ) : (
-                        <Text transition="color 0.2s">
-                            {String(row[col.key as keyof T] || "-")}
-                        </Text>
-                    )}
-                </Table.Cell>
-            ))}
+                return (
+                    <Table.Cell
+                        key={String(col.key)}
+                        textAlign={col.textAlign || "left"}
+                        py={3.5}
+                        px={5}
+                        fontSize="13px"
+                        fontWeight="600"
+                        borderColor={cellBorderColor}
+                        color={textColor}
+                        whiteSpace="nowrap"
+                        position="relative"
+                        zIndex={5}
+                    >
+                        {cIdx === 0 && (
+                            <Box
+                                position="absolute"
+                                left={0}
+                                top={0}
+                                bottom={0}
+                                width="2px"
+                                bg="blue.500"
+                                opacity={0}
+                                transition="opacity 0.2s"
+                                _groupHover={{ opacity: 1 }}
+                            />
+                        )}
+
+                        {col.renderComponent ? (
+                            col.renderComponent(normalizedValue, row)
+                        ) : shouldRenderBadge ? (
+                            <SmartBadge value={String(normalizedValue)} />
+                        ) : (
+                            <Text>{String(normalizedValue)}</Text>
+                        )}
+                    </Table.Cell>
+                );
+            })}
 
             {actions && actions.length > 0 && (
-                <Table.Cell py={4} px={6} textAlign="right" borderColor={cellBorderColor}>
+                <Table.Cell
+                    py={3.5}
+                    px={5}
+                    textAlign="right"
+                    borderColor={cellBorderColor}
+                    whiteSpace="nowrap"
+                    width="1%"
+                    position="sticky"
+                    right={0}
+                    zIndex={7}
+                    bg="inherit"
+                    _groupHover={{ bg: "inherit" }}
+                    boxShadow={useColorModeValue("inset 1px 0 0 var(--chakra-colors-gray-100)", "inset 1px 0 0 rgba(255,255,255,0.16)")}
+                >
                     <ActionMenu row={row} actions={actions} />
                 </Table.Cell>
             )}

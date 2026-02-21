@@ -3,6 +3,7 @@
 import { IconButton, IconButtonProps } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
 import { BsFullscreen, BsFullscreenExit } from "react-icons/bs"
+import { MdFullscreen, MdFullscreenExit } from "react-icons/md"
 
 interface FullscreenButtonProps extends IconButtonProps { }
 
@@ -39,7 +40,7 @@ export const FullscreenButton = (props: FullscreenButtonProps) => {
       // rounded="full"
       {...props}
     >
-      {isFullscreen ? <BsFullscreenExit /> : <BsFullscreen />}
+      {isFullscreen ? <MdFullscreenExit  /> : <MdFullscreen  />}
     </IconButton>
   )
 }

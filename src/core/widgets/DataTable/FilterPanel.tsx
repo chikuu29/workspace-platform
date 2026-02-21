@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { HStack, Input, Box, Button } from "@chakra-ui/react";
+import { Stack, Input, Box, Button } from "@chakra-ui/react";
 import { LuSearch, LuX } from "react-icons/lu";
 import { InputGroup } from "@/components/ui/input-group";
 import { useColorModeValue } from "@/components/ui/color-mode";
@@ -13,7 +13,7 @@ interface FilterPanelProps {
 
 /**
  * FilterPanel
- * High-density premium search bar.
+ * Responsive search/filter bar used by DataTable.
  */
 const FilterPanelComponent: React.FC<FilterPanelProps> = ({
     searchQuery,
@@ -25,23 +25,23 @@ const FilterPanelComponent: React.FC<FilterPanelProps> = ({
     const borderColor = useColorModeValue("gray.100", "whiteAlpha.100");
 
     return (
-        <HStack gap={4} w="full" mb={6}>
+        <Stack direction={{ base: "column", md: "row" }} gap={3} w="full" mb={6}>
             <InputGroup
                 flex="1"
                 startElement={<LuSearch color="gray.400" />}
                 endElement={
-                    searchQuery && (
+                    searchQuery ? (
                         <Box
                             cursor="pointer"
                             onClick={onClear}
                             p={1}
                             borderRadius="full"
-                            _hover={{ color: "red.500", bg: "red.50/10" }}
+                            _hover={{ color: "red.500", bg: "red.50" }}
                             transition="all 0.2s"
                         >
                             <LuX size="14px" />
                         </Box>
-                    )
+                    ) : undefined
                 }
             >
                 <Input
@@ -52,7 +52,7 @@ const FilterPanelComponent: React.FC<FilterPanelProps> = ({
                     bg={bg}
                     borderWidth="1px"
                     borderColor={borderColor}
-                    h="45px"
+                    h="44px"
                     fontSize="sm"
                     fontWeight="600"
                     _focus={{
@@ -65,19 +65,20 @@ const FilterPanelComponent: React.FC<FilterPanelProps> = ({
             </InputGroup>
 
             <Button
-                variant="ghost"
+                variant="subtle"
                 size="sm"
                 onClick={onClear}
                 disabled={!searchQuery}
                 colorPalette="blue"
                 borderRadius="xl"
                 fontWeight="700"
-                px={6}
-                h="45px"
+                px={5}
+                h="44px"
+                w={{ base: "full", md: "auto" }}
             >
                 Clear Filters
             </Button>
-        </HStack>
+        </Stack>
     );
 };
 

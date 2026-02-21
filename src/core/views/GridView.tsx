@@ -10,38 +10,97 @@ import {
     Skeleton,
     HStack,
     Badge,
+    Button,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import DataTable from "../widgets/DataTable";
 import { DataTableColumn, DataTableAction } from "../widgets/DataTable/types";
 
-// Types for GridView Configuration
-export interface GridTableColumn extends DataTableColumn<any> { }
+type Trend = "up" | "down" | "neutral";
 
-export interface SubKPIConfig {
+type DashboardSectionType =
+    | "KPI_CARD"
+    | "TABLE_VIEW"
+    | "CHART_VIEW"
+    | "FILTER_SECTION"
+    | "ACTION_BUTTON";
+
+interface GridTableColumn extends DataTableColumn<any> { }
+
+interface SubKPIConfig {
     label: string;
     value: string | number;
-    trend?: "up" | "down" | "neutral";
+    trend?: Trend;
 }
 
-export interface KPICardConfig {
+interface KPICardConfig {
     label: string;
     value: string | number;
     helpText?: string;
-    trend?: "up" | "down" | "neutral";
+    trend?: Trend;
     colorPalette?: string;
     subKpis?: SubKPIConfig[];
 }
 
-export interface GridViewConfig {
-    title: string;
+interface DataSourceConfig {
+    type: "inline" | "api";
+    data?: any[];
+    fallbackData?: any[];
+    api?: {
+        path: string;
+        method?: "GET" | "POST";
+        params?: Record<string, any>;
+    };
+}
+
+interface ActionConfig {
+    label: string;
+    icon?: string;
+    colorPalette?: string;
+    isDanger?: boolean;
+    requiresConfirm?: boolean;
+    confirmMessage?: string;
+    event?: string;
+}
+
+interface DashboardSection {
+    id: string;
+    uiType?: DashboardSectionType;
+    UI_TYPE?: DashboardSectionType | { type: DashboardSectionType };
+    title?: string;
+    description?: string;
+    dataSource?: string;
+    actionRef?: string;
+    props?: Record<string, any>;
+}
+
+interface GridViewConfig {
+    title?: string;
     appMeta?: {
         appName: string;
         version: string;
+        owner?: string;
         [key: string]: any;
     };
-    kpis: KPICardConfig[];
-    tableConfig: {
+    layout?: {
+        maxW?: string;
+        contentPadding?: Record<string, any>;
+        sectionGap?: number;
+    };
+    dataSource?: Record<string, DataSourceConfig>;
+    UI_VIEW?: {
+        schema?: {
+            sections?: DashboardSection[];
+        };
+    };
+    uiSchema?: {
+        sections: DashboardSection[];
+    };
+    actions?: Record<string, ActionConfig[]>;
+
+    // Legacy fallback compatibility
+    kpis?: KPICardConfig[];
+    tableConfig?: {
         title: string;
         apiPath: string;
         columns: GridTableColumn[];
@@ -54,7 +113,19 @@ export interface GridViewConfig {
     };
 }
 
-// Sub-component for Nested KPI Tile
+const FALLBACK_TABLE_DATA = [
+    { id: "M001", name: "John Doe", joinDate: "2024-01-15", plan: "Annual Platinum", status: "Active", lastVisit: "2 hours ago", trainer: "Alex" },
+    { id: "M002", name: "Jane Smith", joinDate: "2024-02-01", plan: "Monthly Basic", status: "Active", lastVisit: "5 hours ago", trainer: "Sarah" },
+    { id: "M003", name: "Robert Brown", joinDate: "2023-11-20", plan: "6-Month Flex", status: "Inactive", lastVisit: "3 days ago", trainer: "Alex" },
+    { id: "M004", name: "Alice Wilson", joinDate: "2024-02-12", plan: "Annual Platinum", status: "Active", lastVisit: "1 hour ago", trainer: "Michael" },
+    { id: "M005", name: "Chris Evans", joinDate: "2024-03-01", plan: "Monthly Basic", status: "Active", lastVisit: "Just now", trainer: "Sarah" },
+    { id: "M006", name: "Emma Stone", joinDate: "2024-03-05", plan: "Annual Platinum", status: "Active", lastVisit: "1 day ago", trainer: "Michael" },
+];
+
+const ANALYTICS_COMPONENT_REGISTRY: Record<string, () => Promise<{ default: React.ComponentType<any> }>> = {
+    RevenuAnalytics: () => import("@/features/modules/gym/RevenuAnalytics"),
+};
+
 const SubKPITile = React.memo(({ config }: { config: SubKPIConfig }) => {
     const labelColor = useColorModeValue("gray.500", "gray.400");
     const valueColor = useColorModeValue("gray.700", "gray.200");
@@ -71,7 +142,6 @@ const SubKPITile = React.memo(({ config }: { config: SubKPIConfig }) => {
     );
 });
 
-// Sub-component for KPI Card (Memoized)
 const KPICard = React.memo(({ config }: { config: KPICardConfig }) => {
     const bg = useColorModeValue("white", "whiteAlpha.50");
     const borderColor = useColorModeValue("gray.100", "whiteAlpha.100");
@@ -119,16 +189,19 @@ const KPICard = React.memo(({ config }: { config: KPICardConfig }) => {
     );
 });
 
-// Analytics Section (Internal Placeholder)
-const AnalyticsLoader = ({ id }: { id: string }) => {
+const AnalyticsLoader = ({ componentKey }: { componentKey: string }) => {
     const Component = useMemo(() => {
-        if (id === "RevenuAnalytics") {
-            return lazy(() => import("@/features/modules/gym/RevenuAnalytics"));
-        }
-        return null;
-    }, [id]);
+        const importFactory = ANALYTICS_COMPONENT_REGISTRY[componentKey];
+        return importFactory ? lazy(importFactory) : null;
+    }, [componentKey]);
 
-    if (!Component) return null;
+    if (!Component) {
+        return (
+            <Box p={6} borderRadius="xl" border="1px dashed" borderColor="gray.200">
+                <Text fontSize="sm" color="gray.500">Analytics component '{componentKey}' is not registered.</Text>
+            </Box>
+        );
+    }
 
     return (
         <Suspense fallback={<Skeleton height="300px" borderRadius="3xl" />}>
@@ -137,50 +210,140 @@ const AnalyticsLoader = ({ id }: { id: string }) => {
     );
 };
 
-/**
- * GridView
- * Master layout for dashbaord views.
- * Orchestrates KPIs, Analytics, and the Advanced DataTable.
- */
 const GridView: React.FC<{ config: GridViewConfig }> = ({ config }) => {
-    // 1. Mock Table Data (Usually fetched from config.tableConfig.apiPath)
-    const tableData = useMemo(() => [
-        { id: "M001", name: "John Doe", joinDate: "2024-01-15", plan: "Annual Platinum", status: "Active", lastVisit: "2 hours ago", trainer: "Alex" },
-        { id: "M002", name: "Jane Smith", joinDate: "2024-02-01", plan: "Monthly Basic", status: "Active", lastVisit: "5 hours ago", trainer: "Sarah" },
-        { id: "M003", name: "Robert Brown", joinDate: "2023-11-20", plan: "6-Month Flex", status: "Inactive", lastVisit: "3 days ago", trainer: "Alex" },
-        { id: "M004", name: "Alice Wilson", joinDate: "2024-02-12", plan: "Annual Platinum", status: "Active", lastVisit: "1 hour ago", trainer: "Michael" },
-        { id: "M005", name: "Chris Evans", joinDate: "2024-03-01", plan: "Monthly Basic", status: "Active", lastVisit: "Just now", trainer: "Sarah" },
-        { id: "M006", name: "Emma Stone", joinDate: "2024-03-05", plan: "Annual Platinum", status: "Active", lastVisit: "1 day ago", trainer: "Michael" },
-    ], []);
+    const contentPadding = config.layout?.contentPadding || { base: 4, md: 8 };
+    const sectionGap = config.layout?.sectionGap ?? 10;
+    const maxW = config.layout?.maxW || "1600px";
 
-    // 2. Table Actions
-    const tableActions: DataTableAction<any>[] = useMemo(() => [
-        {
-            label: "Edit Member",
-            icon: "FcSettings",
-            onClick: (row) => console.log("Edit", row),
-        },
-        {
-            label: "Delete",
-            icon: "FcDeleteDatabase",
-            isDanger: true,
-            requiresConfirm: true,
-            onClick: (row) => console.log("Delete", row),
-            isVisible: (row) => row.status !== 'Active' // Only delete inactive members
+    const resolveData = (dataSourceKey?: string): any[] => {
+        if (!dataSourceKey) return [];
+        const source = config.dataSource?.[dataSourceKey];
+        if (!source) return [];
+        if (source.type === "inline") return source.data || [];
+        return source.fallbackData || [];
+    };
+
+    const resolveActions = (actionRef?: string, sectionId?: string): DataTableAction<any>[] => {
+        const rawActions = actionRef ? config.actions?.[actionRef] || [] : [];
+
+        return rawActions.map((action) => ({
+            label: action.label,
+            icon: action.icon,
+            colorPalette: action.colorPalette,
+            isDanger: action.isDanger,
+            requiresConfirm: action.requiresConfirm,
+            confirmMessage: action.confirmMessage,
+            onClick: (row: any) => {
+                const event = action.event || action.label;
+                console.log(`[GridView Action] ${event}`, { row, sectionId });
+            },
+        }));
+    };
+
+    const sections = useMemo<DashboardSection[]>(() => {
+        if (config.UI_VIEW?.schema?.sections?.length) {
+            return config.UI_VIEW.schema.sections;
         }
-    ], []);
 
-    const kpiSection = useMemo(() => (
-        <SimpleGrid columns={{ base: 1, md: 2, lg: 3, xl: 3 }} gap={6} w="100%">
-            {config.kpis.map((kpi, index) => (
-                <KPICard key={`${kpi.label}-${index}`} config={kpi} />
-            ))}
-        </SimpleGrid>
-    ), [config.kpis]);
+        if (config.uiSchema?.sections?.length) {
+            return config.uiSchema.sections;
+        }
+
+        const legacySections: DashboardSection[] = [];
+        if (config.kpis?.length) {
+            legacySections.push({ id: "legacy-kpis", UI_TYPE: "KPI_CARD", title: "KPI Overview" });
+        }
+        if (config.analytics?.components?.length) {
+            legacySections.push({ id: "legacy-analytics", UI_TYPE: "CHART_VIEW", title: "Analytics" });
+        }
+        if (config.tableConfig?.columns?.length) {
+            legacySections.push({ id: "legacy-table", UI_TYPE: "TABLE_VIEW", title: config.tableConfig.title });
+        }
+        return legacySections;
+    }, [config]);
+
+    const renderSection = (section: DashboardSection) => {
+        const sectionType = getSectionType(section);
+        if (!sectionType) return null;
+
+        if (sectionType === "KPI_CARD") {
+            const kpis: KPICardConfig[] = section.dataSource
+                ? resolveData(section.dataSource)
+                : (config.kpis || []);
+
+            const columns = section.props?.columns || { base: 1, md: 2, lg: 3, xl: 3 };
+            return (
+                <Box key={section.id}>
+                    {section.title && (
+                        <Heading size="md" mb={4}>{section.title}</Heading>
+                    )}
+                    <SimpleGrid columns={columns} gap={6} w="100%">
+                        {kpis.map((kpi, index) => (
+                            <KPICard key={`${kpi.label}-${index}`} config={kpi} />
+                        ))}
+                    </SimpleGrid>
+                </Box>
+            );
+        }
+
+        if (sectionType === "TABLE_VIEW") {
+            const tableData = section.dataSource
+                ? resolveData(section.dataSource)
+                : FALLBACK_TABLE_DATA;
+
+            const tableColumns: GridTableColumn[] = section.props?.columns || config.tableConfig?.columns || [];
+            const actions = resolveActions(section.actionRef, section.id);
+
+            return (
+                <Box key={section.id}>
+                    <DataTable
+                        title={section.title || config.tableConfig?.title || "Data Table"}
+                        data={tableData}
+                        columns={tableColumns as any}
+                        actions={actions}
+                        initialState={section.props?.initialState}
+                    />
+                </Box>
+            );
+        }
+
+        if (sectionType === "CHART_VIEW") {
+            const analyticsComponents = section.props?.components || config.analytics?.components || [];
+            return (
+                <Box key={section.id}>
+                    {section.title && (
+                        <Heading size="md" mb={4}>{section.title}</Heading>
+                    )}
+                    <VStack align="stretch" gap={4}>
+                        {analyticsComponents.map((comp: any) => (
+                            <AnalyticsLoader
+                                key={comp.id || comp.componentKey}
+                                componentKey={comp.componentKey || comp.id}
+                            />
+                        ))}
+                    </VStack>
+                </Box>
+            );
+        }
+
+        if (sectionType === "ACTION_BUTTON") {
+            const buttonActions = resolveActions(section.actionRef, section.id);
+            return (
+                <HStack key={section.id} justify="end" gap={3}>
+                    {buttonActions.map((action) => (
+                        <Button key={action.label} onClick={() => action.onClick({})} colorPalette={action.colorPalette || "blue"}>
+                            {action.label}
+                        </Button>
+                    ))}
+                </HStack>
+            );
+        }
+
+        return null;
+    };
 
     return (
-        <VStack gap={10} align="stretch" w="100%" p={{ base: 4, md: 8 }} maxW="1600px" mx="auto">
-            {/* Header Section */}
+        <VStack gap={sectionGap} align="stretch" w="100%" p={contentPadding} maxW={maxW} mx="auto">
             <Flex direction={{ base: "column", sm: "row" }} justify="space-between" align={{ base: "start", sm: "center" }} gap={4}>
                 <VStack align="start" gap={1}>
                     <Heading size="xl" fontWeight="900" letterSpacing="tight">
@@ -189,37 +352,24 @@ const GridView: React.FC<{ config: GridViewConfig }> = ({ config }) => {
                     {config.appMeta && (
                         <HStack gap={3}>
                             <Badge variant="solid" colorPalette="blue" size="sm">v{config.appMeta.version}</Badge>
-                            <Text fontSize="xs" fontWeight="600" color="gray.500">System Owner: {config.appMeta.owner}</Text>
+                            {config.appMeta.owner && (
+                                <Text fontSize="xs" fontWeight="600" color="gray.500">System Owner: {config.appMeta.owner}</Text>
+                            )}
                         </HStack>
                     )}
                 </VStack>
             </Flex>
 
-            {/* KPI Section */}
-            <Box>
-                {kpiSection}
-            </Box>
-
-            {/* Analytics Section - Lazy Loaded */}
-            {config.analytics && config.analytics.components.length > 0 && (
-                <Box>
-                    {config.analytics.components.map(comp => (
-                        <AnalyticsLoader key={comp.id} id={comp.id} />
-                    ))}
-                </Box>
-            )}
-
-            {/* Advanced DataTable Section */}
-            <Box>
-                <DataTable
-                    title={config.tableConfig.title}
-                    data={tableData}
-                    columns={config.tableConfig.columns as any}
-                    actions={tableActions}
-                />
-            </Box>
+            {sections.map((section) => renderSection(section))}
         </VStack>
     );
 };
 
 export default React.memo(GridView);
+    const getSectionType = (section: DashboardSection): DashboardSectionType | null => {
+        if (section.UI_TYPE) {
+            if (typeof section.UI_TYPE === "string") return section.UI_TYPE;
+            return section.UI_TYPE.type;
+        }
+        return section.uiType || null;
+    };

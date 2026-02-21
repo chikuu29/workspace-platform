@@ -1,0 +1,121 @@
+{
+  "_id": {
+    "$oid": "699961ebbd7b09b9178a0637"
+  },
+  "id": "3",
+  "pageName": "GymDashboard",
+  "route": "GymDashboard",
+  "appName": "myGym",
+  "appMeta": {
+    "appName": "Gym",
+    "viewName": "GymDashboard",
+    "viewId": "2",
+    "version": "1.0.0",
+    "owner": "Suryanarayan Biswal",
+    "createdAt": "2024-11-19"
+  },
+  "title": "Gym Operations Dashboard",
+  "kpis": [
+    {
+      "label": "Total Revenue",
+      "value": "$45,231.89",
+      "helpText": "+20.1% from last month",
+      "trend": "up",
+      "colorPalette": "blue",
+      "subKpis": [
+        {
+          "label": "Memberships",
+          "value": "$32,100"
+        },
+        {
+          "label": "PT Sessions",
+          "value": "$13,131"
+        }
+      ]
+    },
+    {
+      "label": "Total Members",
+      "value": "1,234",
+      "helpText": "+12 new today",
+      "trend": "up",
+      "colorPalette": "green",
+      "subKpis": [
+        {
+          "label": "Active",
+          "value": "892"
+        },
+        {
+          "label": "Inactive",
+          "value": "342"
+        }
+      ]
+    },
+    {
+      "label": "Staff Overview",
+      "value": "63",
+      "helpText": "All departments",
+      "trend": "neutral",
+      "colorPalette": "purple",
+      "subKpis": [
+        {
+          "label": "Trainers",
+          "value": "48"
+        },
+        {
+          "label": "Front Desk",
+          "value": "15"
+        }
+      ]
+    }
+  ],
+  "tableConfig": {
+    "title": "Recent Member Activities",
+    "apiPath": "gym/members/activities",
+    "columns": [
+      {
+        "label": "ID",
+        "key": "id",
+        "width": "80px",
+        "textAlign": "center"
+      },
+      {
+        "label": "Member Name",
+        "key": "name",
+        "width": "200px",
+        "isSortable": true
+      },
+      {
+        "label": "Plan",
+        "key": "plan",
+        "width": "120px",
+        "isSortable": true
+      },
+      {
+        "label": "Assigned Trainer",
+        "key": "trainer",
+        "width": "150px"
+      },
+      {
+        "label": "Status",
+        "key": "status",
+        "width": "100px",
+        "textAlign": "center",
+        "isSortable": true
+      },
+      {
+        "label": "Last Visit",
+        "key": "lastVisit",
+        "width": "150px",
+        "isSortable": true
+      }
+    ]
+  },
+  "analytics": {
+    "components": [
+      {
+        "name": "Revenue Analytics",
+        "id": "RevenuAnalytics"
+      }
+    ]
+  }
+}

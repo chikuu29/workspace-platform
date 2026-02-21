@@ -1,8 +1,8 @@
 import React, { memo, useEffect, useState } from "react";
-import { Box, VStack, Skeleton, SkeletonCircle, HStack, Text } from "@chakra-ui/react";
-import GridView, { type GridViewConfig } from "@/core/views/GridView";
+import { Box, VStack, Skeleton, HStack, Text, SimpleGrid } from "@chakra-ui/react";
 import { GETAPI } from "@/app/api";
 import FallbackRenderer from "@/core/renderer/FallbackRenderer";
+import ViewRenderer from "@/core/renderer/ViewRenderer";
 
 /**
  * DashboardSkeleton
@@ -25,11 +25,10 @@ const DashboardSkeleton = memo(() => (
 
 /**
  * GymView
- * Refactored to fetch its configuration dynamically via GETAPI.
- * Decoupled from static JSON files for production scalability.
+ * Fetches dashboard template and delegates view selection to ViewRenderer using UI_TYPE.
  */
-const GymView = memo((params: any) => {
-  const [config, setConfig] = useState<GridViewConfig | null>(null);
+const GymView = memo(() => {
+  const [config, setConfig] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<boolean>(false);
 
@@ -45,7 +44,7 @@ const GymView = memo((params: any) => {
     }).subscribe({
       next: (res: any) => {
         if (res.success && res.result?.length > 0) {
-          setConfig(res.result[0] as GridViewConfig);
+          setConfig(res.result[0]);
         } else {
           setError(true);
         }
@@ -71,14 +70,17 @@ const GymView = memo((params: any) => {
     );
   }
 
-  return (
-    <GridView config={config} />
-  );
-});
+  if (!config?.UI_TYPE?.type) {
+    return (
+      <FallbackRenderer
+        reason="MISSING_UI_TYPE"
+        config={config}
+      />
+    );
+  }
 
-import { SimpleGrid } from "@chakra-ui/react"; // Utility import for skeleton
+  return <ViewRenderer config={config} />;
+});
 
 GymView.displayName = "GymView";
 export default GymView;
-
-

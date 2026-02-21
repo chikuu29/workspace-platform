@@ -90,7 +90,7 @@ const FormView = ({ config }: any) => {
                     direction={{ base: "column", md: "row" }}
                     justify="space-between"
                     align={{ base: "start", md: "flex-end" }}
-                    mb={{ base: "8", md: "12" }}
+                    mb={{ base: "8", md: "8" }}
                     gap="6"
                 >
                     <VStack align="start" gap="4">
@@ -107,7 +107,7 @@ const FormView = ({ config }: any) => {
                     <HStack gap="4">
                         {actions.map((btn: any, idx: number) => {
                             const isSubmit = btn.event === 'submit';
-                            return (btn.position === 'top' || !btn.position) && (
+                            return (
                                 <Button
                                     key={btn.name || idx}
                                     onClick={isSubmit ? undefined : () => handleAction(btn)}

@@ -1,39 +1,39 @@
 
-import React from "react";
-import { Text } from "@chakra-ui/react";
-import { ViewRegistry } from "../registry/ViewRegistry";
+import React, { useMemo } from "react";
+import { ViewRegistry, ViewType } from "../registry/ViewRegistry";
+import FallbackRenderer from "./FallbackRenderer";
 import "../views";
 import "../widgets"; // Ensure all widgets are registered globally
 
 const ViewRenderer = ({ config }: { config: any }) => {
-
-    const { UI_TYPE, ...rest } = config;
-    console.log("UI_TYPE", UI_TYPE);
-
+    console.log("========ViewRenderer========s")
+    const UI_TYPE = config?.UI_TYPE;
     if (!UI_TYPE) {
-        return <>
-            <Text>UI_TYPE is not defined</Text>
-        </>
+        return <FallbackRenderer reason="MISSING_UI_TYPE" config={config} />;
     }
-    const { type, ...restUIConfig } = UI_TYPE;
+    // Use useMemo for component lookup to optimize performance
+    const Component = useMemo(() => {
+        if (!UI_TYPE?.type) return null;
+        return ViewRegistry.get(UI_TYPE.type as ViewType);
+    }, [UI_TYPE?.type]);
 
-    if (type === "") {
-        return <>
-            <Text>UI_TYPE is not defined</Text>
-        </>
+
+
+    if (!UI_TYPE.type || UI_TYPE.type === "") {
+        return <FallbackRenderer reason="INVALID_TYPE" config={config} />;
     }
-    const Component = ViewRegistry.get(type);
 
-    if (Component) {
+    if (!Component) {
         return (
-            <Component config={config} />
+            <FallbackRenderer
+                reason="COMPONENT_NOT_FOUND"
+                type={UI_TYPE.type}
+                config={config}
+            />
         );
     }
 
-
-    return <>
-        <Text>UI_TYPE is not defined</Text>
-    </>
+    return <Component config={config} />;
 };
 
 export default React.memo(ViewRenderer);

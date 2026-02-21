@@ -1,8 +1,9 @@
-import { Box, Flex, Input, Field, Text } from "@chakra-ui/react";
+import { Box, Flex, Input, Field, Text, HStack } from "@chakra-ui/react";
 import { useColorModeValue } from "../../components/ui/color-mode";
 import { useEffect, useState, useMemo, memo, useCallback } from "react";
 import React from "react";
 import { FieldError, useFormContext, useWatch } from "react-hook-form";
+import { CloseButton } from "../../components/ui/close-button";
 
 import { ruleEngine } from "../engine/logicEngine";
 
@@ -16,6 +17,7 @@ interface TEXTFIELD {
   hidden?: boolean;
   widget?: string;
   oneLiner?: boolean;
+  enableClear?: boolean;
   outLineBorder?: boolean;
   maxLength?: number;
   minLength?: number;
@@ -34,6 +36,7 @@ const TextField = ({
   hidden = false,
   widget,
   oneLiner = false,
+  enableClear = false,
   outLineBorder = true,
   mandatory = false,
   events,
@@ -57,13 +60,19 @@ const TextField = ({
   const handleInputChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = event.target.value;
-      // methods.setValue(name, newValue, { shouldValidate: true }); // Handled by RHF onChange now
       if (events) {
         ruleEngine.processEvents(events, newValue, 'change', methods);
       }
     },
-    [methods, name, events]
+    [methods, events]
   );
+
+  const handleClear = useCallback(() => {
+    methods.setValue(name, "", { shouldValidate: true });
+    if (events) {
+      ruleEngine.processEvents(events, "", 'change', methods);
+    }
+  }, [methods, name, events]);
 
   const labelWidth = oneLiner ? { base: "full", md: "35%" } : "full";
   const inputWidth = oneLiner ? { base: "full", md: "65%" } : "full";
@@ -120,51 +129,61 @@ const TextField = ({
             </Box>
           )}
 
-          <Box w={inputWidth} position="relative">
-            {(() => {
-              const { onChange, ...restRegister } = methods.register(name, {
-                required: mandatory ? `${text} is required` : false,
-                maxLength: maxLength ? { value: maxLength, message: `Max length is ${maxLength}` } : undefined,
-                minLength: minLength ? { value: minLength, message: `Min length is ${minLength}` } : undefined,
-                pattern: patternValue ? {
-                  value: patternValue,
-                  message: props.patternMessage || (type === "email" ? "Invalid email address" : "Invalid format")
-                } : undefined
-              });
+          <Box w={inputWidth}>
+            <HStack gap={2} w="full" align="center">
+              {(() => {
+                const { onChange, ...restRegister } = methods.register(name, {
+                  required: mandatory ? `${text} is required` : false,
+                  maxLength: maxLength ? { value: maxLength, message: `Max length is ${maxLength}` } : undefined,
+                  minLength: minLength ? { value: minLength, message: `Min length is ${minLength}` } : undefined,
+                  pattern: patternValue ? {
+                    value: patternValue,
+                    message: props.patternMessage || (type === "email" ? "Invalid email address" : "Invalid format")
+                  } : undefined
+                });
 
-              return (
-                <Input
-                  {...restRegister}
-                  type={type}
-                  id={name}
-                  placeholder={oneLiner ? description : ""}
-                  size="md"
-                  variant="outline"
-                  disabled={disabled}
-                  bg={useColorModeValue("white", "whiteAlpha.50")}
-                  borderRadius="lg"
-                  borderWidth="1.5px"
-                  borderColor={useColorModeValue("gray.200", "whiteAlpha.200")}
-                  _hover={{
-                    borderColor: useColorModeValue("gray.300", "whiteAlpha.400"),
-                  }}
-                  _focus={{
-                    borderColor: "blue.500",
-                    boxShadow: "0 0 0 1px rgba(66, 153, 225, 0.6)",
-                    bg: useColorModeValue("white", "whiteAlpha.100"),
-                  }}
-                  _invalid={{
-                    borderColor: "red.500",
-                    boxShadow: "0 0 0 1px rgba(229, 62, 62, 0.6)",
-                  }}
-                  transition="all 0.2s"
-                  onChange={(e) => {
-                    onChange(e); // Call RHF's onChange
-                    handleInputChange(e); // Call our custom logic for rules
-                  }}
+                return (
+                  <Input
+                    {...restRegister}
+                    type={type}
+                    id={name}
+                    placeholder={oneLiner ? description : ""}
+                    size="md"
+                    variant="outline"
+                    disabled={disabled}
+                    flex="1"
+                    bg={useColorModeValue("white", "whiteAlpha.50")}
+                    borderRadius="lg"
+                    borderWidth="1.5px"
+                    borderColor={useColorModeValue("gray.200", "whiteAlpha.200")}
+                    _hover={{
+                      borderColor: useColorModeValue("gray.300", "whiteAlpha.400"),
+                    }}
+                    _focus={{
+                      borderColor: "blue.500",
+                      boxShadow: "0 0 0 1px rgba(66, 153, 225, 0.6)",
+                      bg: useColorModeValue("white", "whiteAlpha.100"),
+                    }}
+                    _invalid={{
+                      borderColor: "red.500",
+                      boxShadow: "0 0 0 1px rgba(229, 62, 62, 0.6)",
+                    }}
+                    transition="all 0.2s"
+                    onChange={(e) => {
+                      onChange(e); // Call RHF's onChange
+                      handleInputChange(e); // Call our custom logic for rules
+                    }}
+                  />
+                );
+              })()}
+              {enableClear && value && !disabled && (
+                <CloseButton
+                  size="sm"
+                  onClick={handleClear}
+                  _hover={{ bg: "transparent", color: "red.500" }}
                 />
-              );
-            })()}
+              )}
+            </HStack>
 
             <Flex justify="flex-end" mt={1} gap={4}>
               {maxLength && (

@@ -34,7 +34,7 @@
                 "styles": {
                     "variant": "outline"
                 },
-                "hidden": true,
+                "hidden": false,
                 "oneLiner": true,
                 "required": true,
                 "event": "draft"
@@ -60,12 +60,21 @@
                         "iconName": "LuUser",
                         "widgets": [
                             {
-                                "name": "memberName",
-                                "text": "Full Name",
-                                "description": "Enter member's legal name as per ID",
+                                "name": "memberFirstName",
+                                "text": "First Name",
+                                "description": "Enter member's first name",
                                 "widget": "textField",
                                 "oneLiner": true,
-                                "mandatory": true,
+                                "required": true,
+                                "maxLength": 50
+                            },
+                            {
+                                "name": "memberLastName",
+                                "text": "Last Name",
+                                "description": "Enter member's last name",
+                                "widget": "textField",
+                                "oneLiner": true,
+                                "required": true,
                                 "maxLength": 50
                             },
                             {
@@ -113,7 +122,7 @@
                                 "description": "Current permanent residence details",
                                 "widget": "textAreaField",
                                 "oneLiner": true,
-                                "mandatory": false
+                                "required": false
                             }
                         ]
                     },

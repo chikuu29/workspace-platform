@@ -9,6 +9,8 @@ import StepperWidget from './Stepper';
 import KPITile from './KPITile';
 import KPITable from './KPITable';
 import TabsWidget from './TabsWidget';
+import DateField from './DateField';
+import DateTimeField from './DateTimeField';
 
 // Register widgets
 ComponentRegistry.register('textField', TextField);
@@ -21,5 +23,7 @@ ComponentRegistry.register('stepper', StepperWidget);
 ComponentRegistry.register('kpi', KPITile);
 ComponentRegistry.register('kpiTable', KPITable);
 ComponentRegistry.register('tabs', TabsWidget);
+ComponentRegistry.register('dateField', DateField);
+ComponentRegistry.register('dateAndTimeField', DateTimeField);
 
-export { TextField, RadioField, TextArea, UploadField, CollapsiblePanel, Grid, StepperWidget, KPITile, KPITable, TabsWidget };
+export { TextField, RadioField, TextArea, UploadField, CollapsiblePanel, Grid, StepperWidget, KPITile, KPITable, TabsWidget, DateField, DateTimeField };

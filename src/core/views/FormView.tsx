@@ -16,14 +16,13 @@ import "../widgets";
 import AsyncLoadIcon from "@/utils/hooks/AsyncLoadIcon";
 import { useFormStore } from "../store/useFormStore";
 import { appEventRegistry } from "../registry/AppEventRegistry";
-import { Alert } from "@/components/ui/alert";
-
-interface FormActionFeedback {
-    status: "success" | "error";
-    message: string;
-}
+import { AppAlertPayload, buildApiResponseAlert } from "@/core/utils/apiResponseAlert";
+import ApiResponseModalAlert from "@/core/components/ApiResponseModalAlert";
+import { useDispatch } from "react-redux";
+import { startLoading, stopLoading } from "@/app/slices/loader/appLoaderSlice";
 
 const FormView = ({ config }: any) => {
+    const dispatch = useDispatch();
     const layoutStyles = config?.UI_TYPE?.layoutStyles || {};
     const cardBg = useColorModeValue("white", "rgba(15, 23, 42, 0.8)");
     const borderColor = useColorModeValue("gray.200", "rgba(56, 189, 248, 0.1)");
@@ -58,7 +57,8 @@ const FormView = ({ config }: any) => {
     }, [config]);
 
     const [submittedData, setSubmittedData] = React.useState<any>(null);
-    const [actionFeedback, setActionFeedback] = React.useState<FormActionFeedback | null>(null);
+    const [actionFeedback, setActionFeedback] = React.useState<AppAlertPayload | null>(null);
+    const [isResponseModalOpen, setIsResponseModalOpen] = React.useState(false);
     const [isEventInProgress, setIsEventInProgress] = React.useState(false);
     const [pendingEventName, setPendingEventName] = React.useState<string | null>(null);
     const formId = React.useId();
@@ -73,6 +73,7 @@ const FormView = ({ config }: any) => {
 
         setIsEventInProgress(true);
         setPendingEventName(eventName);
+        dispatch(startLoading(`Processing ${eventName}...`));
 
         try {
             const result = await appEventRegistry.executeEvent(
@@ -82,17 +83,21 @@ const FormView = ({ config }: any) => {
                 config
             );
 
-            setActionFeedback({
-                status: result.success ? "success" : "error",
-                message: result.message,
+            const alertPayload = buildApiResponseAlert(result, {
+                defaultSuccessMessage: "Action completed successfully.",
+                defaultErrorMessage: "Action failed. Please try again.",
             });
+
+            setActionFeedback(alertPayload);
+            setIsResponseModalOpen(true);
 
             return result;
         } finally {
             setIsEventInProgress(false);
             setPendingEventName(null);
+            dispatch(stopLoading());
         }
-    }, [actionEventConfig, config, isEventInProgress]);
+    }, [actionEventConfig, config, dispatch, isEventInProgress]);
 
     const handleFormSubmit = useCallback(async (data: any) => {
         if (isEventInProgress) return;
@@ -159,15 +164,6 @@ const FormView = ({ config }: any) => {
                     </HStack>
                 </Flex>
 
-                {actionFeedback && (
-                    <Alert
-                        status={actionFeedback.status as any}
-                        title={actionFeedback.message}
-                        mb={4}
-                        rounded="xl"
-                    />
-                )}
-
                 <Box
                     rounded="3xl"
                     shadow="xl"
@@ -197,9 +193,14 @@ const FormView = ({ config }: any) => {
                     </Box>
                 )}
             </Box>
+
+            <ApiResponseModalAlert
+                payload={actionFeedback}
+                open={isResponseModalOpen}
+                onClose={() => setIsResponseModalOpen(false)}
+            />
         </Box>
     );
 };
 
 export default FormView;
-

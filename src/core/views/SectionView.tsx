@@ -18,6 +18,8 @@ import { LuArrowRight, LuArrowLeft, LuCheck } from "react-icons/lu";
 import { UIEngine } from "../renderer/UIEngine";
 import "../widgets"; // Ensure all widgets are registered
 import { useFormStore } from "../store/useFormStore";
+import ApiResponseModalAlert from "../components/ApiResponseModalAlert";
+import type { AppAlertPayload } from "../utils/apiResponseAlert";
 
 
 const SectionView = ({ config }: any) => {
@@ -31,6 +33,10 @@ const SectionView = ({ config }: any) => {
 
     const [step, setStep] = React.useState(0);
     const formValues = useFormStore(state => state.values);
+
+    // Alert Modal State
+    const [actionFeedback, setActionFeedback] = React.useState<AppAlertPayload | null>(null);
+    const [isResponseModalOpen, setIsResponseModalOpen] = React.useState(false);
 
     const sections = useMemo(() => {
         return config?.UI_VIEW?.schema?.sections || [];
@@ -219,6 +225,12 @@ const SectionView = ({ config }: any) => {
                     </HStack>
                 </Flex>
             </Box>
+
+            <ApiResponseModalAlert
+                payload={actionFeedback}
+                open={isResponseModalOpen}
+                onClose={() => setIsResponseModalOpen(false)}
+            />
         </Box>
     );
 };

@@ -13,22 +13,28 @@ import {
   Field,
   Dialog,
   Portal,
+  Badge,
+  Progress,
+  Center,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import React, { useRef, useState, useCallback, memo } from "react";
+import React, { useRef, useState, useCallback, memo, useMemo, useEffect } from "react";
 import { FieldError, useFormContext } from "react-hook-form";
 import {
-  FaCamera,
-  FaTimes,
-  FaDownload,
-  FaEye,
-  FaTrash,
-  FaRedo,
-  FaCheck,
-} from "react-icons/fa";
-import { FcOldTimeCamera, FcStackOfPhotos, FcVideoCall } from "react-icons/fc";
-import { LuUpload, LuCamera, LuX, LuEye, LuDownload, LuTrash2, LuRotateCcw, LuCheck } from "react-icons/lu";
+  LuUpload,
+  LuCamera,
+  LuX,
+  LuEye,
+  LuDownload,
+  LuTrash2,
+  LuRotateCcw,
+  LuCheck,
+  LuFile,
+  LuImage,
+  LuVideo,
+} from "react-icons/lu";
 import { POSTAPI } from "../../app/api";
+import { ruleEngine } from "../engine/logicEngine";
 
 interface UPLOAD {
   name: string;
@@ -44,7 +50,70 @@ interface UPLOAD {
   multiple: boolean;
   oneLiner?: boolean;
   description?: string;
+  events?: any;
+  enableClear?: boolean;
 }
+
+// Optimized Sub-component for individual file display
+const FileItem = memo(({
+  file,
+  onRemove,
+  onView,
+  status = "pending",
+  isUploaded = false
+}: {
+  file: any,
+  onRemove: () => void,
+  onView?: () => void,
+  status?: string,
+  isUploaded?: boolean
+}) => {
+  const bg = useColorModeValue("whiteAlpha.500", "whiteAlpha.100");
+  const borderColor = useColorModeValue("gray.200", "whiteAlpha.200");
+
+  const fileName = isUploaded ? file.originalName : file.name;
+  const fileSize = (file.size / 1024).toFixed(1);
+  const isImg = file.type?.startsWith("image/") || ["jpg", "jpeg", "png", "gif"].some(ext => fileName.toLowerCase().endsWith(ext));
+
+  return (
+    <Flex
+      p={3}
+      borderRadius="xl"
+      bg={bg}
+      align="center"
+      gap={3}
+      borderWidth="1.5px"
+      borderColor={isUploaded ? "green.200" : borderColor}
+      transition="all 0.2s"
+      _hover={{ transform: "translateY(-2px)", boxShadow: "sm" }}
+    >
+      <Center boxSize="40px" borderRadius="lg" bg={isUploaded ? "green.100" : "indigo.50"} color={isUploaded ? "green.600" : "indigo.500"}>
+        {isImg ? <LuImage size={20} /> : <LuFile size={20} />}
+      </Center>
+
+      <VStack align="stretch" gap={0} flex="1">
+        <Text fontSize="xs" fontWeight="bold" truncate maxW="220px">{fileName}</Text>
+        <HStack gap={2}>
+          <Text fontSize="2xs" color="fg.subtle">{fileSize} KB</Text>
+          <Badge size="xs" colorPalette={isUploaded ? "green" : "indigo"} variant="subtle" borderRadius="full" fontSize="8px">
+            {isUploaded ? "UPLOADED" : "PENDING"}
+          </Badge>
+        </HStack>
+      </VStack>
+
+      <HStack gap={1}>
+        {onView && (
+          <IconButton size="xs" variant="ghost" onClick={onView} _hover={{ bg: "whiteAlpha.300" }}>
+            <LuEye />
+          </IconButton>
+        )}
+        <IconButton size="xs" variant="ghost" colorPalette="red" onClick={onRemove} _hover={{ bg: "red.50", color: "red.600" }}>
+          <LuTrash2 />
+        </IconButton>
+      </HStack>
+    </Flex>
+  );
+});
 
 const UploadField = ({
   name,
@@ -60,6 +129,8 @@ const UploadField = ({
   errors,
   oneLiner = false,
   description,
+  events,
+  enableClear = true,
 }: UPLOAD) => {
   if (hidden) return null;
 
@@ -73,6 +144,7 @@ const UploadField = ({
   const [stream, setStream] = useState<MediaStream | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   const [uploadedFiles, setUploadedFiles] = useState<any[]>(
     methods.watch(name) || []
@@ -103,6 +175,7 @@ const UploadField = ({
             const updatedFiles = [...uploadedFiles, ...response.uploadFiles];
             setUploadedFiles(updatedFiles);
             methods.setValue(name, updatedFiles, { shouldValidate: true });
+            if (events) ruleEngine.processEvents(events, updatedFiles, 'change', methods);
             setSelectedFiles([]);
             setPreviews([]);
             onClose();
@@ -110,35 +183,50 @@ const UploadField = ({
         });
       }
     }
-  }, [selectedFiles, defaultApiConfig, name, uploadedFiles, methods, onClose]);
+  }, [selectedFiles, defaultApiConfig, name, uploadedFiles, methods, onClose, events]);
 
-  const handleClear = useCallback(() => {
+  const handleClear = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
     setSelectedFiles([]);
     setPreviews([]);
     setUploadedFiles([]);
     methods.setValue(name, null, { shouldValidate: true });
-  }, [methods, name]);
+    if (events) ruleEngine.processEvents(events, null, 'change', methods);
+  }, [methods, name, events]);
 
   const handleRemoveFile = useCallback((index: number) => {
-    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
-    setPreviews((prev) => prev.filter((_, i) => i !== index));
+    setSelectedFiles((prev) => {
+      const newFiles = prev.filter((_, i) => i !== index);
+      return newFiles;
+    });
+    setPreviews((prev) => {
+      const oldUrl = prev[index];
+      if (oldUrl) URL.revokeObjectURL(oldUrl);
+      return prev.filter((_, i) => i !== index);
+    });
   }, []);
 
   const handleUploadedRemoveFile = useCallback((index: number) => {
-    if (window.confirm("Are you sure you want to remove this file?")) {
-      const updatedFiles = uploadedFiles.filter((_, i) => i !== index);
-      setUploadedFiles(updatedFiles);
-      methods.setValue(name, updatedFiles, { shouldValidate: true });
-    }
-  }, [uploadedFiles, methods, name]);
+    const updatedFiles = uploadedFiles.filter((_, i) => i !== index);
+    setUploadedFiles(updatedFiles);
+    methods.setValue(name, updatedFiles, { shouldValidate: true });
+    if (events) ruleEngine.processEvents(events, updatedFiles, 'change', methods);
+  }, [uploadedFiles, methods, name, events]);
 
-  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => event.preventDefault();
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => setIsDragging(false);
 
   const handleDrop = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
+    setIsDragging(false);
     const files = event.dataTransfer.files ? Array.from(event.dataTransfer.files) : [];
     if (files.length > 0) {
-      handleFileChange({ target: { files: files as any } } as any);
+      const input = { target: { files: files as any } } as React.ChangeEvent<HTMLInputElement>;
+      handleFileChange(input);
     }
   }, [handleFileChange]);
 
@@ -185,12 +273,20 @@ const UploadField = ({
     if (capturedImage) {
       const response = await fetch(capturedImage);
       const blob = await response.blob();
-      const file = new File([blob], "captured_photo.jpeg", { type: "image/jpeg" });
-      handleFileChange({ target: { files: [file] as any } } as any);
+      const file = new File([blob], `captured_${Date.now()}.jpeg`, { type: "image/jpeg" });
+      const input = { target: { files: [file] as any } } as React.ChangeEvent<HTMLInputElement>;
+      handleFileChange(input);
       setLiveCameraActive(false);
       setCapturedImage(null);
     }
   };
+
+  // Cleanup effect for preview URLs
+  useEffect(() => {
+    return () => {
+      previews.forEach(url => URL.revokeObjectURL(url));
+    };
+  }, [previews]);
 
   const labelWidth = oneLiner ? { base: "full", md: "35%" } : "full";
   const contentWidth = oneLiner ? { base: "full", md: "65%" } : "full";
@@ -206,19 +302,11 @@ const UploadField = ({
         >
           {text && (
             <Box w={labelWidth}>
-              <Field.Label
-                htmlFor={name}
-                fontSize="sm"
-                fontWeight="semibold"
-                color="fg.muted"
-                transition="color 0.2s"
-                _invalid={{ color: "red.500" }}
-                mb={oneLiner ? 0 : 1}
-              >
+              <Field.Label fontSize="sm" fontWeight="semibold" color="fg.muted">
                 {text}
               </Field.Label>
-              {description && (
-                <Text fontSize="xs" color="fg.subtle" mb={oneLiner ? 0 : 1}>
+              {description && !oneLiner && (
+                <Text fontSize="xs" color="fg.subtle">
                   {description}
                 </Text>
               )}
@@ -226,45 +314,37 @@ const UploadField = ({
           )}
 
           <Box w={contentWidth}>
-            <Flex gap={2} align="center">
-              <Input
-                id={name}
-                onClick={onOpen}
-                flex="1"
-                value={uploadedFiles.length > 0 ? `${uploadedFiles.length} file(s) uploaded` : ""}
-                placeholder="Click to upload files"
-                readOnly
-                size="md"
-                bg={useColorModeValue("white", "whiteAlpha.50")}
-                borderRadius="lg"
-                borderWidth="1.5px"
-                borderColor={useColorModeValue("gray.200", "whiteAlpha.200")}
-                _hover={{ borderColor: useColorModeValue("gray.300", "whiteAlpha.400") }}
-                cursor="pointer"
-              />
-              <IconButton
-                aria-label="Upload"
-                variant="outline"
-                size="md"
-                borderRadius="lg"
-                onClick={onOpen}
-                _hover={{ bg: "blue.50", color: "blue.500", borderColor: "blue.200" }}
-              >
-                <LuCamera />
-              </IconButton>
-              {uploadedFiles.length > 0 && (
+            <HStack gap={2} w="full" align="center">
+              <Box flex="1" position="relative">
+                <Box w="full" onClick={onOpen} cursor="pointer">
+                  <Input
+                    readOnly
+                    value={uploadedFiles.length > 0 ? `${uploadedFiles.length} file(s) uploaded` : ""}
+                    placeholder="Click to upload files..."
+                    size="md"
+                    borderRadius="xl"
+                    borderWidth="1.5px"
+                    bg={useColorModeValue("white", "whiteAlpha.100")}
+                    _focus={{ borderColor: "indigo.500", boxShadow: "0 0 0 1px var(--chakra-colors-indigo-500)" }}
+                  />
+                  <Center position="absolute" right="3" top="50%" transform="translateY(-50%)" color="gray.400">
+                    <LuCamera size={18} />
+                  </Center>
+                </Box>
+              </Box>
+
+              {enableClear && uploadedFiles.length > 0 && !disabled && (
                 <IconButton
-                  aria-label="Clear All"
-                  variant="outline"
-                  size="md"
-                  borderRadius="lg"
-                  colorPalette="red"
+                  size="sm"
+                  variant="ghost"
+                  color="fg.muted"
                   onClick={handleClear}
+                  _hover={{ bg: "transparent", color: "red.500" }}
                 >
                   <LuX />
                 </IconButton>
               )}
-            </Flex>
+            </HStack>
             <Field.ErrorText fontSize="xs" color="red.500" mt={1}>
               {errors?.message?.toString()}
             </Field.ErrorText>
@@ -272,87 +352,129 @@ const UploadField = ({
         </Flex>
       </Field.Root>
 
-      <Dialog.Root open={open} size="xl" placement="center" onOpenChange={e => { if (!e.open) { stopCamera(); onClose(); } }}>
+      <Dialog.Root open={open} size="md" placement="center" onOpenChange={e => { if (!e.open) { stopCamera(); onClose(); } }}>
         <Portal>
-          <Dialog.Backdrop />
+          <Dialog.Backdrop bg="blackAlpha.600" backdropFilter="blur(8px)" />
           <Dialog.Positioner p={4}>
-            <Dialog.Content borderRadius="xl" boxShadow="2xl">
-              <Dialog.Header borderBottomWidth="1px" pb={4}>
+            <Dialog.Content
+              borderRadius="2xl"
+              boxShadow="2xl"
+              overflow="hidden"
+              border="2px solid"
+              borderColor={useColorModeValue("indigo.500", "indigo.400")}
+              bg={useColorModeValue("white", "rgba(15, 23, 42, 0.98)")}
+              backdropFilter="blur(24px)"
+              position="relative"
+            >
+              <IconButton
+                variant="subtle"
+                size="sm"
+                onClick={onClose}
+                borderRadius="full"
+                position="absolute"
+                right="4"
+                top="4"
+                zIndex="docked"
+                colorPalette="indigo"
+              >
+                <LuX />
+              </IconButton>
+
+              <Dialog.Header borderBottomWidth="1px" p={5} bg={useColorModeValue("gray.50", "whiteAlpha.50")}>
                 <Flex justify="space-between" align="center">
-                  <Text fontWeight="bold" fontSize="lg">Upload Documents</Text>
-                  <IconButton variant="ghost" size="sm" onClick={onClose}><LuX /></IconButton>
+                  <Text fontWeight="bold" fontSize="lg" color={useColorModeValue("indigo.700", "indigo.300")}>Upload Documents</Text>
                 </Flex>
               </Dialog.Header>
-              <Dialog.Body py={6}>
+
+              <Dialog.Body p={6}>
                 {!liveCameraActive ? (
-                  <VStack gap={6}>
+                  <VStack gap={6} align="stretch">
+                    {/* Dropzone Area */}
                     <Box
                       w="full"
                       h="160px"
                       border="2px dashed"
-                      borderColor={useColorModeValue("gray.200", "whiteAlpha.200")}
-                      borderRadius="xl"
+                      borderColor={isDragging ? "indigo.500" : useColorModeValue("indigo.200", "whiteAlpha.300")}
+                      borderRadius="2xl"
                       display="flex"
                       flexDirection="column"
                       alignItems="center"
                       justifyContent="center"
-                      bg={useColorModeValue("gray.50", "whiteAlpha.50")}
+                      bg={isDragging ? useColorModeValue("indigo.50", "whiteAlpha.200") : useColorModeValue("indigo.50/30", "whiteAlpha.50")}
                       transition="all 0.2s"
-                      _hover={{ borderColor: "blue.400", bg: useColorModeValue("blue.50", "whiteAlpha.100") }}
+                      _hover={{ borderColor: "indigo.500", bg: useColorModeValue("indigo.50", "whiteAlpha.100"), transform: "scale(1.01)" }}
                       cursor="pointer"
                       onClick={handleButtonClick}
                       onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
                       onDrop={handleDrop}
+                      position="relative"
                     >
-                      <LuUpload size={32} color="var(--chakra-colors-blue-500)" />
-                      <Text mt={3} fontWeight="medium" fontSize="sm">Drag & drop or Click to upload</Text>
-                      <Text fontSize="xs" color="fg.subtle">Supports: {accept}</Text>
+                      <VStack gap={2}>
+                        <Center boxSize="50px" borderRadius="full" bg="indigo.100" color="indigo.600" _dark={{ bg: "indigo.900/40" }}>
+                          <LuUpload size={24} />
+                        </Center>
+                        <VStack gap={0}>
+                          <Text fontWeight="bold" fontSize="sm">Click or Drag to Upload</Text>
+                          <Text fontSize="xs" color="fg.subtle">Max size 10MB per file</Text>
+                        </VStack>
+                      </VStack>
                     </Box>
 
-                    {liveCameraAllow && (
-                      <Button w="full" variant="outline" size="lg" borderRadius="xl" onClick={startCamere}>
-                        <LuCamera /> Use Camera
+                    {liveCameraAllow && !capturedImage && (
+                      <Button
+                        w="full"
+                        variant="subtle"
+                        size="md"
+                        borderRadius="xl"
+                        onClick={startCamere}
+                        colorPalette="indigo"
+                      >
+                        <LuCamera /> Take a Photo
                       </Button>
                     )}
 
                     {(selectedFiles.length > 0 || uploadedFiles.length > 0) && (
                       <VStack w="full" align="stretch" gap={3}>
-                        <Text fontSize="xs" fontWeight="bold" color="fg.muted" textTransform="uppercase" letterSpacing="wider">
-                          File List ({selectedFiles.length + uploadedFiles.length})
-                        </Text>
-                        <VStack gap={2} align="stretch" maxH="200px" overflowY="auto" pr={2}>
+                        <Flex justify="space-between" align="center">
+                          <Text fontSize="2xs" fontWeight="bold" color="fg.muted" textTransform="uppercase" letterSpacing="widest">
+                            FILES ({selectedFiles.length + uploadedFiles.length})
+                          </Text>
+                          {selectedFiles.length > 0 && <Badge size="sm" variant="subtle" colorPalette="orange">PENDING</Badge>}
+                        </Flex>
+
+                        <VStack gap={2} align="stretch" maxH="220px" overflowY="auto" pr={1} className="custom-scroll">
                           {selectedFiles.map((file, i) => (
-                            <Flex key={`sel-${i}`} p={2} borderRadius="md" bg="bg.subtle" align="center" gap={3} borderWidth="1px">
-                              <Box boxSize="40px" borderRadius="md" bg="blue.100" />
-                              <VStack align="stretch" gap={0} flex="1">
-                                <Text fontSize="xs" fontWeight="semibold" truncate maxW="200px">{file.name}</Text>
-                                <Text fontSize="2xs" color="fg.subtle">{(file.size / 1024).toFixed(1)} KB • Pending</Text>
-                              </VStack>
-                              <IconButton size="xs" variant="ghost" colorPalette="red" onClick={() => handleRemoveFile(i)}><LuTrash2 /></IconButton>
-                            </Flex>
+                            <FileItem
+                              key={`sel-${i}`}
+                              file={file}
+                              onRemove={() => handleRemoveFile(i)}
+                            />
                           ))}
                           {uploadedFiles.map((file, i) => (
-                            <Flex key={`up-${i}`} p={2} borderRadius="md" bg="green.50" _dark={{ bg: "green.900/20" }} align="center" gap={3} borderWidth="1px" borderColor="green.200">
-                              <Box boxSize="40px" borderRadius="md" overflow="hidden">
-                                <Image src={location.origin + "/api/" + file.accessObjectPath} boxSize="full" objectFit="cover" />
-                              </Box>
-                              <VStack align="stretch" gap={0} flex="1">
-                                <Text fontSize="xs" fontWeight="semibold" truncate maxW="200px">{file.originalName}</Text>
-                                <Text fontSize="2xs" color="green.600">{(file.size / 1024).toFixed(1)} KB • Uploaded</Text>
-                              </VStack>
-                              <HStack gap={1}>
-                                <IconButton size="xs" variant="ghost" onClick={() => window.open(location.origin + "/api/" + file.accessObjectPath, "_blank")}><LuEye /></IconButton>
-                                <IconButton size="xs" variant="ghost" colorPalette="red" onClick={() => handleUploadedRemoveFile(i)}><LuTrash2 /></IconButton>
-                              </HStack>
-                            </Flex>
+                            <FileItem
+                              key={`up-${i}`}
+                              file={file}
+                              isUploaded
+                              onRemove={() => handleUploadedRemoveFile(i)}
+                              onView={() => window.open(location.origin + "/api/" + file.accessObjectPath, "_blank")}
+                            />
                           ))}
                         </VStack>
                       </VStack>
                     )}
                   </VStack>
                 ) : (
-                  <VStack gap={4}>
-                    <Box w="full" borderRadius="xl" overflow="hidden" bg="black" position="relative" aspectRatio={4 / 3}>
+                  <VStack gap={5}>
+                    <Box
+                      w="full"
+                      borderRadius="2xl"
+                      overflow="hidden"
+                      bg="black"
+                      position="relative"
+                      aspectRatio={4 / 3}
+                      boxShadow="inner"
+                    >
                       {capturedImage ? (
                         <Image src={capturedImage} boxSize="full" objectFit="contain" />
                       ) : (
@@ -361,24 +483,29 @@ const UploadField = ({
                     </Box>
                     <HStack w="full" gap={3}>
                       {!capturedImage ? (
-                        <Button flex="1" size="lg" colorPalette="blue" borderRadius="xl" onClick={capturePhoto}><LuCamera /> Capture</Button>
+                        <Button flex="1" size="lg" colorPalette="blue" borderRadius="xl" onClick={capturePhoto} boxShadow="0 4px 12px rgba(66, 153, 225, 0.4)">
+                          <LuCamera /> Capture
+                        </Button>
                       ) : (
                         <>
                           <Button flex="1" size="lg" variant="outline" borderRadius="xl" onClick={startCamere}><LuRotateCcw /> Retake</Button>
-                          <Button flex="1" size="lg" colorPalette="green" borderRadius="xl" onClick={confirmPhoto}><LuCheck /> Confirm</Button>
+                          <Button flex="1" size="lg" colorPalette="green" borderRadius="xl" onClick={confirmPhoto} boxShadow="0 4px 12px rgba(72, 187, 120, 0.4)">
+                            <LuCheck /> Use Photo
+                          </Button>
                         </>
                       )}
-                      <Button variant="ghost" onClick={() => { stopCamera(); setLiveCameraActive(false); setCapturedImage(null); }} size="lg">Cancel</Button>
+                      <Button variant="outline" onClick={() => { stopCamera(); setLiveCameraActive(false); setCapturedImage(null); }} size="lg">Cancel</Button>
                     </HStack>
                   </VStack>
                 )}
               </Dialog.Body>
-              <Dialog.Footer borderTopWidth="1px" pt={4}>
+
+              <Dialog.Footer borderTopWidth="1px" p={5} bg={useColorModeValue("indigo.50/30", "whiteAlpha.50")}>
                 <HStack gap={3} w="full">
-                  <Button variant="ghost" flex="1" colorPalette="red" onClick={onClose}>Close</Button>
+                  <Button variant="ghost" flex="1" onClick={onClose} borderRadius="xl">Cancel</Button>
                   {selectedFiles.length > 0 && (
-                    <Button flex="2" colorPalette="blue" size="lg" borderRadius="xl" onClick={handleModalConfirm}>
-                      <LuUpload /> Upload Files
+                    <Button flex="2" colorPalette="indigo" size="lg" borderRadius="xl" onClick={handleModalConfirm} fontWeight="extrabold" boxShadow="0 8px 20px -4px var(--chakra-colors-indigo-500)">
+                      <LuUpload /> Upload {selectedFiles.length} {selectedFiles.length === 1 ? "File" : "Files"}
                     </Button>
                   )}
                 </HStack>

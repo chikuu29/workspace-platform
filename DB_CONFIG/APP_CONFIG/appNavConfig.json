@@ -128,7 +128,7 @@
                     {
                         "label": "Home",
                         "icon": "FcHome",
-                        "path": "/app/myGym/GymView",
+                        "path": "/app/myGym/home",
                         "isMaster": true
                     },
                     {

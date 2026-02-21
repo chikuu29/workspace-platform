@@ -1,7 +1,7 @@
 import { VStack, Text, Box, Flex, Separator } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import React, { memo, useState, useCallback } from "react";
-import MenuLink from "./components/MenuLink";
+import MenuLink from "@/core/components/MenuLink";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/store";
 import { APP_CONFIG_STATE } from "@/app/types/appConfigInterface";

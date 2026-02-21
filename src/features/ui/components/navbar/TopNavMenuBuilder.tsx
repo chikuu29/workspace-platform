@@ -3,7 +3,7 @@ import { useColorMode, useColorModeValue } from "@/components/ui/color-mode";
 // import { APP_CONFIG_STATE } from "@/app/types/appConfigInterface";
 // import { RootState } from "@/app/store";
 // import DynamicIcon from "@/utils/app/renderDynamicIcons";
-import MenuLink from "../sidebar/components/MenuLink";
+import MenuLink from "@/core/components/MenuLink";
 import React, { memo } from "react";
 // import { Link } from "react-router";
 import AsyncLoadIcon from "@/utils/hooks/AsyncLoadIcon";

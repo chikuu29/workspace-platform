@@ -13,7 +13,7 @@ import { LuTriangleAlert, LuFileSearch, LuSettings } from "react-icons/lu";
 import { motion } from "framer-motion";
 
 interface FallbackRendererProps {
-    reason: "MISSING_UI_TYPE" | "INVALID_TYPE" | "COMPONENT_NOT_FOUND";
+    reason: "MISSING_UI_TYPE" | "INVALID_TYPE" | "COMPONENT_NOT_FOUND" | "TEMPLATE_NOT_FOUND";
     type?: string;
     config?: any;
 }
@@ -48,6 +48,15 @@ const FallbackRenderer: React.FC<FallbackRendererProps> = ({ reason, type, confi
                     description: `The component type "${type}" is not registered in ViewRegistry.`,
                     icon: LuFileSearch,
                     badge: "Registry Error"
+                };
+            case "TEMPLATE_NOT_FOUND":
+                return {
+                    title: "Template Not Found",
+                    description: type
+                        ? `Could not load template "${type}". Please check the template name and try again.`
+                        : "The requested template could not be found or loaded.",
+                    icon: LuFileSearch,
+                    badge: "Template Error"
                 };
             default:
                 return {

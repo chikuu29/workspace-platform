@@ -6,6 +6,7 @@ import { Outlet } from "react-router";
 import AppFooter from "@/features/ui/components/footer/AppFooter";
 import Appbreadcurmb from "@/features/ui/components/navbar/Appbreadcurmb";
 import { SidebarProvider } from "@/contexts/SidebarContext";
+import DialogRenderer from "@/core/renderer/DialogRenderer";
 
 /**
  * WorkspaceLayout
@@ -31,6 +32,8 @@ const WorkspaceLayout = () => {
           </Box>
         </Flex>
       </Flex>
+      {/* Global template dialog — Zustand-driven, no provider needed */}
+      <DialogRenderer />
     </SidebarProvider>
   );
 };

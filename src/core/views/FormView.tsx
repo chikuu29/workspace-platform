@@ -84,7 +84,7 @@ const FormView = ({ config }: any) => {
     if (!tabs.length) return null;
 
     return (
-        <Box py={{ base: "8", md: "8" }} position="relative">
+        <Box position="relative">
             <Box {...layoutStyles}>
                 <Flex
                     direction={{ base: "column", md: "row" }}

@@ -166,7 +166,16 @@
                             {
                                 "label": "Add Trainer",
                                 "icon": "FcPlus",
-                                "path": "/panel/addTrainer"
+                                "action": {
+                                    "type": "modal",
+                                    "templateName": "AddTrainer",
+                                    "config": {
+                                        "size": "full",
+                                        "closeOnOverlayClick": true,
+                                        "closeOnEsc": true,
+                                        "scrollBehavior": "inside"
+                                    }
+                                }
                             },
                             {
                                 "label": "Manage Schedules",

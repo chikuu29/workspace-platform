@@ -1,0 +1,271 @@
+{
+    "id": "2",
+    "pageName": "AddTrainer",
+    "route": "AddTrainer",
+    "appName": "myGym",
+    "appMeta": {
+        "appName": "Gym",
+        "viewName": "AddTrainer",
+        "viewId": "2",
+        "version": "1.0.0",
+        "owner": "Suryanarayan Biswal",
+        "createdAt": "2024-11-19"
+    },
+    "settings": {
+        "theme": "default",
+        "language": "en",
+        "securityEnabled": true,
+        "sanitizeHtml": false
+    },
+    "scripts": {
+        "files": [
+            "Gym/addTrainerScript"
+        ],
+        "postScript": "documentPostScript"
+    },
+    "ACTIONS": {
+        "showSaveButton": true,
+        "ACTION_BUTTONS": [
+            {
+                "name": "Draft",
+                "text": "Draft",
+                "iconName": "LuSave",
+                "widget": "button",
+                "styles": {
+                    "variant": "outline"
+                },
+                "hidden": false,
+                "oneLiner": true,
+                "required": true,
+                "event": "draft"
+            }
+        ]
+    },
+    "UI_TYPE": {
+        "type": "FORM_VIEW",
+        "title": "Trainer Onboarding",
+        "description": "Register new trainers with a comprehensive, guided experience.",
+        "target": "forms",
+        "layoutStyles": {
+            "p": 4
+        }
+    },
+    "UI_VIEW": {
+        "schema": {
+            "forms": {
+                "tabs": [
+                    {
+                        "title": "Personal Details",
+                        "description": "Basic identification and contact information.",
+                        "iconName": "LuUser",
+                        "widgets": [
+                            {
+                                "name": "trainerFirstName",
+                                "text": "First Name",
+                                "description": "Enter trainer's first name",
+                                "widget": "textField",
+                                "oneLiner": true,
+                                "required": true,
+                                "maxLength": 50
+                            },
+                            {
+                                "name": "trainerLastName",
+                                "text": "Last Name",
+                                "description": "Enter trainer's last name",
+                                "widget": "textField",
+                                "oneLiner": true,
+                                "required": true,
+                                "maxLength": 50
+                            },
+                            {
+                                "name": "trainerEmail",
+                                "text": "Email Address",
+                                "description": "Official email for internal communications",
+                                "type": "email",
+                                "widget": "textField",
+                                "oneLiner": true,
+                                "required": true
+                            },
+                            {
+                                "name": "trainerPhone",
+                                "text": "Phone Number",
+                                "description": "Primary contact number",
+                                "type": "tel",
+                                "widget": "textField",
+                                "oneLiner": true,
+                                "required": true
+                            },
+                            {
+                                "name": "trainerGender",
+                                "text": "Gender",
+                                "description": "Select the trainer's gender",
+                                "widget": "radioField",
+                                "oneLiner": true,
+                                "enableClear": true,
+                                "options": [
+                                    {
+                                        "label": "Male",
+                                        "value": "male"
+                                    },
+                                    {
+                                        "label": "Female",
+                                        "value": "female"
+                                    },
+                                    {
+                                        "label": "Other",
+                                        "value": "other"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "trainerAddress",
+                                "text": "Residential Address",
+                                "description": "Current permanent residence details",
+                                "widget": "textAreaField",
+                                "oneLiner": true,
+                                "required": false
+                            }
+                        ]
+                    },
+                    {
+                        "title": "Professional Details",
+                        "description": "Expertise, experience, and availability.",
+                        "iconName": "LuActivity",
+                        "widgets": [
+                            {
+                                "name": "specialization",
+                                "text": "Specialization",
+                                "description": "Primary area of expertise (e.g., Strength Training, Yoga, Cardio, CrossFit)",
+                                "widget": "radioField",
+                                "oneLiner": true,
+                                "options": [
+                                    {
+                                        "label": "Strength Training",
+                                        "value": "strength"
+                                    },
+                                    {
+                                        "label": "Yoga",
+                                        "value": "yoga"
+                                    },
+                                    {
+                                        "label": "Cardio & HIIT",
+                                        "value": "cardio"
+                                    },
+                                    {
+                                        "label": "CrossFit",
+                                        "value": "crossfit"
+                                    },
+                                    {
+                                        "label": "Personal Training",
+                                        "value": "personal"
+                                    }
+                                ],
+                                "required": true
+                            },
+                            {
+                                "name": "experienceYears",
+                                "text": "Years of Experience",
+                                "description": "Total professional training experience in years",
+                                "widget": "textField",
+                                "type": "number",
+                                "oneLiner": true,
+                                "required": true
+                            },
+                            {
+                                "name": "joiningDate",
+                                "text": "Joining Date",
+                                "description": "Select the official start date of employment",
+                                "widget": "dateField",
+                                "oneLiner": true,
+                                "required": true,
+                                "enableClear": true
+                            },
+                            {
+                                "name": "availableSlot",
+                                "text": "Available Slot",
+                                "description": "Preferred training session slot",
+                                "widget": "dateAndTimeField",
+                                "oneLiner": true,
+                                "required": true,
+                                "enableClear": true
+                            },
+                            {
+                                "name": "bio",
+                                "text": "Trainer Bio",
+                                "description": "A short bio highlighting certifications, achievements, and training philosophy",
+                                "widget": "textAreaField",
+                                "oneLiner": true
+                            }
+                        ]
+                    },
+                    {
+                        "title": "Verification",
+                        "description": "Documents and profile setup.",
+                        "iconName": "LuShieldCheck",
+                        "widgets": [
+                            {
+                                "name": "idProof",
+                                "text": "Government ID Proof",
+                                "description": "Upload a valid passport, driver's license, or national ID",
+                                "widget": "uploadField",
+                                "oneLiner": true,
+                                "required": true,
+                                "liveCameraAllow": true,
+                                "defaultApiConfig": {
+                                    "uploadURL": "app/upload"
+                                }
+                            },
+                            {
+                                "name": "certifications",
+                                "text": "Certifications",
+                                "description": "Upload professional fitness certifications (e.g., ACE, NASM, ISSA)",
+                                "widget": "uploadField",
+                                "oneLiner": true,
+                                "required": true,
+                                "liveCameraAllow": false,
+                                "defaultApiConfig": {
+                                    "uploadURL": "app/upload"
+                                }
+                            },
+                            {
+                                "name": "profilePic",
+                                "text": "Profile Photo",
+                                "description": "A professional photo for the gym's trainer directory",
+                                "widget": "uploadField",
+                                "oneLiner": true,
+                                "liveCameraAllow": true,
+                                "accept": "image/*",
+                                "defaultApiConfig": {
+                                    "uploadURL": "app/upload"
+                                }
+                            },
+                            {
+                                "name": "paymentMode",
+                                "text": "Salary Payment Mode",
+                                "description": "Preferred method for salary disbursement",
+                                "widget": "radioField",
+                                "oneLiner": true,
+                                "enableClear": true,
+                                "options": [
+                                    {
+                                        "label": "Bank Transfer",
+                                        "value": "bank"
+                                    },
+                                    {
+                                        "label": "Cash",
+                                        "value": "cash"
+                                    },
+                                    {
+                                        "label": "UPI / Digital",
+                                        "value": "upi"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    "active": true
+}

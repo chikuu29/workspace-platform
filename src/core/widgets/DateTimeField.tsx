@@ -63,6 +63,7 @@ const DateTimeField = ({
 
     // Integrated State
     const [open, setOpen] = useState(false);
+    const [viewMode, setViewMode] = useState<"calendar" | "year">("calendar");
     const [viewDate, setViewDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState<Date | null>(value ? new Date(value) : null);
 
@@ -108,6 +109,17 @@ const DateTimeField = ({
         });
     }, [selectedDate]);
 
+    const years = useMemo(() => {
+        const currentYear = new Date().getFullYear();
+        const startYear = currentYear - 50;
+        const endYear = currentYear + 50;
+        const yearsArray = [];
+        for (let i = startYear; i <= endYear; i++) {
+            yearsArray.push(i);
+        }
+        return yearsArray;
+    }, []);
+
     const daysInMonth = useMemo(() => {
         const year = viewDate.getFullYear();
         const month = viewDate.getMonth();
@@ -132,8 +144,21 @@ const DateTimeField = ({
         if (events) ruleEngine.processEvents(events, iso, 'change', methods);
     };
 
+    const handleYearSelect = (year: number) => {
+        setViewDate(new Date(year, viewDate.getMonth(), 1));
+        setViewMode("calendar");
+    };
+
     const handleTimeSync = (newHour: string, newMin: string, newAmpm: string) => {
-        if (!selectedDate) return;
+        if (!selectedDate) {
+            // If no date selected yet, use viewDate or today
+            const baseDate = viewDate || new Date();
+            let h = parseInt(newHour) || 12;
+            if (newAmpm === "PM" && h < 12) h += 12;
+            if (newAmpm === "AM" && h === 12) h = 0;
+            baseDate.setHours(h, parseInt(newMin) || 0, 0, 0);
+            return;
+        }
         const newDate = new Date(selectedDate);
         let h = parseInt(newHour) || 12;
         if (newAmpm === "PM" && h < 12) h += 12;
@@ -183,7 +208,10 @@ const DateTimeField = ({
                     <Box w={inputWidth}>
                         <HStack gap={2} w="full" align="center">
                             <Box flex="1">
-                                <PopoverRoot open={open} onOpenChange={(e) => setOpen(e.open)}>
+                                <PopoverRoot open={open} onOpenChange={(e) => {
+                                    setOpen(e.open);
+                                    if (!e.open) setViewMode("calendar");
+                                }}>
                                     <PopoverTrigger asChild>
                                         <Box w="full">
                                             <InputGroup
@@ -219,102 +247,142 @@ const DateTimeField = ({
                                         boxShadow="2xl"
                                     >
                                         <PopoverBody p="4">
-                                            <VStack gap="4">
+                                            <VStack gap="4" align="stretch">
                                                 <Flex w="full" justify="space-between" align="center">
-                                                    <IconButton size="xs" variant="ghost" onClick={() => changeMonth(-1)}>
+                                                    <IconButton size="xs" variant="ghost" onClick={() => changeMonth(-1)} visibility={viewMode === "year" ? "hidden" : "visible"}>
                                                         <LuChevronLeft />
                                                     </IconButton>
-                                                    <Text fontWeight="bold" fontSize="sm">
-                                                        {viewDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
-                                                    </Text>
-                                                    <IconButton size="xs" variant="ghost" onClick={() => changeMonth(1)}>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        fontWeight="bold"
+                                                        onClick={() => setViewMode(viewMode === "calendar" ? "year" : "calendar")}
+                                                        _hover={{ bg: useColorModeValue("gray.100", "whiteAlpha.100") }}
+                                                    >
+                                                        {viewMode === "calendar"
+                                                            ? viewDate.toLocaleString('default', { month: 'long', year: 'numeric' })
+                                                            : "Select Year"
+                                                        }
+                                                    </Button>
+                                                    <IconButton size="xs" variant="ghost" onClick={() => changeMonth(1)} visibility={viewMode === "year" ? "hidden" : "visible"}>
                                                         <LuChevronRight />
                                                     </IconButton>
                                                 </Flex>
 
-                                                <SimpleGrid columns={7} gap="1" w="full">
-                                                    {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => (
-                                                        <Center key={d} fontSize="2xs" fontWeight="bold" color={mutedColor}>
-                                                            {d}
-                                                        </Center>
-                                                    ))}
-                                                    {daysInMonth.map((date, i) => (
-                                                        <Center key={i}>
-                                                            {date && (
-                                                                <Button
-                                                                    size="xs"
-                                                                    variant={selectedDate?.toDateString() === date.toDateString() ? "solid" : "ghost"}
-                                                                    colorPalette={selectedDate?.toDateString() === date.toDateString() ? "blue" : "gray"}
-                                                                    onClick={() => handleDateSelect(date)}
-                                                                    fontSize="xs"
-                                                                    w="8"
-                                                                    h="8"
-                                                                    borderRadius="md"
-                                                                >
-                                                                    {date.getDate()}
-                                                                </Button>
-                                                            )}
-                                                        </Center>
-                                                    ))}
-                                                </SimpleGrid>
+                                                {/* Scrollable Area */}
+                                                <Box maxH="320px" overflowY="auto" px={1}>
+                                                    {viewMode === "calendar" ? (
+                                                        <SimpleGrid columns={7} gap="1" w="full">
+                                                            {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, idx) => (
+                                                                <Center key={`${d}-${idx}`} fontSize="2xs" fontWeight="bold" color={mutedColor}>
+                                                                    {d}
+                                                                </Center>
+                                                            ))}
+                                                            {daysInMonth.map((date, i) => (
+                                                                <Center key={i}>
+                                                                    {date && (
+                                                                        <Button
+                                                                            size="xs"
+                                                                            variant={selectedDate?.toDateString() === date.toDateString() ? "solid" : "ghost"}
+                                                                            colorPalette={selectedDate?.toDateString() === date.toDateString() ? "blue" : "gray"}
+                                                                            onClick={() => handleDateSelect(date)}
+                                                                            fontSize="xs"
+                                                                            w="8"
+                                                                            h="8"
+                                                                            borderRadius="md"
+                                                                        >
+                                                                            {date.getDate()}
+                                                                        </Button>
+                                                                    )}
+                                                                </Center>
+                                                            ))}
+                                                        </SimpleGrid>
+                                                    ) : (
+                                                        <Box w="full">
+                                                            <SimpleGrid columns={3} gap="2">
+                                                                {years.map(year => (
+                                                                    <Button
+                                                                        key={year}
+                                                                        size="sm"
+                                                                        variant={viewDate.getFullYear() === year ? "solid" : "ghost"}
+                                                                        colorPalette={viewDate.getFullYear() === year ? "blue" : "gray"}
+                                                                        onClick={() => handleYearSelect(year)}
+                                                                        borderRadius="md"
+                                                                    >
+                                                                        {year}
+                                                                    </Button>
+                                                                ))}
+                                                            </SimpleGrid>
+                                                        </Box>
+                                                    )}
 
-                                                <Box w="full" pt="3" borderTop="1px solid" borderColor={borderColor}>
-                                                    <VStack gap="4">
-                                                        <HStack justify="center" gap="6">
-                                                            <VStack gap="0">
-                                                                <Text fontSize="2xs" color={mutedColor} fontWeight="bold">HOUR</Text>
-                                                                <Input
-                                                                    type="number"
-                                                                    min={1}
-                                                                    max={12}
-                                                                    value={hour}
-                                                                    onChange={(e) => {
-                                                                        const v = e.target.value.slice(-2);
-                                                                        setHour(v);
-                                                                        handleTimeSync(v, minute, ampm);
-                                                                    }}
-                                                                    w="14"
-                                                                    textAlign="center"
-                                                                    variant="flushed"
-                                                                    fontWeight="bold"
-                                                                />
-                                                            </VStack>
-                                                            <Text pt="4" fontWeight="bold" fontSize="xl">:</Text>
-                                                            <VStack gap="0">
-                                                                <Text fontSize="2xs" color={mutedColor} fontWeight="bold">MIN</Text>
-                                                                <Input
-                                                                    type="number"
-                                                                    min={0}
-                                                                    max={59}
-                                                                    value={minute}
-                                                                    onChange={(e) => {
-                                                                        const v = e.target.value.slice(-2);
-                                                                        setMinute(v);
-                                                                        handleTimeSync(hour, v, ampm);
-                                                                    }}
-                                                                    w="14"
-                                                                    textAlign="center"
-                                                                    variant="flushed"
-                                                                    fontWeight="bold"
-                                                                />
-                                                            </VStack>
-                                                        </HStack>
+                                                    {selectedDate && viewMode === "calendar" && (
+                                                        <Box w="full" pt="4" mt="2" borderTop="1px solid" borderColor={borderColor}>
+                                                            <VStack gap="4">
+                                                                <HStack justify="center" gap="6">
+                                                                    <VStack gap="0" align="center">
+                                                                        <Text fontSize="2xs" color={mutedColor} fontWeight="bold">HOUR</Text>
+                                                                        <Input
+                                                                            type="number"
+                                                                            min={1}
+                                                                            max={12}
+                                                                            value={hour}
+                                                                            onChange={(e) => {
+                                                                                let v = e.target.value.slice(-2);
+                                                                                if (parseInt(v) > 12) v = "12";
+                                                                                if (parseInt(v) < 1) v = "01";
+                                                                                setHour(v);
+                                                                                handleTimeSync(v, minute, ampm);
+                                                                            }}
+                                                                            w="14"
+                                                                            textAlign="center"
+                                                                            variant="flushed"
+                                                                            fontWeight="bold"
+                                                                        />
+                                                                    </VStack>
+                                                                    <Text pt="4" fontWeight="bold" fontSize="xl">:</Text>
+                                                                    <VStack gap="0" align="center">
+                                                                        <Text fontSize="2xs" color={mutedColor} fontWeight="bold">MIN</Text>
+                                                                        <Input
+                                                                            type="number"
+                                                                            min={0}
+                                                                            max={59}
+                                                                            value={minute}
+                                                                            onChange={(e) => {
+                                                                                let v = e.target.value.slice(-2);
+                                                                                if (parseInt(v) > 59) v = "59";
+                                                                                if (parseInt(v) < 0) v = "00";
+                                                                                setMinute(v);
+                                                                                handleTimeSync(hour, v, ampm);
+                                                                            }}
+                                                                            w="14"
+                                                                            textAlign="center"
+                                                                            variant="flushed"
+                                                                            fontWeight="bold"
+                                                                        />
+                                                                    </VStack>
+                                                                </HStack>
 
-                                                        <SegmentedControl
-                                                            value={ampm}
-                                                            onValueChange={(e) => {
-                                                                if (e.value) {
-                                                                    setAmpm(e.value);
-                                                                    handleTimeSync(hour, minute, e.value);
-                                                                }
-                                                            }}
-                                                            items={["AM", "PM"]}
-                                                            size="sm"
-                                                            w="full"
-                                                        />
-                                                    </VStack>
+                                                                <Center w="full">
+                                                                    <SegmentedControl
+                                                                        value={ampm}
+                                                                        onValueChange={(e) => {
+                                                                            if (e.value) {
+                                                                                setAmpm(e.value);
+                                                                                handleTimeSync(hour, minute, e.value);
+                                                                            }
+                                                                        }}
+                                                                        items={["AM", "PM"]}
+                                                                        size="sm"
+                                                                        w="140px"
+                                                                    />
+                                                                </Center>
+                                                            </VStack>
+                                                        </Box>
+                                                    )}
                                                 </Box>
 
+                                                {/* Pinned Footer */}
                                                 <Button
                                                     w="full"
                                                     size="md"
@@ -322,6 +390,7 @@ const DateTimeField = ({
                                                     onClick={() => setOpen(false)}
                                                     borderRadius="xl"
                                                     fontWeight="bold"
+                                                    mt="2"
                                                 >
                                                     Done
                                                 </Button>

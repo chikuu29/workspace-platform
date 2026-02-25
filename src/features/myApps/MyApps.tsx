@@ -116,10 +116,11 @@ export default function MyApps() {
       </Box>
 
       {/* Main Content */}
-      <Box py={2} px={6}>
+      <Box py={4} px={6}>
         {!error && (
           <>
             {filteredApps.length > 0 ? (
+
               <AppList apps={filteredApps} handleNavigate={handleDefaultNavigate} />
             ) : (
               <Center flexDir="column" py={20} gap={4}>
@@ -151,7 +152,9 @@ const AppItem: React.FC<AppItemProps> = ({
 }) => {
   if (appConfig?.hidden) return null;
 
-  const bgCard = useColorModeValue("white", "gray.800");
+
+
+  const bgCard = useColorModeValue("#fff", "transparent");
   const borderColor = useColorModeValue("gray.100", "whiteAlpha.100");
   const hoverBorderColor = useColorModeValue("brand.200", "brand.700");
 
@@ -161,8 +164,8 @@ const AppItem: React.FC<AppItemProps> = ({
       direction="column"
       align="center"
       justify="center"
-      // bg={bgCard}
-      p={6}
+      bg={bgCard}
+      // p={6}
       border="1px solid"
       borderColor={borderColor}
       borderRadius="2xl"
@@ -176,11 +179,11 @@ const AppItem: React.FC<AppItemProps> = ({
         borderColor: hoverBorderColor,
       }}
       onClick={(e) => handleNavigate(e, appConfig)}
-      gap={4}
-      h="200px" // Fixed height for consistency
+      // gap={4}
+      h="100px" // Compact fixed height
     >
       <Box
-        p={4}
+        // p={2}
         borderRadius="xl"
         bg={useColorModeValue("gray.50", "whiteAlpha.50")}
         transition="inherit"
@@ -190,13 +193,13 @@ const AppItem: React.FC<AppItemProps> = ({
           {...logoConfig.style}
           src={logoConfig.url}
           alt={`${name} logo`}
-          maxH="60px"
-          maxW="60px"
+          maxH="40px"
+          maxW="40px"
           objectFit="contain"
         />
       </Box>
       <VStack gap={1}>
-        <Text fontSize="md" fontWeight="700" textAlign="center" lineHeight="tight">
+        <Text fontSize="xs" fontWeight="600" textAlign="center" lineHeight="tight">
           {name}
         </Text>
       </VStack>
@@ -210,7 +213,7 @@ interface AppListProps {
 }
 
 const AppList: React.FC<AppListProps> = ({ apps, handleNavigate }) => (
-  <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4, xl: 5 }} gap={6}>
+  <SimpleGrid columns={{ base: 3, sm: 4, md: 5, lg: 6, xl: 8 }} gap={3}>
     {apps.map((app, index) => (
       <AppItem
         key={index}

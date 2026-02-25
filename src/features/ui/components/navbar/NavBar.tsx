@@ -30,7 +30,7 @@ const Navbar = () => {
   // Theme-aware colors
   // Match project bg.default (gray.50 / dark slate) with slight transparency for blur
   const navBg = useColorModeValue(
-    "rgba(249, 249, 249, 0.88)",
+    "#ffff",
     "rgba(15, 23, 42, 0.88)"
   );
   const borderColor = useColorModeValue("gray.100", "whiteAlpha.100");

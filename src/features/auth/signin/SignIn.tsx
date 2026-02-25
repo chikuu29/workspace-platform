@@ -336,7 +336,7 @@ const SignIn = () => {
                         >
                             <Button
                                 onClick={loginWithSso}
-                                variant={"premium" as any}
+                                variant="premium"
                                 size="lg"
                                 h="70px"
                                 borderRadius="2xl"

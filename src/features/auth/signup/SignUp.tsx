@@ -350,7 +350,7 @@ const SignUp = () => {
                 <Button
                   size="lg"
                   h="56px"
-                  variant={"premium" as any}
+                  variant="premium"
                   borderRadius="xl"
                   fontWeight="700"
                   w="100%"

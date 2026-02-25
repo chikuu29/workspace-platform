@@ -99,6 +99,7 @@ const Appbreadcurmb = forwardRef((props, ref) => {
       position="sticky"
       top="0"
       zIndex="sticky"
+      borderBottomRadius="20px"
     >
       <Flex h="full" alignItems="center" justifyContent="space-between">
         <Breadcrumb.Root variant="plain" size="sm">

@@ -18,7 +18,7 @@ import { useFormStore } from "../store/useFormStore";
 import { appEventRegistry } from "../registry/AppEventRegistry";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/app/slices/loader/appLoaderSlice";
-
+const MotionBox = motion.create(Box);
 const FormView = ({ config }: any) => {
     const dispatch = useDispatch();
     const layoutStyles = config?.UI_TYPE?.layoutStyles || {};
@@ -44,8 +44,7 @@ const FormView = ({ config }: any) => {
                 event: "submit",
                 position: "top",
                 styles: {
-                    variant: "outline",
-                    colorPalette: "blue"
+                    variant: "action"
                 }
             };
             return [...buttons, submitButton];
@@ -103,6 +102,8 @@ const FormView = ({ config }: any) => {
 
     if (!tabs.length) return null;
 
+
+    const bgCard = useColorModeValue("#fff", "transparent");
     return (
         <Box position="relative">
             <Box {...layoutStyles}>
@@ -160,6 +161,7 @@ const FormView = ({ config }: any) => {
                     overflow="hidden"
                     backdropFilter="blur(10px)"
                     position="relative"
+                    bg={bgCard}
                 >
                     <UIEngine
                         config={tabs}

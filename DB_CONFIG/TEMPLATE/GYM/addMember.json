@@ -50,7 +50,7 @@
                 "iconName": "LuSave",
                 "widget": "button",
                 "styles": {
-                    "variant": "outline"
+                    "variant": "action"
                 },
                 "hidden": false,
                 "oneLiner": true,

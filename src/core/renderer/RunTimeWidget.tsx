@@ -50,8 +50,9 @@ const RunTimeWidgetRender: React.FC<any> = React.memo(({ configs, tabs, ...rest 
           }
         }
 
+
         return (
-          <Box key={widgetConfig.name} {...rest}>
+          <Box key={widgetConfig.name} {...rest} >
             {(() => {
               switch (widgetConfig.widget) {
                 default:

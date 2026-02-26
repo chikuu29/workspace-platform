@@ -4,13 +4,18 @@ import PanelNavBarAction from "./NavbarActions";
 import { SidebarResponsive } from "../sidebar/PanelSideBar";
 import Brand from "../Brand/Brand";
 import TopNavMenuBuilder from "./TopNavMenuBuilder";
-import { memo, useMemo } from "react";
+import { memo, useMemo, useCallback } from "react";
 import { AiOutlineMenuUnfold, AiOutlineMenuFold } from "react-icons/ai";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/store";
 import { APP_CONFIG_STATE } from "@/app/types/appConfigInterface";
 import useScrollShadow from "@/utils/hooks/useScrollShadow";
+
+// Centralized hover border — same token used across nav / sidebar / menu items
+const HOVER_BORDER_COLOR = "app.btn.border";
+
+const TRANSITION = "all 0.2s ease";
 
 /**
  * Navbar
@@ -34,7 +39,13 @@ const Navbar = () => {
     "rgba(15, 23, 42, 0.88)"
   );
   const borderColor = useColorModeValue("gray.100", "whiteAlpha.100");
-  const iconHoverBg = useColorModeValue("gray.100", "whiteAlpha.100");
+  const iconHoverBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
+
+  // Stable hover object — not re-created every render
+  const iconBtnHover = useMemo(
+    () => ({ bg: iconHoverBg, border: "1px solid", borderColor: HOVER_BORDER_COLOR }),
+    [iconHoverBg]
+  );
 
   // Memoize the sidebar toggle icon to prevent re-creation
   const ToggleIcon = useMemo(
@@ -78,8 +89,8 @@ const Navbar = () => {
                   variant="ghost"
                   size="md"
                   borderRadius="xl"
-                  _hover={{ bg: iconHoverBg }}
-                  transition="all 0.2s"
+                  _hover={iconBtnHover}
+                  transition={TRANSITION}
                 >
                   <ToggleIcon size={20} />
                 </IconButton>

@@ -4,6 +4,11 @@ export const buttonRecipe = defineRecipe({
     base: {
         borderRadius: "md",
         cursor: "pointer",
+        // border: "1px solid",
+        _hover: {
+            borderColor: "app.btn.border",
+        }
+
     },
     variants: {
         variant: {

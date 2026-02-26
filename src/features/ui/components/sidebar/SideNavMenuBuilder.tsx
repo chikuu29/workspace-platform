@@ -1,19 +1,33 @@
-import { VStack, Text, Box, Flex, Separator } from "@chakra-ui/react";
+import { VStack, Text, Box, Flex } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import React, { memo, useState, useCallback } from "react";
+import React, { memo, useState, useCallback, useMemo } from "react";
 import MenuLink from "@/core/components/MenuLink";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/store";
 import { APP_CONFIG_STATE } from "@/app/types/appConfigInterface";
 import { LuChevronDown } from "react-icons/lu";
 
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+/** Shared hover border colour — change once, applies to every interactive
+ *  surface in this file including the CollapsibleGroup header. */
+const HOVER_BORDER_COLOR = "app.btn.border";
+
+const TRANSITION_FAST = "all 0.15s ease";
+const TRANSITION_PANEL = "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 interface SideNavPropsType {
   showFullSideBarMenu: boolean;
 }
 
+// ─── CollapsibleGroup ─────────────────────────────────────────────────────────
+
 /**
  * CollapsibleGroup
  * Accordion-style menu group with smooth chevron rotation and height animation.
+ * The group header follows the same hover border convention as MenuLink items.
  */
 const CollapsibleGroup = memo(
   ({
@@ -26,17 +40,23 @@ const CollapsibleGroup = memo(
     showFull: boolean;
   }) => {
     const [isOpen, setIsOpen] = useState(true);
+
     const textColor = useColorModeValue("gray.500", "whiteAlpha.500");
     const hoverBg = useColorModeValue("gray.50", "whiteAlpha.50");
 
-    const handleToggle = useCallback(() => {
-      setIsOpen((prev) => !prev);
-    }, []);
+    // Stable hover object — same border-left convention as MenuLink
+    const groupHeaderHover = useMemo(
+      () => ({
+        bg: hoverBg,
+        borderLeftColor: HOVER_BORDER_COLOR,
+      }),
+      [hoverBg]
+    );
 
-    if (!showFull) {
-      // In collapsed mode, just render the children (icon-only) without group headers
-      return <>{children}</>;
-    }
+    const handleToggle = useCallback(() => setIsOpen((prev) => !prev), []);
+
+    // Collapsed sidebar — render children (icon-only) without group labels
+    if (!showFull) return <>{children}</>;
 
     return (
       <Box w="full">
@@ -46,10 +66,12 @@ const CollapsibleGroup = memo(
           px={3}
           py={2}
           cursor="pointer"
-          borderRadius="lg"
+          borderRadius="5px"
           onClick={handleToggle}
-          _hover={{ bg: hoverBg }}
-          transition="all 0.15s"
+          transition={TRANSITION_FAST}
+          // Reserve space for the left-border to prevent layout shift on hover
+          borderLeft="2px solid transparent"
+          _hover={groupHeaderHover}
           role="button"
           aria-expanded={isOpen}
         >
@@ -62,6 +84,7 @@ const CollapsibleGroup = memo(
           >
             {label}
           </Text>
+          {/* Chevron rotates smoothly on open/close */}
           <Box
             transition="transform 0.2s ease"
             transform={isOpen ? "rotate(0deg)" : "rotate(-90deg)"}
@@ -71,10 +94,10 @@ const CollapsibleGroup = memo(
           </Box>
         </Flex>
 
-        {/* Animated content area */}
+        {/* Animated content panel */}
         <Box
           overflow="hidden"
-          transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
+          transition={TRANSITION_PANEL}
           maxH={isOpen ? "1000px" : "0px"}
           opacity={isOpen ? 1 : 0}
         >
@@ -87,10 +110,13 @@ const CollapsibleGroup = memo(
   }
 );
 
+// ─── SideNavMenuBuilder ───────────────────────────────────────────────────────
+
 /**
  * SideNavMenuBuilder
- * Renders the sidebar navigation menu from Redux state.
- * Supports collapsible sub-menu groups, memoized for performance.
+ * Renders the sidebar navigation tree from Redux state.
+ * Supports collapsible sub-menu groups with animated expand/collapse.
+ * Memoized to prevent re-renders when unrelated Redux state changes.
  */
 const SideNavMenuBuilder = memo(({ showFullSideBarMenu }: SideNavPropsType) => {
   const { FEATURE }: APP_CONFIG_STATE = useSelector(
@@ -100,23 +126,15 @@ const SideNavMenuBuilder = memo(({ showFullSideBarMenu }: SideNavPropsType) => {
   if (FEATURE.length === 0) return null;
 
   return (
-    <VStack
-      gap={2}
-      w="full"
-      align={showFullSideBarMenu ? "stretch" : "center"}
-    >
+    <VStack gap={2} w="full" align={showFullSideBarMenu ? "stretch" : "center"}>
       {FEATURE.map((menu: any, index: number) => (
         <React.Fragment key={`menu-${index}`}>
           {menu.isMaster ? (
-            <MenuLink
-              menuConfig={menu}
-              showFullSideBarMenu={showFullSideBarMenu}
-            />
+            /* Top-level standalone item */
+            <MenuLink menuConfig={menu} showFullSideBarMenu={showFullSideBarMenu} />
           ) : (
-            <CollapsibleGroup
-              label={menu.label}
-              showFull={showFullSideBarMenu}
-            >
+            /* Grouped item with collapsible children */
+            <CollapsibleGroup label={menu.label} showFull={showFullSideBarMenu}>
               {menu.menu?.map((subMenu: any, subIndex: number) => (
                 <MenuLink
                   key={`sub-${index}-${subIndex}`}

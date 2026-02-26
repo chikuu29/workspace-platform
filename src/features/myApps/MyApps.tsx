@@ -153,57 +153,51 @@ const AppItem: React.FC<AppItemProps> = ({
   if (appConfig?.hidden) return null;
 
 
+  // const bgCard = useColorModeValue("rgba(255,255,255,0.95)", "rgba(255,255,255,0.04)");
 
-  const bgCard = useColorModeValue("#fff", "transparent");
-  const borderColor = useColorModeValue("gray.100", "whiteAlpha.100");
-  const hoverBorderColor = useColorModeValue("brand.200", "brand.700");
+  // // const bgCard = useColorModeValue("#fff", "transparent");
+  // const borderColor = useColorModeValue("gray.100", "whiteAlpha.100");
+  // const hoverBorderColor = useColorModeValue("rgba(99,102,241,0.12)", "rgba(255,255,255,0.08)")
+  const cardBg = useColorModeValue("rgba(255,255,255,0.95)", "rgba(255,255,255,0.04)");
+  const cardBorder = useColorModeValue("rgba(99,102,241,0.12)", "rgba(255,255,255,0.08)");
+
 
   return (
-    <Flex
-      role="group"
-      direction="column"
-      align="center"
-      justify="center"
-      bg={bgCard}
-      // p={6}
-      border="1px solid"
-      borderColor={borderColor}
+    <Box
+      bg={cardBg}
+      borderWidth="1px"
+      borderColor={cardBorder}
       borderRadius="2xl"
-      boxShadow={'md'}
+      p={5}
       cursor="pointer"
-      position="relative"
-      transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+      transition="all 0.22s cubic-bezier(0.4,0,0.2,1)"
+      backdropFilter="blur(8px)"
+      boxShadow="0 2px 12px rgba(0,0,0,0.06)"
       _hover={{
-        transform: "translateY(-4px)",
-        boxShadow: "xl",
-        borderColor: hoverBorderColor,
+        transform: "translateY(-3px)",
+        boxShadow: "0 12px 32px rgba(99,102,241,0.18)",
+        borderColor: "app.text.accent",
       }}
       onClick={(e) => handleNavigate(e, appConfig)}
-      // gap={4}
-      h="100px" // Compact fixed height
     >
-      <Box
-        // p={2}
-        borderRadius="xl"
-        bg={useColorModeValue("gray.50", "whiteAlpha.50")}
-        transition="inherit"
-        _groupHover={{ bg: "transparent" }}
-      >
+      <Flex direction="column" align="center" justify="center" gap={3}>
         <Image
-          {...logoConfig.style}
-          src={logoConfig.url}
+          {...logoConfig?.style}
+          src={logoConfig?.url}
           alt={`${name} logo`}
-          maxH="40px"
-          maxW="40px"
-          objectFit="contain"
+          borderRadius="xl"
         />
-      </Box>
-      <VStack gap={1}>
-        <Text fontSize="xs" fontWeight="600" textAlign="center" lineHeight="tight">
+        <Text
+          fontSize="sm"
+          fontWeight={600}
+          color="app.text.primary"
+          textAlign="center"
+          letterSpacing="0.01em"
+        >
           {name}
         </Text>
-      </VStack>
-    </Flex>
+      </Flex>
+    </Box>
   );
 };
 
@@ -213,7 +207,7 @@ interface AppListProps {
 }
 
 const AppList: React.FC<AppListProps> = ({ apps, handleNavigate }) => (
-  <SimpleGrid columns={{ base: 3, sm: 4, md: 5, lg: 6, xl: 8 }} gap={3}>
+  <SimpleGrid columns={[1, 2, 3, 4]} gap={4}>
     {apps.map((app, index) => (
       <AppItem
         key={index}

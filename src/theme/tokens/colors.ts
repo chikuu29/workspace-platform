@@ -88,7 +88,7 @@ export const colors = {
         800: { value: "#212121" },
         900: { value: "#171717" },
         950: { value: "#0d0d0d" },
-    },
+    }
 
 }
 
@@ -109,6 +109,149 @@ export const semanticTokens = {
             default: {
                 value: { _light: "#f0f4ff", _dark: "rgba(15, 23, 42, 0.9)" }
             }
+        },
+
+
+        "app.navbar.border": {
+            value: {
+                _light: "rgba(99,102,241,0.12)",
+                _dark: "rgba(255,255,255,0.06)",
+            },
+        },
+        "app.btn.border": {
+            value: {
+                _light: "#6366f1",
+                _dark: "#818cf8",
+            },
+        },
+        // ── Card / panel surface ──────────────────────────────
+        "app.card.bg": {
+            value: {
+                _light: "rgba(255,255,255,0.95)",
+                _dark: "rgba(255,255,255,0.04)",
+            },
+        },
+        "app.card.border": {
+            value: {
+                _light: "rgba(99,102,241,0.15)",
+                _dark: "rgba(255,255,255,0.08)",
+            },
+        },
+        // ── Text ─────────────────────────────────────────────
+        "app.text.primary": {
+            value: {
+                _light: "#0f172a",
+                _dark: "#f1f5f9",
+            },
+        },
+        "app.text.muted": {
+            value: {
+                _light: "#64748b",
+                _dark: "#94a3b8",
+            },
+        },
+        "app.text.accent": {
+            value: {
+                _light: "#6366f1",
+                _dark: "#818cf8",
+            },
+        },
+        // ── Divider ──────────────────────────────────────────
+        "app.divider": {
+            value: {
+                _light: "rgba(148,163,184,0.3)",
+                _dark: "rgba(255,255,255,0.06)",
+            },
+        },
+
+        // ── Auth page background ──────────────────────────────
+        "auth.bg": {
+            value: {
+                _light: "#f0f4ff",
+                _dark: "rgba(15, 23, 42, 0.97)",
+            },
+        },
+        // ── Auth card surface ─────────────────────────────────
+        "auth.card.bg": {
+            value: {
+                _light: "rgba(255,255,255,0.95)",
+                _dark: "rgba(255,255,255,0.04)",
+            },
+        },
+        "auth.card.border": {
+            value: {
+                _light: "rgba(99,102,241,0.15)",
+                _dark: "rgba(255,255,255,0.08)",
+            },
+        },
+        // ── Input fields ──────────────────────────────────────
+        "auth.input.bg": {
+            value: {
+                _light: "#ffffff",
+                _dark: "rgba(255,255,255,0.05)",
+            },
+        },
+        "auth.input.border": {
+            value: {
+                _light: "rgba(203,213,225,0.8)",
+                _dark: "rgba(255,255,255,0.1)",
+            },
+        },
+        "auth.input.border.focus": {
+            value: {
+                _light: "#6366f1",
+                _dark: "#818cf8",
+            },
+        },
+        "auth.input.glow": {
+            value: {
+                _light: "0 0 0 3px rgba(99,102,241,0.18)",
+                _dark: "0 0 0 3px rgba(129,140,248,0.25), 0 0 20px rgba(99,102,241,0.12)",
+            },
+        },
+        // ── Auth text ─────────────────────────────────────────
+        "auth.text.primary": {
+            value: {
+                _light: "#0f172a",
+                _dark: "#f1f5f9",
+            },
+        },
+        "auth.text.muted": {
+            value: {
+                _light: "#64748b",
+                _dark: "#94a3b8",
+            },
+        },
+        "auth.text.accent": {
+            value: {
+                _light: "#6366f1",
+                _dark: "#818cf8",
+            },
+        },
+        "auth.btn.bg": {
+            value: {
+                _light: "#6366f1",
+                _dark: "#6366f1",
+            },
+        },
+        "auth.social.bg": {
+            value: {
+                _light: "#ffffff",
+                _dark: "rgba(255,255,255,0.05)",
+            },
+        },
+        "auth.social.border": {
+            value: {
+                _light: "rgba(203,213,225,0.8)",
+                _dark: "rgba(255,255,255,0.1)",
+            },
+        },
+        "auth.divider": {
+            value: {
+                _light: "rgba(148,163,184,0.4)",
+                _dark: "rgba(255,255,255,0.08)",
+            },
         }
+
     }
 }

@@ -1,6 +1,6 @@
-import { Box, HStack, VStack, Text } from "@chakra-ui/react";
+import { Box, HStack, VStack, Text, Popover, Stack } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { NavLink, useNavigate } from "react-router";
+import { NavLink, useNavigate, useLocation } from "react-router";
 import AsyncLoadIcon from "@/utils/hooks/AsyncLoadIcon";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/store";
@@ -50,6 +50,8 @@ interface MenuConfig {
     };
     /** New action-driven navigation — replaces path when present */
     action?: NavigationAction;
+    /** Sub-menu items for group rendering */
+    menu?: MenuConfig[];
 }
 
 interface MenuLinkProps {
@@ -95,6 +97,7 @@ function buildHoverStyles(hoverBg: string, includeShift: boolean) {
  */
 const MenuLink = memo(({ menuConfig, showFullSideBarMenu }: MenuLinkProps) => {
     const navigate = useNavigate();
+    const location = useLocation();
     const activeBg = useColorModeValue("blue.50", "whiteAlpha.100");
     const activeAccent = useColorModeValue("blue.500", "blue.400");
     const hoverBg = useColorModeValue("gray.100", "whiteAlpha.100");
@@ -141,6 +144,27 @@ const MenuLink = memo(({ menuConfig, showFullSideBarMenu }: MenuLinkProps) => {
         const clean = menuConfig.target.startsWith("/") ? menuConfig.target.substring(1) : menuConfig.target;
         return `/${tenant}/workspace/${clean}`;
     }, [tenant, menuConfig.target]);
+
+    /**
+     * Recursive check to see if this item or any of its children are currently active.
+     * This ensures parent "Groups" in the navbar stay highlighted.
+     */
+    const isGroupActive = useMemo(() => {
+        // Direct path match
+        if (navigationPath && location.pathname.startsWith(navigationPath)) {
+            return true;
+        }
+        // Check children
+        if (Array.isArray(menuConfig.menu)) {
+            return menuConfig.menu.some((child) => {
+                const cleanChild = child.path?.startsWith("/") ? child.path.substring(1) : child.path;
+                if (!cleanChild) return false;
+                const fullChildPath = `/${tenant}/workspace/${cleanChild}`;
+                return location.pathname.startsWith(fullChildPath);
+            });
+        }
+        return false;
+    }, [location.pathname, navigationPath, tenant, menuConfig.menu]);
 
     // ─── Event handlers ───────────────────────────────────────────────
 
@@ -280,6 +304,36 @@ const MenuLink = memo(({ menuConfig, showFullSideBarMenu }: MenuLinkProps) => {
     };
 
     // ─── Render decision ──────────────────────────────────────────────
+
+    // Group item — renders a Popover trigger + sub-menu
+    if (Array.isArray(menuConfig.menu) && menuConfig.menu.length > 0) {
+        return (
+            <Popover.Root positioning={{ placement: "bottom-start" }}>
+                <Popover.Trigger asChild>
+                    <Box w="full" cursor="pointer" lineHeight="normal">
+                        {renderContent(isGroupActive)}
+                    </Box>
+                </Popover.Trigger>
+                <Popover.Positioner>
+                    <Popover.Content
+                        border={0}
+                        boxShadow="xl"
+                        p={4}
+                        rounded="xl"
+                        minW="sm"
+                        bg="bg.default"
+                        zIndex="popover"
+                    >
+                        <Stack>
+                            {menuConfig.menu.map((child, index) => (
+                                <MenuLink key={index} menuConfig={child} showFullSideBarMenu={true} />
+                            ))}
+                        </Stack>
+                    </Popover.Content>
+                </Popover.Positioner>
+            </Popover.Root>
+        );
+    }
 
     // Action-driven or pathless items
     if (menuConfig.action || !menuConfig.path) {

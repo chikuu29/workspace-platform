@@ -63,15 +63,27 @@ const SignIn = () => {
 
     const checkVersion = useCallback(async () => {
         try {
-            const response = await fetch(`../version.json?t=${Date.now()}`);
+            const versionUrl = `${import.meta.env.BASE_URL}version.json?t=${Date.now()}`;
+            const response = await fetch(versionUrl);
             const CURRENT_VERSION = "{{HASH_PLACEHOLDER}}";
-            if (!response.ok) throw new Error("Network response was not ok");
-            const data = await response.json();
+            if (!response.ok) return;
+
+            const contentType = response.headers.get("content-type") || "";
+            if (!contentType.includes("application/json")) return;
+
+            const responseText = await response.text();
+            let data: Record<string, string>;
+            try {
+                data = JSON.parse(responseText);
+            } catch {
+                return;
+            }
+
             if (data["version"] !== CURRENT_VERSION && CURRENT_VERSION !== "{{HASH_PLACEHOLDER}}") {
                 setIsNewVersionAvailable(true);
             }
         } catch (error) {
-            console.error("Error fetching version:", error);
+            // Ignore version check failures to avoid noisy logs on auth route.
         }
     }, []);
 
@@ -148,9 +160,9 @@ const SignIn = () => {
 
     const loginWithSso = () => {
         dispatch(startLoading("Redirecting to SSO..."));
-        const clientId = "work_space_platform";
-        const authServerUrl = "http://localhost/oauth/authorize";
-        const redirectTo = "http://localhost:5173/auth/callback";
+        const clientId = import.meta.env.VITE_CLIENT_ID as string;
+        const authServerUrl = import.meta.env.VITE_OAUTH_URL as string;
+        const redirectTo = (import.meta.env.VITE_REDIRECT_URL as string) || `${window.location.origin}/auth/callback`;
         const deviceId = getOrCreateDeviceId();
 
         window.open(

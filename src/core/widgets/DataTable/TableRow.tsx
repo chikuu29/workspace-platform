@@ -5,7 +5,7 @@ import ActionMenu from "./ActionMenu";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { motion } from "framer-motion";
 
-const MotionRow = motion(Table.Row as any);
+const MotionRow = motion.create(Table.Row as any);
 
 interface TableRowProps<T> {
     row: T;

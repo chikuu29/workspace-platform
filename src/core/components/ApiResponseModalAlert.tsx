@@ -13,8 +13,8 @@ import { LuCircleCheck, LuCircleX, LuTriangleAlert, LuInfo } from "react-icons/l
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { useApiResponseModalStore } from "@/core/store/useApiResponseModalStore";
 
-const MotionCircle = motion(Circle as any);
-const MotionBox = motion(Box as any);
+const MotionCircle = motion.create(Circle as any);
+const MotionBox = motion.create(Box as any);
 
 const getStatusConfig = (status?: "success" | "error" | "warning" | "info") => {
   switch (status) {

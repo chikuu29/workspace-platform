@@ -5,7 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { useNavigate } from "react-router";
+import { useLocation } from "react-router";
 import { useDispatch } from "react-redux";
 import { login, logout } from "@/app/slices/auth/authSlice";
 import { GETAPI } from "@/app/api";
@@ -44,7 +44,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [authInfo, setAuthInfo] = useState<any>(null);
   const [reloginRequired, setReloginRequired] = useState(true);
-  const navigate = useNavigate();
+  const routerLocation = useLocation();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,7 +56,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const accessToken = localStorage.getItem("access_token");
 
         if (!storedLoginInfo || !accessToken) {
-          console.warn("Authentication details missing.");
+          const isAuthRoute = routerLocation.pathname.startsWith("/auth");
+          if (!isAuthRoute) {
+            console.warn("Authentication details missing.");
+          }
           setAuthInfo(null); // No redirection, just reset auth state
           return;
         }
@@ -67,8 +70,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         loginInfo.success = true;
         loginInfo.isAuthenticated = true;
         // loginInfo.login_info=storedLoginInfo
-
-        console.log("Login Info:", loginInfo);
 
         dispatch(fetchAppConfig());
         setAuthInfo(loginInfo); // No need for unnecessary nesting
@@ -84,34 +85,38 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (reloginRequired) {
       fetchData();
     }
-  }, [reloginRequired, dispatch]);
+  }, [reloginRequired, dispatch, routerLocation.pathname]);
 
   const setLoginAuthInfo = (loginData: any) => {
-    console.log("Setting AUTH INFO FROM LOGIN:", loginData);
     setAuthInfo((prevAuth: any) => ({ ...prevAuth, ...loginData }));
     setReloginRequired(false);
   };
 
-  const logoutUser = async () => {
-    console.log("Logging out...");
+  const logoutUser = () => {
     dispatch(startLoading("Logging you out, please wait..."));
 
-    try {
-      GETAPI({
-        path: "/auth/logout",
-        isPrivateApi: true,
-      }).subscribe((res: any) => {
-        if (res.success) {
+    const finalizeLogout = () => {
+      dispatch(logout());
+      localStorage.clear();
+      dispatch(stopLoading());
+      window.location.reload();
+    };
 
-          dispatch(logout());
-          localStorage.clear(); // Clear local storage
-          dispatch(stopLoading());
-          location.reload(); // Refresh page after logout
+    GETAPI({
+      path: "/auth/logout",
+      isPrivateApi: true,
+    }).subscribe({
+      next: (res: any) => {
+        if (!res?.success) {
+          console.warn("Logout API did not succeed, completing local logout.");
         }
-      });
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
+        finalizeLogout();
+      },
+      error: (error: any) => {
+        console.warn("Logout API failed, completing local logout.", error);
+        finalizeLogout();
+      },
+    });
   };
 
   if (loading) {

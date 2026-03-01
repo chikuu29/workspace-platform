@@ -9,20 +9,22 @@ import { AppDispatch } from "../../app/store";
 import { useAuth } from "../../contexts/AuthProvider";
 
 const AuthCallback = () => {
+
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const { setLoginAuthInfo } = useAuth();
 
-  // Constants for OAuth configuration
-  const clientId = "work_space_platform";
-  const clientSecret = "Demo@123";
-  const redirectUrl = "http://localhost:5173/auth/callback";
+  // Constants for OAuth configuration (read from Vite env)
+  const clientId = import.meta.env.VITE_CLIENT_ID as string;
+  const clientSecret = import.meta.env.VITE_CLIENT_SECRET as string;
+  const redirectUrl = (import.meta.env.VITE_REDIRECT_URL as string) || `${window.location.origin}/auth/callback`;
 
   useEffect(() => {
     // 1. Extract the authorization code from URL parameters
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
-
+    console.log("CODE ",code);
+    
     if (code) {
       exchangeAuthorizationCode(code);
     } else {

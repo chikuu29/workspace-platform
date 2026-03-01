@@ -5,7 +5,7 @@ import { DataTableColumn } from "./types";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { motion } from "framer-motion";
 
-const MotionBox = motion(Box as any);
+const MotionBox = motion.create(Box as any);
 
 interface MobileDataCardProps<T> {
     row: T;

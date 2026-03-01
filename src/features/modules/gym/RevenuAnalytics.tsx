@@ -16,7 +16,7 @@ import { motion } from "framer-motion";
 import { LuArrowUpRight, LuUsers, LuTrendingUp, LuActivity } from "react-icons/lu";
 import LoadIcon from "../../../utils/hooks/LoadIcon";
 
-const MotionBox = motion(Box as any);
+const MotionBox = motion.create(Box as any);
 
 /**
  * MetricTile

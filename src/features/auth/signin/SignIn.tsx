@@ -31,6 +31,11 @@ import AppVersionAlert from "@/features/ui/components/alert/AppVersionAlert";
 import { AlertProps } from "@/app/types/appConfigInterface";
 import { SiAuthelia } from "react-icons/si";
 import { getOrCreateDeviceId } from "@/utils/services/appServices";
+import {
+    generateCodeVerifier,
+    generateCodeChallenge,
+    storeCodeVerifier,
+} from "@/utils/services/pkceService";
 
 const MotionBox = motion.create(Box);
 const MotionStack = motion.create(Stack);
@@ -158,17 +163,28 @@ const SignIn = () => {
         }
     };
 
-    const loginWithSso = () => {
+    const loginWithSso = async () => {
         dispatch(startLoading("Redirecting to SSO..."));
         const clientId = import.meta.env.VITE_CLIENT_ID as string;
         const authServerUrl = import.meta.env.VITE_OAUTH_URL as string;
         const redirectTo = (import.meta.env.VITE_REDIRECT_URL as string) || `${window.location.origin}/auth/callback`;
         const deviceId = getOrCreateDeviceId();
 
-        window.open(
-            `${authServerUrl}?client_id=${clientId}&response_type=code&redirect_url=${redirectTo}&scope=openid profile email&device_id=${deviceId}`,
-            "_self"
-        );
+        // PKCE: Generate verifier, persist it, and derive the challenge (S256)
+        const codeVerifier = generateCodeVerifier();
+        storeCodeVerifier(codeVerifier);
+        const codeChallenge = await generateCodeChallenge(codeVerifier);
+
+        const authUrl = new URL(authServerUrl);
+        authUrl.searchParams.set("client_id", clientId);
+        authUrl.searchParams.set("response_type", "code");
+        authUrl.searchParams.set("redirect_url", redirectTo);
+        authUrl.searchParams.set("scope", "openid profile email");
+        authUrl.searchParams.set("device_id", deviceId);
+        authUrl.searchParams.set("code_challenge", codeChallenge);
+        authUrl.searchParams.set("code_challenge_method", "S256");
+
+        window.open(authUrl.toString(), "_self");
     };
 
     const containerVariants = {

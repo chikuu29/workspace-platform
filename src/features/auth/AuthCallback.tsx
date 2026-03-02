@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { POSTAPI } from "../../app/api";
 import { getOrCreateDeviceId } from "../../utils/services/appServices";
+import { getStoredCodeVerifier } from "../../utils/services/pkceService";
 import { fetchAppConfig } from "../../app/slices/appConfig/appConfigSlice";
 import { login } from "../../app/slices/auth/authSlice";
 import { useDispatch } from "react-redux";
@@ -23,8 +24,8 @@ const AuthCallback = () => {
     // 1. Extract the authorization code from URL parameters
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
-    console.log("CODE ",code);
-    
+    console.log("CODE ", code);
+
     if (code) {
       exchangeAuthorizationCode(code);
     } else {
@@ -36,6 +37,9 @@ const AuthCallback = () => {
   const exchangeAuthorizationCode = async (code: string) => {
     const deviceId = getOrCreateDeviceId();
 
+    // PKCE: Retrieve the stored verifier (single-use — removed on read)
+    const codeVerifier = getStoredCodeVerifier();
+
     // 2. Prepare the payload for token exchange
     const apiRequestData = {
       client_id: clientId,
@@ -44,6 +48,7 @@ const AuthCallback = () => {
       code,
       redirect_url: redirectUrl,
       device_id: deviceId,
+      code_verifier: codeVerifier,
     };
 
     // 3. call the API to exchange the code for tokens

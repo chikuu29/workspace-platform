@@ -4,7 +4,7 @@ import { POSTAPI } from "../../app/api";
 import { getOrCreateDeviceId } from "../../utils/services/appServices";
 import { getStoredCodeVerifier } from "../../utils/services/pkceService";
 import { fetchAppConfig } from "../../app/slices/appConfig/appConfigSlice";
-import { login } from "../../app/slices/auth/authSlice";
+import { login, AuthPayload } from "../../app/slices/auth/authSlice";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../app/store";
 import { useAuth } from "../../contexts/AuthProvider";
@@ -59,37 +59,32 @@ const AuthCallback = () => {
     }).subscribe({
       next: (res: any) => {
         if (res.success) {
-          // 4. Store tokens and user info in localStorage
-          localStorage.setItem("access_token", res.access_token);
-          localStorage.setItem("id_token", res.id_token);
-          localStorage.setItem("login_info", JSON.stringify(res.login_info));
-          localStorage.setItem("tenant_name", res.login_info?.tenant_name);
-          localStorage.setItem("authInfo", JSON.stringify(res));
-
-          // 5. Construct the login info object for Redux state
-          const loginInfo = {
+          // Build AuthPayload for Redux — no localStorage needed.
+          // The backend already sets an httpOnly session-token cookie
+          // in this same response, so refreshes are handled by /auth/me.
+          const loginPayload: AuthPayload = {
+            success: true,
             login_info: res.login_info || {},
             access_token: res.access_token,
-            success: true,
-            isAuthenticated: true,
+            authProvider: res.authProvider,
           };
 
-          // 6. Update application state
-          setLoginAuthInfo(res.login_info);
+          // Update in-memory state only
+          setLoginAuthInfo(loginPayload);
           dispatch(fetchAppConfig());
-          dispatch(login(loginInfo));
+          dispatch(login(loginPayload));
 
-          // 7. Redirect to the main application area
+          // Navigate to the main app area
           navigate("/myApps");
         } else {
           console.error("Token exchange failed:", res.message);
-          navigate("/auth/login"); // Redirect on failure
+          navigate("/auth/login");
         }
       },
       error: (error: any) => {
         console.error("Error exchanging authorization code:", error);
-        navigate("/auth/login"); // Redirect on error
-      }
+        navigate("/auth/login");
+      },
     });
   };
 

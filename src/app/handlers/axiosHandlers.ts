@@ -65,9 +65,25 @@ privateAPI.interceptors.request.use(
     (error: AxiosError) => Promise.reject(error)
 );
 
+/**
+ * Response interceptor: handle 401 (session expired) globally.
+ * Instead of every component checking for 401, centralise it here
+ * so the user is redirected once and in-memory auth state is cleared.
+ */
 privateAPI.interceptors.response.use(
     (response: AxiosResponse) => response,
-    (error: AxiosError) => Promise.reject(error)
+    (error: AxiosError) => {
+        if (error.response?.status === 401) {
+            const { logout } = require('../slices/auth/authSlice');
+            store.dispatch(logout());
+
+            // Redirect only if not already on auth pages
+            if (!window.location.pathname.startsWith('/auth')) {
+                window.location.href = '/auth/login';
+            }
+        }
+        return Promise.reject(error);
+    }
 );
 
 export { privateAPI, publicAPI, BASE_URL };

@@ -12,7 +12,7 @@ import { login, logout, AuthPayload } from "@/app/slices/auth/authSlice";
 import { GETAPI } from "@/app/api";
 import { fetchAppConfig } from "@/app/slices/appConfig/appConfigSlice";
 import type { AppDispatch } from "@/app/store";
-import Loader from "@/features/ui/components/Loader/Loader";
+import Loader, { AppLoader } from "@/features/ui/components/Loader/Loader";
 import { startLoading, stopLoading } from "@/app/slices/loader/appLoaderSlice";
 
 // --- Context Type Definitions ---
@@ -45,7 +45,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [authInfo, setAuthInfo] = useState<AuthPayload | null>(null);
   const [reloginRequired, setReloginRequired] = useState(true);
-  const routerLocation = useLocation();
+
 
   /**
    * Hydrate auth state from the server on every mount / page refresh.
@@ -62,17 +62,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     dispatch(startLoading("Restoring your session…"));
 
     try {
-      // Subscribe to the RxJS observable returned by GETAPI.
-      // The httpOnly session-token cookie is sent automatically.
       GETAPI({
         path: "/auth/me",
-        isPrivateApi: true, // public axios instance — cookie is enough
+        isPrivateApi: true,
       }).subscribe({
         next: (res: any) => {
           if (res.success) {
-
-            console.log("res", res);
-
             const payload: AuthPayload = {
               success: true,
               login_info: res.login_info,
@@ -83,19 +78,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setAuthInfo(payload);
             dispatch(login(payload));
             dispatch(fetchAppConfig());
+            setReloginRequired(false); // Session is now hydrated
           } else {
-            // Server says session is invalid → not authenticated
             setAuthInfo(null);
           }
           dispatch(stopLoading());
           setLoading(false);
         },
         error: () => {
-          // Network error or 401 — treat as unauthenticated
-          const isAuthRoute = routerLocation.pathname.startsWith("/auth");
-          if (!isAuthRoute) {
-            console.warn("Session hydration failed — redirecting to login.");
-          }
           setAuthInfo(null);
           dispatch(stopLoading());
           setLoading(false);
@@ -106,19 +96,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       dispatch(stopLoading());
       setLoading(false);
     }
-  }, [dispatch, routerLocation.pathname]);
+  }, [dispatch]);
 
   useEffect(() => {
-    // Skip hydration on auth routes (/auth/login, /auth/callback, /auth/sign-up)
-    // — there's no session cookie yet. After OAuth callback completes,
-    // setLoginAuthInfo() sets state directly without needing /auth/me.
-    // const isAuthRoute = routerLocation.pathname.startsWith("/auth");
-
-    // if (isAuthRoute) {
-    //   setLoading(false);
-    //   return;
-    // }
-
     if (reloginRequired) {
       hydrateSession();
     }
@@ -172,7 +152,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [dispatch]);
 
   if (loading) {
-    return <Loader loaderText="Restoring your session…" />;
+    return <AppLoader />;
   }
 
   return (

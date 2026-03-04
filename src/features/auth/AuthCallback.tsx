@@ -53,7 +53,7 @@ const AuthCallback = () => {
 
     // 3. call the API to exchange the code for tokens
     POSTAPI({
-      path: "oauth/token",
+      path: "oauth/exchange",
       data: apiRequestData,
       isPrivateApi: true,
     }).subscribe({

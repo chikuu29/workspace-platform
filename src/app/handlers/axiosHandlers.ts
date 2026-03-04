@@ -1,5 +1,6 @@
 import axios, { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { RootState, store } from '../store';
+import { getOrCreateDeviceId } from '../../utils/services/appServices';
 
 const BASE_URL = import.meta.env.DEV ? '/api' : import.meta.env.VITE_API_URL;
 
@@ -30,6 +31,7 @@ const createApiClient = (): AxiosInstance =>
 const applyCommonRequestHeaders = (config: InternalAxiosRequestConfig) => {
     config.headers = config.headers || {};
     config.headers['X-CSRFToken'] = getCsrfToken();
+    config.headers['X-Device-ID'] = getOrCreateDeviceId();
 
     if (!config.headers['Content-Type']) {
         if (config.data instanceof FormData) {

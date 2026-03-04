@@ -66,10 +66,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // The httpOnly session-token cookie is sent automatically.
       GETAPI({
         path: "/auth/me",
-        isPrivateApi: false, // public axios instance — cookie is enough
+        isPrivateApi: true, // public axios instance — cookie is enough
       }).subscribe({
         next: (res: any) => {
           if (res.success) {
+
+            console.log("res", res);
+
             const payload: AuthPayload = {
               success: true,
               login_info: res.login_info,
@@ -109,17 +112,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Skip hydration on auth routes (/auth/login, /auth/callback, /auth/sign-up)
     // — there's no session cookie yet. After OAuth callback completes,
     // setLoginAuthInfo() sets state directly without needing /auth/me.
-    const isAuthRoute = routerLocation.pathname.startsWith("/auth");
+    // const isAuthRoute = routerLocation.pathname.startsWith("/auth");
 
-    if (isAuthRoute) {
-      setLoading(false);
-      return;
-    }
+    // if (isAuthRoute) {
+    //   setLoading(false);
+    //   return;
+    // }
 
     if (reloginRequired) {
       hydrateSession();
     }
-  }, [reloginRequired, hydrateSession, routerLocation.pathname]);
+  }, [reloginRequired, hydrateSession]);
 
   /**
    * Called immediately after a successful login or OAuth callback

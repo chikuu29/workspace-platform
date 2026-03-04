@@ -59,22 +59,21 @@ const AuthCallback = () => {
     }).subscribe({
       next: (res: any) => {
         if (res.success) {
-          // Build AuthPayload for Redux — no localStorage needed.
-          // The backend already sets an httpOnly session-token cookie
-          // in this same response, so refreshes are handled by /auth/me.
+          console.log("Token exchange success:", res);
+
+          // The backend already called OAuth2 userinfo internally,
+          // so res.login_info contains the full user profile.
           const loginPayload: AuthPayload = {
             success: true,
-            login_info: res.login_info || {},
+            login_info: res.login_info,
             access_token: res.access_token,
             authProvider: res.authProvider,
           };
 
-          // Update in-memory state only
+          // Hydrate Redux and AuthContext in one go
           setLoginAuthInfo(loginPayload);
-          dispatch(fetchAppConfig());
           dispatch(login(loginPayload));
-
-          // Navigate to the main app area
+          dispatch(fetchAppConfig());
           navigate("/myApps");
         } else {
           console.error("Token exchange failed:", res.message);

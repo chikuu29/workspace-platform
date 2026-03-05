@@ -56,7 +56,7 @@ const AppCard: React.FC<AppCardProps> = memo(({ appConfig, handleNavigate }) => 
       borderRadius="2xl"
       border="1px solid"
       borderColor="app.card.border"
-      bg="app.bg"
+      bg="app.card.bg"
       backdropFilter="blur(16px)"
       boxShadow="app.shadow.glass-glow"
       overflow="hidden"
@@ -202,7 +202,7 @@ export default function MyApps() {
                 My Applications
               </Text>
               <Text fontSize="xs" color="gray.500">
-                Access your workspace tools
+                Launch your workspace applications
               </Text>
             </VStack>
           </Flex>

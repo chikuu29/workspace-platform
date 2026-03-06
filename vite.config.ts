@@ -72,6 +72,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
+      port: 5174,
       hmr: { overlay: true },
       proxy: {
         '/api': {

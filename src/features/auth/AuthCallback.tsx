@@ -77,12 +77,12 @@ const AuthCallback = () => {
           navigate("/myApps");
         } else {
           console.error("Token exchange failed:", res.message);
-          navigate("/auth/login");
+          navigate("/auth/error", { state: { message: res.message, type: "EXCHANGE_FAILURE" } });
         }
       },
       error: (error: any) => {
         console.error("Error exchanging authorization code:", error);
-        navigate("/auth/login");
+        navigate("/auth/error", { state: { message: "Network error during authentication exchange.", type: "NETWORK_ERROR" } });
       },
     });
   };

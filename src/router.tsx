@@ -7,6 +7,7 @@ import DynamicLayout from "./utils/app/DynamicLayout";
 
 const PageNotFound = lazy(() => import("./pages/NoPageFound"));
 const AuthCallback = lazy(() => import("@/features/auth/AuthCallback"));
+const AuthError = lazy(() => import("@/features/auth/AuthError"));
 const AuthLayout = lazy(() => import("@/theme/layouts/auth/auth"));
 const SignInPage = lazy(() => import("@/features/auth/signin/SignIn"));
 const SignUpPage = lazy(() => import("@/features/auth/signup/SignUp"));
@@ -52,6 +53,10 @@ const routes: RouteObject[] = [
       {
         path: "callback",
         element: <AuthCallback />,
+      },
+      {
+        path: "error",
+        element: <AuthError />,
       },
       {
         path: "getstarted",

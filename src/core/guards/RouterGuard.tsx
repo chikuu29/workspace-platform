@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/app/store";
 import Loader from "@/features/ui/components/Loader/Loader";
 import FallbackRenderer from "../renderer/FallbackRenderer";
+import { GetNavMenuConfig } from "@/utils/services/appServices";
 
 interface RouterGuardProps {
   children: React.ReactNode;
@@ -18,6 +19,7 @@ interface RouterGuardProps {
  */
 const RouterGuard: React.FC<RouterGuardProps> = ({ children }) => {
   console.info("=== ROUTERGAURD ===")
+  GetNavMenuConfig();
   const location = useLocation();
   const params = useParams();
 

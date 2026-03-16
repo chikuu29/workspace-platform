@@ -105,6 +105,7 @@ const registry: RegistryConfig = {
     myGym: {
         layout: () => import("@/theme/layouts/workspace"),
         home: () => import("@/features/modules/gym/GymView"),
+        // AddMember: () => import("@/features/modules/gym/AddMember"),
         Subscription: () => import("@/features/modules/gym/Subscription"),
         ListMember: () => import("@/features/modules/gym/Members"),
     },

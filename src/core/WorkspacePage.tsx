@@ -48,7 +48,7 @@ const WorkspacePage = () => {
         const getUITemplate = async () => {
             GETAPI({
                 path: `app/ui_template`,
-                serverName: 'ui',
+
                 params: {
                     pageName: UITemplateID,
                     appName: app

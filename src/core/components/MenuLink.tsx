@@ -10,6 +10,7 @@ import { ActionEngine } from "@/core/action-engine/ActionEngine";
 import { useModalStore } from "@/core/store/useModalStore";
 import type { NavigationAction, ActionExecutionContext } from "@/core/action-engine/types";
 
+
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 /** Shared easing for all interactive transitions in this component */
@@ -150,7 +151,7 @@ const MenuLink = memo(({ menuConfig, showFullSideBarMenu }: MenuLinkProps) => {
         if (clean === "myApps" || clean === "profile" || clean === "settings") {
             return `/${clean}`;
         }
-
+        console.log("MenuLink targetUrl", clean, organizationName);
         return `/${organizationName}/workspace/${clean}`;
     }, [organizationName, menuConfig.target]);
 

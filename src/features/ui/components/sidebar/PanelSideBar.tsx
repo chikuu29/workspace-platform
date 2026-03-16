@@ -40,7 +40,10 @@ const PanelSideBar = () => {
 
   // Don't render if no sidebar menu should be shown
   if (!DISPLAY_TYPE?.SHOW_SIDE_NAV_MENU || FEATURE.length === 0) return null;
-
+  const navBg = useColorModeValue(
+    "#ffff",
+    "rgba(15, 23, 42, 0.88)"
+  );
   return (
     <Box
       as="nav"
@@ -51,7 +54,8 @@ const PanelSideBar = () => {
       boxShadow={shadow}
       transition="width 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
       w={isCollapsed ? "78px" : "260px"}
-      bg="bg.default"
+      // bg="bg.default"
+      bg={navBg}
       borderRight="1px solid"
       borderColor={borderColor}
       flexShrink={0}

@@ -203,7 +203,7 @@ export const AppLoader = memo(() => {
     >
       <VStack gap={8}>
         {/* Logo with pulse */}
-        <Box css={{ animation: "loader-pulse 2.5s ease-in-out infinite" }}>
+        {/* <Box css={{ animation: "loader-pulse 2.5s ease-in-out infinite" }}>
           <Image
             src="/assets/icons/logo.png"
             alt="Workspace Logo"
@@ -211,7 +211,7 @@ export const AppLoader = memo(() => {
             w="auto"
             objectFit="contain"
           />
-        </Box>
+        </Box> */}
 
         {/* Spinner */}
         <OrbitalSpinner size="56px" />

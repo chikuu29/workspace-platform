@@ -24,7 +24,7 @@
                 "id": "MYOMSSYSTEM",
                 "hidden": true,
                 "name": "OMS SYSTEM",
-                "target": "/workspace/app/MyOMS/MyOMS",
+                "target": "/app/MyOMS/MyOMS",
                 "actions": {
                     "onClick": ""
                 },
@@ -63,13 +63,13 @@
                     {
                         "label": "Home",
                         "icon": "FcHome",
-                        "path": "/workspace/app/AdminModules/AdminModule",
+                        "path": "/app/AdminModules/AdminModule",
                         "isMaster": true
                     },
                     {
                         "label": "DB INFO",
                         "icon": "FaDatabase",
-                        "path": "/workspace/app/AdminModules/DatabaseStatistics",
+                        "path": "/app/AdminModules/DatabaseStatistics",
                         "isMaster": true
                     },
                     {
@@ -128,7 +128,7 @@
                     {
                         "label": "Home",
                         "icon": "FcHome",
-                        "path": "/workspace/app/myGym/home",
+                        "path": "/app/myGym/home",
                         "isMaster": true
                     },
                     {
@@ -139,17 +139,17 @@
                             {
                                 "label": "List Members",
                                 "icon": "FcTodoList",
-                                "path": "/workspace/app/myGym/ListMember"
+                                "path": "/app/myGym/ListMember"
                             },
                             {
                                 "label": "Add Member",
                                 "icon": "FcPlus",
-                                "path": "/workspace/app/myGym/AddMember"
+                                "path": "/app/myGym/AddMember"
                             },
                             {
                                 "label": "Member Check-In",
                                 "icon": "FcCheckmark",
-                                "path": "/workspace/app/myGym/MemberCheckIn"
+                                "path": "/app/myGym/MemberCheckIn"
                             }
                         ]
                     },
@@ -161,7 +161,7 @@
                             {
                                 "label": "List Trainers",
                                 "icon": "FcReading",
-                                "path": "/workspace/app/myGym/listTrainers"
+                                "path": "/app/myGym/listTrainers"
                             },
                             {
                                 "label": "Add Trainer",
@@ -180,7 +180,7 @@
                             {
                                 "label": "Manage Schedules",
                                 "icon": "FcCalendar",
-                                "path": "/workspace/app/myGym/trainerSchedules"
+                                "path": "/app/myGym/trainerSchedules"
                             }
                         ]
                     },
@@ -192,17 +192,17 @@
                             {
                                 "label": "List Classes",
                                 "icon": "FcTodoList",
-                                "path": "/workspace/app/myGym/listClasses"
+                                "path": "/app/myGym/listClasses"
                             },
                             {
                                 "label": "Add Class",
                                 "icon": "FcPlus",
-                                "path": "/workspace/app/myGym/addClass"
+                                "path": "/app/myGym/addClass"
                             },
                             {
                                 "label": "Class Bookings",
                                 "icon": "FcBookmark",
-                                "path": "/workspace/app/myGym/classBookings"
+                                "path": "/app/myGym/classBookings"
                             }
                         ]
                     },
@@ -214,17 +214,17 @@
                             {
                                 "label": "Revenue Report",
                                 "icon": "FcMoneyTransfer",
-                                "path": "/workspace/app/myGym/revenueReport"
+                                "path": "/app/myGym/revenueReport"
                             },
                             {
                                 "label": "Attendance Report",
                                 "icon": "FcClock",
-                                "path": "/workspace/app/myGym/attendanceReport"
+                                "path": "/app/myGym/attendanceReport"
                             },
                             {
                                 "label": "Performance Report",
                                 "icon": "FcStatistics",
-                                "path": "/workspace/app/myGym/performanceReport"
+                                "path": "/app/myGym/performanceReport"
                             }
                         ]
                     },
@@ -236,12 +236,12 @@
                             {
                                 "label": "Subscription Plans",
                                 "icon": "FcPlanner",
-                                "path": "/workspace/app/myGym/Subscription"
+                                "path": "/app/myGym/Subscription"
                             },
                             {
                                 "label": "Payment History",
                                 "icon": "FcList",
-                                "path": "/workspace/app/myGym/PaymentsHistory"
+                                "path": "/app/myGym/PaymentsHistory"
                             }
                         ]
                     }

@@ -98,7 +98,11 @@ const AuthCallback = () => {
           dispatch(login(res));
           dispatch(fetchAppConfig());
           setStatus("success");
-          navigate("/myApps");
+
+          // Extract the redirect URL from the state parameter (passed from SignIn.tsx)
+          const params = new URLSearchParams(window.location.search);
+          const stateRedirect = params.get("state");
+          navigate(stateRedirect || "/myApps");
         } else {
           setStatus("error");
           setErrorMsg(res.message || "Token exchange failed.");

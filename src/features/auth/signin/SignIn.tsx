@@ -184,6 +184,11 @@ const SignIn = () => {
         authUrl.searchParams.set("code_challenge", codeChallenge);
         authUrl.searchParams.set("code_challenge_method", "S256");
 
+        // Pass the redirect parameter in the state to preserve it through the OAuth flow
+        if (redirectUrl) {
+            authUrl.searchParams.set("state", redirectUrl);
+        }
+
         window.open(authUrl.toString(), "_self");
     };
 

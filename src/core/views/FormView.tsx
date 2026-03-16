@@ -10,7 +10,7 @@ import {
     Badge,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { UIEngine } from "../renderer/UIEngine";
 import "../widgets";
 import AsyncLoadIcon from "@/utils/hooks/AsyncLoadIcon";
@@ -18,15 +18,23 @@ import { useFormStore } from "../store/useFormStore";
 import { appEventRegistry } from "../registry/AppEventRegistry";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/app/slices/loader/appLoaderSlice";
-const MotionBox = motion.create(Box);
 const FormView = ({ config }: any) => {
     const dispatch = useDispatch();
     const layoutStyles = config?.UI_TYPE?.layoutStyles || {};
-    const cardBg = useColorModeValue("white", "rgba(15, 23, 42, 0.8)");
-    const borderColor = useColorModeValue("gray.200", "rgba(56, 189, 248, 0.1)");
-    const headingColor = useColorModeValue("blue.600", "white");
-    const codeBg = useColorModeValue("gray.50", "gray.900");
-    const formValues = useFormStore(state => state.values);
+    const borderColor = useColorModeValue("rgba(99, 102, 241, 0.16)", "rgba(255, 255, 255, 0.08)");
+    const headingColor = useColorModeValue("app.text.primary", "app.text.primary");
+    const headerBg = useColorModeValue(
+        "linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(239,246,255,0.96) 48%, rgba(238,242,255,0.98) 100%)",
+        "linear-gradient(135deg, rgba(15,23,42,0.96) 0%, rgba(30,41,59,0.92) 48%, rgba(15,23,42,0.98) 100%)"
+    );
+    const headerPanelBg = useColorModeValue("rgba(255,255,255,0.76)", "rgba(255,255,255,0.04)");
+    const cardBg = useColorModeValue("rgba(255,255,255,0.94)", "rgba(15,23,42,0.72)");
+    const metaBg = useColorModeValue("rgba(255,255,255,0.7)", "rgba(255,255,255,0.05)");
+    const accentGlow = useColorModeValue(
+        "0 24px 60px -36px rgba(59, 130, 246, 0.42)",
+        "0 24px 60px -40px rgba(2, 6, 23, 0.85)"
+    );
+    const formValues = useFormStore((state) => state.values);
 
     const tabs = useMemo(() => config?.UI_VIEW?.schema?.forms?.tabs || [], [config]);
 
@@ -53,10 +61,21 @@ const FormView = ({ config }: any) => {
         return buttons;
     }, [config]);
 
-    const [submittedData, setSubmittedData] = React.useState<any>(null);
     const [isEventInProgress, setIsEventInProgress] = React.useState(false);
     const [pendingEventName, setPendingEventName] = React.useState<string | null>(null);
     const formId = React.useId();
+    const title = config?.UI_TYPE?.title || "Information Portal";
+    const description =
+        config?.UI_TYPE?.description ||
+        "Complete the form details and use the actions panel to save or trigger related events.";
+    const visibleActionButtons = useMemo(
+        () => actionButtons.filter((button: any) => !button?.hidden),
+        [actionButtons]
+    );
+    const totalFields = useMemo(
+        () => tabs.reduce((count: number, tab: any) => count + (tab?.widgets?.length || 0), 0),
+        [tabs]
+    );
 
     const executeFormEvent = useCallback(async (eventName: string, payload: any) => {
         if (isEventInProgress) {
@@ -88,10 +107,7 @@ const FormView = ({ config }: any) => {
 
     const handleFormSubmit = useCallback(async (data: any) => {
         if (isEventInProgress) return;
-        const result = await executeFormEvent("submit", data);
-        if (result.success) {
-            setSubmittedData(data);
-        }
+        await executeFormEvent("submit", data);
     }, [executeFormEvent, isEventInProgress]);
 
     const handleActionButtonClick = useCallback(async (button: any) => {
@@ -101,68 +117,205 @@ const FormView = ({ config }: any) => {
     }, [executeFormEvent, formValues, isEventInProgress]);
 
     if (!tabs.length) return null;
-
-
-    const bgCard = useColorModeValue("#fff", "transparent");
     return (
         <Box position="relative">
             <Box {...layoutStyles}>
-                <Flex
-                    direction={{ base: "column", md: "row" }}
-                    justify="space-between"
-                    align={{ base: "start", md: "flex-end" }}
-                    mb={{ base: "8", md: "8" }}
-                    gap="6"
+                <Box
+                    mb="6"
+                    p={{ base: "5", md: "6" }}
+                    borderRadius="3xl"
+                    border="1px solid"
+                    borderColor={borderColor}
+                    bg={headerBg}
+                    boxShadow={accentGlow}
+                    position="relative"
+                    overflow="hidden"
+                    backdropFilter="blur(18px)"
                 >
-                    <VStack align="start" gap="4">
-                        <Badge variant="subtle" colorPalette="blue" px="3" py="1" rounded="full" textTransform="uppercase" fontSize="10px" letterSpacing="widest">
-                            {config.UI_TYPE?.title || "Data Entry"}
-                        </Badge>
-                        <VStack gap="1" align="start">
-                            <Heading size={{ base: "xl", md: "2xl" }} fontWeight="extrabold" letterSpacing="tight" color={headingColor}>
-                                {config.UI_TYPE?.title || "Information Portal"}
-                            </Heading>
-                        </VStack>
-                    </VStack>
-
-                    <HStack gap="4">
-                        {actionButtons.map((btn: any, idx: number) => {
-                            const isSubmit = btn.event === "submit";
-                            return (
-                                <Button
-                                    key={btn.name || idx}
-                                    onClick={isSubmit ? undefined : () => handleActionButtonClick(btn)}
-                                    type={isSubmit ? "submit" : "button"}
-                                    form={isSubmit ? formId : undefined}
-                                    display={btn.hidden ? "none" : "flex"}
-                                    loading={isEventInProgress && pendingEventName === btn.event}
-                                    disabled={isEventInProgress}
-                                    {...btn?.styles}
+                    <Box
+                        position="absolute"
+                        inset="-40% auto auto 70%"
+                        w={{ base: "180px", md: "260px" }}
+                        h={{ base: "180px", md: "260px" }}
+                        borderRadius="full"
+                        bg="rgba(59,130,246,0.14)"
+                        filter="blur(40px)"
+                        pointerEvents="none"
+                    />
+                    <Flex
+                        direction={{ base: "column", xl: "row" }}
+                        justify="space-between"
+                        align="stretch"
+                        gap="6"
+                        position="relative"
+                        zIndex={1}
+                    >
+                        <VStack align="stretch" gap="5" flex="1">
+                            <HStack gap="3" flexWrap="wrap">
+                                <Badge
+                                    colorPalette="blue"
+                                    px="3.5"
+                                    py="1.5"
+                                    rounded="full"
+                                    textTransform="uppercase"
+                                    fontSize="10px"
+                                    letterSpacing="widest"
+                                    bg={metaBg}
+                                    color="app.text.accent"
+                                    border="1px solid"
+                                    borderColor={borderColor}
                                 >
-                                    <HStack gap="2">
-                                        <Text fontWeight="bold">{btn.text}</Text>
-                                        {btn.iconName && (
-                                            <Box>
-                                                <AsyncLoadIcon iconName={btn.iconName} />
-                                            </Box>
-                                        )}
-                                    </HStack>
-                                </Button>
-                            );
-                        })}
-                    </HStack>
-                </Flex>
+                                    Form View
+                                </Badge>
+                                <Badge
+                                    variant="outline"
+                                    px="3.5"
+                                    py="1.5"
+                                    rounded="full"
+                                    fontSize="xs"
+                                    color="app.text.muted"
+                                    borderColor={borderColor}
+                                >
+                                    {tabs.length} section{tabs.length === 1 ? "" : "s"}
+                                </Badge>
+                                <Badge
+                                    variant="outline"
+                                    px="3.5"
+                                    py="1.5"
+                                    rounded="full"
+                                    fontSize="xs"
+                                    color="app.text.muted"
+                                    borderColor={borderColor}
+                                >
+                                    {totalFields} field{totalFields === 1 ? "" : "s"}
+                                </Badge>
+                            </HStack>
+
+                            <VStack gap="2" align="start" maxW="3xl">
+                                <Heading
+                                    size={{ base: "xl", md: "2xl" }}
+                                    fontWeight="extrabold"
+                                    letterSpacing="tight"
+                                    color={headingColor}
+                                >
+                                    {title}
+                                </Heading>
+                                <Text
+                                    fontSize={{ base: "sm", md: "md" }}
+                                    color="app.text.muted"
+                                    lineHeight="tall"
+                                    maxW="2xl"
+                                >
+                                    {description}
+                                </Text>
+                            </VStack>
+                        </VStack>
+
+                        {visibleActionButtons.length > 0 && (
+                            <Box
+                                w={{ base: "full", xl: "auto" }}
+                                minW={{ xl: "320px" }}
+                                p="3"
+                                borderRadius="2xl"
+                                bg={headerPanelBg}
+                                border="1px solid"
+                                borderColor={borderColor}
+                                backdropFilter="blur(14px)"
+                                display="flex"
+                                alignItems="stretch"
+                            >
+                                <VStack align="stretch" gap="3" justify="center" w="full">
+                                    <Text
+                                        fontSize="xs"
+                                        fontWeight="700"
+                                        textTransform="uppercase"
+                                        letterSpacing="widest"
+                                        color="app.text.muted"
+                                        px="2"
+                                    >
+                                        Actions
+                                    </Text>
+                                    <Flex
+                                        gap="3"
+                                        wrap="wrap"
+                                        align="stretch"
+                                        justify={{ base: "stretch", md: "flex-start", xl: "flex-end" }}
+                                    >
+                                        {visibleActionButtons.map((btn: any, idx: number) => {
+                                            const isSubmit = btn.event === "submit";
+                                            const customStyles = btn?.styles || {};
+                                            const defaultShadow = isSubmit
+                                                ? "0 16px 30px -18px rgba(59, 130, 246, 0.7)"
+                                                : "0 14px 28px -22px rgba(15, 23, 42, 0.35)";
+
+                                            return (
+                                                <Button
+                                                    key={btn.name || idx}
+                                                    onClick={isSubmit ? undefined : () => handleActionButtonClick(btn)}
+                                                    type={isSubmit ? "submit" : "button"}
+                                                    form={isSubmit ? formId : undefined}
+                                                    loading={isEventInProgress && pendingEventName === btn.event}
+                                                    disabled={isEventInProgress}
+                                                    // h={customStyles.h || "54px"}
+                                                    // minH="54px"
+                                                    px={customStyles.px || "6"}
+                                                    borderRadius={customStyles.borderRadius || "xl"}
+                                                    fontWeight="700"
+                                                    letterSpacing="0.01em"
+                                                    flex={{ base: "1 1 100%", sm: "1 1 calc(50% - 0.375rem)", xl: "0 0 auto" }}
+                                                    minW={{ xl: "160px" }}
+                                                    justifyContent="center"
+                                                    gap="2.5"
+                                                    transition="all 0.2s ease"
+                                                    variant={customStyles.variant || (isSubmit ? "solid" : "subtle")}
+                                                    colorPalette={customStyles.colorPalette || (isSubmit ? "blue" : "gray")}
+                                                    boxShadow={customStyles.boxShadow || defaultShadow}
+                                                    _hover={{
+                                                        transform: "translateY(-1px)",
+                                                        boxShadow: customStyles.boxShadow || defaultShadow,
+                                                        ...customStyles._hover,
+                                                    }}
+                                                    {...customStyles}
+                                                >
+                                                    {btn.iconName && (
+                                                        <Box
+                                                            display="inline-flex"
+                                                            alignItems="center"
+                                                            justifyContent="center"
+                                                            boxSize="4"
+                                                        >
+                                                            <AsyncLoadIcon iconName={btn.iconName} />
+                                                        </Box>
+                                                    )}
+                                                    <Text fontWeight="inherit">{btn.text}</Text>
+                                                </Button>
+                                            );
+                                        })}
+                                    </Flex>
+                                </VStack>
+                            </Box>
+                        )}
+                    </Flex>
+                </Box>
 
                 <Box
                     rounded="3xl"
-                    shadow="xl"
+                    shadow={accentGlow}
                     border="1px solid"
                     borderColor={borderColor}
                     overflow="hidden"
-                    backdropFilter="blur(10px)"
+                    backdropFilter="blur(14px)"
                     position="relative"
-                    bg={bgCard}
+                    bg={cardBg}
                 >
+                    <Box
+                        h="1px"
+                        bgGradient="to-r"
+                        gradientFrom="transparent"
+                        gradientVia="blue.400"
+                        gradientTo="transparent"
+                        opacity="0.7"
+                    />
                     <UIEngine
                         config={tabs}
                         tabs={tabs}

@@ -98,9 +98,9 @@ const AppBreadcrumb = forwardRef((props, ref) => {
 
   return (
     <Box
-      h="56px"
       w="100%"
-      px="6"
+      px={{ base: "3", sm: "4", md: "6" }}
+      py={{ base: "2.5", md: "2" }}
       borderBottom="1px solid"
       borderColor={borderColorValue}
       bg={bgValue}
@@ -110,17 +110,38 @@ const AppBreadcrumb = forwardRef((props, ref) => {
       zIndex="sticky"
       borderBottomRadius="20px"
     >
-      <Flex h="full" alignItems="center" justifyContent="space-between">
-        <Breadcrumb.Root variant="plain" size="sm">
-          <Breadcrumb.List>
+      <Flex
+        minH={{ base: "auto", md: "56px" }}
+        direction={{ base: "column", md: "row" }}
+        align={{ base: "stretch", md: "center" }}
+        justifyContent="space-between"
+        gap={{ base: "3", md: "4" }}
+      >
+        <Box flex="1" minW="0" overflow="hidden">
+          <Box
+            overflowX="auto"
+            overflowY="hidden"
+            whiteSpace="nowrap"
+            css={{
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+            }}
+            sx={{
+              "&::-webkit-scrollbar": {
+                display: "none",
+              },
+            }}
+          >
+            <Breadcrumb.Root variant="plain" size="sm">
+              <Breadcrumb.List flexWrap="nowrap" minW="max-content">
             {config.map((c: ConfigItem, index) => {
               const isLast = index === config.length - 1;
               return (
                 <React.Fragment key={index}>
                   <Breadcrumb.Item>
                     <HStack
-                      gap="2"
-                      px="3"
+                      gap={{ base: "1.5", md: "2" }}
+                      px={{ base: "2.5", md: "3" }}
                       py="1.5"
                       rounded="lg"
                       transition="all 0.2s"
@@ -128,13 +149,16 @@ const AppBreadcrumb = forwardRef((props, ref) => {
                       onClick={() => handleNavigate(c, isLast)}
                       _hover={!isLast ? { bg: hoverBg, transform: "translateY(-1px)" } : {}}
                       color={isLast ? activeColor : inactiveColor}
+                      minW="fit-content"
                     >
                       {c.icon && <Box color={isLast ? activeColor : "inherit"}>{c.icon}</Box>}
                       <Text
                         fontWeight={isLast ? "bold" : "600"}
-                        fontSize="xs"
+                        fontSize={{ base: "11px", md: "xs" }}
                         textTransform="capitalize"
                         letterSpacing="tight"
+                        maxW={{ base: "112px", sm: "160px", md: "220px" }}
+                        truncate
                       >
                         {c.label}
                       </Text>
@@ -148,16 +172,26 @@ const AppBreadcrumb = forwardRef((props, ref) => {
                 </React.Fragment>
               );
             })}
-          </Breadcrumb.List>
-        </Breadcrumb.Root>
+              </Breadcrumb.List>
+            </Breadcrumb.Root>
+          </Box>
+        </Box>
 
-        <HStack gap="3">
+        <HStack
+          gap="3"
+          justify={{ base: "flex-end", md: "flex-start" }}
+          alignSelf={{ base: "stretch", md: "center" }}
+          flexShrink={0}
+        >
           <Flex
             p="1"
             bg={controlsBg}
             rounded="xl"
             border="1px solid"
             borderColor={controlsBorder}
+            justify="center"
+            align="center"
+            w={{ base: "full", sm: "auto" }}
           >
             <ColorModeButton variant="ghost" size="sm" rounded="lg" />
             <FullscreenButton variant="ghost" size="sm" rounded="lg" />

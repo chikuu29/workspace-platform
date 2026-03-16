@@ -21,17 +21,17 @@ import type {
 
 // ─── Path Builder ────────────────────────────────────────────────────
 
-/** Builds a tenant-scoped workspace path */
-const buildWorkspacePath = (path: string, tenant: string): string => {
+/** Builds an organization-scoped workspace path */
+const buildWorkspacePath = (path: string, organizationName: string): string => {
     const cleanPath = path.startsWith("/") ? path.substring(1) : path;
-    return `/${tenant}/workspace/${cleanPath}`;
+    return `/${organizationName}/workspace/${cleanPath}`;
 };
 
 // ─── Individual Handlers ─────────────────────────────────────────────
 
 const handleRoute: ActionHandler = (action, ctx) => {
     const { path } = action as RouteAction;
-    const fullPath = buildWorkspacePath(path, ctx.tenant);
+    const fullPath = buildWorkspacePath(path, ctx.organizationName);
     ctx.navigate(fullPath);
 };
 

@@ -4,6 +4,7 @@ import { privateAPI, publicAPI } from "./handlers/axiosHandlers";
 import { getFromCache, saveToCache } from "./handlers/dexieHandles";
 
 type RequestMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+export type APIService = "core" | "ui" | "ai";
 
 interface APIRequestOptions {
   method: RequestMethod;
@@ -15,6 +16,7 @@ interface APIRequestOptions {
   enableCache?: boolean;
   cacheTTL?: number;
   files?: FileList | File[];
+  serverName?: APIService;
 }
 
 interface LegacyGetOptions {
@@ -23,6 +25,7 @@ interface LegacyGetOptions {
   isPrivateApi?: boolean;
   enableCache?: boolean;
   cacheTTL?: number;
+  serverName?: APIService;
 }
 
 interface LegacyPostOptions {
@@ -32,6 +35,7 @@ interface LegacyPostOptions {
   enableCache?: boolean;
   cacheTTL?: number;
   files?: FileList | File[];
+  serverName?: APIService;
 }
 
 const errorMessages: Record<number, string> = {
@@ -43,22 +47,47 @@ const errorMessages: Record<number, string> = {
   505: "Server not found",
 };
 
-const buildCacheKey = ({ method, path, params = {}, data = {} }: APIRequestOptions) =>
-  `${method}_${path}_${JSON.stringify(params)}_${JSON.stringify(data)}`;
+const buildCacheKey = ({ method, path, params = {}, data = {}, serverName = "core" }: APIRequestOptions) =>
+  `${serverName}_${method}_${path}_${JSON.stringify(params)}_${JSON.stringify(data)}`;
 
 const buildPayload = (data: any = {}, files?: FileList | File[]) => {
+  // If no files, return data as is (could be Object, FormData, or URLSearchParams)
   if (!files || files.length === 0) return data;
 
-  const formData = new FormData();
+  // Append files to FormData. If data is already FormData, use it; otherwise create new.
+  const formData = (data instanceof FormData) ? data : new FormData();
+
+  if (!(data instanceof FormData)) {
+    Object.keys(data || {}).forEach((key) => {
+      formData.append(key, data[key]);
+    });
+  }
+
   Array.from(files).forEach((file) => {
     formData.append("files", file, file.name);
   });
 
-  Object.keys(data || {}).forEach((key) => {
-    formData.append(key, data[key]);
-  });
-
   return formData;
+};
+
+// Map service to its respective base URL
+export const getBaseUrl = (serverName: APIService) => {
+  if (import.meta.env.DEV) {
+    switch (serverName) {
+      case "ui": return "/ui-api";
+      case "ai": return "/ai-api";
+      case "core":
+      default: return "/api";
+    }
+  } else {
+    // In production, fallback to environment variables
+    switch (serverName) {
+      case "ui": return import.meta.env.VITE_UI_API_URL || "/ui-api";
+      case "ai": return import.meta.env.VITE_AI_API_URL || "/ai-api";
+      case "core":
+      default: return import.meta.env.VITE_API_URL || "/api";
+    }
+  }
 };
 
 /**
@@ -75,10 +104,11 @@ const APIRequest = ({
   enableCache = false,
   cacheTTL = 300,
   files,
+  serverName = "core",
 }: APIRequestOptions) => {
   const apiHandler = isPrivateApi ? privateAPI : publicAPI;
   const shouldCache = enableCache && method === "GET";
-  const cacheKey = buildCacheKey({ method, path, params, data });
+  const cacheKey = buildCacheKey({ method, path, params, data, serverName } as APIRequestOptions);
   const payload = buildPayload(data, files);
 
   return from(
@@ -90,6 +120,7 @@ const APIRequest = ({
 
       const response = await apiHandler.request({
         method,
+        baseURL: getBaseUrl(serverName), // Dynamically target the correct server
         url: path,
         params,
         data: method === "GET" ? undefined : payload,
@@ -106,8 +137,11 @@ const APIRequest = ({
     })()
   ).pipe(
     catchError((error) => {
+      // For 401s, axiosHandlers usually retries. If we are here, it means the retry also failed
+      // or it was a path that skips refresh (like /auth/refresh itself).
       const statusCode = error?.response?.status as number;
-      const message = errorMessages[statusCode] || "An unknown error occurred";
+      const serverMessage = error?.response?.data?.message || error?.response?.data?.detail;
+      const message = serverMessage || errorMessages[statusCode] || "An unknown error occurred";
 
       return of({
         success: false,
@@ -119,7 +153,7 @@ const APIRequest = ({
   );
 };
 
-const GETAPI = ({ path, params = {}, isPrivateApi = false, enableCache = false, cacheTTL = 300 }: LegacyGetOptions) =>
+const GETAPI = ({ path, params = {}, isPrivateApi = false, enableCache = false, cacheTTL = 300, serverName = "core" }: LegacyGetOptions) =>
   APIRequest({
     method: "GET",
     path,
@@ -127,9 +161,10 @@ const GETAPI = ({ path, params = {}, isPrivateApi = false, enableCache = false, 
     isPrivateApi,
     enableCache,
     cacheTTL,
+    serverName,
   });
 
-const POSTAPI = ({ path, data = {}, isPrivateApi = false, files, enableCache = false, cacheTTL = 300 }: LegacyPostOptions) =>
+const POSTAPI = ({ path, data = {}, isPrivateApi = false, files, enableCache = false, cacheTTL = 300, serverName = "core" }: LegacyPostOptions) =>
   APIRequest({
     method: "POST",
     path,
@@ -138,9 +173,10 @@ const POSTAPI = ({ path, data = {}, isPrivateApi = false, files, enableCache = f
     files,
     enableCache,
     cacheTTL,
+    serverName,
   });
 
-const PUTAPI = ({ path, data = {}, isPrivateApi = false, files, enableCache = false, cacheTTL = 300 }: LegacyPostOptions) =>
+const PUTAPI = ({ path, data = {}, isPrivateApi = false, files, enableCache = false, cacheTTL = 300, serverName = "core" }: LegacyPostOptions) =>
   APIRequest({
     method: "PUT",
     path,
@@ -149,9 +185,10 @@ const PUTAPI = ({ path, data = {}, isPrivateApi = false, files, enableCache = fa
     files,
     enableCache,
     cacheTTL,
+    serverName,
   });
 
-const DELETEAPI = ({ path, data = {}, isPrivateApi = false, enableCache = false, cacheTTL = 300 }: LegacyPostOptions) =>
+const DELETEAPI = ({ path, data = {}, isPrivateApi = false, enableCache = false, cacheTTL = 300, serverName = "core" }: LegacyPostOptions) =>
   APIRequest({
     method: "DELETE",
     path,
@@ -159,6 +196,30 @@ const DELETEAPI = ({ path, data = {}, isPrivateApi = false, enableCache = false,
     isPrivateApi,
     enableCache,
     cacheTTL,
+    serverName,
   });
 
-export { APIRequest, GETAPI, POSTAPI, PUTAPI, DELETEAPI };
+/**
+ * Specialized OAuth2 POST helper.
+ * Automatically handles content-type detection and token refresh failure.
+ */
+const POSTWITHOAUTH = async (path: string, options: { body?: any; data?: any; headers?: any; sid?: string; redirect?: string }) => {
+  const payload = options.body || options.data;
+
+  // If sid (session_id) is provided, ensure it's in the payload for grant-style requests
+  if (options.sid && payload instanceof URLSearchParams) {
+    if (!payload.has("sid") && !payload.has("session_id")) {
+      payload.append("sid", options.sid);
+    }
+  }
+
+  return APIRequest({
+    method: "POST",
+    path,
+    data: payload,
+    headers: options.headers,
+    isPrivateApi: true,
+  }).toPromise();
+};
+
+export { APIRequest, GETAPI, POSTAPI, PUTAPI, DELETEAPI, POSTWITHOAUTH };

@@ -1,175 +1,62 @@
-import {
-  useContext,
-  createContext,
-  ReactNode,
-  useEffect,
-  useState,
-  useCallback,
-} from "react";
-import { useLocation } from "react-router";
-import { useDispatch } from "react-redux";
-import { login, logout, AuthPayload } from "@/app/slices/auth/authSlice";
-import { GETAPI } from "@/app/api";
+import { ReactNode, useEffect } from "react";
+import { Center, VStack } from "@chakra-ui/react";
+import { useDispatch, useSelector } from "react-redux";
+import { login, setLoading } from "../app/slices/auth/authSlice";
+import { GETAPI } from "../app/api";
+import type { AppDispatch, RootState } from '../app/store';
+import { Skeleton } from "@/components/ui/skeleton";
 import { fetchAppConfig } from "@/app/slices/appConfig/appConfigSlice";
-import type { AppDispatch } from "@/app/store";
-import Loader, { AppLoader } from "@/features/ui/components/Loader/Loader";
-import { startLoading, stopLoading } from "@/app/slices/loader/appLoaderSlice";
-
-// --- Context Type Definitions ---
-
-interface AuthContextType {
-  /** Full auth payload from /auth/me or initial login */
-  authInfo: AuthPayload | null;
-  /** Whether a re-login/session check is required */
-  reloginRequired: boolean;
-  /** Update auth info after initial login (bypasses /auth/me fetch) */
-  setLoginAuthInfo: (data: AuthPayload) => void;
-  /** Trigger a server logout and clear all in-memory state */
-  logoutUser: () => void;
-  /** Whether the auth hydration request is in-flight */
-  loading: boolean;
-}
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
-// --- Context ---
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// --- Provider ---
-
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const [loading, setLoading] = useState(true);
-  const [authInfo, setAuthInfo] = useState<AuthPayload | null>(null);
-  const [reloginRequired, setReloginRequired] = useState(true);
-
-
-  /**
-   * Hydrate auth state from the server on every mount / page refresh.
-   *
-   * WHY /auth/me instead of localStorage?
-   * - The httpOnly cookie is immune to XSS (JavaScript cannot read it).
-   * - The server is the single source of truth for permissions/roles.
-   * - On every refresh, the user gets the freshest data.
-   * - `withCredentials: true` on axios ensures the cookie is sent
-   *   automatically — no manual token attachment needed for this call.
-   */
-  const hydrateSession = useCallback(async () => {
-    setLoading(true);
-    dispatch(startLoading("Restoring your session…"));
-
-    try {
-      GETAPI({
-        path: "/auth/me",
-        isPrivateApi: true,
-      }).subscribe({
-        next: (res: any) => {
-          if (res.success) {
-            const payload: AuthPayload = {
-              success: true,
-              login_info: res.login_info,
-              access_token: res.access_token,
-              authProvider: res.authProvider,
-            };
-
-            setAuthInfo(payload);
-            dispatch(login(payload));
-            dispatch(fetchAppConfig());
-            setReloginRequired(false); // Session is now hydrated
-          } else {
-            setAuthInfo(null);
-          }
-          dispatch(stopLoading());
-          setLoading(false);
-        },
-        error: () => {
-          setAuthInfo(null);
-          dispatch(stopLoading());
-          setLoading(false);
-        },
-      });
-    } catch {
-      setAuthInfo(null);
-      dispatch(stopLoading());
-      setLoading(false);
-    }
-  }, [dispatch]);
+  const isLoading = useSelector((state: RootState) => state.auth.isLoading);
+  const isHydrated = useSelector((state: RootState) => state.auth.isHydrated);
 
   useEffect(() => {
-    if (reloginRequired) {
-      hydrateSession();
-    }
-  }, [reloginRequired, hydrateSession]);
-
-  /**
-   * Called immediately after a successful login or OAuth callback
-   * to set auth state without waiting for /auth/me.
-   * On subsequent refreshes, hydrateSession will re-fetch from server.
-   */
-  const setLoginAuthInfo = useCallback(
-    (payload: AuthPayload) => {
-      setAuthInfo(payload);
-      dispatch(login(payload));
-      setReloginRequired(false);
-    },
-    [dispatch]
-  );
-
-  /**
-   * Logout: call server to clear httpOnly cookie, then wipe in-memory state.
-   */
-  const logoutUser = useCallback(() => {
-    dispatch(startLoading("Logging you out…"));
-
-    const finalizeLogout = () => {
-      dispatch(logout());
-      setAuthInfo(null);
-      dispatch(stopLoading());
-      // Full reload ensures all in-memory state is cleared
-      window.location.href = "/auth/login";
+    const fetchData = async () => {
+      try {
+        GETAPI({
+          path: "/auth/me",
+          isPrivateApi: true,
+          enableCache: false,
+          cacheTTL: 120
+        }).subscribe(
+          (res: any) => {
+            if (res.success) {
+              dispatch(login(res));
+              dispatch(fetchAppConfig());
+            } else {
+              dispatch(setLoading(false));
+            }
+          }
+        );
+      } catch (error) {
+        console.log("Error", error);
+        dispatch(setLoading(false));
+      }
     };
 
-    GETAPI({
-      path: "/auth/logout",
-      isPrivateApi: true,
-    }).subscribe({
-      next: (res: any) => {
-        if (!res?.success) {
-          console.warn(
-            "Logout API did not succeed, completing local logout."
-          );
-        }
-        finalizeLogout();
-      },
-      error: (error: any) => {
-        console.warn("Logout API failed, completing local logout.", error);
-        finalizeLogout();
-      },
-    });
-  }, [dispatch]);
-
-  if (loading) {
-    return <AppLoader />;
-  }
+    if (!isHydrated) {
+      fetchData();
+    }
+  }, [dispatch, isHydrated]);
 
   return (
-    <AuthContext.Provider
-      value={{ setLoginAuthInfo, authInfo, loading, reloginRequired, logoutUser }}
-    >
-      {!loading && children}
-    </AuthContext.Provider>
+    <>
+      {isLoading ? (
+        <Center w="100vw" h="100vh" bg="bg.default">
+          <VStack gap={4}>
+            <Skeleton height="40px" width="200px" borderRadius="md" />
+            <Skeleton height="20px" width="150px" borderRadius="md" />
+          </VStack>
+        </Center>
+      ) : (
+        children
+      )}
+    </>
   );
-};
-
-// --- Custom Hook ---
-
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
 };

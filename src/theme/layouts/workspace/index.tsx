@@ -4,7 +4,7 @@ import PanelSideBar from "@/features/ui/components/sidebar/PanelSideBar";
 import { memo } from "react";
 import { Outlet } from "react-router";
 import AppFooter from "@/features/ui/components/footer/AppFooter";
-import Appbreadcurmb from "@/features/ui/components/navbar/Appbreadcurmb";
+import AppBreadcrumb from "@/features/ui/components/navbar/AppBreadcrumb";
 import { SidebarProvider } from "@/contexts/SidebarContext";
 import DialogRenderer from "@/core/renderer/DialogRenderer";
 
@@ -21,11 +21,13 @@ const WorkspaceLayout = () => {
         <Flex flex="1" overflow="hidden">
           <PanelSideBar />
           {/* Main Content */}
-          <Box flex="1" overflowY="auto" position="relative" zIndex={0} p={2}>
+          <Box flex="1" overflowY="auto" position="relative" zIndex={0} >
             <Flex flexDirection="column" minH="100%">
-              <VStack align="stretch" flex="1" gap={4}>
-                <Appbreadcurmb />
-                <Outlet />
+              <VStack align="stretch" flex="1" gap={2} mb={3}>
+                <AppBreadcrumb />
+                <Box px={5}>
+                  <Outlet />
+                </Box>
               </VStack>
               <AppFooter />
             </Flex>

@@ -101,7 +101,7 @@ const MenuLink = memo(({ menuConfig, showFullSideBarMenu }: MenuLinkProps) => {
     const activeBg = useColorModeValue("blue.50", "whiteAlpha.100");
     const activeAccent = useColorModeValue("blue.500", "blue.400");
     const hoverBg = useColorModeValue("gray.100", "whiteAlpha.100");
-    const auth = useSelector((state: RootState) => state.auth);
+    const organizations = useSelector((state: RootState) => state.organizations);
 
     const textRef = useRef<HTMLParagraphElement>(null);
     const [isTruncated, setIsTruncated] = useState(false);
@@ -111,14 +111,14 @@ const MenuLink = memo(({ menuConfig, showFullSideBarMenu }: MenuLinkProps) => {
 
     // ─── Derived values ───────────────────────────────────────────────
 
-    const tenant = useMemo(
-        () => (auth?.loginInfo ? auth.loginInfo["tenant_name"] : "GHOST_TENANT"),
-        [auth?.loginInfo]
+    const organizationName = useMemo(
+        () => (organizations?.organization?.name ? organizations.organization.name : "GHOST_ORG"),
+        [organizations?.organization?.name]
     );
 
     const actionContext = useMemo<ActionExecutionContext>(
-        () => ({ navigate, openModal, tenant, menuConfig: menuConfig as unknown as Record<string, unknown> }),
-        [navigate, openModal, tenant, menuConfig]
+        () => ({ navigate, openModal, organizationName, menuConfig: menuConfig as unknown as Record<string, unknown> }),
+        [navigate, openModal, organizationName, menuConfig]
     );
 
     // ─── Stable hover style objects ──────────────────────────────────
@@ -131,19 +131,28 @@ const MenuLink = memo(({ menuConfig, showFullSideBarMenu }: MenuLinkProps) => {
     const expandedActive = useMemo(() => ({ transform: "scale(0.98)" }), []);
     const collapsedActive = useMemo(() => ({ transform: "scale(0.95)" }), []);
 
-    // ─── Path building ────────────────────────────────────────────────
-
     const navigationPath = useMemo(() => {
         if (!menuConfig.path) return "";
         const clean = menuConfig.path.startsWith("/") ? menuConfig.path.substring(1) : menuConfig.path;
-        return `/${tenant}/workspace/${clean}`;
-    }, [tenant, menuConfig.path]);
+
+        // Platform level views (Portal)
+        if (clean === "myApps" || clean === "profile" || clean === "settings") {
+            return `/${clean}`;
+        }
+
+        return `/${organizationName}/workspace/${clean}`;
+    }, [organizationName, menuConfig.path]);
 
     const targetUrl = useMemo(() => {
         if (!menuConfig.target) return "";
         const clean = menuConfig.target.startsWith("/") ? menuConfig.target.substring(1) : menuConfig.target;
-        return `/${tenant}/workspace/${clean}`;
-    }, [tenant, menuConfig.target]);
+
+        if (clean === "myApps" || clean === "profile" || clean === "settings") {
+            return `/${clean}`;
+        }
+
+        return `/${organizationName}/workspace/${clean}`;
+    }, [organizationName, menuConfig.target]);
 
     /**
      * Recursive check to see if this item or any of its children are currently active.
@@ -159,12 +168,12 @@ const MenuLink = memo(({ menuConfig, showFullSideBarMenu }: MenuLinkProps) => {
             return menuConfig.menu.some((child) => {
                 const cleanChild = child.path?.startsWith("/") ? child.path.substring(1) : child.path;
                 if (!cleanChild) return false;
-                const fullChildPath = `/${tenant}/workspace/${cleanChild}`;
+                const fullChildPath = `/${organizationName}/workspace/${cleanChild}`;
                 return location.pathname.startsWith(fullChildPath);
             });
         }
         return false;
-    }, [location.pathname, navigationPath, tenant, menuConfig.menu]);
+    }, [location.pathname, navigationPath, organizationName, menuConfig.menu]);
 
     // ─── Event handlers ───────────────────────────────────────────────
 

@@ -2,6 +2,8 @@ import React, { Suspense, useMemo } from "react";
 import { useParams, useSearchParams } from "react-router";
 import { AppLoader } from "@/features/ui/components/Loader/Loader";
 import { AppRegistry } from "@/core/registry/AppRegistry";
+import RequireAccess from "@/core/guards/RequireAccess";
+import FallbackRenderer from "@/core/renderer/FallbackRenderer";
 
 /**
  * HandleDynamicView
@@ -21,14 +23,14 @@ const HandleDynamicView = () => {
     [appCode, appParam]
   );
 
-  // Resolve the view component from registry (cached)
-  const Component = useMemo(() => {
+  // Resolve the view component and its permissions from registry
+  const resolution = useMemo(() => {
     if (!view) return null;
     return AppRegistry.resolveView(appName, view);
   }, [appName, view]);
 
   // Fallback to WorkspacePage if no matching component found
-  if (!Component) {
+  if (!resolution || !resolution.component) {
     const WorkspacePage = AppRegistry.resolveWorkspacePage();
     return (
       <Suspense fallback={<AppLoader />}>
@@ -37,14 +39,29 @@ const HandleDynamicView = () => {
     );
   }
 
-  // Unique key ensures fresh render when route changes
   const uniqueKey = `${appName}-${view || "home"}-${params || "base"}`;
+  const { component: Component, permissions, requireAll } = resolution;
 
-  return (
+  const content = (
     <Suspense fallback={<AppLoader />} key={uniqueKey}>
       <Component />
     </Suspense>
   );
+
+  // If the view requires PBAC permissions, wrap it in a RequireAccess guard
+  if (permissions) {
+    return (
+      <RequireAccess
+        permissions={permissions}
+        requireAll={requireAll}
+        fallback={<FallbackRenderer reason="PBAC_UNAUTHORIZED" />}
+      >
+        {content}
+      </RequireAccess>
+    );
+  }
+
+  return content;
 };
 
 export default React.memo(HandleDynamicView);

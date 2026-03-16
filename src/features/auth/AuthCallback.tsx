@@ -4,10 +4,10 @@ import { POSTAPI } from "../../app/api";
 import { getOrCreateDeviceId } from "../../utils/services/appServices";
 import { getStoredCodeVerifier } from "../../utils/services/pkceService";
 import { fetchAppConfig } from "../../app/slices/appConfig/appConfigSlice";
-import { login, AuthPayload } from "../../app/slices/auth/authSlice";
+import { login } from "../../app/slices/auth/authSlice";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../app/store";
-import { useAuth } from "../../contexts/AuthProvider";
+// import { useAuth } from "../../contexts/AuthProvider";
 
 import {
   Flex,
@@ -26,7 +26,7 @@ type AuthStatus = "loading" | "error" | "success";
 const AuthCallback = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { setLoginAuthInfo } = useAuth();
+  // const { setLoginAuthInfo } = useAuth();
 
   const [status, setStatus] = useState<AuthStatus>("loading");
   const [errorMsg, setErrorMsg] = useState<string>("");
@@ -86,15 +86,16 @@ const AuthCallback = () => {
       isPrivateApi: true,
     }).subscribe({
       next: (res: any) => {
+        console.log("res", res);
         if (res.success) {
-          const loginPayload: AuthPayload = {
-            success: true,
-            login_info: res.login_info,
-            access_token: res.access_token,
-            authProvider: res.authProvider,
-          };
-          setLoginAuthInfo(loginPayload);
-          dispatch(login(loginPayload));
+          // const loginPayload = {
+          //   success: true,
+          //   login_info: res.login_info,
+          //   access_token: res.access_token,
+          //   authProvider: res.authProvider,
+          // };
+          // setLoginAuthInfo(loginPayload);
+          dispatch(login(res));
           dispatch(fetchAppConfig());
           setStatus("success");
           navigate("/myApps");

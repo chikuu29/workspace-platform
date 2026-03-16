@@ -81,9 +81,83 @@ export const ruleEngine = {
     }
 };
 
+import { GETAPI, POSTAPI, PUTAPI, DELETEAPI } from "@/app/api";
+
 export const actionEngine = {
-    trigger: (eventName: string, params: any) => {
-        console.log(`[ActionEngine] Triggering ${eventName}`, params);
+    trigger: (actionConfig: any, payload: any = {}, onSuccess?: () => void) => {
+        const store = useFormStore.getState();
+        console.log(`[ActionEngine] Executing Action:`, actionConfig, "with payload:", payload);
+
+        if (!actionConfig) return;
+
+        switch (actionConfig.type) {
+            case "openPanel":
+                // Trigger the global panel
+                store.setPanelState(true, actionConfig.panelConfig, payload);
+                break;
+            case "closePanel":
+                store.setPanelState(false);
+                break;
+            case "apiCall":
+                const method = actionConfig.method?.toUpperCase() || "GET";
+                let path = actionConfig.apiPath;
+
+                // Replace path vars like {{id}} with payload data
+                if (path && path.includes("{{") && payload) {
+                    Object.keys(payload).forEach(key => {
+                        path = path.replace(`{{${key}}}`, payload[key]);
+                    });
+                }
+
+                const apiConfig = {
+                    path,
+                    serverName: actionConfig.serverName || "core",
+                    isPrivateApi: true,
+                    data: (method === "POST" || method === "PUT") ? payload : undefined
+                };
+
+                const executeCall = () => {
+                    switch (method) {
+                        case "POST": return POSTAPI(apiConfig).subscribe;
+                        case "PUT": return PUTAPI(apiConfig).subscribe;
+                        case "DELETE": return DELETEAPI(apiConfig).subscribe;
+                        default: return GETAPI(apiConfig).subscribe;
+                    }
+                };
+
+                executeCall()((res: any) => {
+                    if (res.success) {
+                        console.log("[ActionEngine] API Success", res);
+                        store.setPanelState(false);
+                        if (onSuccess) onSuccess();
+                    }
+                });
+                break;
+            case "navigate":
+                let navPath = actionConfig.path;
+                const organizationName = store.organizationName;
+
+                if (navPath && payload) {
+                    // Replace path vars like {{id}} with payload data
+                    Object.keys(payload).forEach(key => {
+                        navPath = navPath.replace(`{{${key}}}`, payload[key]);
+                    });
+                    // Also replace global vars
+                    if (organizationName) {
+                        navPath = navPath.replace(`{{organizationName}}`, organizationName);
+                    }
+                }
+
+                if (store.navigate) {
+                    console.log("[ActionEngine] Navigating to:", navPath);
+                    store.navigate(navPath);
+                } else {
+                    console.error("[ActionEngine] Navigation function not found in store");
+                }
+                break;
+            default:
+                console.warn("[ActionEngine] Unknown action type:", actionConfig.type);
+        }
     }
 };
 

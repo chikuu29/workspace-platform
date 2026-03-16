@@ -12,6 +12,10 @@ import TabsWidget from './TabsWidget';
 import DateField from './DateField';
 import DateTimeField from './DateTimeField';
 
+import SelectField from './SelectField';
+import SwitchField from './SwitchField';
+import CardGrid from './CardGrid';
+
 // Register widgets
 WidgetRegistry.register('textField', TextField);
 WidgetRegistry.register('radioField', RadioField);
@@ -25,6 +29,9 @@ WidgetRegistry.register('kpiTable', KPITable);
 WidgetRegistry.register('tabs', TabsWidget);
 WidgetRegistry.register('dateField', DateField);
 WidgetRegistry.register('dateAndTimeField', DateTimeField);
+WidgetRegistry.register('selectField', SelectField);
+WidgetRegistry.register('switchField', SwitchField);
+WidgetRegistry.register('cardGrid', CardGrid);
 
-export { TextField, RadioField, TextArea, UploadField, CollapsiblePanel, Grid, StepperWidget, KPITile, KPITable, TabsWidget, DateField, DateTimeField };
+export { TextField, RadioField, TextArea, UploadField, CollapsiblePanel, Grid, StepperWidget, KPITile, KPITable, TabsWidget, DateField, DateTimeField, SelectField, SwitchField, CardGrid };
 

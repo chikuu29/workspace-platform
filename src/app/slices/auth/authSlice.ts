@@ -1,70 +1,46 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-// --- Type Definitions ---
-
-/** Shape of user info returned by the /auth/me endpoint */
-export interface LoginInfo {
-    userFullName: string;
-    role: string;
-    email: string;
-    phone: string | null;
-    image: string | null;
-    firstName: string;
-    lastName: string;
-    tenant_name: string | null;
-    permissions: string[];
-}
-
-/** Payload dispatched after successful login or session hydration */
-export interface AuthPayload {
-    success: boolean;
-    login_info: LoginInfo;
-    access_token: string;
-    authProvider?: string;
-    message?: string;
-}
+// Removed monolithic LoginInfo, now handled by userSlice, tenantSlice, rbacSlice
 
 interface AuthState {
     isAuthenticated: boolean;
-    loginInfo: LoginInfo | null;
     access_token: string | null;
-    authRes: AuthPayload | null;
+    authRes: any | null;
+    isLoading: boolean;
+    isHydrated: boolean;
 }
-
-// --- Initial State ---
 
 const initialState: AuthState = {
     isAuthenticated: false,
-    loginInfo: null,
     access_token: null,
     authRes: null,
+    isLoading: true,
+    isHydrated: false,
 };
-
-// --- Slice ---
 
 const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-        /**
-         * Hydrate auth state from login response or /auth/me response.
-         * Both share the same AuthPayload shape.
-         */
-        login: (state, action: PayloadAction<AuthPayload>) => {
+        setLoading: (state, action: PayloadAction<boolean>) => {
+            state.isLoading = action.payload;
+        },
+        login: (state, action: PayloadAction<any>) => {
             state.authRes = action.payload;
             state.isAuthenticated = action.payload.success;
-            state.loginInfo = action.payload.login_info;
             state.access_token = action.payload.access_token;
+            state.isLoading = false;
+            state.isHydrated = true;
         },
-        /** Clear all auth state — called on logout or 401 */
         logout: (state) => {
             state.isAuthenticated = false;
-            state.loginInfo = null;
             state.access_token = null;
             state.authRes = null;
-        },
-    },
+            state.isLoading = false;
+            state.isHydrated = true;
+        }
+    }
 });
 
-export const { login, logout } = authSlice.actions;
+export const { login, logout, setLoading } = authSlice.actions;
 export default authSlice.reducer;

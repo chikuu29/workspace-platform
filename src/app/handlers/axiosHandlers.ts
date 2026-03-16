@@ -58,7 +58,6 @@ const getCsrfToken = (): string => {
 
 /** Static headers applied to every request on both instances. */
 const DEFAULT_HEADERS = {
-    'Content-Type': 'application/json',
     'X-Client-ID': import.meta.env.VITE_X_Client_ID,
 } as const;
 
@@ -73,13 +72,22 @@ const attachDynamicHeaders = (config: InternalAxiosRequestConfig): InternalAxios
     headers['X-CSRFToken'] = getCsrfToken();
     headers['X-Device-ID'] = getOrCreateDeviceId();
 
-    // Let browser set multipart boundary automatically for FormData
-    if (!headers['Content-Type']) {
+    // ── Dynamic Content-Type Detection ──
+    // If not manually specified, detect based on payload type
+    if (!headers['Content-Type'] && config.data) {
         if (config.data instanceof FormData) {
-            headers['Content-Type'] = 'multipart/form-data';
-        } else if (config.data && typeof config.data === 'object') {
+            // NOTE: We DELETE Content-Type for FormData. 
+            // If we set it to 'multipart/form-data' manually, the boundary will be missing.
+            // Deleting it lets Axios/Browser set it with the correct boundary.
+            delete headers['Content-Type'];
+        } else if (config.data instanceof URLSearchParams) {
+            headers['Content-Type'] = 'application/x-www-form-urlencoded';
+        } else if (typeof config.data === 'object') {
             headers['Content-Type'] = 'application/json';
         }
+    } else if (!headers['Content-Type'] && !config.data && config.method !== 'get') {
+        // Fallback for non-GET requests without data
+        headers['Content-Type'] = 'application/json';
     }
 
     config.headers = headers;
@@ -121,10 +129,16 @@ publicAPI.interceptors.request.use(
 privateAPI.interceptors.request.use(
     (config) => {
         const enriched = attachDynamicHeaders(config);
-        const token = (store.getState() as RootState)?.auth?.access_token;
+        const state = store.getState() as RootState;
+        const token = state?.auth?.access_token;
+        const organizationUuid = state?.organizations?.organization?.uuid;
 
         if (token) {
             enriched.headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        if (organizationUuid) {
+            enriched.headers['X-Organization-ID'] = organizationUuid;
         }
 
         return enriched;
@@ -153,7 +167,7 @@ privateAPI.interceptors.request.use(
 // ────────────────────────────────────────────────────────────────────────
 
 /** Paths excluded from silent refresh to prevent infinite loops. */
-const SKIP_REFRESH_PATHS = ['/auth/me', '/auth/refresh', '/auth/logout'] as const;
+const SKIP_REFRESH_PATHS = ['/auth/me', '/auth/refresh', '/auth/logout', "/oauth2/authorize"] as const;
 
 /** Module-level flag: is a refresh call currently in-flight? */
 let isRefreshing = false;
@@ -246,7 +260,6 @@ privateAPI.interceptors.response.use(
             const currentAuth = (store.getState() as RootState).auth;
             store.dispatch(login({
                 success: true,
-                login_info: currentAuth.loginInfo!,
                 access_token: data.access_token,
                 authProvider: currentAuth.authRes?.authProvider,
             }));

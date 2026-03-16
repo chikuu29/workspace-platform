@@ -1,25 +1,25 @@
 import {
   Box,
+  Flex,
+  Image,
+  Input,
   SimpleGrid,
   Text,
-  Input,
-  Image,
-  Flex,
-  Icon,
   VStack,
+  HStack,
+  Icon,
+  Heading,
   Center,
-  Container
 } from "@chakra-ui/react";
+import { memo, useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router";
-import * as dynamicFunctions from "../../script/myAppsScript";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
-import { memo, useEffect, useMemo, useState } from "react";
-import { useColorModeValue } from "@/components/ui/color-mode";
-import { LuSearch, LuLayoutGrid, LuChevronRight } from "react-icons/lu";
-import { InputGroup } from "@/components/ui/input-group";
-import React from "react";
 import { FiSearch } from "react-icons/fi";
+import { LuChevronRight, LuLayoutGrid, LuSearch } from "react-icons/lu";
+import * as dynamicFunctions from "../../script/myAppsScript";
+import { InputGroup } from "@/components/ui/input-group";
+import { useColorModeValue } from "@/components/ui/color-mode";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -133,103 +133,138 @@ AppCard.displayName = "AppCard";
 
 // ─── main MyApps ─────────────────────────────────────────────────────────────
 
-export default function MyApps() {
+function MyApps() {
   const appConfig = useSelector((state: RootState) => state.app.appConfig);
   const error = useSelector((state: RootState) => state.app.error);
-  const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
-  const appList = appConfig?.config?.appList || [];
-  const [filteredApps, setFilteredApps] = useState<any[]>([]);
   const auth = useSelector((state: RootState) => state.auth);
+  const organizations = useSelector((state: RootState) => state.organizations);
+  const navigate = useNavigate();
 
-  const bgPage = useColorModeValue("gray.50", "gray.900");
-  const bgHeader = useColorModeValue("rgba(255, 255, 255, 0.8)", "rgba(23, 25, 35, 0.8)");
-  const searchBg = useColorModeValue("white", "gray.800");
+  const [searchTerm, setSearchTerm] = useState("");
+  const appList = useMemo(() => appConfig?.config?.appList ?? [], [appConfig]);
+  const orgApps = organizations?.organization?.apps || {};
 
-  useEffect(() => {
-    const filtered = appList.filter(
-      (app: any) => app.name?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredApps(filtered);
-  }, [searchTerm, appList]);
+  const filteredApps = useMemo(() => {
+    return appList.filter((app: any) => {
+      const appKey = app.appCode || app.id;
+      // If the app is a specific APP_ module, check if the organization has an active subscription for it
+      if (appKey?.startsWith("APP_") && !orgApps[appKey]) {
+        return false;
+      }
 
-  const handleDefaultNavigate = (e: React.MouseEvent, appConfig: any) => {
+      // Convert snake_case to Title Case (e.g., organization_email -> Organization Email).toLowerCase())
+      return app.name.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+  }, [searchTerm, appList, orgApps]);
+
+  const handleDefaultNavigate = useCallback((e: React.MouseEvent, cfg: any) => {
     e.preventDefault();
     if (!auth?.isAuthenticated) return;
 
-    const tenant_name = auth?.loginInfo?.["tenant_name"] || "GHOST_TENANT";
+    const organizationName = organizations?.organization?.name ?? "GHOST_ORG";
 
-    if (Object.keys(appConfig.actions || {}).length > 0) {
-      if (appConfig.actions["onClick"]) {
-        const actionName = appConfig.actions["onClick"];
-        if (actionName in dynamicFunctions) {
-          (dynamicFunctions as any)[actionName](e, appConfig);
-        } else {
-          console.error(`Method ${actionName} not found`);
-        }
-      } else if (appConfig.target) {
-        navigate(`/${tenant_name}/workspace${appConfig.target}`);
-      }
-    } else if (appConfig.target) {
-      navigate(`/${tenant_name}/workspace${appConfig.target}`);
+    const action = cfg.actions?.["onClick"];
+    if (action && action in dynamicFunctions) {
+      (dynamicFunctions as any)[action](e, cfg);
+      return;
     }
-  };
+    if (cfg.target) {
+      navigate(`/${organizationName}${cfg.target}`);
+    }
+  }, [auth?.isAuthenticated, organizations?.organization?.name, navigate]);
 
   return (
-    <Box borderRadius={[20, 20, 20, 20]}>
-      {/* Sticky Header Section */}
-      <Box
-        borderRadius={20}
-        position="sticky"
-        top="-1px"
-        zIndex={100}
-        // bg={bgHeader}
-        backdropFilter="blur(12px)"
-        borderBottom="1px solid"
-        borderColor={useColorModeValue("gray.200", "whiteAlpha.100")}
-        py={1}
-        px={6}
-        boxShadow="sm"
-      >
-        {/* <Container maxW="7xl"> */}
-        <Flex justify="space-between" align="center" gap={4} wrap="wrap">
-          <Flex align="center" gap={3}>
-            <Center p={2} bg="brand.500" borderRadius="lg" color="white">
-              <Icon as={LuLayoutGrid} boxSize={5} />
-            </Center>
-            <VStack align="start" gap={0}>
-              <Text fontSize="lg" fontWeight="bold" lineHeight="1.2">
-                My Applications
-              </Text>
-              <Text fontSize="xs" color="gray.500">
-                Launch your workspace applications
-              </Text>
-            </VStack>
+    <Box p="2">
+      <VStack gap={6} align="stretch">
+        {/* Header Section */}
+
+        <Box
+          // borderRadius={20}
+          position="sticky"
+          top="-1px"
+          zIndex={100}
+          // bg={bgHeader}
+          backdropFilter="blur(12px)"
+          borderBottom="1px solid"
+          borderColor={useColorModeValue("gray.200", "whiteAlpha.100")}
+          py={3}
+          px={2}
+          boxShadow="sm"
+          borderRadius="md"
+        >
+          {/* <Container maxW="7xl"> */}
+          <Flex justify="space-between" align="center" gap={4} wrap="wrap">
+            <Flex align="center" gap={3}>
+              <Center p={2} bg="brand.500" borderRadius="lg" color="white">
+                <Icon as={LuLayoutGrid} boxSize={5} />
+              </Center>
+              <VStack align="start" gap={0}>
+                <Text fontSize="lg" fontWeight="bold" lineHeight="1.2">
+                  My Applications
+                </Text>
+                <Text fontSize="xs" color="gray.500">
+                  Launch your workspace applications
+                </Text>
+              </VStack>
+            </Flex>
+
+            <Box>
+              <InputGroup flex="1" startElement={<Icon as={LuSearch} color="gray.400" />}>
+                <Input
+                  placeholder="Search apps..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  // bg={searchBg}
+                  borderRadius="full"
+                  border="1px solid"
+                  borderColor={useColorModeValue("gray.200", "whiteAlpha.200")}
+                  _focus={{
+                    borderColor: "brand.500",
+                    boxShadow: "0 0 0 1px var(--chakra-colors-brand-500)"
+                  }}
+                />
+              </InputGroup>
+            </Box>
           </Flex>
+          {/* </Container> */}
+        </Box>
 
-          <Box>
-            <InputGroup flex="1" startElement={<Icon as={LuSearch} color="gray.400" />}>
-              <Input
-                placeholder="Search apps..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                bg={searchBg}
-                borderRadius="full"
-                border="1px solid"
-                borderColor={useColorModeValue("gray.200", "whiteAlpha.200")}
-                _focus={{
-                  borderColor: "brand.500",
-                  boxShadow: "0 0 0 1px var(--chakra-colors-brand-500)"
-                }}
-              />
-            </InputGroup>
-          </Box>
-        </Flex>
-        {/* </Container> */}
-      </Box>
+        {/* Search Bar */}
+        {/* <Box
+          position="sticky"
+          top="100px"
+          zIndex={10}
+          bg="app.navbar.bg"
+          backdropFilter="blur(16px)"
+          borderRadius="full"
+          border="1px solid"
+          borderColor="app.navbar.border"
+          boxShadow="app.shadow.glass-glow"
+          px={4}
+          py={1.5}
+          width="full"
+        >
+          <InputGroup
+            startElement={<FiSearch color="var(--chakra-colors-app-text-accent)" size={18} />}
+            width="full"
+          >
+            <Input
+              placeholder="Search your apps..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              border="none"
+              outline="none"
+              px={2}
+              fontSize="sm"
+              fontWeight="500"
+              color="app.text.primary"
+              _focus={{ boxShadow: "none", border: "none", outline: "none" }}
+              _active={{ border: "none", outline: "none" }}
+              _placeholder={{ color: "app.text.muted" }}
+            />
+          </InputGroup>
+        </Box> */}
 
-      {/* Main Content */}
-      <Box py={4} px={6}>
         {/* Grid Section */}
         {!error && (
           <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4, xl: 5 }} gap={4}>
@@ -250,92 +285,9 @@ export default function MyApps() {
             <Text fontSize="sm" color="app.text.muted">Try a different search term</Text>
           </Flex>
         )}
-      </Box>
+      </VStack>
     </Box>
   );
 }
 
-// Sub-components
-
-interface AppItemProps {
-  appConfig: any;
-  logoConfig: any;
-  name: string;
-  handleNavigate: (e: React.MouseEvent, appConfig: any) => void;
-}
-
-const AppItem: React.FC<AppItemProps> = ({
-  appConfig,
-  logoConfig,
-  name,
-  handleNavigate,
-}) => {
-  if (appConfig?.hidden) return null;
-
-
-  // const bgCard = useColorModeValue("rgba(255,255,255,0.95)", "rgba(255,255,255,0.04)");
-
-  // // const bgCard = useColorModeValue("#fff", "transparent");
-  // const borderColor = useColorModeValue("gray.100", "whiteAlpha.100");
-  // const hoverBorderColor = useColorModeValue("rgba(99,102,241,0.12)", "rgba(255,255,255,0.08)")
-  const cardBg = useColorModeValue("rgba(255,255,255,0.95)", "rgba(255,255,255,0.04)");
-  const cardBorder = useColorModeValue("rgba(99,102,241,0.12)", "rgba(255,255,255,0.08)");
-
-
-  return (
-    <Box
-      bg={cardBg}
-      borderWidth="1px"
-      borderColor={cardBorder}
-      borderRadius="2xl"
-      p={5}
-      cursor="pointer"
-      transition="all 0.22s cubic-bezier(0.4,0,0.2,1)"
-      backdropFilter="blur(8px)"
-      boxShadow="0 2px 12px rgba(0,0,0,0.06)"
-      _hover={{
-        transform: "translateY(-3px)",
-        boxShadow: "0 12px 32px rgba(99,102,241,0.18)",
-        borderColor: "app.text.accent",
-      }}
-      onClick={(e) => handleNavigate(e, appConfig)}
-    >
-      <Flex direction="column" align="center" justify="center" gap={3}>
-        <Image
-          {...logoConfig?.style}
-          src={logoConfig?.url}
-          alt={`${name} logo`}
-          borderRadius="xl"
-        />
-        <Text
-          fontSize="sm"
-          fontWeight={600}
-          color="app.text.primary"
-          textAlign="center"
-          letterSpacing="0.01em"
-        >
-          {name}
-        </Text>
-      </Flex>
-    </Box>
-  );
-};
-
-interface AppListProps {
-  apps: any[];
-  handleNavigate: (e: React.MouseEvent, appConfig: any) => void;
-}
-
-const AppList: React.FC<AppListProps> = ({ apps, handleNavigate }) => (
-  <SimpleGrid columns={[1, 2, 3, 4]} gap={4}>
-    {apps.map((app, index) => (
-      <AppItem
-        key={index}
-        appConfig={app}
-        logoConfig={app.logo}
-        name={app.name}
-        handleNavigate={handleNavigate}
-      />
-    ))}
-  </SimpleGrid>
-);
+export default memo(MyApps);

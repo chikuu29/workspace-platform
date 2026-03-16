@@ -105,8 +105,6 @@ const TextArea = ({
               })}
               id={name}
               placeholder={oneLiner ? description : ""}
-              size="md"
-              minH="100px"
               disabled={disabled}
               bg={useColorModeValue("white", "whiteAlpha.50")}
               borderRadius="lg"

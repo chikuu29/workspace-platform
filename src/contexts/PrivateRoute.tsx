@@ -1,8 +1,8 @@
 // src/PrivateRoute.tsx
 import React from "react";
 import { Navigate, useLocation } from "react-router";
-import { useAuth } from "./AuthProvider";
-import { GetNavMenuConfig } from "../utils/services/appServices";
+import { useSelector } from "react-redux";
+import { RootState } from "@/app/store";
 import Loader from "@/features/ui/components/Loader/Loader";
 // import isAuthenticated from './auth';
 
@@ -18,7 +18,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
   redirection = true,
 }) => {
   console.log("%c===EXCECUTE PRIVATE ROUTE===", "color:red");
-  GetNavMenuConfig();
+  // GetNavMenuConfig();
   const location = useLocation();
   elseNavigation =
     elseNavigation && elseNavigation !== ""
@@ -27,14 +27,16 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
         : elseNavigation
       : `/auth/login?redirect=${encodeURIComponent(location.pathname + location.search)}`;
 
-  const { authInfo, loading } = useAuth();
-  console.log("auth", authInfo);
+  const authState = useSelector((state: RootState) => state.auth);
+  const isLoading = authState.isLoading;
+  const isAuthenticated = authState.isAuthenticated;
+  const authRes = authState.authRes;
 
-  if (loading) {
+  if (isLoading) {
     return <Loader />; // Or a loading spinner
   }
 
-  if (!authInfo && !authInfo?.success) {
+  if (!authRes || !authRes?.success || !isAuthenticated) {
     // setRedirectUrl(location.pathname);
     return <Navigate to={elseNavigation} replace />;
   }

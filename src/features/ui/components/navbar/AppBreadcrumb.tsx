@@ -7,8 +7,11 @@ import {
   LuBox,
   LuLayers,
   LuLayoutDashboard,
-  LuChevronRight
+  LuChevronRight,
+  LuUser,
+  LuSettings
 } from "react-icons/lu";
+import { FiHelpCircle } from "react-icons/fi";
 import {
   useLocation,
   useNavigate,
@@ -22,7 +25,7 @@ interface ConfigItem {
   icon?: React.ReactElement;
 }
 
-const Appbreadcurmb = forwardRef((props, ref) => {
+const AppBreadcrumb = forwardRef((props, ref) => {
   const { appCode, view, secondaryView } = useParams();
   const [searchParams] = useSearchParams();
   const appParam = searchParams.get("app");
@@ -43,7 +46,13 @@ const Appbreadcurmb = forwardRef((props, ref) => {
       { path: "/myApps", label: "Home", icon: <LuHouse size="14" /> }
     ];
 
-    if (!view && !appCode) {
+    if (pathname.toLowerCase().includes("/profile")) {
+      newConfig.push({ path: pathname, label: "Profile", icon: <LuUser size="14" /> });
+    } else if (pathname.toLowerCase().includes("/settings")) {
+      newConfig.push({ path: pathname, label: "Settings", icon: <LuSettings size="14" /> });
+    } else if (pathname.toLowerCase().includes("/helpcenter")) {
+      newConfig.push({ path: pathname, label: "Help Center", icon: <FiHelpCircle size="14" /> });
+    } else if (!view && !appCode) {
       newConfig.push({ path: "#", label: "MyApps", icon: <LuLayers size="14" /> });
     } else {
       const appBasePath = appCode ? `/app/${appCode}/home` : `/?app=${appName}`;
@@ -160,4 +169,4 @@ const Appbreadcurmb = forwardRef((props, ref) => {
   );
 });
 
-export default Appbreadcurmb;
+export default AppBreadcrumb;

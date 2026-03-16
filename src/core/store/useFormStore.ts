@@ -21,6 +21,16 @@ interface FormState {
     changeUI: (targets: string[], updates: Partial<WidgetProps>) => void;
     scripts: Record<string, any>;
     setScripts: (scripts: Record<string, any>) => void;
+    // Global Panel State for CDUI
+    panelOpen: boolean;
+    panelConfig: any | null;
+    panelData: any | null;
+    setPanelState: (isOpen: boolean, config?: any, data?: any) => void;
+    // Navigation context
+    navigate?: (path: string) => void;
+    setNavigate: (nav: any) => void;
+    organizationName?: string;
+    setOrganizationName: (name: string) => void;
 }
 
 export const useFormStore = create<FormState>((set, get) => ({
@@ -30,8 +40,19 @@ export const useFormStore = create<FormState>((set, get) => ({
     errors: {},
     metadata: {},
     scripts: {},
+    panelOpen: false,
+    panelConfig: null,
+    panelData: null,
+
+    setPanelState: (isOpen, config = null, data = null) => set({
+        panelOpen: isOpen,
+        panelConfig: config ? config : get().panelConfig,
+        panelData: data ? data : get().panelData,
+    }),
 
     setScripts: (scripts) => set({ scripts }),
+    setNavigate: (navigate) => set({ navigate }),
+    setOrganizationName: (organizationName) => set({ organizationName }),
 
     initialize: (config: any[]) => {
         const currentValues = get().values || {};

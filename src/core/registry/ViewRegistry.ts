@@ -6,6 +6,7 @@ export enum ViewType {
     SECTION_VIEW = "SECTION_VIEW",
     FORM_VIEW = "FORM_VIEW",
     GRID_VIEW = "GRID_VIEW",
+    PAGE_VIEW = "PAGE_VIEW",
 }
 
 class Registry {

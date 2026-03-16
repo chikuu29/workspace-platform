@@ -3,7 +3,7 @@ import { Box, Skeleton, Text, VStack } from "@chakra-ui/react";
 import type { SectionRendererProps } from "./types";
 
 const CHART_COMPONENT_REGISTRY: Record<string, () => Promise<{ default: React.ComponentType<any> }>> = {
-  RevenuAnalytics: () => import("@/features/modules/gym/RevenuAnalytics")
+  RevenuAnalytics: () => import("@/features/modules/system/AuthUser")
 };
 
 const AnalyticsLoader = ({ componentKey }: { componentKey: string }) => {

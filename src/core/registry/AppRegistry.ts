@@ -19,9 +19,23 @@ import { lazy, type ComponentType, type LazyExoticComponent } from "react";
 /** Factory function that returns a dynamic import promise */
 type LazyImportFn = () => Promise<{ default: ComponentType<any> }>;
 
-/** Config for a single app — maps view names to lazy import functions */
+/** 
+ * Optional config to attach PBAC permissions to a specific view route.
+ * 
+ * To require multiple permissions:
+ * - Use an array: `permissions: ["ACCOUNT.ROLES.READ", "ACCOUNT.USERS.READ"]`
+ * - Set `requireAll: true` (AND logic) if they need EVERY permission in the array.
+ * - Set `requireAll: false` (OR logic, default) if they only need ANY ONE of them.
+ */
+interface AppViewConfig {
+    component: LazyImportFn;
+    permissions?: string | string[];
+    requireAll?: boolean;
+}
+
+/** Config for a single app — maps view names to lazy imports or complex configs */
 interface AppModuleConfig {
-    [viewName: string]: LazyImportFn;
+    [viewName: string]: LazyImportFn | AppViewConfig;
 }
 
 /** Top-level registry shape — maps app names to module configs */
@@ -41,10 +55,52 @@ const lazyCache = new Map<string, LazyExoticComponent<ComponentType<any>>>();
 
 /** Mutable registry — seeded with defaults, extensible at runtime */
 const registry: RegistryConfig = {
-    AdminModules: {
+    system: {
         layout: () => import("@/theme/layouts/workspace"),
-        home: () => import("@/features/modules/admin/AdminView"),
-        DatabaseStatistics: () => import("@/features/modules/admin/DatabaseStatisticsView"),
+        home: () => import("@/features/modules/system/PlatformView"),
+        DatabaseStatistics: {
+            component: () => import("@/features/modules/system/DatabaseStatisticsView"),
+            permissions: "SYSTEM_ADMINISTRATOR.SYSTEM.*",
+        },
+        ApplicationClients: {
+            component: () => import("@/features/modules/system/OAuthView"),
+            permissions: "SYSTEM_ADMINISTRATOR.SYSTEM.*",
+        },
+        AuthUsers: () => import("@/features/modules/system/AuthUser"),
+        Organizations: {
+            component: () => import("@/features/modules/system/OrganizationView"),
+            permissions: "SYSTEM_ADMINISTRATOR.SYSTEM.*",
+        },
+        accesscontrol: {
+            component: () => import("@/features/modules/system/AccessControlView"),
+            permissions: "SYSTEM_ADMINISTRATOR.SYSTEM.*",
+        },
+        SaasApps: {
+            component: () => import("@/features/modules/system/SaasAppsView"),
+            permissions: "SYSTEM_ADMINISTRATOR.SYSTEM.*",
+        },
+        Features: {
+            component: () => import("@/features/modules/system/FeaturesView"),
+            permissions: "SYSTEM_ADMINISTRATOR.SYSTEM.*",
+        },
+        Permissions: {
+            component: () => import("@/features/modules/system/PermissionsView"),
+            permissions: "SYSTEM_ADMINISTRATOR.SYSTEM.*",
+        },
+        SubscriptionPlans: {
+            component: () => import("@/features/modules/system/SubscriptionPlansView"),
+            permissions: "SYSTEM_ADMINISTRATOR.SYSTEM.*",
+        },
+        OrganizationRoles: {
+            component: () => import("@/features/modules/system/OrganizationRolesView")
+        },
+        OrganizationUsers: {
+            component: () => import("@/features/modules/system/OrganizationUsersView")
+        },
+        OrganizationAccess: () => import("@/features/modules/system/OrganizationAccessView"),
+        PolicyManagement: {
+            component: () => import("@/features/modules/system/PolicyManagementView")
+        },
     },
     myGym: {
         layout: () => import("@/theme/layouts/workspace"),
@@ -80,26 +136,49 @@ const getCachedLazy = (
 
 // ─── Public API ──────────────────────────────────────────────────────
 
+export interface ResolvedAppView {
+    component: LazyExoticComponent<ComponentType<any>>;
+    permissions?: string | string[];
+    requireAll?: boolean;
+}
+
 export const AppRegistry = {
     /**
      * Resolve a view component for a given app and view name.
+     * Returns an object containing the cached component and any required permissions.
      * Falls back to "Default" config if the app has no entry.
      * Returns null if the view doesn't exist in either config.
      */
     resolveView(
         appName: string,
         viewName: string
-    ): LazyExoticComponent<ComponentType<any>> | null {
+    ): ResolvedAppView | null {
         // Try app-specific config first
         const appConfig = registry[appName];
         if (appConfig && viewName in appConfig) {
-            return getCachedLazy(`${appName}::${viewName}`, appConfig[viewName]);
+            const entry = appConfig[viewName];
+            if (typeof entry === "function") {
+                return { component: getCachedLazy(`${appName}::${viewName}`, entry as LazyImportFn) };
+            }
+            return {
+                component: getCachedLazy(`${appName}::${viewName}`, entry.component),
+                permissions: entry.permissions,
+                requireAll: entry.requireAll,
+            };
         }
 
         // Fallback to Default config
         const defaultConfig = registry["Default"];
         if (defaultConfig && viewName in defaultConfig) {
-            return getCachedLazy(`Default::${viewName}`, defaultConfig[viewName]);
+            const entry = defaultConfig[viewName];
+            if (typeof entry === "function") {
+                return { component: getCachedLazy(`Default::${viewName}`, entry as LazyImportFn) };
+            }
+            return {
+                component: getCachedLazy(`Default::${viewName}`, entry.component),
+                permissions: entry.permissions,
+                requireAll: entry.requireAll,
+            };
         }
 
         return null;
@@ -112,7 +191,8 @@ export const AppRegistry = {
     resolveLayout(
         appName: string
     ): LazyExoticComponent<ComponentType<any>> | null {
-        return this.resolveView(appName, "layout");
+        const resolution = this.resolveView(appName, "layout");
+        return resolution ? resolution.component : null;
     },
 
     /**
@@ -120,7 +200,8 @@ export const AppRegistry = {
      * Used when no specific component matches the route.
      */
     resolveWorkspacePage(): LazyExoticComponent<ComponentType<any>> | null {
-        return this.resolveView("Default", "workspacePage");
+        const resolution = this.resolveView("Default", "workspacePage");
+        return resolution ? resolution.component : null;
     },
 
     /**
@@ -132,7 +213,7 @@ export const AppRegistry = {
 
     /**
      * Register a new app module config at runtime.
-     * Useful for dynamically loaded tenant modules.
+     * Useful for dynamically loaded organization modules.
      */
     registerApp(appName: string, config: AppModuleConfig): void {
         registry[appName] = config;

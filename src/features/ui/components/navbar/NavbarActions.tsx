@@ -10,8 +10,11 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { ColorModeButton, useColorModeValue } from "@/components/ui/color-mode";
-import { useAuth } from "@/contexts/AuthProvider";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router";
+import { RootState } from "@/app/store";
+import { logout } from "@/app/slices/auth/authSlice";
+import { POSTAPI } from "@/app/api";
 import {
   FiLogOut,
   FiSettings,
@@ -28,13 +31,27 @@ import NotificationMenu from "./NotificationMenu";
  * Wrapped with React.memo to prevent unnecessary re-renders from parent.
  */
 const NavbarActions = () => {
-  const auth = useSelector((state: any) => state.auth);
-  const { logoutUser } = useAuth();
+  const userProfile = useSelector((state: RootState) => state.user.profile);
+  const orgName = useSelector((state: RootState) => state.organizations.organization?.name);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // Memoize logout handler to maintain stable reference
   const handleLogout = useCallback(() => {
-    logoutUser?.();
-  }, [logoutUser]);
+    POSTAPI({
+      path: "/auth/logout",
+      isPrivateApi: true,
+    }).subscribe(
+      () => {
+        dispatch(logout());
+        window.location.reload();
+      },
+      () => {
+        dispatch(logout());
+        window.location.reload();
+      }
+    );
+  }, [dispatch]);
 
   const handleRefresh = useCallback(() => {
     window.location.reload();
@@ -52,9 +69,8 @@ const NavbarActions = () => {
   const itemHoverBg = useColorModeValue("gray.100", "whiteAlpha.100");
   const itemHoverColor = "brand.500";
 
-  const user = auth.loginInfo || {};
-  const userName = user.userFullName || "Guest User";
-  const userImage = user.image;
+  const username = userProfile?.full_name || userProfile?.first_name || "Guest User";
+  const userImage = userProfile?.profile?.avatar_url || "";
 
   return (
     <Flex alignItems="center" flexDirection="row" gap={2}>
@@ -93,7 +109,7 @@ const NavbarActions = () => {
           >
             <Avatar.Root size="sm">
               <Avatar.Fallback
-                name={userName}
+                name={username}
                 colorPalette="yellow"
                 fontWeight="bold"
               />
@@ -138,7 +154,7 @@ const NavbarActions = () => {
                   bgClip="text"
                   lineClamp={1}
                 >
-                  {userName}
+                  {username}
                 </Text>
               </Box>
 
@@ -153,6 +169,7 @@ const NavbarActions = () => {
                   color={textColor}
                   _hover={{ bg: itemHoverBg, color: itemHoverColor }}
                   transition="all 0.15s"
+                  onClick={() => orgName && navigate(`/${orgName}/workspace/profile`)}
                 >
                   <Icon as={FiUser} boxSize={4} color={iconColor} />
                   <Text fontSize="sm" fontWeight="600">
@@ -169,6 +186,7 @@ const NavbarActions = () => {
                   color={textColor}
                   _hover={{ bg: itemHoverBg, color: itemHoverColor }}
                   transition="all 0.15s"
+                  onClick={() => orgName && navigate(`/${orgName}/workspace/settings`)}
                 >
                   <Icon as={FiSettings} boxSize={4} color={iconColor} />
                   <Text fontSize="sm" fontWeight="600">
@@ -185,6 +203,7 @@ const NavbarActions = () => {
                   color={textColor}
                   _hover={{ bg: itemHoverBg, color: itemHoverColor }}
                   transition="all 0.15s"
+                  onClick={() => orgName && navigate(`/${orgName}/workspace/helpcenter`)}
                 >
                   <Icon as={FiHelpCircle} boxSize={4} color={iconColor} />
                   <Text fontSize="sm" fontWeight="600">

@@ -11,7 +11,7 @@ const DEFAULT_TABLE_DATA = [
 const toLegacyActions = (events?: Record<string, any>) => {
   if (!events) return [];
   return Object.entries(events).map(([eventKey, config]) => ({
-    label: eventKey.replaceAll("_", " "),
+    label: eventKey.split("_").join(" "),
     onClick: (row: any) => {
       console.log(`[Table Event] ${eventKey}`, { row, config });
     },

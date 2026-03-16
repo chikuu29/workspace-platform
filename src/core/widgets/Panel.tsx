@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { Steps, Box, Button, Collapsible, Text, Flex } from "@chakra-ui/react";
+import { Box, Collapsible, Text, HStack, Icon, SimpleGrid } from "@chakra-ui/react";
 import RunTimeWidgetRender from "../renderer/RunTimeWidget";
+import * as Icons from "react-icons/lu";
 
-import PanelNavBarAction from "../../features/ui/components/navbar/NavbarActions";
-import { LuChevronDown, LuChevronUp } from 'react-icons/lu';
 interface PanelConfig {
   name: string;
   text: string;
@@ -12,9 +11,13 @@ interface PanelConfig {
   widgets: any[];
   layout?: string[];
   styles?: any;
+  iconName?: string;
+  columns?: number | { base?: number; sm?: number; md?: number; lg?: number; xl?: number };
+  gap?: number | string;
+  rowGap?: number | string;
   [key: string]: any;
-  additionalComponent?: React.ReactNode;
 }
+
 const CollapsiblePanel: React.FC<PanelConfig> = ({
   name,
   text,
@@ -24,44 +27,63 @@ const CollapsiblePanel: React.FC<PanelConfig> = ({
   widget,
   styles,
   widgets,
+  iconName,
+  columns,
+  gap,
+  rowGap,
   ...rest
 }) => {
-  console.log("===CALLING PANEEL===", rest);
-
-  const [open, setIsOpen] = useState(isOpen);
+  const [open, setIsOpen] = useState(isOpen ?? true);
 
   const togglePanel = () => {
-    setIsOpen((prev) => !prev);
+    setIsOpen((prev: boolean) => !prev);
   };
+
   if (hidden) return null;
+
+  const IconComponent = iconName ? (Icons as any)[iconName] : null;
+
   return (
-    <Box borderWidth="1px" borderRadius="lg" mb={4} overflow="hidden">
-      <Button
+    <Box w="full" mb={6}>
+      <HStack
         onClick={togglePanel}
-        variant="ghost"
-        width="100%"
-        // bg="navy.400"
-        // bg="whiteAlpha.200"
-        color="white"
-        _hover={{ bg: "navy.400" }}
-        // Align text to start
-        justifyContent="start">{isOpen ? <LuChevronUp /> : <LuChevronDown />}<Text>{text}</Text></Button>
-      {open && (
-        <Collapsible.Root open={open}>
-          <Collapsible.Content>
-            <Box p={2}>
-              <Flex
-                {...styles}
-                justifyContent="flex-start"
-                wrap="wrap"
-                width="100%"
-              >
-                <RunTimeWidgetRender configs={widgets} {...styles} {...rest} />
-              </Flex>
-            </Box>
-          </Collapsible.Content>
-        </Collapsible.Root>
-      )}
+        cursor="pointer"
+        gap={2}
+        mb={4}
+        userSelect="none"
+        _hover={{ "& .panel-icon": { transform: "scale(1.2)" } }}
+      >
+        {IconComponent ? (
+          <Icon as={IconComponent} color="cyan.400" size="md" className="panel-icon" transition="transform 0.2s" />
+        ) : (
+          <Box w="4px" h="14px" bg="cyan.400" borderRadius="full" />
+        )}
+        <Text
+          fontSize="xs"
+          fontWeight="800"
+          textTransform="uppercase"
+          letterSpacing="widest"
+          color="cyan.400"
+        >
+          {text}
+        </Text>
+        <Box flex={1} h="1px" bg="rgba(6,182,212,0.1)" ml={2} />
+      </HStack>
+
+      <Collapsible.Root open={open}>
+        <Collapsible.Content>
+          <Box pl={IconComponent ? 6 : 0}>
+            <SimpleGrid
+              columns={columns || { base: 1, md: 2 }}
+              gap={gap || 6}
+              rowGap={rowGap}
+              w="full"
+            >
+              <RunTimeWidgetRender configs={widgets} {...rest} />
+            </SimpleGrid>
+          </Box>
+        </Collapsible.Content>
+      </Collapsible.Root>
     </Box>
   );
 };

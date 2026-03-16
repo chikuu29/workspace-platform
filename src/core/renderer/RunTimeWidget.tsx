@@ -1,5 +1,5 @@
 import React from "react";
-import { Box } from "@chakra-ui/react";
+import { Box, GridItem } from "@chakra-ui/react";
 import { useFormState, useFormContext } from "react-hook-form";
 import { WidgetRegistry } from "../registry/WidgetRegistry";
 import { useFormStore } from "../store/useFormStore";
@@ -43,16 +43,19 @@ const RunTimeWidgetRender: React.FC<any> = React.memo(({ configs, tabs, ...rest 
           const TabsWidgetComponent = WidgetRegistry.get("tabs");
           if (TabsWidgetComponent) {
             return (
-              <Box key={widgetConfig.name || "tabs-container"} {...rest}>
+              <Box key={widgetConfig.name || "tabs-container"}>
                 <TabsWidgetComponent tabs={widgetConfig.tabs} {...rest} />
               </Box>
             );
           }
         }
 
-
         return (
-          <Box key={widgetConfig.name} {...rest} >
+          <Box
+            key={widgetConfig.name}
+            gridColumn={widgetConfig.colSpan ? `span ${widgetConfig.colSpan}` : undefined}
+            {...(widgetConfig.styles || {})}
+          >
             {(() => {
               switch (widgetConfig.widget) {
                 default:

@@ -1,11 +1,5 @@
 /**
  * Navigation Action Types
- *
- * Discriminated union for all supported navigation action types.
- * Adding a new action = add a union member here + a handler in ActionEngine.
- * Follows Open-Closed Principle.
- *
- * @module core/action-engine/types
  */
 
 // ─── Individual Action Types ─────────────────────────────────────────
@@ -70,15 +64,14 @@ export type NavigationAction =
 
 /**
  * Context injected by the caller (e.g., MenuLink) into ActionEngine.
- * Keeps the engine decoupled from React hooks.
  */
 export interface ActionExecutionContext {
     /** React Router navigate function */
     navigate: (path: string) => void;
     /** Opens a modal via Zustand store */
     openModal: (payload: { templateName: string; appName?: string; config?: DialogConfig }) => void;
-    /** Current tenant name for path building */
-    tenant: string;
+    /** Current organization name for path building */
+    organizationName: string;
     /** The raw menu config for callback handlers */
     menuConfig?: Record<string, unknown>;
 }

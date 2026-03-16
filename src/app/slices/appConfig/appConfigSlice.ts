@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { GETAPI } from '../../api';
 import { catchError, firstValueFrom, map, throwError } from 'rxjs';
-import { APP_CONFIG_STATE } from '../../types/appConfigInterface';
+import { APP_CONFIG_STATE } from '../../../app/interfaces/app.interface';
 import { startLoading, stopLoading } from '../loader/appLoaderSlice';
 
 export const fetchAppConfig = createAsyncThunk(
@@ -15,7 +15,7 @@ export const fetchAppConfig = createAsyncThunk(
         GETAPI({
           path: 'app/app-configuration',
           isPrivateApi: true,
-          enableCache: true,
+          enableCache: false,
           cacheTTL: 300
         }).pipe(
           map((res: any) => {

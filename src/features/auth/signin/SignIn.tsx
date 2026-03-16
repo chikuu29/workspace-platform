@@ -19,7 +19,7 @@ import { useColorModeValue } from "@/components/ui/color-mode";
 import { NavLink, useLocation, useNavigate } from "react-router";
 import { useEffect, useState, useCallback } from "react";
 import { HSeparator } from "@/features/ui/components/separator/Separator";
-import { useAuth } from "@/contexts/AuthProvider";
+// import { useAuth } from "@/contexts/AuthProvider";
 import { useDispatch } from "react-redux";
 import { login } from "@/app/slices/auth/authSlice";
 import { fetchAppConfig } from "@/app/slices/appConfig/appConfigSlice";
@@ -58,7 +58,7 @@ const SignIn = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const dispatch = useDispatch<AppDispatch>();
-    const { authInfo, setLoginAuthInfo } = useAuth();
+    // const { authInfo, setLoginAuthInfo } = useAuth();
 
     const searchParams = new URLSearchParams(location.search);
     const redirectUrl = searchParams.get("redirect");
@@ -96,11 +96,11 @@ const SignIn = () => {
         checkVersion();
     }, [checkVersion]);
 
-    useEffect(() => {
-        if (authInfo?.success) {
-            navigate(redirectUrl || "/myApps", { replace: true });
-        }
-    }, [authInfo, navigate, redirectUrl]);
+    // useEffect(() => {
+    //     if (authInfo?.success) {
+    //         navigate(redirectUrl || "/myApps", { replace: true });
+    //     }
+    // }, [authInfo, navigate, redirectUrl]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -121,7 +121,7 @@ const SignIn = () => {
                 next: (res: any) => {
                     setLoading(false);
                     if (res.success) {
-                        setLoginAuthInfo(res["login_info"]);
+                        // setLoginAuthInfo(res["login_info"]);
                         dispatch(fetchAppConfig());
                         dispatch(login(res));
                         setShowAlert({

@@ -28,6 +28,7 @@ const Navbar = () => {
   const { DISPLAY_TYPE, FEATURE }: APP_CONFIG_STATE = useSelector(
     (state: RootState) => state.app.AppConfigState
   );
+  console.log("Navbar", DISPLAY_TYPE, FEATURE);
 
   // Scroll-aware shadow for depth perception
   const scrollShadow = useScrollShadow();

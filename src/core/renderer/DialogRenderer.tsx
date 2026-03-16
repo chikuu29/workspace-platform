@@ -59,9 +59,8 @@ const DialogRenderer = memo(() => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Get current app from Redux for fallback appName
-    const auth = useSelector((state: RootState) => state.auth);
-    const defaultApp = auth?.loginInfo?.["app_code"] ?? null;
+    // Get current app from Redux for fallback appName (was loginInfo.app_code)
+    const defaultApp = null;
 
     // Fetch template when modal opens
     useEffect(() => {

@@ -1,7 +1,7 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import createVersionPlugin from './plugin/vite-plugin-version/index'; // Adjust the path as needed
-// import tsconfigPaths from 'vite-tsconfig-paths'
+import tsconfigPaths from 'vite-tsconfig-paths'
 import { visualizer } from 'rollup-plugin-visualizer';
 import path from 'path';
 
@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => {
         open: true
       }),
       createVersionPlugin(),
-      // tsconfigPaths()
+      tsconfigPaths()
     ],
     build: {
       chunkSizeWarningLimit: 1500,

@@ -42,7 +42,7 @@ const CollapsibleGroup = memo(
     const [isOpen, setIsOpen] = useState(true);
 
     const textColor = useColorModeValue("gray.500", "whiteAlpha.500");
-    const hoverBg = useColorModeValue("gray.50", "whiteAlpha.50");
+    const hoverBg = useColorModeValue("blue.50", "whiteAlpha.50");
 
     // Stable hover object — same border-left convention as MenuLink
     const groupHeaderHover = useMemo(

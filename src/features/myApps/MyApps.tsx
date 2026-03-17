@@ -183,7 +183,7 @@ function MyApps() {
           position="sticky"
           top="-1px"
           zIndex={100}
-          // bg={bgHeader}
+          bg={"app.card.bg"}
           backdropFilter="blur(12px)"
           borderBottom="1px solid"
           borderColor={useColorModeValue("gray.200", "whiteAlpha.100")}

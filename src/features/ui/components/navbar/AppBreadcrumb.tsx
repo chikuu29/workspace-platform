@@ -90,7 +90,7 @@ const AppBreadcrumb = forwardRef((props, ref) => {
 
   const activeColor = useColorModeValue("blue.600", "blue.400");
   const inactiveColor = useColorModeValue("gray.500", "whiteAlpha.500");
-  const hoverBg = useColorModeValue("gray.100", "whiteAlpha.100");
+  const hoverBg = useColorModeValue("blue.50", "whiteAlpha.100");
   const borderColorValue = useColorModeValue("gray.100", "whiteAlpha.100");
   const bgValue = useColorModeValue("white/90", "rgba(15, 23, 42, 0.9)");
   const controlsBg = useColorModeValue("gray.50", "whiteAlpha.50");
@@ -126,11 +126,7 @@ const AppBreadcrumb = forwardRef((props, ref) => {
               scrollbarWidth: "none",
               msOverflowStyle: "none",
             }}
-            sx={{
-              "&::-webkit-scrollbar": {
-                display: "none",
-              },
-            }}
+            _webkit-scrollbar={{ display: "none" }}
           >
             <Breadcrumb.Root variant="plain" size="sm">
               <Breadcrumb.List flexWrap="nowrap" minW="max-content">

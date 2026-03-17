@@ -66,7 +66,7 @@ const NavbarActions = () => {
     "0px 18px 40px rgba(112, 144, 176, 0.2)",
     "0px 18px 40px rgba(0, 0, 0, 0.4)"
   );
-  const itemHoverBg = useColorModeValue("gray.100", "whiteAlpha.100");
+  const itemHoverBg = useColorModeValue("blue.50", "whiteAlpha.100");
   const itemHoverColor = "brand.500";
 
   const username = userProfile?.full_name || userProfile?.first_name || "Guest User";

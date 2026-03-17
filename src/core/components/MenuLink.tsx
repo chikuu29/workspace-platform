@@ -101,7 +101,7 @@ const MenuLink = memo(({ menuConfig, showFullSideBarMenu }: MenuLinkProps) => {
     const location = useLocation();
     const activeBg = useColorModeValue("blue.50", "whiteAlpha.100");
     const activeAccent = useColorModeValue("blue.500", "blue.400");
-    const hoverBg = useColorModeValue("gray.100", "whiteAlpha.100");
+    const hoverBg = useColorModeValue("blue.50", "whiteAlpha.100");
     const organizations = useSelector((state: RootState) => state.organizations);
 
     const textRef = useRef<HTMLParagraphElement>(null);

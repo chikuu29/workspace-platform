@@ -100,7 +100,7 @@ const AppBreadcrumb = forwardRef((props, ref) => {
     <Box
       w="100%"
       px={{ base: "3", sm: "4", md: "6" }}
-      py={{ base: "2.5", md: "2" }}
+      // py={{ base: "2.5", md: "2" }}
       borderBottom="1px solid"
       borderColor={borderColorValue}
       bg={bgValue}
@@ -130,44 +130,44 @@ const AppBreadcrumb = forwardRef((props, ref) => {
           >
             <Breadcrumb.Root variant="plain" size="sm">
               <Breadcrumb.List flexWrap="nowrap" minW="max-content">
-            {config.map((c: ConfigItem, index) => {
-              const isLast = index === config.length - 1;
-              return (
-                <React.Fragment key={index}>
-                  <Breadcrumb.Item>
-                    <HStack
-                      gap={{ base: "1.5", md: "2" }}
-                      px={{ base: "2.5", md: "3" }}
-                      py="1.5"
-                      rounded="lg"
-                      transition="all 0.2s"
-                      cursor={isLast ? "default" : "pointer"}
-                      onClick={() => handleNavigate(c, isLast)}
-                      _hover={!isLast ? { bg: hoverBg, transform: "translateY(-1px)" } : {}}
-                      color={isLast ? activeColor : inactiveColor}
-                      minW="fit-content"
-                    >
-                      {c.icon && <Box color={isLast ? activeColor : "inherit"}>{c.icon}</Box>}
-                      <Text
-                        fontWeight={isLast ? "bold" : "600"}
-                        fontSize={{ base: "11px", md: "xs" }}
-                        textTransform="capitalize"
-                        letterSpacing="tight"
-                        maxW={{ base: "112px", sm: "160px", md: "220px" }}
-                        truncate
-                      >
-                        {c.label}
-                      </Text>
-                    </HStack>
-                  </Breadcrumb.Item>
-                  {!isLast && (
-                    <Breadcrumb.Separator>
-                      <LuChevronRight size="12" color={inactiveColor} />
-                    </Breadcrumb.Separator>
-                  )}
-                </React.Fragment>
-              );
-            })}
+                {config.map((c: ConfigItem, index) => {
+                  const isLast = index === config.length - 1;
+                  return (
+                    <React.Fragment key={index}>
+                      <Breadcrumb.Item>
+                        <HStack
+                          gap={{ base: "1.5", md: "2" }}
+                          px={{ base: "2.5", md: "3" }}
+                          py="1.5"
+                          rounded="lg"
+                          transition="all 0.2s"
+                          cursor={isLast ? "default" : "pointer"}
+                          onClick={() => handleNavigate(c, isLast)}
+                          _hover={!isLast ? { bg: hoverBg, transform: "translateY(-1px)" } : {}}
+                          color={isLast ? activeColor : inactiveColor}
+                          minW="fit-content"
+                        >
+                          {c.icon && <Box color={isLast ? activeColor : "inherit"}>{c.icon}</Box>}
+                          <Text
+                            fontWeight={isLast ? "bold" : "600"}
+                            fontSize={{ base: "11px", md: "xs" }}
+                            textTransform="capitalize"
+                            letterSpacing="tight"
+                            maxW={{ base: "112px", sm: "160px", md: "220px" }}
+                            truncate
+                          >
+                            {c.label}
+                          </Text>
+                        </HStack>
+                      </Breadcrumb.Item>
+                      {!isLast && (
+                        <Breadcrumb.Separator>
+                          <LuChevronRight size="12" color={inactiveColor} />
+                        </Breadcrumb.Separator>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
               </Breadcrumb.List>
             </Breadcrumb.Root>
           </Box>

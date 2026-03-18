@@ -133,9 +133,41 @@ const performanceHighlights = [
   { label: "Average daily visits", value: "214" },
 ];
 
-const SurfaceCard = ({ children, ...props }: any) => {
-  const bg = useColorModeValue("rgba(255,255,255,0.96)", "rgba(15, 23, 42, 0.72)");
-  const borderColor = useColorModeValue("rgba(99,102,241,0.12)", "rgba(255,255,255,0.08)");
+const animations = `
+  @keyframes slideUpFade {
+    0% { opacity: 0; transform: translateY(24px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  .animate-entrance {
+    animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+  }
+  .delay-1 { animation-delay: 0.1s; }
+  .delay-2 { animation-delay: 0.2s; }
+  .delay-3 { animation-delay: 0.3s; }
+  .delay-4 { animation-delay: 0.4s; }
+  .delay-5 { animation-delay: 0.5s; }
+  
+  .hover-lift {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .hover-lift:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 30px 60px -15px rgba(0,0,0,0.15);
+  }
+  
+  .glow-icon {
+    box-shadow: 0 0 24px currentColor;
+  }
+`;
+
+const SurfaceCard = ({ children, className = "", ...props }: any) => {
+  const bg = useColorModeValue("rgba(255, 255, 255, 0.75)", "rgba(15, 23, 42, 0.6)");
+  const borderColor = useColorModeValue("rgba(255, 255, 255, 0.8)", "rgba(255, 255, 255, 0.08)");
+  const shadow = useColorModeValue(
+    "0 12px 40px -12px rgba(0,0,0,0.06), inset 0 1px 0 0 rgba(255,255,255,0.6)",
+    "0 12px 40px -12px rgba(0,0,0,0.8), inset 0 1px 0 0 rgba(255,255,255,0.05)"
+  );
 
   return (
     <Box
@@ -143,8 +175,10 @@ const SurfaceCard = ({ children, ...props }: any) => {
       border="1px solid"
       borderColor={borderColor}
       borderRadius="3xl"
-      boxShadow={useColorModeValue("0 24px 60px -42px rgba(15, 23, 42, 0.28)", "0 24px 60px -42px rgba(2, 6, 23, 0.8)")}
-      backdropFilter="blur(14px)"
+      boxShadow={shadow}
+      backdropFilter="blur(20px)"
+      className={className}
+      transition="all 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
       {...props}
     >
       {children}
@@ -158,24 +192,24 @@ const MetricCard = ({ label, value, change, accent, icon }: MetricCardProps) => 
   const textMuted = useColorModeValue("gray.600", "gray.300");
 
   return (
-    <SurfaceCard p={5}>
-      <VStack align="stretch" gap={4}>
+    <SurfaceCard p={6} className="hover-lift animate-entrance">
+      <VStack align="stretch" gap={5}>
         <HStack justify="space-between" align="start">
-          <Circle size="12" bg={softBg} color={iconColor}>
+          <Circle size="12" bg={softBg} color={iconColor} className="glow-icon">
             <Icon as={icon} boxSize={5} />
           </Circle>
-          <Badge colorPalette={accent} variant="subtle" px="3" py="1" borderRadius="full">
+          <Badge colorPalette={accent} variant="subtle" px="3" py="1.5" borderRadius="full" fontWeight="bold">
             Live
           </Badge>
         </HStack>
         <VStack align="start" gap="1">
-          <Text fontSize="sm" fontWeight="600" color={textMuted}>
+          <Text fontSize="sm" fontWeight="700" color={textMuted} letterSpacing="wide" textTransform="uppercase">
             {label}
           </Text>
-          <Heading size="xl" letterSpacing="tight">
+          <Heading size="2xl" letterSpacing="tight" fontWeight="900">
             {value}
           </Heading>
-          <Text fontSize="sm" color={textMuted}>
+          <Text fontSize="sm" color={textMuted} fontWeight="500">
             {change}
           </Text>
         </VStack>
@@ -197,14 +231,14 @@ const QuickActionCard = ({
   const bodyText = useColorModeValue("gray.600", "gray.300");
 
   return (
-    <SurfaceCard p={5}>
-      <VStack align="start" gap={4}>
-        <Circle size="11" bg={accentBg} color={accentColor}>
+    <SurfaceCard p={6} className="hover-lift animate-entrance" cursor="pointer" onClick={onClick} border="1px solid" borderColor="transparent" _hover={{ borderColor: useColorModeValue(`${accent}.200`, `${accent}.700`) }}>
+      <VStack align="start" gap={5}>
+        <Circle size="12" bg={accentBg} color={accentColor} className="glow-icon">
           <Icon as={icon} boxSize={5} />
         </Circle>
         <VStack align="start" gap="1">
-          <Heading size="sm">{title}</Heading>
-          <Text fontSize="sm" color={bodyText}>
+          <Heading size="md" letterSpacing="tight" fontWeight="800">{title}</Heading>
+          <Text fontSize="sm" color={bodyText} lineHeight="tall">
             {description}
           </Text>
         </VStack>
@@ -213,7 +247,8 @@ const QuickActionCard = ({
           px="0"
           h="auto"
           colorPalette={accent}
-          onClick={onClick}
+          fontWeight="700"
+          mt={1}
         >
           {actionLabel}
           <LuArrowRight />
@@ -255,316 +290,339 @@ const GymManagementDashboard = () => {
   }, [buildViewPath, navigate]);
 
   const heroBg = useColorModeValue(
-    "linear-gradient(135deg, rgba(15,118,110,0.10) 0%, rgba(59,130,246,0.10) 52%, rgba(249,115,22,0.08) 100%)",
-    "linear-gradient(135deg, rgba(13,148,136,0.20) 0%, rgba(37,99,235,0.18) 52%, rgba(249,115,22,0.12) 100%)"
+    "linear-gradient(135deg, rgba(15,118,110,0.15) 0%, rgba(59,130,246,0.12) 52%, rgba(249,115,22,0.10) 100%)",
+    "linear-gradient(135deg, rgba(13,148,136,0.25) 0%, rgba(37,99,235,0.20) 52%, rgba(249,115,22,0.15) 100%)"
   );
   const softText = useColorModeValue("gray.600", "gray.300");
   const quietText = useColorModeValue("gray.500", "gray.400");
   const dividerColor = useColorModeValue("gray.100", "whiteAlpha.100");
-  const mutedSurface = useColorModeValue("gray.50", "whiteAlpha.50");
+  const mutedSurface = useColorModeValue("rgba(0,0,0,0.03)", "whiteAlpha.50");
   const blueSoftSurface = useColorModeValue("blue.50", "whiteAlpha.100");
   const blueSoftColor = useColorModeValue("blue.600", "blue.300");
   const trackSurface = useColorModeValue("gray.100", "whiteAlpha.100");
   const experienceTone = useColorModeValue("green.600", "green.300");
   const operationsTone = useColorModeValue("blue.600", "blue.300");
 
-  return (
-    <VStack align="stretch" gap={6} pb={8}>
-      <SurfaceCard p={{ base: 5, md: 7 }} bg={heroBg} overflow="hidden" position="relative">
-        <Box
-          position="absolute"
-          top="-24px"
-          right="-16px"
-          w={{ base: "140px", md: "220px" }}
-          h={{ base: "140px", md: "220px" }}
-          borderRadius="full"
-          bg="rgba(59,130,246,0.12)"
-          filter="blur(40px)"
-          pointerEvents="none"
-        />
-        <SimpleGrid columns={{ base: 1, xl: 2 }} gap={8} position="relative">
-          <VStack align="start" gap={4}>
-            <HStack flexWrap="wrap" gap="3">
-              <Badge colorPalette="teal" variant="subtle" px="3" py="1" borderRadius="full">
-                Gym CRM Home
-              </Badge>
-              <Badge variant="outline" px="3" py="1" borderRadius="full">
-                Peak occupancy 78%
-              </Badge>
-              <Badge variant="outline" px="3" py="1" borderRadius="full">
-                4 alerts need action
-              </Badge>
-            </HStack>
+  const decorativeBlob1 = useColorModeValue("rgba(15,118,110,0.25)", "rgba(15,118,110,0.15)");
+  const decorativeBlob2 = useColorModeValue("rgba(59,130,246,0.2)", "rgba(59,130,246,0.1)");
+  const decorativeBlob3 = useColorModeValue("rgba(249,115,22,0.15)", "rgba(249,115,22,0.08)");
 
-            <VStack align="start" gap="2" maxW="2xl">
-              <Heading size={{ base: "xl", md: "2xl" }} letterSpacing="tight">
-                Gym management dashboard for members, billing and floor operations.
-              </Heading>
-              <Text color={softText} fontSize={{ base: "sm", md: "md" }} lineHeight="tall">
-                Track live check-ins, subscription health, trainer capacity and cash flow from one
-                home page. This dashboard is designed as the CRM command center for the gym team.
+  return (
+    <Box position="relative" w="full" minH="100%">
+      <style>{animations}</style>
+
+      {/* Decorative Orbs */}
+      <Box position="absolute" top="-5%" left="-5%" w="350px" h="350px" bg={decorativeBlob1} filter="blur(100px)" borderRadius="full" pointerEvents="none" zIndex={0} />
+      <Box position="absolute" top="30%" right="-5%" w="400px" h="400px" bg={decorativeBlob2} filter="blur(110px)" borderRadius="full" pointerEvents="none" zIndex={0} />
+      <Box position="absolute" top="70%" left="10%" w="300px" h="300px" bg={decorativeBlob3} filter="blur(90px)" borderRadius="full" pointerEvents="none" zIndex={0} />
+
+      <VStack align="stretch" gap={8} pb={12} position="relative" zIndex={1}>
+        <SurfaceCard p={{ base: 6, md: 8 }} bg={heroBg} overflow="hidden" position="relative" className="animate-entrance">
+          <Box
+            position="absolute"
+            top="-30px"
+            right="-20px"
+            w={{ base: "180px", md: "280px" }}
+            h={{ base: "180px", md: "280px" }}
+            borderRadius="full"
+            bg="rgba(255,255,255,0.1)"
+            filter="blur(30px)"
+            pointerEvents="none"
+          />
+          <SimpleGrid columns={{ base: 1, xl: 2 }} gap={10} position="relative">
+            <VStack align="start" gap={6}>
+              <HStack flexWrap="wrap" gap="3">
+                <Badge colorPalette="teal" variant="solid" px="4" py="1.5" borderRadius="full" fontWeight="bold">
+                  Gym CRM Command Center
+                </Badge>
+                <Badge variant="surface" px="4" py="1.5" borderRadius="full" bg={useColorModeValue("white", "whiteAlpha.200")}>
+                  Peak occupancy 78%
+                </Badge>
+                <Badge variant="surface" px="4" py="1.5" borderRadius="full" bg={useColorModeValue("white", "whiteAlpha.200")}>
+                  <Box as="span" w="2" h="2" borderRadius="full" bg="orange.500" display="inline-block" mr={2} />
+                  4 alerts need action
+                </Badge>
+              </HStack>
+
+              <VStack align="start" gap="3" maxW="2xl">
+                <Heading size={{ base: "2xl", md: "3xl" }} letterSpacing="tight" fontWeight="900">
+                  Gym management dashboard for members, billing and floor operations.
+                </Heading>
+                <Text color={softText} fontSize={{ base: "md", md: "lg" }} lineHeight="tall" fontWeight="500">
+                  Track live check-ins, subscription health, trainer capacity and cash flow from one
+                  home page. This dashboard is designed as the CRM command center for the gym team.
+                </Text>
+              </VStack>
+
+              <HStack flexWrap="wrap" gap="4" pt={2}>
+                <Button colorPalette="blue" size="xl" borderRadius="2xl" px={8} className="hover-lift" onClick={() => handleAction("AddMember")}>
+                  <LuUserPlus />
+                  Add member
+                </Button>
+                <Button variant="surface" size="xl" borderRadius="2xl" px={8} className="hover-lift" bg={useColorModeValue("white", "whiteAlpha.200")} onClick={() => handleAction("ListMember")}>
+                  <LuUsers />
+                  Open directory
+                </Button>
+              </HStack>
+            </VStack>
+
+            <SimpleGrid columns={{ base: 1, sm: 3 }} gap={4}>
+              {performanceHighlights.map((item, id) => (
+                <SurfaceCard key={item.label} p={6} className="hover-lift">
+                  <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" fontWeight="800" color={quietText} mb={2}>
+                    {item.label}
+                  </Text>
+                  <Heading size="xl" fontWeight="900" letterSpacing="tight">{item.value}</Heading>
+                </SurfaceCard>
+              ))}
+            </SimpleGrid>
+          </SimpleGrid>
+        </SurfaceCard>
+
+        <SimpleGrid columns={{ base: 1, md: 2, xl: 4 }} gap={6}>
+          {metricCards.map((card, idx) => (
+            <div key={card.label} className={`delay-${(idx % 4) + 1}`}>
+              <MetricCard {...card} />
+            </div>
+          ))}
+        </SimpleGrid>
+
+        <SimpleGrid columns={{ base: 1, xl: 3 }} gap={8}>
+          <VStack align="stretch" gap={8} gridColumn={{ xl: "span 2" }}>
+            <SurfaceCard p={{ base: 6, md: 8 }} className="animate-entrance delay-2">
+              <VStack align="stretch" gap={6}>
+                <Flex justify="space-between" align={{ base: "start", md: "center" }} gap={4} direction={{ base: "column", md: "row" }}>
+                  <Box>
+                    <Text fontSize="sm" textTransform="uppercase" letterSpacing="widest" color={quietText} mb={2} fontWeight="800">
+                      Quick Actions
+                    </Text>
+                    <Heading size="xl" letterSpacing="tight" fontWeight="800">Run the daily gym workflow</Heading>
+                  </Box>
+                  <Badge variant="subtle" colorPalette="blue" px="4" py="2" borderRadius="full" fontWeight="bold">
+                    Front desk + CRM
+                  </Badge>
+                </Flex>
+
+                <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
+                  {quickActions.map((action, idx) => (
+                    <div key={action.title} className={`delay-${(idx % 3) + 2}`}>
+                        <QuickActionCard
+                        {...action}
+                        onClick={() => handleAction(action.target)}
+                        />
+                    </div>
+                  ))}
+                </SimpleGrid>
+              </VStack>
+            </SurfaceCard>
+
+            <SurfaceCard p={{ base: 6, md: 8 }} className="animate-entrance delay-3">
+              <VStack align="stretch" gap={6}>
+                <Flex justify="space-between" align={{ base: "start", md: "center" }} gap={4} direction={{ base: "column", md: "row" }}>
+                  <Box>
+                    <Text fontSize="sm" textTransform="uppercase" letterSpacing="widest" color={quietText} mb={2} fontWeight="800">
+                      Today's Schedule
+                    </Text>
+                    <Heading size="xl" letterSpacing="tight" fontWeight="800">Classes and induction sessions</Heading>
+                  </Box>
+                  <HStack color={softText} p={2} bg={useColorModeValue("blackAlpha.50", "whiteAlpha.100")} borderRadius="xl">
+                    <LuCalendarDays />
+                    <Text fontSize="sm" fontWeight="700">11 sessions booked today</Text>
+                  </HStack>
+                </Flex>
+
+                <VStack align="stretch" gap={4}>
+                  {todaySchedule.map((item) => (
+                    <Box key={`${item.time}-${item.title}`} p={5} borderRadius="2xl" bg={mutedSurface} className="hover-lift">
+                      <Flex justify="space-between" align={{ base: "start", md: "center" }} gap={4} direction={{ base: "column", md: "row" }}>
+                        <HStack align="start" gap={5}>
+                          <Circle size="12" bg={blueSoftSurface} color={blueSoftColor}>
+                            <LuClock3 size="20" />
+                          </Circle>
+                          <VStack align="start" gap="1">
+                            <HStack gap="3" flexWrap="wrap">
+                              <Text fontWeight="800" fontSize="lg">{item.time}</Text>
+                              <Badge variant="outline" borderRadius="full" px="3">
+                                {item.status}
+                              </Badge>
+                            </HStack>
+                            <Text fontWeight="700" fontSize="md">{item.title}</Text>
+                            <Text fontSize="sm" color={softText} fontWeight="500">
+                              {item.owner}
+                            </Text>
+                          </VStack>
+                        </HStack>
+                        <Heading size="sm" color={quietText} fontWeight="600">
+                          {item.occupancy} seats
+                        </Heading>
+                      </Flex>
+                    </Box>
+                  ))}
+                </VStack>
+              </VStack>
+            </SurfaceCard>
+          </VStack>
+
+          <VStack align="stretch" gap={8}>
+            <SurfaceCard p={{ base: 6, md: 8 }} className="animate-entrance delay-2">
+              <VStack align="stretch" gap={5}>
+                <HStack justify="space-between">
+                  <Box>
+                    <Text fontSize="sm" textTransform="uppercase" letterSpacing="widest" color={quietText} mb={2} fontWeight="800">
+                      Alerts
+                    </Text>
+                    <Heading size="lg" letterSpacing="tight" fontWeight="800">Action queue</Heading>
+                  </Box>
+                  <Circle size="10" bg={useColorModeValue("red.50", "red.900")} color={useColorModeValue("red.500", "red.300")}>
+                    <LuBellRing />
+                  </Circle>
+                </HStack>
+
+                {floorAlerts.map((alert) => (
+                  <Box key={alert.title} p={5} borderRadius="2xl" bg={mutedSurface} className="hover-lift" borderLeft="4px solid" borderColor={useColorModeValue(`${alert.tone}.400`, `${alert.tone}.600`)}>
+                    <Badge colorPalette={alert.tone} variant="solid" mb={3} px="3" py="1" borderRadius="full" fontWeight="bold">
+                      {alert.tone === "green" ? "Good signal" : "Needs review"}
+                    </Badge>
+                    <Text fontWeight="800" fontSize="md" mb={1}>{alert.title}</Text>
+                    <Text fontSize="sm" color={softText} fontWeight="500">{alert.description}</Text>
+                  </Box>
+                ))}
+              </VStack>
+            </SurfaceCard>
+
+            <SurfaceCard p={{ base: 6, md: 8 }} className="animate-entrance delay-3">
+              <VStack align="stretch" gap={6}>
+                <Box>
+                  <Text fontSize="sm" textTransform="uppercase" letterSpacing="widest" color={quietText} mb={2} fontWeight="800">
+                    Trainer Board
+                  </Text>
+                  <Heading size="lg" letterSpacing="tight" fontWeight="800">Live floor utilization</Heading>
+                </Box>
+
+                {trainerBoard.map((trainer) => (
+                  <Box key={trainer.name} p={4} borderRadius="2xl" bg={mutedSurface} className="hover-lift">
+                    <HStack justify="space-between" mb={3}>
+                      <HStack gap={4}>
+                        <Avatar.Root size="md">
+                          <Avatar.Fallback>{trainer.name.split(" ").map((part) => part[0]).join("").slice(0, 2)}</Avatar.Fallback>
+                        </Avatar.Root>
+                        <Box>
+                          <Text fontWeight="800" fontSize="md">{trainer.name}</Text>
+                          <Text fontSize="sm" color={softText} fontWeight="500">{trainer.role}</Text>
+                        </Box>
+                      </HStack>
+                      <Badge variant="subtle" colorPalette="blue" px="3" py="1" borderRadius="full" fontWeight="bold">
+                        {trainer.sessions} sessions
+                      </Badge>
+                    </HStack>
+                    <Progress.Root value={trainer.load} size="sm" colorPalette={trainer.load > 85 ? "red" : "blue"} borderRadius="full">
+                      <Progress.Track borderRadius="full">
+                        <Progress.Range borderRadius="full" />
+                      </Progress.Track>
+                    </Progress.Root>
+                  </Box>
+                ))}
+              </VStack>
+            </SurfaceCard>
+
+            <SurfaceCard p={{ base: 6, md: 8 }} className="animate-entrance delay-4">
+              <VStack align="stretch" gap={5}>
+                <Box>
+                  <Text fontSize="sm" textTransform="uppercase" letterSpacing="widest" color={quietText} mb={2} fontWeight="800">
+                    Membership Mix
+                  </Text>
+                  <Heading size="lg" letterSpacing="tight" fontWeight="800">Plan distribution</Heading>
+                </Box>
+
+                {planMix.map((plan) => (
+                  <Box key={plan.name} className="hover-lift">
+                    <Flex justify="space-between" mb={2}>
+                      <Text fontWeight="700">{plan.name}</Text>
+                      <Text fontSize="sm" color={quietText} fontWeight="600">{plan.members} members</Text>
+                    </Flex>
+                    <Box h="3" borderRadius="full" bg={trackSurface} overflow="hidden">
+                      <Box h="full" w={`${plan.share}%`} bg={plan.color} borderRadius="full" transition="width 1s ease-in-out" />
+                    </Box>
+                  </Box>
+                ))}
+
+                <Separator borderColor={dividerColor} my={3} opacity={0.5} />
+
+                <VStack align="stretch" gap={4}>
+                  {recentCheckins.map((member) => (
+                    <HStack key={`${member.name}-${member.time}`} justify="space-between" p={3} borderRadius="xl" bg={mutedSurface} className="hover-lift">
+                      <VStack align="start" gap="0">
+                        <Text fontWeight="700">{member.name}</Text>
+                        <Text fontSize="sm" color={softText} fontWeight="500">{member.plan}</Text>
+                      </VStack>
+                      <Badge variant="outline" fontSize="xs" fontWeight="700">
+                         {member.time}
+                      </Badge>
+                    </HStack>
+                  ))}
+                </VStack>
+              </VStack>
+            </SurfaceCard>
+          </VStack>
+        </SimpleGrid>
+
+        <Box ref={financeRef} className="animate-entrance delay-5">
+          <SurfaceCard p={{ base: 4, md: 6 }}>
+            <VStack align="stretch" gap={5}>
+              <Flex justify="space-between" align={{ base: "start", md: "center" }} direction={{ base: "column", md: "row" }} gap={4} px={{ base: 4, md: 6 }} pt={{ base: 4, md: 6 }}>
+                <Box>
+                  <Text fontSize="sm" textTransform="uppercase" letterSpacing="widest" color={quietText} mb={2} fontWeight="800">
+                    Finance & Retention
+                  </Text>
+                  <Heading size="xl" letterSpacing="tight" fontWeight="900">Revenue analytics snapshot</Heading>
+                </Box>
+                <Badge colorPalette="teal" variant="solid" px="4" py="2" borderRadius="full" fontWeight="bold">
+                  Updated 5 minutes ago
+                </Badge>
+              </Flex>
+              <RevenuAnalytics />
+            </VStack>
+          </SurfaceCard>
+        </Box>
+
+        <SurfaceCard p={{ base: 6, md: 8 }} className="animate-entrance delay-5" bg={useColorModeValue("blue.50", "blue.900")} borderColor={useColorModeValue("blue.100", "blue.800")}>
+          <SimpleGrid columns={{ base: 1, lg: 3 }} gap={8}>
+            <VStack align="start" gap="2">
+              <HStack color={experienceTone} p={2} bg={useColorModeValue("white", "whiteAlpha.200")} borderRadius="xl">
+                <LuShieldCheck size={20} />
+                <Text fontWeight="800" letterSpacing="tight">Member experience</Text>
+              </HStack>
+              <Heading size="md" fontWeight="800" mt={2} letterSpacing="tight">Service score is healthy and improving.</Heading>
+              <Text color={softText} fontSize="md" fontWeight="500" lineHeight="tall">
+                High renewal intent, low churn and stronger trainer occupancy are all trending in the
+                right direction this week.
               </Text>
             </VStack>
 
-            <HStack flexWrap="wrap" gap="3">
-              <Button colorPalette="blue" size="lg" borderRadius="xl" onClick={() => handleAction("AddMember")}>
-                <LuUserPlus />
-                Add member
-              </Button>
-              <Button variant="outline" size="lg" borderRadius="xl" onClick={() => handleAction("ListMember")}>
-                <LuUsers />
-                Open directory
-              </Button>
-            </HStack>
-          </VStack>
-
-          <SimpleGrid columns={{ base: 1, sm: 3 }} gap={4}>
-            {performanceHighlights.map((item) => (
-              <SurfaceCard key={item.label} p={5}>
-                <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" color={quietText} mb={2}>
-                  {item.label}
-                </Text>
-                <Heading size="lg">{item.value}</Heading>
-              </SurfaceCard>
-            ))}
-          </SimpleGrid>
-        </SimpleGrid>
-      </SurfaceCard>
-
-      <SimpleGrid columns={{ base: 1, md: 2, xl: 4 }} gap={5}>
-        {metricCards.map((card) => (
-          <MetricCard key={card.label} {...card} />
-        ))}
-      </SimpleGrid>
-
-      <SimpleGrid columns={{ base: 1, xl: 3 }} gap={6}>
-        <VStack align="stretch" gap={6} gridColumn={{ xl: "span 2" }}>
-          <SurfaceCard p={{ base: 5, md: 6 }}>
-            <VStack align="stretch" gap={5}>
-              <Flex justify="space-between" align={{ base: "start", md: "center" }} gap={4} direction={{ base: "column", md: "row" }}>
-                <Box>
-                  <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" color={quietText} mb={2}>
-                    Quick Actions
-                  </Text>
-                  <Heading size="md">Run the daily gym workflow</Heading>
-                </Box>
-                <Badge variant="subtle" colorPalette="blue" px="3" py="1" borderRadius="full">
-                  Front desk + CRM
-                </Badge>
-              </Flex>
-
-              <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
-                {quickActions.map((action) => (
-                  <QuickActionCard
-                    key={action.title}
-                    {...action}
-                    onClick={() => handleAction(action.target)}
-                  />
-                ))}
-              </SimpleGrid>
-            </VStack>
-          </SurfaceCard>
-
-          <SurfaceCard p={{ base: 5, md: 6 }}>
-            <VStack align="stretch" gap={5}>
-              <Flex justify="space-between" align={{ base: "start", md: "center" }} gap={4} direction={{ base: "column", md: "row" }}>
-                <Box>
-                  <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" color={quietText} mb={2}>
-                    Today's Schedule
-                  </Text>
-                  <Heading size="md">Classes and induction sessions</Heading>
-                </Box>
-                <HStack color={softText}>
-                  <LuCalendarDays />
-                  <Text fontSize="sm">11 sessions booked today</Text>
-                </HStack>
-              </Flex>
-
-              <VStack align="stretch" gap={3}>
-                {todaySchedule.map((item) => (
-                  <Box key={`${item.time}-${item.title}`} p={4} borderRadius="2xl" bg={mutedSurface}>
-                    <Flex justify="space-between" align={{ base: "start", md: "center" }} gap={4} direction={{ base: "column", md: "row" }}>
-                      <HStack align="start" gap={4}>
-                        <Circle size="10" bg={blueSoftSurface} color={blueSoftColor}>
-                          <LuClock3 />
-                        </Circle>
-                        <VStack align="start" gap="1">
-                          <HStack gap="2" flexWrap="wrap">
-                            <Text fontWeight="700">{item.time}</Text>
-                            <Badge variant="outline" borderRadius="full">
-                              {item.status}
-                            </Badge>
-                          </HStack>
-                          <Text fontWeight="600">{item.title}</Text>
-                          <Text fontSize="sm" color={softText}>
-                            {item.owner}
-                          </Text>
-                        </VStack>
-                      </HStack>
-                      <Text fontSize="sm" color={quietText}>
-                        Occupancy {item.occupancy}
-                      </Text>
-                    </Flex>
-                  </Box>
-                ))}
-              </VStack>
-            </VStack>
-          </SurfaceCard>
-        </VStack>
-
-        <VStack align="stretch" gap={6}>
-          <SurfaceCard p={5}>
-            <VStack align="stretch" gap={4}>
-              <HStack justify="space-between">
-                <Box>
-                  <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" color={quietText} mb={2}>
-                    Alerts
-                  </Text>
-                  <Heading size="sm">Action queue</Heading>
-                </Box>
-                <LuBellRing />
+            <VStack align="start" gap="2">
+              <HStack color={operationsTone} p={2} bg={useColorModeValue("white", "whiteAlpha.200")} borderRadius="xl">
+                <LuActivity size={20} />
+                <Text fontWeight="800" letterSpacing="tight">Operations focus</Text>
               </HStack>
-
-              {floorAlerts.map((alert) => (
-                <Box key={alert.title} p={4} borderRadius="2xl" bg={mutedSurface}>
-                  <Badge colorPalette={alert.tone} variant="subtle" mb={3}>
-                    {alert.tone === "green" ? "Good signal" : "Needs review"}
-                  </Badge>
-                  <Text fontWeight="700" mb={1}>{alert.title}</Text>
-                  <Text fontSize="sm" color={softText}>{alert.description}</Text>
-                </Box>
-              ))}
+              <Text fontSize="md" mt={2} color={softText} fontWeight="500" lineHeight="tall" pl={2} borderLeft="4px solid" borderColor={useColorModeValue("blue.300", "blue.600")}>
+                Prioritize renewal follow-up for expiring members and re-balance evening sessions to
+                reduce waitlist pressure.
+              </Text>
             </VStack>
-          </SurfaceCard>
 
-          <SurfaceCard p={5}>
-            <VStack align="stretch" gap={4}>
-              <Box>
-                <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" color={quietText} mb={2}>
-                  Trainer Board
-                </Text>
-                <Heading size="sm">Live floor utilization</Heading>
-              </Box>
-
-              {trainerBoard.map((trainer) => (
-                <Box key={trainer.name}>
-                  <HStack justify="space-between" mb={2}>
-                    <HStack gap={3}>
-                      <Avatar.Root size="sm">
-                        <Avatar.Fallback>{trainer.name.split(" ").map((part) => part[0]).join("").slice(0, 2)}</Avatar.Fallback>
-                      </Avatar.Root>
-                      <Box>
-                        <Text fontWeight="700">{trainer.name}</Text>
-                        <Text fontSize="sm" color={softText}>{trainer.role}</Text>
-                      </Box>
-                    </HStack>
-                    <Text fontSize="sm" color={quietText}>{trainer.sessions} sessions</Text>
-                  </HStack>
-                  <Progress.Root value={trainer.load} size="sm" colorPalette="blue" borderRadius="full">
-                    <Progress.Track borderRadius="full">
-                      <Progress.Range borderRadius="full" />
-                    </Progress.Track>
-                  </Progress.Root>
-                </Box>
-              ))}
+            <VStack align="start" gap={4} justify="center">
+              <Button size="xl" colorPalette="blue" borderRadius="2xl" className="hover-lift" px={8} onClick={() => handleAction("Subscription")}>
+                Review renewals
+                <LuArrowUpRight />
+              </Button>
+              <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")} fontWeight="600">
+                Use the billing area to freeze, upgrade or renew plans without leaving the workspace.
+              </Text>
             </VStack>
-          </SurfaceCard>
-
-          <SurfaceCard p={5}>
-            <VStack align="stretch" gap={4}>
-              <Box>
-                <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" color={quietText} mb={2}>
-                  Membership Mix
-                </Text>
-                <Heading size="sm">Plan distribution</Heading>
-              </Box>
-
-              {planMix.map((plan) => (
-                <Box key={plan.name}>
-                  <Flex justify="space-between" mb={2}>
-                    <Text fontWeight="600">{plan.name}</Text>
-                    <Text fontSize="sm" color={quietText}>{plan.members} members</Text>
-                  </Flex>
-                  <Box h="2.5" borderRadius="full" bg={trackSurface} overflow="hidden">
-                    <Box h="full" w={`${plan.share}%`} bg={plan.color} borderRadius="full" />
-                  </Box>
-                </Box>
-              ))}
-
-              <Separator borderColor={dividerColor} />
-
-              <VStack align="stretch" gap={3}>
-                {recentCheckins.map((member) => (
-                  <HStack key={`${member.name}-${member.time}`} justify="space-between">
-                    <VStack align="start" gap="0">
-                      <Text fontWeight="600">{member.name}</Text>
-                      <Text fontSize="sm" color={softText}>{member.plan}</Text>
-                    </VStack>
-                    <Text fontSize="sm" color={quietText}>{member.time}</Text>
-                  </HStack>
-                ))}
-              </VStack>
-            </VStack>
-          </SurfaceCard>
-        </VStack>
-      </SimpleGrid>
-
-      <Box ref={financeRef}>
-        <SurfaceCard p={{ base: 2, md: 3 }}>
-          <VStack align="stretch" gap={4}>
-            <Flex justify="space-between" align={{ base: "start", md: "center" }} direction={{ base: "column", md: "row" }} gap={3} px={{ base: 3, md: 4 }} pt={{ base: 3, md: 4 }}>
-              <Box>
-                <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" color={quietText} mb={2}>
-                  Finance & Retention
-                </Text>
-                <Heading size="md">Revenue analytics snapshot</Heading>
-              </Box>
-              <Badge colorPalette="teal" variant="subtle" px="3" py="1" borderRadius="full">
-                Updated 5 minutes ago
-              </Badge>
-            </Flex>
-            <RevenuAnalytics />
-          </VStack>
+          </SimpleGrid>
         </SurfaceCard>
-      </Box>
-
-      <SurfaceCard p={{ base: 5, md: 6 }}>
-        <SimpleGrid columns={{ base: 1, lg: 3 }} gap={5}>
-          <VStack align="start" gap="1">
-            <HStack color={experienceTone}>
-              <LuShieldCheck />
-              <Text fontWeight="700">Member experience</Text>
-            </HStack>
-            <Heading size="sm">Service score is healthy and improving.</Heading>
-            <Text color={softText} fontSize="sm">
-              High renewal intent, low churn and stronger trainer occupancy are all trending in the
-              right direction this week.
-            </Text>
-          </VStack>
-
-          <VStack align="start" gap="1">
-            <HStack color={operationsTone}>
-              <LuActivity />
-              <Text fontWeight="700">Operations focus</Text>
-            </HStack>
-            <Text fontSize="sm" color={softText}>
-              Prioritize renewal follow-up for expiring members and re-balance evening sessions to
-              reduce waitlist pressure.
-            </Text>
-          </VStack>
-
-          <VStack align="start" gap="3">
-            <Button colorPalette="blue" borderRadius="xl" onClick={() => handleAction("Subscription")}>
-              Review renewals
-              <LuArrowUpRight />
-            </Button>
-            <Text fontSize="sm" color={quietText}>
-              Use the billing area to freeze, upgrade or renew plans without leaving the workspace.
-            </Text>
-          </VStack>
-        </SimpleGrid>
-      </SurfaceCard>
-    </VStack>
+      </VStack>
+    </Box>
   );
 };
 

@@ -140,12 +140,40 @@ const memberData: MemberRecord[] = [
 
 const filters: Array<"All" | MemberStatus> = ["All", "Active", "Attention", "Frozen"];
 
-const SurfaceCard = ({ children, ...props }: any) => {
-  const bg = useColorModeValue("rgba(255,255,255,0.96)", "rgba(15, 23, 42, 0.72)");
-  const borderColor = useColorModeValue("rgba(99,102,241,0.12)", "rgba(255,255,255,0.08)");
+const animations = `
+  @keyframes slideUpFade {
+    0% { opacity: 0; transform: translateY(24px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  .animate-entrance {
+    animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+  }
+  .delay-1 { animation-delay: 0.1s; }
+  .delay-2 { animation-delay: 0.2s; }
+  .delay-3 { animation-delay: 0.3s; }
+  .delay-4 { animation-delay: 0.4s; }
+  .delay-5 { animation-delay: 0.5s; }
+  
+  .hover-lift {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .hover-lift:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 30px 60px -15px rgba(0,0,0,0.15);
+  }
+  
+  .glow-icon {
+    box-shadow: 0 0 24px currentColor;
+  }
+`;
+
+const SurfaceCard = ({ children, className = "", ...props }: any) => {
+  const bg = useColorModeValue("rgba(255, 255, 255, 0.75)", "rgba(15, 23, 42, 0.6)");
+  const borderColor = useColorModeValue("rgba(255, 255, 255, 0.8)", "rgba(255, 255, 255, 0.08)");
   const shadow = useColorModeValue(
-    "0 24px 60px -42px rgba(15, 23, 42, 0.28)",
-    "0 24px 60px -42px rgba(2, 6, 23, 0.8)"
+    "0 12px 40px -12px rgba(0,0,0,0.06), inset 0 1px 0 0 rgba(255,255,255,0.6)",
+    "0 12px 40px -12px rgba(0,0,0,0.8), inset 0 1px 0 0 rgba(255,255,255,0.05)"
   );
 
   return (
@@ -155,7 +183,9 @@ const SurfaceCard = ({ children, ...props }: any) => {
       borderColor={borderColor}
       borderRadius="3xl"
       boxShadow={shadow}
-      backdropFilter="blur(14px)"
+      backdropFilter="blur(20px)"
+      className={className}
+      transition="all 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
       {...props}
     >
       {children}
@@ -181,17 +211,17 @@ const StatTile = ({
   const muted = useColorModeValue("gray.600", "gray.300");
 
   return (
-    <SurfaceCard p={5}>
-      <VStack align="stretch" gap={4}>
-        <Circle size="12" bg={iconBg} color={iconColor}>
+    <SurfaceCard p={6} className="hover-lift animate-entrance">
+      <VStack align="stretch" gap={5}>
+        <Circle size="12" bg={iconBg} color={iconColor} className="glow-icon">
           <Icon as={icon} boxSize={5} />
         </Circle>
         <VStack align="start" gap="1">
-          <Text fontSize="sm" fontWeight="600" color={muted}>
+          <Text fontSize="sm" fontWeight="800" textTransform="uppercase" letterSpacing="widest" color={muted}>
             {label}
           </Text>
-          <Heading size="lg">{value}</Heading>
-          <Text fontSize="sm" color={muted}>
+          <Heading size="xl" fontWeight="900" letterSpacing="tight">{value}</Heading>
+          <Text fontSize="sm" color={muted} fontWeight="600">
             {helper}
           </Text>
         </VStack>
@@ -203,17 +233,17 @@ const StatTile = ({
 const MemberCard = ({ member }: { member: MemberRecord }) => {
   const muted = useColorModeValue("gray.600", "gray.300");
   const quiet = useColorModeValue("gray.500", "gray.400");
-  const softSurface = useColorModeValue("gray.50", "whiteAlpha.50");
+  const softSurface = useColorModeValue("rgba(0,0,0,0.03)", "whiteAlpha.50");
   const visitProgress = Math.min((member.visitsThisMonth / member.targetVisits) * 100, 100);
   const badgeTone =
     member.status === "Active" ? "green" : member.status === "Attention" ? "orange" : "gray";
 
   return (
-    <SurfaceCard p={5} h="full">
-      <VStack align="stretch" gap={5} h="full">
+    <SurfaceCard p={6} h="full" className="hover-lift animate-entrance delay-2">
+      <VStack align="stretch" gap={6} h="full">
         <Flex justify="space-between" align="start" gap={4}>
-          <HStack align="start" gap={3}>
-            <Avatar.Root size="md">
+          <HStack align="start" gap={4}>
+            <Avatar.Root size="lg">
               <Avatar.Fallback>
                 {member.name
                   .split(" ")
@@ -223,85 +253,85 @@ const MemberCard = ({ member }: { member: MemberRecord }) => {
               </Avatar.Fallback>
             </Avatar.Root>
             <VStack align="start" gap="1">
-              <Heading size="sm">{member.name}</Heading>
-              <Text fontSize="sm" color={muted}>
+              <Heading size="md" fontWeight="800" letterSpacing="tight">{member.name}</Heading>
+              <Text fontSize="sm" color={muted} fontWeight="500">
                 {member.id}
               </Text>
             </VStack>
           </HStack>
-          <Badge colorPalette={badgeTone} variant="subtle" px="3" py="1" borderRadius="full">
+          <Badge colorPalette={badgeTone} variant="subtle" px="4" py="1.5" borderRadius="full" fontWeight="bold">
             {member.status}
           </Badge>
         </Flex>
 
-        <Box p={4} borderRadius="2xl" bg={softSurface}>
-          <SimpleGrid columns={2} gap={4}>
+        <Box p={5} borderRadius="2xl" bg={softSurface}>
+          <SimpleGrid columns={2} gap={5}>
             <VStack align="start" gap="1">
-              <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" color={quiet}>
+              <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" color={quiet} fontWeight="700">
                 Plan
               </Text>
-              <Text fontWeight="700">{member.plan}</Text>
+              <Text fontWeight="800" fontSize="md">{member.plan}</Text>
             </VStack>
             <VStack align="start" gap="1">
-              <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" color={quiet}>
+              <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" color={quiet} fontWeight="700">
                 Trainer
               </Text>
-              <Text fontWeight="700">{member.trainer}</Text>
+              <Text fontWeight="800" fontSize="md">{member.trainer}</Text>
             </VStack>
             <VStack align="start" gap="1">
-              <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" color={quiet}>
+              <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" color={quiet} fontWeight="700">
                 Last Visit
               </Text>
-              <Text fontWeight="700">{member.lastVisit}</Text>
+              <Text fontWeight="800" fontSize="md">{member.lastVisit}</Text>
             </VStack>
             <VStack align="start" gap="1">
-              <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" color={quiet}>
+              <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" color={quiet} fontWeight="700">
                 Renewal
               </Text>
-              <Text fontWeight="700">{member.nextRenewal}</Text>
+              <Text fontWeight="800" fontSize="md">{member.nextRenewal}</Text>
             </VStack>
           </SimpleGrid>
         </Box>
 
         <VStack align="stretch" gap={3} flex="1">
           <HStack justify="space-between">
-            <Text fontSize="sm" fontWeight="600" color={muted}>
+            <Text fontSize="sm" fontWeight="700" color={muted}>
               Monthly visit target
             </Text>
-            <Text fontSize="sm" color={quiet}>
-              {member.visitsThisMonth}/{member.targetVisits}
+            <Text fontSize="sm" fontWeight="800" color={quiet}>
+              {member.visitsThisMonth} / {member.targetVisits}
             </Text>
           </HStack>
-          <Progress.Root value={visitProgress} size="sm" colorPalette="blue" borderRadius="full">
+          <Progress.Root value={visitProgress} size="md" colorPalette="blue" borderRadius="full">
             <Progress.Track borderRadius="full">
               <Progress.Range borderRadius="full" />
             </Progress.Track>
           </Progress.Root>
         </VStack>
 
-        <Separator />
+        <Separator opacity={0.5} />
 
-        <VStack align="stretch" gap={3}>
-          <HStack gap={2} color={muted}>
-            <LuMail />
-            <Text fontSize="sm">{member.email}</Text>
+        <VStack align="stretch" gap={4}>
+          <HStack gap={3} color={muted}>
+            <LuMail size="18" />
+            <Text fontSize="sm" fontWeight="600">{member.email}</Text>
           </HStack>
-          <HStack gap={2} color={muted}>
-            <LuPhone />
-            <Text fontSize="sm">{member.phone}</Text>
+          <HStack gap={3} color={muted}>
+            <LuPhone size="18" />
+            <Text fontSize="sm" fontWeight="600">{member.phone}</Text>
           </HStack>
         </VStack>
 
-        <Flex justify="space-between" align="center" pt={1}>
-          <VStack align="start" gap="0">
-            <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" color={quiet}>
+        <Flex justify="space-between" align="center" pt={2}>
+          <VStack align="start" gap="1">
+            <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" color={quiet} fontWeight="700">
               Outstanding
             </Text>
-            <Text fontWeight="800">{member.outstanding}</Text>
+            <Text fontWeight="900" fontSize="lg" color={member.outstanding !== "$0" ? useColorModeValue("orange.600", "orange.400") : "inherit"}>{member.outstanding}</Text>
           </VStack>
-          <Badge variant="outline" borderRadius="full" px="3" py="1">
-            CRM record
-          </Badge>
+          <Button variant="outline" size="sm" borderRadius="full" className="hover-lift">
+            <LuArrowRight /> Open record
+          </Button>
         </Flex>
       </VStack>
     </SurfaceCard>
@@ -347,277 +377,300 @@ const Members = () => {
   const renewalQueue = memberData.filter((member) => member.status !== "Active").slice(0, 4);
   const muted = useColorModeValue("gray.600", "gray.300");
   const quiet = useColorModeValue("gray.500", "gray.400");
+  
   const heroBg = useColorModeValue(
-    "linear-gradient(135deg, rgba(59,130,246,0.10) 0%, rgba(16,185,129,0.08) 52%, rgba(249,115,22,0.08) 100%)",
-    "linear-gradient(135deg, rgba(37,99,235,0.16) 0%, rgba(13,148,136,0.16) 52%, rgba(249,115,22,0.12) 100%)"
+    "linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(16,185,129,0.1) 52%, rgba(249,115,22,0.1) 100%)",
+    "linear-gradient(135deg, rgba(37,99,235,0.2) 0%, rgba(13,148,136,0.2) 52%, rgba(249,115,22,0.15) 100%)"
   );
-  const searchBg = useColorModeValue("white", "rgba(255,255,255,0.04)");
-  const borderColor = useColorModeValue("rgba(99,102,241,0.12)", "rgba(255,255,255,0.08)");
-  const panelSurface = useColorModeValue("gray.50", "whiteAlpha.50");
+  const searchBg = useColorModeValue("rgba(255,255,255,0.8)", "rgba(15,23,42,0.6)");
+  const borderColor = useColorModeValue("rgba(255, 255, 255, 0.8)", "rgba(255, 255, 255, 0.08)");
+  const panelSurface = useColorModeValue("rgba(0,0,0,0.03)", "whiteAlpha.100");
   const emptyStateBg = useColorModeValue("blue.50", "whiteAlpha.100");
   const emptyStateColor = useColorModeValue("blue.600", "blue.300");
   const teamNoteColor = useColorModeValue("blue.600", "blue.300");
 
+  const blob1 = useColorModeValue("rgba(59,130,246,0.25)", "rgba(59,130,246,0.15)");
+  const blob2 = useColorModeValue("rgba(16,185,129,0.2)", "rgba(16,185,129,0.1)");
+  
   return (
-    <VStack align="stretch" gap={6} pb={8}>
-      <SurfaceCard p={{ base: 5, md: 7 }} bg={heroBg} overflow="hidden" position="relative">
-        <Box
-          position="absolute"
-          right="-20px"
-          top="-24px"
-          w={{ base: "140px", md: "220px" }}
-          h={{ base: "140px", md: "220px" }}
-          borderRadius="full"
-          bg="rgba(59,130,246,0.12)"
-          filter="blur(42px)"
-          pointerEvents="none"
-        />
-        <SimpleGrid columns={{ base: 1, xl: 2 }} gap={8} position="relative">
-          <VStack align="start" gap={4}>
-            <HStack flexWrap="wrap" gap="3">
-              <Badge colorPalette="blue" variant="subtle" px="3" py="1" borderRadius="full">
-                Member Directory
-              </Badge>
-              <Badge variant="outline" px="3" py="1" borderRadius="full">
-                {memberData.length} total records
-              </Badge>
-              <Badge variant="outline" px="3" py="1" borderRadius="full">
-                {attentionCount} follow-ups pending
-              </Badge>
-            </HStack>
+    <Box position="relative" w="full" minH="100%">
+      <style>{animations}</style>
 
-            <VStack align="start" gap="2" maxW="2xl">
-              <Heading size={{ base: "xl", md: "2xl" }} letterSpacing="tight">
-                Modern gym CRM view for member health, renewals and engagement.
-              </Heading>
-              <Text fontSize={{ base: "sm", md: "md" }} color={muted} lineHeight="tall">
-                Review membership status, attendance momentum, trainer assignment and billing
-                follow-up from one responsive member management screen.
-              </Text>
-            </VStack>
+      {/* Decorative Orbs */}
+      <Box position="absolute" top="-10%" left="5%" w="350px" h="350px" bg={blob1} filter="blur(110px)" borderRadius="full" pointerEvents="none" zIndex={0} />
+      <Box position="absolute" top="40%" right="-5%" w="400px" h="400px" bg={blob2} filter="blur(120px)" borderRadius="full" pointerEvents="none" zIndex={0} />
 
-            <HStack flexWrap="wrap" gap="3">
-              <Button colorPalette="blue" size="lg" borderRadius="xl" onClick={() => navigate(buildViewPath("AddMember"))}>
-                <LuUserPlus />
-                Add member
-              </Button>
-              <Button variant="outline" size="lg" borderRadius="xl" onClick={() => navigate(buildViewPath("Subscription"))}>
-                <LuWallet />
-                Review subscriptions
-              </Button>
-            </HStack>
-          </VStack>
+      <VStack align="stretch" gap={8} pb={12} position="relative" zIndex={1}>
+        <SurfaceCard p={{ base: 6, md: 8 }} bg={heroBg} overflow="hidden" position="relative" className="animate-entrance">
+          <Box
+            position="absolute"
+            right="-20px"
+            top="-30px"
+            w={{ base: "180px", md: "280px" }}
+            h={{ base: "180px", md: "280px" }}
+            borderRadius="full"
+            bg="rgba(255,255,255,0.15)"
+            filter="blur(40px)"
+            pointerEvents="none"
+          />
+          <SimpleGrid columns={{ base: 1, xl: 2 }} gap={10} position="relative">
+            <VStack align="start" gap={6}>
+              <HStack flexWrap="wrap" gap="3">
+                <Badge colorPalette="blue" variant="solid" px="4" py="1.5" borderRadius="full" fontWeight="bold">
+                  Member Directory
+                </Badge>
+                <Badge variant="surface" px="4" py="1.5" bg={useColorModeValue("white", "whiteAlpha.200")} borderRadius="full">
+                  {memberData.length} records
+                </Badge>
+                <Badge variant="surface" px="4" py="1.5" bg={useColorModeValue("white", "whiteAlpha.200")} borderRadius="full">
+                  <Box as="span" w="2" h="2" borderRadius="full" bg="orange.500" display="inline-block" mr={2} />
+                  {attentionCount} pending
+                </Badge>
+              </HStack>
 
-          <SimpleGrid columns={{ base: 2, md: 4 }} gap={4}>
-            <StatTile label="Active" value={String(activeCount)} icon={LuUsers} accent="green" helper="Members in good standing" />
-            <StatTile label="Attention" value={String(attentionCount)} icon={LuShieldAlert} accent="orange" helper="Need outreach or renewal" />
-            <StatTile label="Frozen" value={String(frozenCount)} icon={LuClock3} accent="gray" helper="Paused memberships" />
-            <StatTile label="Outstanding" value={String(outstandingCount)} icon={LuActivity} accent="blue" helper="Payment follow-ups" />
-          </SimpleGrid>
-        </SimpleGrid>
-      </SurfaceCard>
-
-      <SurfaceCard p={{ base: 4, md: 5 }}>
-        <Flex
-          direction={{ base: "column", lg: "row" }}
-          justify="space-between"
-          align={{ base: "stretch", lg: "center" }}
-          gap={4}
-        >
-          <Box position="relative" flex="1">
-            <Box
-              position="absolute"
-              left="3"
-              top="50%"
-              transform="translateY(-50%)"
-              color={quiet}
-              zIndex={1}
-            >
-              <LuSearch />
-            </Box>
-            <Input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search by name, plan, trainer or member ID"
-              pl="10"
-              h="12"
-              borderRadius="xl"
-              bg={searchBg}
-              borderColor={borderColor}
-            />
-          </Box>
-
-          <HStack flexWrap="wrap" gap="2">
-            <HStack gap="2" color={quiet} px="2">
-              <LuFilter />
-              <Text fontSize="sm" fontWeight="600">
-                Filter
-              </Text>
-            </HStack>
-            {filters.map((filter) => {
-              const isActive = activeFilter === filter;
-              return (
-                <Button
-                  key={filter}
-                  size="sm"
-                  borderRadius="full"
-                  variant={isActive ? "solid" : "outline"}
-                  colorPalette={isActive ? "blue" : "gray"}
-                  onClick={() => setActiveFilter(filter)}
-                >
-                  {filter}
-                </Button>
-              );
-            })}
-          </HStack>
-        </Flex>
-      </SurfaceCard>
-
-      <SimpleGrid columns={{ base: 1, xl: 3 }} gap={6}>
-        <VStack align="stretch" gap={6} gridColumn={{ xl: "span 2" }}>
-          <Flex justify="space-between" align={{ base: "start", md: "center" }} direction={{ base: "column", md: "row" }} gap={3}>
-            <Box>
-              <Heading size="md">Member cards</Heading>
-              <Text fontSize="sm" color={quiet} mt={1}>
-                Showing {visibleMembers.length} of {memberData.length} members
-              </Text>
-            </Box>
-            <Badge variant="subtle" colorPalette="blue" px="3" py="1" borderRadius="full">
-              Responsive CRM layout
-            </Badge>
-          </Flex>
-
-          <SimpleGrid columns={{ base: 1, md: 2 }} gap={5}>
-            {visibleMembers.map((member) => (
-              <MemberCard key={member.id} member={member} />
-            ))}
-          </SimpleGrid>
-
-          {visibleMembers.length === 0 && (
-            <SurfaceCard p={8}>
-              <VStack align="center" gap={3}>
-                <Circle size="14" bg={emptyStateBg} color={emptyStateColor}>
-                  <LuUsers size="22px" />
-                </Circle>
-                <Heading size="sm">No members match this filter</Heading>
-                <Text color={muted} textAlign="center" maxW="md">
-                  Try a different search term or switch the status filter to see more member records.
+              <VStack align="start" gap="3" maxW="2xl">
+                <Heading size={{ base: "2xl", md: "3xl" }} letterSpacing="tight" fontWeight="900">
+                  Modern gym CRM view for member health and engagement.
+                </Heading>
+                <Text fontSize={{ base: "md", md: "lg" }} color={muted} lineHeight="tall" fontWeight="500">
+                  Review membership status, attendance momentum, trainer assignment and billing
+                  follow-up from one responsive member management screen.
                 </Text>
               </VStack>
-            </SurfaceCard>
-          )}
-        </VStack>
 
-        <VStack align="stretch" gap={6}>
-          <SurfaceCard p={5}>
-            <VStack align="stretch" gap={4}>
-              <Box>
-                <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" color={quiet} mb={2}>
-                  Renewal Queue
-                </Text>
-                <Heading size="sm">Members needing action</Heading>
-              </Box>
-
-              {renewalQueue.map((member) => (
-                <Box key={member.id} p={4} borderRadius="2xl" bg={panelSurface}>
-                  <VStack align="stretch" gap={3}>
-                    <HStack justify="space-between" align="start">
-                      <VStack align="start" gap="1">
-                        <Text fontWeight="700">{member.name}</Text>
-                        <Text fontSize="sm" color={muted}>{member.plan}</Text>
-                      </VStack>
-                      <Badge colorPalette={member.status === "Attention" ? "orange" : "gray"} variant="subtle">
-                        {member.status}
-                      </Badge>
-                    </HStack>
-                    <HStack justify="space-between">
-                      <HStack gap={2} color={quiet}>
-                        <LuCalendarClock />
-                        <Text fontSize="sm">{member.nextRenewal}</Text>
-                      </HStack>
-                      <Text fontSize="sm" fontWeight="700">
-                        {member.outstanding}
-                      </Text>
-                    </HStack>
-                  </VStack>
-                </Box>
-              ))}
-
-              <Button
-                variant="outline"
-                borderRadius="xl"
-                onClick={() => navigate(buildViewPath("Subscription"))}
-              >
-                Open subscription desk
-                <LuArrowRight />
-              </Button>
-            </VStack>
-          </SurfaceCard>
-
-          <SurfaceCard p={5}>
-            <VStack align="stretch" gap={4}>
-              <Box>
-                <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" color={quiet} mb={2}>
-                  Floor Snapshot
-                </Text>
-                <Heading size="sm">Usage momentum</Heading>
-              </Box>
-
-              <SimpleGrid columns={1} gap={4}>
-                <Box p={4} borderRadius="2xl" bg={panelSurface}>
-                  <HStack justify="space-between">
-                    <VStack align="start" gap="1">
-                      <Text fontWeight="700">Morning attendance</Text>
-                      <Text fontSize="sm" color={muted}>Peak traffic window</Text>
-                    </VStack>
-                    <Text fontSize="xl" fontWeight="900">82%</Text>
-                  </HStack>
-                </Box>
-                <Box p={4} borderRadius="2xl" bg={panelSurface}>
-                  <HStack justify="space-between">
-                    <VStack align="start" gap="1">
-                      <Text fontWeight="700">PT utilization</Text>
-                      <Text fontSize="sm" color={muted}>Trainer-led sessions</Text>
-                    </VStack>
-                    <Text fontSize="xl" fontWeight="900">76%</Text>
-                  </HStack>
-                </Box>
-                <Box p={4} borderRadius="2xl" bg={panelSurface}>
-                  <HStack justify="space-between">
-                    <VStack align="start" gap="1">
-                      <Text fontWeight="700">Equipment demand</Text>
-                      <Text fontSize="sm" color={muted}>Strength zone today</Text>
-                    </VStack>
-                    <Text fontSize="xl" fontWeight="900">High</Text>
-                  </HStack>
-                </Box>
-              </SimpleGrid>
-            </VStack>
-          </SurfaceCard>
-
-          <SurfaceCard p={5}>
-            <VStack align="stretch" gap={4}>
-              <Box>
-                <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" color={quiet} mb={2}>
-                  Team Note
-                </Text>
-                <Heading size="sm">Suggested next action</Heading>
-              </Box>
-              <Text color={muted} fontSize="sm" lineHeight="tall">
-                Focus the front desk on members with upcoming renewals and low visit counts.
-                They are the highest-risk segment for churn this week.
-              </Text>
-              <HStack gap={2} color={teamNoteColor}>
-                <LuDumbbell />
-                <Text fontSize="sm" fontWeight="700">
-                  Pair outreach with trainer check-in calls
-                </Text>
+              <HStack flexWrap="wrap" gap="4" pt={2}>
+                <Button colorPalette="blue" size="xl" borderRadius="2xl" px={8} className="hover-lift" onClick={() => navigate(buildViewPath("AddMember"))}>
+                  <LuUserPlus />
+                  Add member
+                </Button>
+                <Button variant="surface" size="xl" borderRadius="2xl" px={8} className="hover-lift" bg={useColorModeValue("white", "whiteAlpha.200")} onClick={() => navigate(buildViewPath("Subscription"))}>
+                  <LuWallet />
+                  Review subscriptions
+                </Button>
               </HStack>
             </VStack>
-          </SurfaceCard>
-        </VStack>
-      </SimpleGrid>
-    </VStack>
+
+            <SimpleGrid columns={{ base: 2, md: 4 }} gap={5}>
+              <StatTile label="Active" value={String(activeCount)} icon={LuUsers} accent="green" helper="In good standing" />
+              <StatTile label="Attention" value={String(attentionCount)} icon={LuShieldAlert} accent="orange" helper="Need outreach" />
+              <StatTile label="Frozen" value={String(frozenCount)} icon={LuClock3} accent="gray" helper="Paused passes" />
+              <StatTile label="Outstanding" value={String(outstandingCount)} icon={LuActivity} accent="blue" helper="Payments due" />
+            </SimpleGrid>
+          </SimpleGrid>
+        </SurfaceCard>
+
+        <SurfaceCard p={{ base: 4, md: 6 }} className="animate-entrance delay-1">
+          <Flex
+            direction={{ base: "column", lg: "row" }}
+            justify="space-between"
+            align={{ base: "stretch", lg: "center" }}
+            gap={6}
+          >
+            <Box position="relative" flex="1">
+              <Box
+                position="absolute"
+                left="4"
+                top="50%"
+                transform="translateY(-50%)"
+                color={quiet}
+                zIndex={1}
+              >
+                <LuSearch size="20" />
+              </Box>
+              <Input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search by name, plan, trainer or member ID"
+                pl="12"
+                h="14"
+                fontSize="lg"
+                fontWeight="500"
+                borderRadius="2xl"
+                bg={searchBg}
+                borderColor={borderColor}
+                boxShadow={useColorModeValue("inset 0 2px 4px rgba(0,0,0,0.02)", "inset 0 2px 4px rgba(0,0,0,0.2)")}
+                _focus={{ borderColor: "blue.400", boxShadow: "0 0 0 1px var(--chakra-colors-blue-400), inset 0 2px 4px rgba(0,0,0,0.02)" }}
+              />
+            </Box>
+
+            <HStack flexWrap="wrap" gap="3">
+              <HStack gap="2" color={quiet} px="3" py="2" bg={panelSurface} borderRadius="xl">
+                <LuFilter />
+                <Text fontSize="sm" fontWeight="700" letterSpacing="wide">
+                  FILTER
+                </Text>
+              </HStack>
+              {filters.map((filter) => {
+                const isActive = activeFilter === filter;
+                return (
+                  <Button
+                    key={filter}
+                    size="lg"
+                    borderRadius="xl"
+                    variant={isActive ? "solid" : "surface"}
+                    colorPalette={isActive ? "blue" : "gray"}
+                    onClick={() => setActiveFilter(filter)}
+                    className="hover-lift"
+                    fontWeight="700"
+                    bg={isActive ? undefined : useColorModeValue("white", "whiteAlpha.200")}
+                  >
+                    {filter}
+                  </Button>
+                );
+              })}
+            </HStack>
+          </Flex>
+        </SurfaceCard>
+
+        <SimpleGrid columns={{ base: 1, xl: 3 }} gap={8}>
+          <VStack align="stretch" gap={8} gridColumn={{ xl: "span 2" }}>
+            <Flex justify="space-between" align={{ base: "start", md: "center" }} direction={{ base: "column", md: "row" }} gap={3} px={2} className="animate-entrance delay-2">
+              <Box>
+                <Heading size="xl" fontWeight="900" letterSpacing="tight">Member directory</Heading>
+                <Text fontSize="md" color={muted} mt={2} fontWeight="500">
+                  Showing {visibleMembers.length} out of {memberData.length} total members matched
+                </Text>
+              </Box>
+              <Badge variant="subtle" colorPalette="blue" px="4" py="2" borderRadius="full" fontWeight="bold">
+                Live CRM sync
+              </Badge>
+            </Flex>
+
+            <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
+              {visibleMembers.map((member) => (
+                <MemberCard key={member.id} member={member} />
+              ))}
+            </SimpleGrid>
+
+            {visibleMembers.length === 0 && (
+              <SurfaceCard p={10} className="animate-entrance delay-2">
+                <VStack align="center" gap={5}>
+                  <Circle size="20" bg={emptyStateBg} color={emptyStateColor}>
+                    <LuUsers size="32px" />
+                  </Circle>
+                  <Heading size="lg" fontWeight="800" letterSpacing="tight">No members match this filter</Heading>
+                  <Text color={muted} textAlign="center" maxW="md" fontSize="lg" fontWeight="500">
+                    Try a different search term or switch the status filter to see more member records.
+                  </Text>
+                </VStack>
+              </SurfaceCard>
+            )}
+          </VStack>
+
+          <VStack align="stretch" gap={8}>
+            <SurfaceCard p={{ base: 6, md: 8 }} className="animate-entrance delay-3">
+              <VStack align="stretch" gap={5}>
+                <Box>
+                  <Text fontSize="sm" textTransform="uppercase" letterSpacing="widest" color={quiet} mb={2} fontWeight="800">
+                    Renewal Queue
+                  </Text>
+                  <Heading size="lg" letterSpacing="tight" fontWeight="800">Needs action</Heading>
+                </Box>
+
+                {renewalQueue.map((member) => (
+                  <Box key={member.id} p={5} borderRadius="2xl" bg={panelSurface} className="hover-lift">
+                    <VStack align="stretch" gap={4}>
+                      <HStack justify="space-between" align="start">
+                        <VStack align="start" gap="1">
+                          <Text fontWeight="800" fontSize="md">{member.name}</Text>
+                          <Text fontSize="sm" color={muted} fontWeight="600">{member.plan}</Text>
+                        </VStack>
+                        <Badge colorPalette={member.status === "Attention" ? "orange" : "gray"} variant="subtle" px="3" py="1" borderRadius="full" fontWeight="bold">
+                          {member.status}
+                        </Badge>
+                      </HStack>
+                      <HStack justify="space-between">
+                        <HStack gap={2} color={quiet}>
+                          <LuCalendarClock />
+                          <Text fontSize="sm" fontWeight="700">{member.nextRenewal}</Text>
+                        </HStack>
+                        <Text fontSize="md" fontWeight="800" color={member.outstanding !== "$0" ? useColorModeValue("orange.600", "orange.400") : "inherit"}>
+                          {member.outstanding}
+                        </Text>
+                      </HStack>
+                    </VStack>
+                  </Box>
+                ))}
+
+                <Button
+                  variant="outline"
+                  borderRadius="xl"
+                  size="xl"
+                  mt={2}
+                  className="hover-lift"
+                  onClick={() => navigate(buildViewPath("Subscription"))}
+                >
+                  Open billing desk
+                  <LuArrowRight />
+                </Button>
+              </VStack>
+            </SurfaceCard>
+
+            <SurfaceCard p={{ base: 6, md: 8 }} className="animate-entrance delay-4">
+              <VStack align="stretch" gap={5}>
+                <Box>
+                  <Text fontSize="sm" textTransform="uppercase" letterSpacing="widest" color={quiet} mb={2} fontWeight="800">
+                    Floor Snapshot
+                  </Text>
+                  <Heading size="lg" letterSpacing="tight" fontWeight="800">Usage momentum</Heading>
+                </Box>
+
+                <SimpleGrid columns={1} gap={4}>
+                  <Box p={5} borderRadius="2xl" bg={panelSurface} className="hover-lift">
+                    <HStack justify="space-between">
+                      <VStack align="start" gap="1">
+                        <Text fontWeight="800">Morning attendance</Text>
+                        <Text fontSize="sm" color={muted} fontWeight="500">Peak traffic window</Text>
+                      </VStack>
+                      <Text fontSize="2xl" fontWeight="900">82%</Text>
+                    </HStack>
+                  </Box>
+                  <Box p={5} borderRadius="2xl" bg={panelSurface} className="hover-lift">
+                    <HStack justify="space-between">
+                      <VStack align="start" gap="1">
+                        <Text fontWeight="800">PT utilization</Text>
+                        <Text fontSize="sm" color={muted} fontWeight="500">Trainer-led sessions</Text>
+                      </VStack>
+                      <Text fontSize="2xl" fontWeight="900">76%</Text>
+                    </HStack>
+                  </Box>
+                  <Box p={5} borderRadius="2xl" bg={panelSurface} className="hover-lift">
+                    <HStack justify="space-between">
+                      <VStack align="start" gap="1">
+                        <Text fontWeight="800">Equipment demand</Text>
+                        <Text fontSize="sm" color={muted} fontWeight="500">Strength zone today</Text>
+                      </VStack>
+                      <Text fontSize="2xl" fontWeight="900" color={useColorModeValue("orange.600", "orange.400")}>High</Text>
+                    </HStack>
+                  </Box>
+                </SimpleGrid>
+              </VStack>
+            </SurfaceCard>
+
+            <SurfaceCard p={{ base: 6, md: 8 }} className="animate-entrance delay-5" bg={useColorModeValue("blue.50", "blue.900")} borderColor={useColorModeValue("blue.100", "blue.800")}>
+              <VStack align="stretch" gap={5}>
+                <Box>
+                  <Text fontSize="sm" textTransform="uppercase" letterSpacing="widest" color={useColorModeValue("blue.600", "blue.300")} mb={2} fontWeight="800">
+                    Team Note
+                  </Text>
+                  <Heading size="md" letterSpacing="tight" fontWeight="800">Suggested next action</Heading>
+                </Box>
+                <Text color={useColorModeValue("gray.700", "gray.300")} fontSize="md" lineHeight="tall" fontWeight="500">
+                  Focus the front desk on members with upcoming renewals and low visit counts.
+                  They are the highest-risk segment for churn this week.
+                </Text>
+                <HStack gap={3} color={teamNoteColor} p={3} bg={useColorModeValue("white", "whiteAlpha.200")} borderRadius="xl" mt={2}>
+                  <LuDumbbell size="20" />
+                  <Text fontSize="sm" fontWeight="800" letterSpacing="tight">
+                    Pair outreach with trainer check-in calls
+                  </Text>
+                </HStack>
+              </VStack>
+            </SurfaceCard>
+          </VStack>
+        </SimpleGrid>
+      </VStack>
+    </Box>
   );
 };
 

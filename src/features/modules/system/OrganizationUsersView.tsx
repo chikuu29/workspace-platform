@@ -145,7 +145,7 @@ const OrganizationUsersView = memo(() => {
                             </HStack>
                         </Table.Cell>
                         <Table.Cell textAlign="right">
-                            <UIPermissionGuard permission="ACCOUNT.ROLES.ASSIGN">
+                            <UIPermissionGuard permissions={["ACCOUNT.ROLES.ASSIGN"]}>
                                 <IconButton variant="ghost" size="xs" onClick={() => handleEditClick(user)}>
                                     <LuPencil />
                                 </IconButton>

@@ -8,12 +8,11 @@ import {
   Button,
   Text,
   PinInput,
-  PinInputField,
   HStack,
   Flex,
 } from "@chakra-ui/react";
 
-import { useColorModeValue } from "../../../components/ui/color-mode";
+import { useColorModeValue } from "@/components/ui/color-mode";
 
 const AppOtp = () => {
   //   const bgColor = useColorModeValue("gray.100", "gray.800");

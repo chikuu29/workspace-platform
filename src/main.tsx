@@ -11,7 +11,7 @@ import { store } from "./app/store.ts";
 import Loader from "./features/ui/components/Loader/Loader.tsx";
 import ApiResponseModalAlert from "./core/components/ApiResponseModalAlert.tsx";
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  // <StrictMode>
+  <StrictMode>
     <ChakraProvider>
       {/* <AuthProvider> */}
       <Provider store={store} >
@@ -21,5 +21,5 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       </Provider>
       {/* </AuthProvider> */}
     </ChakraProvider>
-  // </StrictMode>
+  </StrictMode>
 );

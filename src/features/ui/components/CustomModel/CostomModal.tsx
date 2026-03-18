@@ -1,6 +1,6 @@
 // CustomModal.js
 import React from "react";
-import { useColorModeValue } from "../../../components/ui/color-mode";
+import { useColorModeValue } from "@/components/ui/color-mode";
 import { Steps, Button, Dialog, Portal } from "@chakra-ui/react";
 
 const CustomModal = ({

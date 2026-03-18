@@ -36,7 +36,7 @@ export const ScriptProvider: React.FC<{
   if (loading) {
 
     return (
-      <Loader loaderText="Just a moment , we're getting things ready for you..." />
+      <Loader  />
     ); // Or a loading spinner
   }
   return (

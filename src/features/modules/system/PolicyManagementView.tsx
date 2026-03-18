@@ -665,13 +665,13 @@ const PolicyCard = memo(({ policy, onEdit, onDelete }: PolicyCardProps) => {
           </Text>
 
           <HStack gap={2}>
-            <UIPermissionGuard permission="ACCOUNT.POLICIES.EDIT">
+            <UIPermissionGuard permissions={["ACCOUNT.POLICIES.EDIT"]}>
               <Button size="xs" variant="ghost" onClick={handleEdit}>
                 <LuPencil /> Edit
               </Button>
             </UIPermissionGuard>
             {!policy.is_system_policy && (
-              <UIPermissionGuard permission="ACCOUNT.POLICIES.DELETE">
+              <UIPermissionGuard permissions={["ACCOUNT.POLICIES.DELETE"]}>
                 <Button colorPalette="red" size="xs" variant="ghost" onClick={handleDelete}>
                   <LuTrash2 /> Delete
                 </Button>
@@ -1009,7 +1009,7 @@ const PolicyManagementView = memo(() => {
         subtitle="Configure access policies with fine-grained Allow and Deny rules."
         actions={
           <HStack gap={3}>
-            <UIPermissionGuard permission="ACCOUNT.POLICIES.CREATE">
+            <UIPermissionGuard permissions={["ACCOUNT.POLICIES.CREATE"]}>
               <Button
                 colorPalette="purple"
                 borderRadius="xl"
@@ -1063,7 +1063,7 @@ const PolicyManagementView = memo(() => {
                   : "Create your first policy to define access control rules."}
               </Text>
               {!searchQuery && (
-                <UIPermissionGuard permission="ACCOUNT.POLICIES.CREATE">
+                <UIPermissionGuard permissions={["ACCOUNT.POLICIES.CREATE"]}>
                   <Button
                     mt={2}
                     size="sm"

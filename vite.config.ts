@@ -26,11 +26,10 @@ export default defineConfig(({ mode }) => {
       tsconfigPaths()
     ],
     build: {
-      chunkSizeWarningLimit: 1500,
+      chunkSizeWarningLimit: 2000, // Set higher limit since we're now optimizing chunks
       target: 'esnext', // Optimize for modern browsers
       cssCodeSplit: true, // Enable CSS code splitting
       sourcemap: false, // Disable sourcemaps for production (optional)
-
       minify: 'terser', // Minify using Terser for better compression
       terserOptions: {
         compress: {
@@ -38,19 +37,22 @@ export default defineConfig(({ mode }) => {
           drop_debugger: mode === 'production', // Remove debugger statements
         },
       },
-      // rollupOptions: {
-      //   output: {
-      //     manualChunks(id) {
-      //       if (id.includes('node_modules')) {
-      //         if (id.includes('react') || id.includes('react-dom') || id.includes('@chakra-ui')) {
-      //           return 'react-vendor';
-      //         }
-      //         return 'vendor';
-      //       }
-      //     }
-      //   }
-
-      // }
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            // Separate vendor libraries into their own chunks
+            'vendor-react': ['react', 'react-dom', 'react-router'],
+            'vendor-chakra': ['@chakra-ui/react', '@chakra-ui/cli'],
+            'vendor-state': ['zustand', '@reduxjs/toolkit', 'react-redux'],
+            'vendor-animation': ['framer-motion', 'canvas-confetti'],
+            'vendor-utils': ['axios', 'rxjs', 'moment', 'uuid', 'dexie', 'react-icons', 'react-hook-form', 'next-themes'],
+          },
+          // Optimize chunk file names
+          chunkFileNames: 'chunks/[name]-[hash].js',
+          entryFileNames: 'js/[name]-[hash].js',
+          assetFileNames: 'assets/[name]-[hash][extname]',
+        },
+      },
     },
     server: {
       port: 5174,

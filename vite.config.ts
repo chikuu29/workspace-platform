@@ -68,10 +68,10 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/ui-api/, '')
         },
-        '/ai-api': {
-          target: env.VITE_AI_API_URL,
+        '/identity': {
+          target: env.VITE_IDENTITY_PROVIDER_API_URL,
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/ai-api/, '')
+          rewrite: (path) => path.replace(/^\/identity/, '')
         }
       }
     }

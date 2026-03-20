@@ -4,7 +4,7 @@ import { privateAPI, publicAPI } from "./handlers/axiosHandlers";
 import { getFromCache, saveToCache } from "./handlers/dexieHandles";
 
 type RequestMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-export type APIService = "core" | "ui" | "ai";
+export type APIService = "core" | "ui" | "ai" | "identity";
 
 interface APIRequestOptions {
   method: RequestMethod;
@@ -73,9 +73,11 @@ const buildPayload = (data: any = {}, files?: FileList | File[]) => {
 // Map service to its respective base URL
 export const getBaseUrl = (serverName: APIService) => {
   if (import.meta.env.DEV) {
+   console.log(`DEV MODE: Routing API call to ${serverName} server`);
     switch (serverName) {
       case "ui": return "/ui-api";
       case "ai": return "/ai-api";
+      case "identity": return "/identity";
       case "core":
       default: return "/api";
     }
@@ -84,6 +86,7 @@ export const getBaseUrl = (serverName: APIService) => {
     switch (serverName) {
       case "ui": return import.meta.env.VITE_UI_API_URL || "/ui-api";
       case "ai": return import.meta.env.VITE_AI_API_URL || "/ai-api";
+      case "identity": return import.meta.env.VITE_IDENTITY_PROVIDER_API_URL || "/identity";
       case "core":
       default: return import.meta.env.VITE_API_URL || "/api";
     }

@@ -4,13 +4,13 @@ import {
   Container,
   Flex,
   Heading,
-  Icon,
+  Alert,
   Input,
   SimpleGrid,
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { Alert } from "@/components/ui/alert";
+// import { Alert } from "@/components/ui/alert";
 import { Field } from "@/components/ui/field";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useColorModeValue } from "@/components/ui/color-mode";
@@ -21,6 +21,10 @@ import { POSTAPI } from "@/app/api";
 import { AlertProps } from "@/app/types/appConfigInterface";
 import { SiAuthelia } from "react-icons/si";
 import { useForm } from "react-hook-form";
+import AuthFormInput from "../components/AuthFormInput";
+import { MdEmail } from "react-icons/md";
+import { FiPhone } from "react-icons/fi";
+import { FaBuilding } from "react-icons/fa6";
 
 const MotionBox = motion.create(Box);
 const MotionStack = motion.create(Stack);
@@ -43,37 +47,30 @@ const SignUp = () => {
 
   const onFormSubmit = (formData: any) => {
     setLoading(true);
-    setShowAlert(prev => ({ ...prev, isVisible: false }));
+    setShowAlert((prev) => ({ ...prev, isVisible: false }));
 
     POSTAPI({
-      path: "account/register",
+      path: "account/register/organization",
+      serverName: "identity",
       data: formData,
       isPrivateApi: false,
-    }).subscribe({
-      next: (res: any) => {
-        setLoading(false);
-        if (res.success) {
-          setShowAlert({
-            title: "Success",
-            description: "Account created successfully! Redirecting to login...",
-            status: "success",
-            isVisible: true,
-          });
-          setTimeout(() => navigate("/auth/login"), 2000);
-        } else {
-          setShowAlert({
-            title: "Registration Failed",
-            description: res.message || "Registration failed",
-            status: "error",
-            isVisible: true,
-          });
+    }).subscribe((res: any) => {
+      setLoading(false);
+      if (res.success) {
+        setShowAlert({
+          title: "Success",
+          description: res?.message || "Organization created successfully",
+          status: "success",
+          isVisible: true,
+        });
+      } else {
+        let errorDescription = res?.message || "Failed to create organization";
+        if (res?.error?.detail) {
+          errorDescription = `${errorDescription}: ${res.error.detail}`;
         }
-      },
-      error: (error: any) => {
-        setLoading(false);
         setShowAlert({
           title: "Error",
-          description: error?.response?.data?.message || "An error occurred during registration",
+          description: errorDescription,
           status: "error",
           isVisible: true,
         });
@@ -88,14 +85,14 @@ const SignUp = () => {
       y: 0,
       transition: {
         duration: 0.6,
-        staggerChildren: 0.1
-      }
-    }
+        staggerChildren: 0.1,
+      },
+    },
   };
 
   const itemVariants = {
     hidden: { opacity: 0, x: -20 },
-    visible: { opacity: 1, x: 0 }
+    visible: { opacity: 1, x: 0 },
   };
 
   return (
@@ -131,9 +128,17 @@ const SignUp = () => {
         zIndex="0"
       />
 
-      <Container maxW="7xl" position="relative" zIndex="1" py={{ base: 12, md: 24 }}>
-        <SimpleGrid columns={{ base: 1, md: 2 }} gap={{ base: 16, lg: 32 }} alignItems="center">
-
+      <Container
+        maxW="7xl"
+        position="relative"
+        zIndex="1"
+        py={{ base: 12, md: 24 }}
+      >
+        <SimpleGrid
+          columns={{ base: 1, md: 2 }}
+          gap={{ base: 16, lg: 32 }}
+          alignItems="center"
+        >
           {/* Left Side: Welcome Content */}
           <MotionStack
             gap={8}
@@ -238,7 +243,9 @@ const SignUp = () => {
                   >
                     Account
                   </Text>
-                  <Text as="span" color="brand.400">.</Text>
+                  <Text as="span" color="brand.400">
+                    .
+                  </Text>
                 </Heading>
                 <Text color="gray.500" fontSize="md" fontWeight="500">
                   Fill in your details to get started.
@@ -248,7 +255,7 @@ const SignUp = () => {
 
             <form onSubmit={handleSubmit(onFormSubmit)}>
               <Stack gap={4}>
-                <Field
+                {/* <Field
                   invalid={!!errors.business_name}
                   errorText={errors.business_name?.message?.toString()}
                   helperText="No spaces (e.g., my-company, techcorp)"
@@ -329,9 +336,89 @@ const SignUp = () => {
                     borderRadius="lg"
                     variant="subtle"
                   />
-                </Field>
+                </Field> */}
+                <MotionBox variants={itemVariants} mb={3}>
+                  <AuthFormInput
+                    label="Organization Name"
+                    required
+                    icon={<FaBuilding size={16} />}
+                    error={errors.organization_name?.message?.toString()}
+                    hint="No spaces — use letters, numbers or hyphens (e.g. acme-corp)"
+                    inputProps={
+                      {
+                        ...register("organization_name", {
+                          required: "Organization name is required",
+                          minLength: {
+                            value: 2,
+                            message: "Enter a valid organization name",
+                          },
+                          pattern: {
+                            value: /^\S+$/,
+                            message:
+                              "Organization name must not contain spaces",
+                          },
+                        }),
+                        placeholder: "e.g. acme-corp",
+                        autoComplete: "organization",
+                        "aria-label": "Organization Name",
+                      } as any
+                    }
+                  />
+                </MotionBox>
 
-                <AnimatePresence>
+                {/* ── Admin email ──────────────────────────────────── */}
+                <MotionBox variants={itemVariants} mb={3}>
+                  <AuthFormInput
+                    label="Admin Email"
+                    required
+                    icon={<MdEmail size={18} />}
+                    error={errors.organization_email?.message?.toString()}
+                    inputProps={
+                      {
+                        ...register("organization_email", {
+                          required: "Email is required",
+                          pattern: {
+                            value: /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/,
+                            message: "Enter a valid email address",
+                          },
+                        }),
+                        type: "email",
+                        placeholder: "admin@yourcompany.com",
+                        autoComplete: "email",
+                        "aria-label": "Admin Email",
+                      } as any
+                    }
+                  />
+                </MotionBox>
+
+                {/* ── Phone number ─────────────────────────────────── */}
+                <MotionBox variants={itemVariants} mb={3}>
+                  <AuthFormInput
+                    label="Phone Number"
+                    required
+                    icon={<FiPhone size={17} />}
+                    error={errors.phone_number?.message?.toString()}
+                    hint="Include country code (e.g. +91 98765 43210)"
+                    inputProps={
+                      {
+                        ...register("phone_number", {
+                          required: "Phone number is required",
+                          pattern: {
+                            value: /^\+?[1-9]\d{6,14}$/,
+                            message:
+                              "Enter a valid phone number with country code",
+                          },
+                        }),
+                        type: "tel",
+                        placeholder: "+91 98765 43210",
+                        autoComplete: "tel",
+                        "aria-label": "Phone Number",
+                      } as any
+                    }
+                  />
+                </MotionBox>
+
+                {/* <AnimatePresence>
                   {showAlert.isVisible && (
                     <MotionBox
                       initial={{ opacity: 0, height: 0 }}
@@ -345,8 +432,31 @@ const SignUp = () => {
                       />
                     </MotionBox>
                   )}
-                </AnimatePresence>
-
+                </AnimatePresence> */}
+                {/* ── Alert ─────────────────────────────────────────── */}
+                {showAlert.isVisible && (
+                  <MotionBox
+                    initial={{ opacity: 0, scale: 0.97 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    mb={4}
+                  >
+                    <Alert.Root
+                      status={showAlert.status}
+                      variant="outline"
+                      borderRadius="xl"
+                      borderWidth="1.5px"
+                      fontSize="sm"
+                    >
+                      <Alert.Indicator />
+                      <Alert.Title fontWeight="semibold">
+                        {showAlert.title}
+                      </Alert.Title>
+                      <Alert.Description>
+                        {showAlert.description}
+                      </Alert.Description>
+                    </Alert.Root>
+                  </MotionBox>
+                )}
                 <Button
                   size="lg"
                   h="56px"

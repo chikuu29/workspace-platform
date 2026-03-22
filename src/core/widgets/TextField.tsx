@@ -115,14 +115,14 @@ const TextField = ({
                 mb={oneLiner ? 0 : 1}
                  css={{
                     "& [data-part='label']": {
-                        color: "auth.text.muted",
+                        color: "app.text.muted",
                         fontSize: "0.8125rem",
                         fontWeight: 500,
                         letterSpacing: "0.02em",
                         marginBottom: "6px",
                     },
                     "& [data-part='helper-text']": {
-                        color: "auth.text.muted",
+                        color: "app.text.muted",
                         fontSize: "0.75rem",
                         marginTop: "4px",
                     },
@@ -176,21 +176,21 @@ const TextField = ({
                     disabled={disabled}
                     flex="1"
                     size="lg"
-                    bg={"auth.input.bg"}
-                    borderColor="auth.input.border"
+                    bg={"app.input.bg"}
+                    borderColor="app.input.border"
                     borderRadius="lg"
                     borderWidth="1.5px"
                     // borderColor={useColorModeValue("gray.200", "whiteAlpha.200")}
                     _hover={{
-                      borderColor: "auth.input.border.focus",
+                      borderColor: "app.input.border.focus",
                     }}
                     _invalid={{
                       borderColor: "red.500",
                       boxShadow: "0 0 0 3px rgba(239,68,68,0.2)",
                     }}
                     _focus={{
-                      borderColor: "auth.input.border.focus",
-                      boxShadow: "auth.input.glow",
+                      borderColor: "app.input.border.focus",
+                      boxShadow: "app.input.glow",
                       outline: "none",
                     }}
                     transition="all 0.22s cubic-bezier(0.4,0,0.2,1)"

@@ -87,9 +87,11 @@ const Navbar = () => {
                   aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
                   display={{ base: "none", xl: "flex" }}
                   onClick={toggleSidebar}
-                  variant="ghost"
+                  // variant="ghost"
                   size="md"
                   borderRadius="xl"
+                  color={"app.text.primary"}
+                  bg={"app.card.bg"}
                   _hover={iconBtnHover}
                   transition={TRANSITION}
                 >

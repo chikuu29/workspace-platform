@@ -404,7 +404,7 @@ const Subscription = () => {
               </VStack>
 
               <HStack flexWrap="wrap" gap="4" pt={2}>
-                <Button colorPalette="blue" size="xl" borderRadius="2xl" px={8} className="hover-lift" onClick={() => navigate(buildViewPath("AddMember"))}>
+                <Button colorPalette="blue" size="xl" borderRadius="2xl" px={8} className="hover-lift" onClick={() => navigate(buildViewPath("AddSubscriptionPlan"))}>
                   <LuBadgeDollarSign />
                   New subscription
                 </Button>

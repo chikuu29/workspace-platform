@@ -146,45 +146,9 @@
                         ]
                     },
                     {
-                        "title": "Membership Plan",
-                        "description": "Configure subscription and fitness goals.",
+                        "title": "Fitness Goals",
                         "iconName": "LuActivity",
                         "widgets": [
-                            {
-                                "name": "planType",
-                                "text": "Select Plan",
-                                "description": "Choose the membership duration that best fits your schedule",
-                                "widget": "radioField",
-                                "oneLiner": true,
-                                "options": [
-                                    {
-                                        "label": "Monthly",
-                                        "value": "monthly"
-                                    },
-                                    {
-                                        "label": "Quarterly",
-                                        "value": "quarterly"
-                                    },
-                                    {
-                                        "label": "Annual",
-                                        "value": "annual"
-                                    },
-                                    {
-                                        "label": "Trial",
-                                        "value": "trial"
-                                    }
-                                ],
-                                "required": true
-                            },
-                            {
-                                "name": "joiningDate",
-                                "text": "Joining Date",
-                                "description": "Select the official start date of the membership",
-                                "widget": "dateField",
-                                "oneLiner": true,
-                                "required": true,
-                                "enableClear": true
-                            },
                             {
                                 "name": "appointmentTime",
                                 "text": "Appointment Slot",

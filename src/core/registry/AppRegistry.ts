@@ -108,6 +108,9 @@ const registry: RegistryConfig = {
         // AddMember: () => import("@/features/modules/gym/AddMember"),
         Subscription: () => import("@/features/modules/gym/Subscription"),
         ListMember: () => import("@/features/modules/gym/Members"),
+        GymSubscriptionPlans: () => import("@/features/modules/gym/GymSubscriptionPlans"),
+        AddSubscriptionPlan: () => import("@/features/modules/gym/AddSubscriptionPlan"),
+        CreateSubscription: () => import("@/features/modules/gym/CreateSubscription"),
     },
     Default: {
         workspacePage: () => import("@/core/WorkspacePage"),

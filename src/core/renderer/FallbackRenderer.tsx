@@ -98,7 +98,7 @@ const FallbackRenderer: React.FC<FallbackRendererProps> = ({ reason, type, confi
         >
             <Box
                 p="10"
-                bg={bg}
+                bg={"app.card.bg"}
                 borderRadius="3xl"
                 border="2px dashed"
                 borderColor={borderColor}

@@ -120,7 +120,7 @@ export const UIEngine: React.FC<UIEngineProps> = ({ config, initialData = {}, on
                             borderColor={dialogBorderColor}
                             shadow="2xl"
                             boxShadow="2xl" backdrop={false}
-                            bg={dialogBg}
+                            bg={"app.card.bg"}
                             // backdropFilter="blur(60px)"
                             maxW={{ base: "95vw", md: "500px" }}
                         >

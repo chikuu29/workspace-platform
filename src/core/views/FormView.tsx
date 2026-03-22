@@ -18,6 +18,7 @@ import { useFormStore } from "../store/useFormStore";
 import { appEventRegistry } from "../registry/AppEventRegistry";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/app/slices/loader/appLoaderSlice";
+
 const FormView = ({ config }: any) => {
   const dispatch = useDispatch();
   const layoutStyles = config?.UI_TYPE?.layoutStyles || {};
@@ -29,18 +30,12 @@ const FormView = ({ config }: any) => {
     "app.text.primary",
     "app.text.primary",
   );
-  const headerBg = useColorModeValue(
-    "linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(239,246,255,0.96) 48%, rgba(238,242,255,0.98) 100%)",
-    "linear-gradient(135deg, rgba(15,23,42,0.96) 0%, rgba(30,41,59,0.92) 48%, rgba(15,23,42,0.98) 100%)",
-  );
+ 
   const headerPanelBg = useColorModeValue(
     "rgba(255,255,255,0.76)",
     "rgba(255,255,255,0.04)",
   );
-  const cardBg = useColorModeValue(
-    "rgba(255,255,255,0.94)",
-    "rgba(15,23,42,0.72)",
-  );
+
 
   const metaBg = useColorModeValue(
     "rgba(255,255,255,0.7)",
@@ -58,7 +53,7 @@ const FormView = ({ config }: any) => {
   );
 
   const actionEventConfig = useMemo(
-    () => config?.ACTIONS?.event || {},
+    () => config?.ACTIONS?.events || {},
     [config],
   );
 
@@ -108,6 +103,7 @@ const FormView = ({ config }: any) => {
 
   const executeFormEvent = useCallback(
     async (eventName: string, payload: any) => {
+      console.log("Executing form event:", eventName, payload);
       if (isEventInProgress) {
         return {
           success: false,
@@ -118,7 +114,8 @@ const FormView = ({ config }: any) => {
       setIsEventInProgress(true);
       setPendingEventName(eventName);
       dispatch(startLoading(`Processing ${eventName}...`));
-
+      console.log("actionEventConfig:", actionEventConfig);
+      
       try {
         const result = await appEventRegistry.executeEvent(
           eventName,
@@ -139,6 +136,8 @@ const FormView = ({ config }: any) => {
 
   const handleFormSubmit = useCallback(
     async (data: any) => {
+      console.log("Form submitted:", data);
+
       if (isEventInProgress) return;
       await executeFormEvent("submit", data);
     },
@@ -147,6 +146,8 @@ const FormView = ({ config }: any) => {
 
   const handleActionButtonClick = useCallback(
     async (button: any) => {
+      console.log("Form button clicked:", button.name);
+      
       if (!button?.event || button.event === "submit" || isEventInProgress)
         return;
 

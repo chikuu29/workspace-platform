@@ -38,12 +38,9 @@ const PanelSideBar = () => {
 
   const borderColor = useColorModeValue("gray.100", "whiteAlpha.50");
 
+
   // Don't render if no sidebar menu should be shown
   if (!DISPLAY_TYPE?.SHOW_SIDE_NAV_MENU || FEATURE.length === 0) return null;
-  const navBg = useColorModeValue(
-    "#ffff",
-    "rgba(15, 23, 42, 0.88)"
-  );
   return (
     <Box
       as="nav"

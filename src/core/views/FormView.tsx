@@ -15,12 +15,23 @@ import { UIEngine } from "../renderer/UIEngine";
 import "../widgets";
 import AsyncLoadIcon from "@/utils/hooks/AsyncLoadIcon";
 import { useFormStore } from "../store/useFormStore";
-import { appEventRegistry } from "../registry/AppEventRegistry";
-import { useDispatch } from "react-redux";
+import { ActionEngine } from "../action-engine/ActionEngine";
+import { useDispatch, useSelector } from "react-redux";
 import { startLoading, stopLoading } from "@/app/slices/loader/appLoaderSlice";
+import { useNavigate } from "react-router";
+import { useModalStore } from "@/core/store/useModalStore";
+import { RootState } from "@/app/store";
 
 const FormView = ({ config }: any) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const openModal = useModalStore((s) => s.openModal);
+  const organizations = useSelector((state: RootState) => state.organizations);
+  const organizationName = useMemo(
+      () => (organizations?.organization?.name ? organizations.organization.name : "GHOST_ORG"),
+      [organizations?.organization?.name]
+  );
+
   const layoutStyles = config?.UI_TYPE?.layoutStyles || {};
   const borderColor = useColorModeValue(
     "rgba(99, 102, 241, 0.16)",
@@ -117,21 +128,31 @@ const FormView = ({ config }: any) => {
       console.log("actionEventConfig:", actionEventConfig);
       
       try {
-        const result = await appEventRegistry.executeEvent(
-          eventName,
-          actionEventConfig?.[eventName],
-          payload,
-          config,
-        );
+        const actionToExecute = actionEventConfig?.[eventName];
+        if (!actionToExecute) {
+            console.warn(`No action configuration found for event: ${eventName}`);
+            return { success: false, message: `No action config for '${eventName}'` };
+        }
+        
+        const actionContext = {
+            navigate,
+            openModal,
+            organizationName,
+            payload,
+        };
 
-        return result;
+        await ActionEngine.execute(actionToExecute, actionContext);
+        return { success: true };
+      } catch (error) {
+        console.error("ActionEngine Execution Error", error);
+        return { success: false, error };
       } finally {
         setIsEventInProgress(false);
         setPendingEventName(null);
         dispatch(stopLoading());
       }
     },
-    [actionEventConfig, config, dispatch, isEventInProgress],
+    [actionEventConfig, dispatch, isEventInProgress, navigate, openModal, organizationName],
   );
 
   const handleFormSubmit = useCallback(

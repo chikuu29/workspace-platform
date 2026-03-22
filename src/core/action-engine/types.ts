@@ -51,14 +51,29 @@ export interface CallbackAction {
     readonly handler: string;
 }
 
+export interface ApiCallAction {
+    readonly type: "API_CALL";
+    readonly url: string;
+    readonly method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+    readonly params?: Record<string, any>;
+    readonly headers?: Record<string, string>;
+    readonly successMessage?: string;
+    readonly errorMessage?: string;
+    readonly laterActions?: AppAction | AppAction[];
+}
+
 // ─── Union Type ──────────────────────────────────────────────────────
 
-export type NavigationAction =
+export type AppAction =
     | RouteAction
     | ModalAction
     | DrawerAction
     | ExternalAction
-    | CallbackAction;
+    | CallbackAction
+    | ApiCallAction
+    | { type: "NAVIGATION"; path: string }; // Alias for route action to support JSON config
+
+export type NavigationAction = AppAction; // Alias for backward compatibility
 
 // ─── Execution Context ───────────────────────────────────────────────
 
@@ -74,11 +89,15 @@ export interface ActionExecutionContext {
     organizationName: string;
     /** The raw menu config for callback handlers */
     menuConfig?: Record<string, unknown>;
+    /** Incoming payload from the firing view (e.g., form data) */
+    payload?: any;
+    /** Output from a previous action, useful for chaining laterActions */
+    response?: any;
 }
 
 // ─── Action Handler Signature ────────────────────────────────────────
 
 export type ActionHandler = (
-    action: NavigationAction,
+    action: AppAction,
     context: ActionExecutionContext
-) => void;
+) => void | Promise<void>;

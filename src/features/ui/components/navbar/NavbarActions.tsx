@@ -120,6 +120,7 @@ const NavbarActions = () => {
         <Portal>
           <Menu.Positioner>
             <Menu.Content
+              bg={"app.card.bg"}
               minW="240px"
               backdropFilter="blur(16px)"
               borderRadius="2xl"

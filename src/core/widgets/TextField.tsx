@@ -61,16 +61,16 @@ const TextField = ({
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = event.target.value;
       if (events) {
-        ruleEngine.processEvents(events, newValue, 'change', methods);
+        ruleEngine.processEvents(events, newValue, "change", methods);
       }
     },
-    [methods, events]
+    [methods, events],
   );
 
   const handleClear = useCallback(() => {
     methods.setValue(name, "", { shouldValidate: true });
     if (events) {
-      ruleEngine.processEvents(events, "", 'change', methods);
+      ruleEngine.processEvents(events, "", "change", methods);
     }
   }, [methods, name, events]);
 
@@ -95,12 +95,7 @@ const TextField = ({
   }, [props.pattern, type]);
 
   return (
-    <Box
-      w="full"
-      py={2}
-      px={1}
-      transition="all 0.2s"
-    >
+    <Box w="full" py={2} px={1} transition="all 0.2s">
       <Field.Root invalid={!!errors} required={mandatory} disabled={disabled}>
         <Flex
           direction={oneLiner ? { base: "column", md: "row" } : "column"}
@@ -112,12 +107,26 @@ const TextField = ({
             <Box w={labelWidth}>
               <Field.Label
                 htmlFor={name}
-                fontSize="sm"
-                fontWeight="semibold"
-                color="fg.muted"
+                // fontSize="sm"
+                // fontWeight="semibold"
+                // color="fg.muted"
                 transition="color 0.2s"
                 _invalid={{ color: "red.500" }}
                 mb={oneLiner ? 0 : 1}
+                 css={{
+                    "& [data-part='label']": {
+                        color: "auth.text.muted",
+                        fontSize: "0.8125rem",
+                        fontWeight: 500,
+                        letterSpacing: "0.02em",
+                        marginBottom: "6px",
+                    },
+                    "& [data-part='helper-text']": {
+                        color: "auth.text.muted",
+                        fontSize: "0.75rem",
+                        marginTop: "4px",
+                    },
+                }}
               >
                 {text}
               </Field.Label>
@@ -134,12 +143,28 @@ const TextField = ({
               {(() => {
                 const { onChange, ...restRegister } = methods.register(name, {
                   required: mandatory ? `${text} is required` : false,
-                  maxLength: maxLength ? { value: maxLength, message: `Max length is ${maxLength}` } : undefined,
-                  minLength: minLength ? { value: minLength, message: `Min length is ${minLength}` } : undefined,
-                  pattern: patternValue ? {
-                    value: patternValue,
-                    message: props.patternMessage || (type === "email" ? "Invalid email address" : "Invalid format")
-                  } : undefined
+                  maxLength: maxLength
+                    ? {
+                        value: maxLength,
+                        message: `Max length is ${maxLength}`,
+                      }
+                    : undefined,
+                  minLength: minLength
+                    ? {
+                        value: minLength,
+                        message: `Min length is ${minLength}`,
+                      }
+                    : undefined,
+                  pattern: patternValue
+                    ? {
+                        value: patternValue,
+                        message:
+                          props.patternMessage ||
+                          (type === "email"
+                            ? "Invalid email address"
+                            : "Invalid format"),
+                      }
+                    : undefined,
                 });
 
                 return (
@@ -150,23 +175,26 @@ const TextField = ({
                     placeholder={oneLiner ? description : ""}
                     disabled={disabled}
                     flex="1"
-                    bg={useColorModeValue("white", "whiteAlpha.50")}
+                    size="lg"
+                    bg={"auth.input.bg"}
+                    borderColor="auth.input.border"
                     borderRadius="lg"
                     borderWidth="1.5px"
-                    borderColor={useColorModeValue("gray.200", "whiteAlpha.200")}
+                    // borderColor={useColorModeValue("gray.200", "whiteAlpha.200")}
                     _hover={{
-                      borderColor: useColorModeValue("gray.300", "whiteAlpha.400"),
-                    }}
-                    _focus={{
-                      borderColor: "blue.500",
-                      boxShadow: "0 0 0 1px rgba(66, 153, 225, 0.6)",
-                      bg: useColorModeValue("white", "whiteAlpha.100"),
+                      borderColor: "auth.input.border.focus",
                     }}
                     _invalid={{
                       borderColor: "red.500",
-                      boxShadow: "0 0 0 1px rgba(229, 62, 62, 0.6)",
+                      boxShadow: "0 0 0 3px rgba(239,68,68,0.2)",
                     }}
-                    transition="all 0.2s"
+                    _focus={{
+                      borderColor: "auth.input.border.focus",
+                      boxShadow: "auth.input.glow",
+                      outline: "none",
+                    }}
+                    transition="all 0.22s cubic-bezier(0.4,0,0.2,1)"
+                    backdropFilter="blur(4px)"
                     onChange={(e) => {
                       onChange(e); // Call RHF's onChange
                       handleInputChange(e); // Call our custom logic for rules
@@ -185,11 +213,19 @@ const TextField = ({
 
             <Flex justify="flex-end" mt={1} gap={4}>
               {maxLength && (
-                <Text fontSize="2xs" fontWeight="medium" color={value?.length > maxLength ? "red.500" : "fg.subtle"}>
+                <Text
+                  fontSize="2xs"
+                  fontWeight="medium"
+                  color={value?.length > maxLength ? "red.500" : "fg.subtle"}
+                >
                   {value?.length || 0} / {maxLength}
                 </Text>
               )}
-              <Field.ErrorText fontSize="xs" color="red.500" fontWeight="medium">
+              <Field.ErrorText
+                fontSize="xs"
+                color="red.500"
+                fontWeight="medium"
+              >
                 {errors?.message?.toString()}
               </Field.ErrorText>
             </Flex>

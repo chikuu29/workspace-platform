@@ -21,7 +21,7 @@ const AppFooter = () => {
       h="14"
       borderTop="1px solid"
       borderColor={borderColor}
-      bg={footerBg}
+      bg={"app.card.bg"}
       px="8"
       position="relative"
       zIndex="sticky"

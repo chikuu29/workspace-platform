@@ -65,7 +65,7 @@ const Navbar = () => {
         top="0"
         left="0"
         zIndex={999}
-        bg={navBg}
+        bg={"app.card.bg"}
         backdropFilter="blur(16px)"
         borderBottom="1px solid"
         borderColor={borderColor}

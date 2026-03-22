@@ -103,7 +103,7 @@ const AppBreadcrumb = forwardRef((props, ref) => {
       // py={{ base: "2.5", md: "2" }}
       borderBottom="1px solid"
       borderColor={borderColorValue}
-      bg={bgValue}
+      bg={"app.card.bg"}
       backdropFilter="blur(12px)"
       position="sticky"
       top="0"

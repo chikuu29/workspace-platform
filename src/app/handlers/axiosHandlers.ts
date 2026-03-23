@@ -61,16 +61,41 @@ const DEFAULT_HEADERS = {
     'X-Client-ID': import.meta.env.VITE_X_Client_ID,
 } as const;
 
+/** 
+ * Extract appCode from URL or search params.
+ * Used to tag every API call with the current application context.
+ */
+const getAppCode = (): string | null => {
+    if (typeof window === 'undefined') return null;
+    
+    // 1. Try URL path pattern: /:org/workspace/app/:appCode/...
+    const pathMatch = window.location.pathname.match(/\/app\/([^/]+)/);
+    if (pathMatch?.[1]) return pathMatch[1];
+
+    // 2. Try search parameter: ?app=:appCode
+    const urlParams = new URLSearchParams(window.location.search);
+    const appParam = urlParams.get('app');
+    if (appParam) return appParam;
+
+    return null;
+};
+
 /**
  * Attach dynamic headers that change per-request:
  *  - X-CSRFToken   → fresh value from cookie
  *  - X-Device-ID   → stable device fingerprint
+ *  - X-App-Code    → current application identifier
  *  - Content-Type   → auto-detect FormData vs JSON
  */
 const attachDynamicHeaders = (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
     const headers = config.headers ?? {};
     headers['X-CSRFToken'] = getCsrfToken();
     headers['X-Device-ID'] = getOrCreateDeviceId();
+
+    const appCode = getAppCode();
+    if (appCode) {
+        headers['X-App-Code'] = appCode;
+    }
 
     // ── Dynamic Content-Type Detection ──
     // If not manually specified, detect based on payload type

@@ -28,8 +28,8 @@ const FormView = ({ config }: any) => {
   const openModal = useModalStore((s) => s.openModal);
   const organizations = useSelector((state: RootState) => state.organizations);
   const organizationName = useMemo(
-      () => (organizations?.organization?.name ? organizations.organization.name : "GHOST_ORG"),
-      [organizations?.organization?.name]
+    () => (organizations?.organization?.name ? organizations.organization.name : "GHOST_ORG"),
+    [organizations?.organization?.name]
   );
 
   const layoutStyles = config?.UI_TYPE?.layoutStyles || {};
@@ -41,7 +41,7 @@ const FormView = ({ config }: any) => {
     "app.text.primary",
     "app.text.primary",
   );
- 
+
   const headerPanelBg = useColorModeValue(
     "rgba(255,255,255,0.76)",
     "rgba(255,255,255,0.04)",
@@ -126,19 +126,19 @@ const FormView = ({ config }: any) => {
       setPendingEventName(eventName);
       dispatch(startLoading(`Processing ${eventName}...`));
       console.log("actionEventConfig:", actionEventConfig);
-      
+
       try {
         const actionToExecute = actionEventConfig?.[eventName];
         if (!actionToExecute) {
-            console.warn(`No action configuration found for event: ${eventName}`);
-            return { success: false, message: `No action config for '${eventName}'` };
+          console.warn(`No action configuration found for event: ${eventName}`);
+          return { success: false, message: `No action config for '${eventName}'` };
         }
-        
+
         const actionContext = {
-            navigate,
-            openModal,
-            organizationName,
-            payload,
+          navigate,
+          openModal,
+          organizationName,
+          payload,
         };
 
         await ActionEngine.execute(actionToExecute, actionContext);
@@ -168,7 +168,7 @@ const FormView = ({ config }: any) => {
   const handleActionButtonClick = useCallback(
     async (button: any) => {
       console.log("Form button clicked:", button.name);
-      
+
       if (!button?.event || button.event === "submit" || isEventInProgress)
         return;
 

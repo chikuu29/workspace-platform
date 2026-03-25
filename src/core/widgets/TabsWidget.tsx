@@ -42,7 +42,14 @@ const TabsWidget: React.FC<TabsWidgetProps> = ({ tabs, defaultValue, ...rest }) 
     const tabsKey = React.useMemo(() => tabs.map(t => t.title).join('-'), [tabs]);
 
     return (
-        <TabsRoot key={tabsKey} defaultValue={defaultTabValue} variant="plain" w="full">
+        <TabsRoot
+            key={tabsKey}
+            defaultValue={defaultTabValue}
+            lazyMount
+            unmountOnExit
+            variant="plain"
+            w="full"
+        >
             <Box
                 position="sticky"
                 top="0"

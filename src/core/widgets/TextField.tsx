@@ -1,6 +1,6 @@
 import { Box, Flex, Input, Field, Text, HStack } from "@chakra-ui/react";
 import { useColorModeValue } from "../../components/ui/color-mode";
-import { useEffect, useState, useMemo, memo, useCallback } from "react";
+import { useMemo, memo, useCallback } from "react";
 import React from "react";
 import { FieldError, useFormContext, useWatch } from "react-hook-form";
 import { CloseButton } from "../../components/ui/close-button";
@@ -46,6 +46,7 @@ const TextField = ({
   pattern, // Add pattern
   patternMessage, // Add patternMessage
 }: TEXTFIELD) => {
+  console.log("Rendering TextField:", name, text);
   if (hidden) return null;
   const props = { pattern, patternMessage }; // Create props object for useMemo
 
@@ -57,18 +58,31 @@ const TextField = ({
     name,
   });
 
-  const handleInputChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = event.target.value;
-      if (events) {
-        ruleEngine.processEvents(events, newValue, "change", methods);
-      }
+   // 🔥 Debounced rule engine (IMPORTANT)
+  const debouncedRule = useMemo(() => {
+    let timer: any;
+    return (val: string) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        if (events) {
+          ruleEngine.processEvents(events, val, "change", methods);
+        }
+      }, 300);
+    };
+  }, [events, methods]);
+
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>, rhfOnChange: any) => {
+      const val = e.target.value;
+      rhfOnChange(e); // RHF update
+      debouncedRule(val); // Rule engine
     },
-    [methods, events],
+    [debouncedRule]
   );
 
   const handleClear = useCallback(() => {
     methods.setValue(name, "", { shouldValidate: true });
+
     if (events) {
       ruleEngine.processEvents(events, "", "change", methods);
     }
@@ -195,10 +209,7 @@ const TextField = ({
                     }}
                     transition="all 0.22s cubic-bezier(0.4,0,0.2,1)"
                     backdropFilter="blur(4px)"
-                    onChange={(e) => {
-                      onChange(e); // Call RHF's onChange
-                      handleInputChange(e); // Call our custom logic for rules
-                    }}
+                     onChange={(e) => handleChange(e, onChange)}
                   />
                 );
               })()}

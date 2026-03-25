@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import RunTimeWidget from './RunTimeWidget';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useFormStore } from '../store/useFormStore';
-import { ruleEngine } from '../engine/logicEngine';
 
 
 import {
@@ -31,12 +30,19 @@ interface UIEngineProps {
     [key: string]: any;
 }
 
-export const UIEngine: React.FC<UIEngineProps> = ({ config, initialData = {}, onSubmit, children, formId, ...rest }) => {
-    console.log("===RENDER UI ENGINE===");
+const EMPTY_INITIAL_DATA: Record<string, any> = {};
 
+const UIEngineComponent: React.FC<UIEngineProps> = ({ config, initialData = EMPTY_INITIAL_DATA, onSubmit, children, formId, ...rest }) => {
+    console.log("===Rendering UIEngine with config===");
     const initialize = useFormStore(state => state.initialize);
     const setFieldValue = useFormStore(state => state.setFieldValue);
+    // const defaultValues = useMemo(
+    //     () => buildFormStateFromConfig(config, initialData).values,
+    //     [config, initialData]
+    // );
+    // const hasMountedRef = useRef(false);
 
+   console.log("Initial Data:", initialData);
     const methods = useForm({
         defaultValues: initialData,
         mode: "onSubmit" // Change to onSubmit
@@ -51,9 +57,19 @@ export const UIEngine: React.FC<UIEngineProps> = ({ config, initialData = {}, on
         }
     }, [config, initialize]);
 
+    // useEffect(() => {
+    //     if (hasMountedRef.current) {
+    //         reset(defaultValues);
+    //         initialize(config);
+    //         return;
+    //     }
+
+    //     hasMountedRef.current = true;
+    // }, [config, defaultValues, initialize, reset]);
+
     // Global listener for field changes to sync with Zustand and trigger Rules
     useEffect(() => {
-        const subscription = watch((value, { name, type }) => {
+        const subscription = watch((value, { name }) => {
             if (name) {
                 const currentStoreValue = useFormStore.getState().values[name];
                 const newFieldValue = value[name];
@@ -65,7 +81,7 @@ export const UIEngine: React.FC<UIEngineProps> = ({ config, initialData = {}, on
             }
         });
         return () => subscription.unsubscribe();
-    }, [watch, setFieldValue, methods]);
+    }, [watch, setFieldValue]);
 
     const handleFormSubmit = (data: any) => {
         if (onSubmit) onSubmit(data);
@@ -231,3 +247,6 @@ export const UIEngine: React.FC<UIEngineProps> = ({ config, initialData = {}, on
         </FormProvider>
     );
 };
+
+export const UIEngine = React.memo(UIEngineComponent);
+UIEngine.displayName = "UIEngine";

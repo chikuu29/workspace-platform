@@ -1,6 +1,6 @@
 import { Box, Flex, Textarea, Field, Text } from "@chakra-ui/react";
 import { useColorModeValue } from "../../components/ui/color-mode";
-import { memo, useEffect, useState, useMemo, useCallback } from "react";
+import { memo, useCallback } from "react";
 import React from "react";
 import { FieldError, useFormContext, useWatch } from "react-hook-form";
 
@@ -37,6 +37,7 @@ const TextArea = ({
   minLength,
   errors,
 }: TEXTAREA) => {
+  console.log("Rendering TextArea:", name, text);
   if (hidden) return null;
 
   const methods = useFormContext();

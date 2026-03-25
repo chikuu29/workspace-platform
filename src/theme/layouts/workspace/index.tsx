@@ -25,7 +25,7 @@ const WorkspaceLayout = () => {
             <Flex flexDirection="column" minH="100%">
               <VStack align="stretch" flex="1" gap={2} mb={3}>
                 <AppBreadcrumb />
-                <Box px={5}>
+                <Box>
                   <Outlet />
                 </Box>
               </VStack>

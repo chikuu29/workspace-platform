@@ -6,7 +6,7 @@ import "../views";
 import "../widgets"; // Ensure all widgets are registered globally
 
 const ViewRenderer = ({ config }: { config: any }) => {
-    console.log("========ViewRenderer========s")
+    console.log("===Rendering ViewRenderer with config===");
     const UI_TYPE = config?.UI_TYPE;
     if (!UI_TYPE) {
         return <FallbackRenderer reason="MISSING_UI_TYPE" config={config} />;

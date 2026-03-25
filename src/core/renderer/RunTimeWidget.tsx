@@ -1,24 +1,39 @@
 import React from "react";
-import { Box, GridItem } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { useFormState, useFormContext } from "react-hook-form";
 import { WidgetRegistry } from "../registry/WidgetRegistry";
 import { useFormStore } from "../store/useFormStore";
 
 const RunTimeWidgetRender: React.FC<any> = React.memo(({ configs, tabs, ...rest }) => {
-  const { errors } = useFormState();
+  const { control, setValue, getValues } = useFormContext();
+  const { errors } = useFormState({ control });
   const visibility = useFormStore(state => state.visibility);
   const uiProps = useFormStore(state => state.uiProps);
-  const values = useFormStore(state => state.values);
-  const { setValue } = useFormContext() || {};
 
   // Sync Zustand values back to react-hook-form if they change via rule engine
-  React.useEffect(() => {
-    if (setValue) {
-      Object.keys(values).forEach(key => {
-        setValue(key, values[key]);
-      });
-    }
-  }, [values, setValue]);
+  // React.useEffect(() => {
+  //   let previousValues = useFormStore.getState().values;
+
+  //   const unsubscribe = useFormStore.subscribe((state) => {
+  //     const nextValues = state.values;
+  //     if (nextValues === previousValues) return;
+
+  //     Object.keys(nextValues).forEach(key => {
+  //       if (previousValues[key] === nextValues[key]) return;
+  //       if (getValues(key) === nextValues[key]) return;
+
+  //       setValue(key, nextValues[key], {
+  //         shouldDirty: false,
+  //         shouldTouch: false,
+  //         shouldValidate: false,
+  //       });
+  //     });
+
+  //     previousValues = nextValues;
+  //   });
+
+  //   return unsubscribe;
+  // }, [getValues, setValue]);
 
   // If tabs are provided at this level, render the TabsWidget directly
   if (tabs && tabs.length > 0) {

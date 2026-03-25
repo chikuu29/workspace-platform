@@ -10,7 +10,6 @@ import {
   Badge,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { AnimatePresence } from "framer-motion";
 import { UIEngine } from "../renderer/UIEngine";
 import "../widgets";
 import AsyncLoadIcon from "@/utils/hooks/AsyncLoadIcon";
@@ -26,10 +25,8 @@ const FormView = ({ config }: any) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const openModal = useModalStore((s) => s.openModal);
-  const organizations = useSelector((state: RootState) => state.organizations);
-  const organizationName = useMemo(
-    () => (organizations?.organization?.name ? organizations.organization.name : "GHOST_ORG"),
-    [organizations?.organization?.name]
+  const organizationName = useSelector(
+    (state: RootState) => state.organizations?.organization?.name ?? "GHOST_ORG"
   );
 
   const layoutStyles = config?.UI_TYPE?.layoutStyles || {};
@@ -56,8 +53,6 @@ const FormView = ({ config }: any) => {
     "0 24px 60px -36px rgba(59, 130, 246, 0.42)",
     "0 24px 60px -40px rgba(2, 6, 23, 0.85)",
   );
-  const formValues = useFormStore((state) => state.values);
-
   const tabs = useMemo(
     () => config?.UI_VIEW?.schema?.forms?.tabs || [],
     [config],
@@ -172,9 +167,9 @@ const FormView = ({ config }: any) => {
       if (!button?.event || button.event === "submit" || isEventInProgress)
         return;
 
-      await executeFormEvent(button.event, formValues);
+      await executeFormEvent(button.event, useFormStore.getState().values);
     },
-    [executeFormEvent, formValues, isEventInProgress],
+    [executeFormEvent, isEventInProgress],
   );
 
   if (!tabs.length) return null;
@@ -323,6 +318,7 @@ const FormView = ({ config }: any) => {
                           }
                           type={isSubmit ? "submit" : "button"}
                           form={isSubmit ? formId : undefined}
+                          size={'md'}
                           loading={
                             isEventInProgress && pendingEventName === btn.event
                           }
@@ -330,7 +326,7 @@ const FormView = ({ config }: any) => {
                           // h={customStyles.h || "54px"}
                           // minH="54px"
                           px={customStyles.px || "6"}
-                          borderRadius={customStyles.borderRadius || "xl"}
+                          borderRadius={customStyles.borderRadius || "sm"}
                           fontWeight="700"
                           letterSpacing="0.01em"
                           flex={{
@@ -401,12 +397,10 @@ const FormView = ({ config }: any) => {
           <UIEngine
             config={tabs}
             tabs={tabs}
-            initialData={formValues}
             onSubmit={handleFormSubmit}
             formId={formId}
-          >
-            <AnimatePresence mode="wait" />
-          </UIEngine>
+            initialData={{ "memberFirstName": "Surya" }}
+          />
         </Box>
       </Box>
     </Box>

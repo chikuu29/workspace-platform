@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react"
+import { useEffect, useState, useMemo, memo } from "react"
 import { useParams, useSearchParams } from "react-router"
 import ViewRenderer from "./renderer/ViewRenderer"
 import FallbackRenderer from "./renderer/FallbackRenderer"
@@ -29,7 +29,7 @@ const LoadingState = () => (
 )
 
 const WorkspacePage = () => {
-    console.log("========WorkspacePage========s")
+    console.log("===Rendering WorkspacePage===")
     const { appCode, view: UITemplateID, organization_name } = useParams()
     const [searchParams] = useSearchParams()
     const appParam = searchParams.get("app")
@@ -78,4 +78,4 @@ const WorkspacePage = () => {
     return <ViewRenderer config={config} />
 }
 
-export default WorkspacePage
+export default  memo(WorkspacePage)

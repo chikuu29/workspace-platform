@@ -11,29 +11,29 @@ const RunTimeWidgetRender: React.FC<any> = React.memo(({ configs, tabs, ...rest 
   const uiProps = useFormStore(state => state.uiProps);
 
   // Sync Zustand values back to react-hook-form if they change via rule engine
-  // React.useEffect(() => {
-  //   let previousValues = useFormStore.getState().values;
+  React.useEffect(() => {
+    let previousValues = useFormStore.getState().values;
 
-  //   const unsubscribe = useFormStore.subscribe((state) => {
-  //     const nextValues = state.values;
-  //     if (nextValues === previousValues) return;
+    const unsubscribe = useFormStore.subscribe((state) => {
+      const nextValues = state.values;
+      if (nextValues === previousValues) return;
 
-  //     Object.keys(nextValues).forEach(key => {
-  //       if (previousValues[key] === nextValues[key]) return;
-  //       if (getValues(key) === nextValues[key]) return;
+      Object.keys(nextValues).forEach(key => {
+        if (previousValues[key] === nextValues[key]) return;
+        if (getValues(key) === nextValues[key]) return;
 
-  //       setValue(key, nextValues[key], {
-  //         shouldDirty: false,
-  //         shouldTouch: false,
-  //         shouldValidate: false,
-  //       });
-  //     });
+        setValue(key, nextValues[key], {
+          shouldDirty: false,
+          shouldTouch: false,
+          shouldValidate: false,
+        });
+      });
 
-  //     previousValues = nextValues;
-  //   });
+      previousValues = nextValues;
+    });
 
-  //   return unsubscribe;
-  // }, [getValues, setValue]);
+    return unsubscribe;
+  }, [getValues, setValue]);
 
   // If tabs are provided at this level, render the TabsWidget directly
   if (tabs && tabs.length > 0) {

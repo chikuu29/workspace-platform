@@ -67,7 +67,7 @@
         "description": "Register new members with a premium, guided experience.",
         "target": "forms",
         "layoutStyles": {
-            "p": 4
+            "p":"0"
         }
     },
     "UI_VIEW": {

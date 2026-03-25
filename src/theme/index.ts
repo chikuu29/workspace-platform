@@ -5,7 +5,12 @@ import { recipes } from "./recipes"
 export const system = createSystem(defaultConfig, {
     theme: {
         tokens: {
-            colors
+            colors,
+            fonts: {
+                body: { value: "Inter, sans-serif" },
+                heading: { value: "Inter, sans-serif" },
+                mono: { value: "JetBrains Mono, monospace" },
+            }
         },
         semanticTokens,
         recipes,
@@ -26,7 +31,7 @@ export const system = createSystem(defaultConfig, {
             bg: "bg.default",
 
             fontWeight: "500",
-            fontFamily: "Inter, sans-serif",
+            fontFamily: "body",
             "&::-webkit-scrollbar": {
                 display: "none",
             },

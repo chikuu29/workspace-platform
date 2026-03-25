@@ -81,7 +81,7 @@ const Navbar = () => {
         >
           {/* Left: Toggle + Brand */}
           <Flex alignItems="center" gap={3}>
-            <Box>
+            <Box >
               {DISPLAY_TYPE.SHOW_SIDE_NAV_MENU && (
                 <IconButton
                   aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}

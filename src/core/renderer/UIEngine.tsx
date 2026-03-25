@@ -90,7 +90,6 @@ const UIEngineComponent: React.FC<UIEngineProps> = ({ config, initialData = EMPT
     const [alertOpen, setAlertOpen] = useState(false);
     const [groupedErrors, setGroupedErrors] = useState<Record<string, string[]>>({});
     const dialogBorderColor = useColorModeValue("red.100", "whiteAlpha.200");
-    const dialogBg = useColorModeValue("rgba(255, 255, 255, 0.8)", "rgba(15, 23, 42, 0.8)");
     const titleColor = useColorModeValue("red.700", "red.400");
     const subtitleColor = useColorModeValue("gray.500", "whiteAlpha.600");
     const dividerColor = useColorModeValue("red.50", "whiteAlpha.100");

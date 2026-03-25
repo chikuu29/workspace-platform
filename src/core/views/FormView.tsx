@@ -177,9 +177,9 @@ const FormView = ({ config }: any) => {
     <Box position="relative">
       <Box {...layoutStyles}>
         <Box
-          mb="6"
+          mb="3"
           p={{ base: "5", md: "6" }}
-          borderRadius="3xl"
+          borderTopRadius="3xl"
           border="1px solid"
           borderColor={borderColor}
           bg={"app.card.bg"}
@@ -325,10 +325,10 @@ const FormView = ({ config }: any) => {
                           disabled={isEventInProgress}
                           // h={customStyles.h || "54px"}
                           // minH="54px"
-                          px={customStyles.px || "6"}
+                          // px={customStyles.px || "6"}
                           borderRadius={customStyles.borderRadius || "sm"}
-                          fontWeight="700"
-                          letterSpacing="0.01em"
+                          // fontWeight="700"
+                          // letterSpacing="0.01em"
                           flex={{
                             base: "1 1 100%",
                             sm: "1 1 calc(50% - 0.375rem)",
@@ -337,7 +337,7 @@ const FormView = ({ config }: any) => {
                           minW={{ xl: "160px" }}
                           justifyContent="center"
                           gap="2.5"
-                          transition="all 0.2s ease"
+                          
                           variant={
                             customStyles.variant ||
                             (isSubmit ? "solid" : "subtle")
@@ -346,7 +346,7 @@ const FormView = ({ config }: any) => {
                             customStyles.colorPalette ||
                             (isSubmit ? "blue" : "gray")
                           }
-                          boxShadow={customStyles.boxShadow || defaultShadow}
+                          // boxShadow={customStyles.boxShadow || defaultShadow}
                           _hover={{
                             transform: "translateY(-1px)",
                             boxShadow: customStyles.boxShadow || defaultShadow,
@@ -355,14 +355,14 @@ const FormView = ({ config }: any) => {
                           {...customStyles}
                         >
                           {btn.iconName && (
-                            <Box
-                              display="inline-flex"
-                              alignItems="center"
-                              justifyContent="center"
-                              boxSize="4"
-                            >
+                            // <Box
+                            //   display="inline-flex"
+                            //   alignItems="center"
+                            //   justifyContent="center"
+                            //   boxSize="4"
+                            // >
                               <AsyncLoadIcon iconName={btn.iconName} />
-                            </Box>
+                            // </Box>
                           )}
                           <Text fontWeight="inherit">{btn.text}</Text>
                         </Button>
@@ -376,7 +376,8 @@ const FormView = ({ config }: any) => {
         </Box>
 
         <Box
-          rounded="3xl"
+          // rounded="3xl"
+          borderBottomRadius={"3xl"}
           shadow={accentGlow}
           border="1px solid"
           borderColor={borderColor}
@@ -399,7 +400,6 @@ const FormView = ({ config }: any) => {
             tabs={tabs}
             onSubmit={handleFormSubmit}
             formId={formId}
-            initialData={{ "memberFirstName": "Surya" }}
           />
         </Box>
       </Box>

@@ -4,7 +4,7 @@ import PanelNavBarAction from "./NavbarActions";
 import { SidebarResponsive } from "../sidebar/PanelSideBar";
 import Brand from "../Brand/Brand";
 import TopNavMenuBuilder from "./TopNavMenuBuilder";
-import { memo, useMemo, useCallback } from "react";
+import { memo, useMemo } from "react";
 import { AiOutlineMenuUnfold, AiOutlineMenuFold } from "react-icons/ai";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { useSelector } from "react-redux";
@@ -28,8 +28,6 @@ const Navbar = () => {
   const { DISPLAY_TYPE, FEATURE }: APP_CONFIG_STATE = useSelector(
     (state: RootState) => state.app.AppConfigState
   );
-  console.log("Navbar", DISPLAY_TYPE, FEATURE);
-
   // Scroll-aware shadow for depth perception
   const scrollShadow = useScrollShadow();
 
@@ -41,11 +39,33 @@ const Navbar = () => {
   );
   const borderColor = useColorModeValue("gray.100", "whiteAlpha.100");
   const iconHoverBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
+  const controlShellBg = useColorModeValue(
+    "rgba(255, 255, 255, 0.88)",
+    "rgba(15, 23, 42, 0.78)"
+  );
+  const controlShellBorder = useColorModeValue(
+    "rgba(148, 163, 184, 0.22)",
+    "rgba(255, 255, 255, 0.08)"
+  );
+  const controlShellShadow = useColorModeValue(
+    "0 16px 36px -24px rgba(15, 23, 42, 0.3)",
+    "0 18px 36px -26px rgba(2, 6, 23, 0.8)"
+  );
+  const toggleBtnBg = useColorModeValue(
+    "rgba(255,255,255,0.92)",
+    "rgba(15,23,42,0.92)"
+  );
 
   // Stable hover object — not re-created every render
   const iconBtnHover = useMemo(
-    () => ({ bg: iconHoverBg, border: "1px solid", borderColor: HOVER_BORDER_COLOR }),
-    [iconHoverBg]
+    () => ({
+      bg: iconHoverBg,
+      border: "1px solid",
+      borderColor: HOVER_BORDER_COLOR,
+      transform: "translateY(-1px)",
+      boxShadow: controlShellShadow,
+    }),
+    [controlShellShadow, iconHoverBg]
   );
 
   // Memoize the sidebar toggle icon to prevent re-creation
@@ -81,25 +101,40 @@ const Navbar = () => {
         >
           {/* Left: Toggle + Brand */}
           <Flex alignItems="center" gap={3}>
-            <Box >
-              {DISPLAY_TYPE.SHOW_SIDE_NAV_MENU && (
-                <IconButton
-                  aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-                  display={{ base: "none", xl: "flex" }}
-                  onClick={toggleSidebar}
-                  // variant="ghost"
-                  size="md"
-                  borderRadius="xl"
-                  color={"app.text.primary"}
-                  bg={"app.card.bg"}
+            {(DISPLAY_TYPE.SHOW_SIDE_NAV_MENU || FEATURE.length > 0) && (
+              <Box
+                display="flex"
+                alignItems="center"
+                gap="2"
+                p="1.5"
+                borderRadius="2xl"
+                bg={controlShellBg}
+                border="1px solid"
+                borderColor={controlShellBorder}
+                boxShadow={controlShellShadow}
+                backdropFilter="blur(18px)"
+              >
+                {DISPLAY_TYPE.SHOW_SIDE_NAV_MENU && (
+                  <IconButton
+                    aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                    display={{ base: "none", xl: "flex" }}
+                    onClick={toggleSidebar}
+                    size="sm"
+                    borderRadius="xl"
+                  color="app.text.primary"
+                  bg={toggleBtnBg}
+                  border="1px solid"
+                  borderColor="app.card.border"
+                  boxShadow="0 12px 24px -20px rgba(15, 23, 42, 0.35)"
                   _hover={iconBtnHover}
                   transition={TRANSITION}
                 >
-                  <ToggleIcon size={20} />
-                </IconButton>
-              )}
-              {FEATURE.length > 0 && <SidebarResponsive />}
-            </Box>
+                    <ToggleIcon size={20} />
+                  </IconButton>
+                )}
+                {FEATURE.length > 0 && <SidebarResponsive />}
+              </Box>
+            )}
             <Brand />
           </Flex>
 

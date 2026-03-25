@@ -81,6 +81,14 @@ export default React.memo(PanelSideBar);
 export function SidebarResponsive() {
   const { isMobileOpen, openMobile, closeMobile } = useSidebar();
   const location = useLocation();
+  const triggerBg = useColorModeValue(
+    "rgba(255,255,255,0.92)",
+    "rgba(15,23,42,0.92)"
+  );
+  const triggerBorder = useColorModeValue(
+    "rgba(148, 163, 184, 0.22)",
+    "rgba(255, 255, 255, 0.08)"
+  );
 
   // Auto-close drawer on route change
   useEffect(() => {
@@ -107,9 +115,18 @@ export function SidebarResponsive() {
       <IconButton
         aria-label="Open menu"
         cursor="pointer"
-        variant="ghost"
-        size="sm"
+        size="md"
         borderRadius="xl"
+        color="app.text.primary"
+        bg={triggerBg}
+        border="1px solid"
+        borderColor="app.card.border"
+        boxShadow="0 12px 24px -20px rgba(15, 23, 42, 0.35)"
+        _hover={{
+          transform: "translateY(-1px)",
+          boxShadow: "0 16px 28px -22px rgba(15, 23, 42, 0.4)",
+        }}
+        transition="all 0.2s ease"
         onClick={openMobile}
       >
         <AiOutlineMenuUnfold size={20} />

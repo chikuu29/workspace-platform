@@ -142,20 +142,21 @@ function MyApps() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const appList = useMemo(() => appConfig?.config?.appList ?? [], [appConfig]);
-  const orgApps = organizations?.organization?.apps || {};
+  const subscribed_apps = organizations?.organization?.subscribed_apps || [];
 
   const filteredApps = useMemo(() => {
     return appList.filter((app: any) => {
-      const appKey = app.appCode || app.id;
+    
+      const app_slug = app.app_slug || app.id;
       // If the app is a specific APP_ module, check if the organization has an active subscription for it
-      if (appKey?.startsWith("APP_") && !orgApps[appKey]) {
+      if (!subscribed_apps.includes(app_slug)) {
         return false;
       }
 
       // Convert snake_case to Title Case (e.g., organization_email -> Organization Email).toLowerCase())
       return app.name.toLowerCase().includes(searchTerm.toLowerCase());
     });
-  }, [searchTerm, appList, orgApps]);
+  }, [searchTerm, appList, subscribed_apps]);
 
   const handleDefaultNavigate = useCallback((e: React.MouseEvent, cfg: any) => {
     e.preventDefault();

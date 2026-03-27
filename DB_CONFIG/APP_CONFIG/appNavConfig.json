@@ -4,7 +4,8 @@
     "config": {
         "appList": [
             {
-                "id": "ADMIN_MODULES",
+                "id": "PLATFORM",
+                "app_slug": "PLATFORM",
                 "hidden": false,
                 "name": "Admin Module",
                 "target": "/workspace/app/system/home",
@@ -22,6 +23,7 @@
             },
             {
                 "id": "MY_GYM",
+                "app_slug": "MY_GYM",
                 "hidden": false,
                 "name": "Gym Management",
                 "target": "/workspace/app/myGym/home",
@@ -39,6 +41,7 @@
             },
             {
                 "id": "MY_HOSTEL",
+                "app_slug": "MY_HOSTEL",
                 "hidden": false,
                 "name": "Hostel Management",
                 "target": "/workspace/app/myHostel/home",
@@ -56,6 +59,7 @@
             },
             {
                 "id": "MY_RESTAURANT",
+                "app_slug": "MY_RESTAURANT",
                 "hidden": false,
                 "name": "Restaurant Management",
                 "target": "/workspace/app/myRestaurant/home",

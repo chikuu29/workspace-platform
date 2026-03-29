@@ -252,7 +252,7 @@ export const UserCard = memo(({ user, actions = [], onAction }: UserCardProps) =
                             </Badge>
                         )}
 
-                        {user.user_type === "PLATFORM" && (
+                        {user.user_type === "SYSTEM" && (
                             <Badge key="flag-platform" variant="subtle" colorPalette="cyan" borderRadius="full" px={2} fontSize="2xs">
                                 Platform
                             </Badge>

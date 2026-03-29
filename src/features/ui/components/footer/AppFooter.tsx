@@ -38,7 +38,7 @@ const AppFooter = () => {
         {/* Left Side: Copyright & Branding */}
         <HStack gap="4" color={textColor} fontSize="xs" fontWeight="medium">
           <Text letterSpacing="wider">
-            © {currentYear} <Text as="span" fontWeight="bold" color={activeTextColor}>PLATFORM™</Text>
+            © {currentYear} <Text as="span" fontWeight="bold" color={activeTextColor}>SYSTEM™</Text>
           </Text>
           <Box h="3px" w="3px" bg={textColor} rounded="full" display={{ base: "none", md: "block" }} />
           <HStack gap="1" display={{ base: "none", md: "flex" }}>

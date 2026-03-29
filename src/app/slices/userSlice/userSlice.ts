@@ -10,7 +10,7 @@ interface UserProfile {
     last_name?: string;
     full_name?: string;
     phone_number?: string | null;
-    user_type?: "PLATFORM" | "ORGANIZATION";
+    user_type?: "SYSTEM" | "ORGANIZATION";
     is_active?: boolean;
     profile?: Record<string, any>;
 }

@@ -10,7 +10,7 @@ interface RbacState {
     roles: string[];
     permissions: string[];
     scope: string[];
-    user_type: string | null;
+    user_type: string | "SYSTEM" | "ORGANIZATION" | "UNASSIGNED";
     policies: PolicySummary[];
 }
 
@@ -18,7 +18,7 @@ const initialState: RbacState = {
     roles: [],
     permissions: [],
     scope: [],
-    user_type: null,
+    user_type: "UNASSIGNED",
     policies: [],
 };
 
@@ -37,7 +37,7 @@ const rbacSlice = createSlice({
             state.roles = [];
             state.permissions = [];
             state.scope = [];
-            state.user_type = null;
+            state.user_type = "UNASSIGNED";
             state.policies = [];
         }
     },
@@ -56,7 +56,7 @@ const rbacSlice = createSlice({
             state.roles = [];
             state.permissions = [];
             state.scope = [];
-            state.user_type = null;
+            state.user_type = "UNASSIGNED";
             state.policies = [];
         });
     }

@@ -23,7 +23,7 @@ interface ActiveOrganization {
     created_at?: string;
     subscription?: Subscription | null;
     apps?: Record<string, any>;
-    subscribed_apps?: Record<string, any>[];
+    subscribed_apps?: string[];
     features?: Record<string, any>[];
 }
 

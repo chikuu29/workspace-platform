@@ -398,7 +398,7 @@ const OrganizationRolesView = memo(() => {
 
   // ── Global State ─────────────────────────────────────────────────────────
   const { user_type } = useSelector((state: RootState) => state.rbac);
-  const isPlatformUser = user_type === "PLATFORM";
+  const isPlatformUser = user_type === "SYSTEM";
   console.log("isPlatformUser", isPlatformUser);
 
   // ── Handlers ────────────────────────────────────────────────────────────

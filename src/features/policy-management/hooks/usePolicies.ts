@@ -44,8 +44,8 @@ const usePolicies = (): UsePoliciesReturn => {
       subscriptionRef.current.unsubscribe();
     }
 
-    // Use platform endpoint for PLATFORM users, org endpoint for others
-    const apiCall = userType === "PLATFORM"
+    // Use platform endpoint for SYSTEM users, org endpoint for others
+    const apiCall = userType === "SYSTEM"
       ? fetchPlatformPolicies()
       : fetchPolicies();
 

@@ -10,7 +10,9 @@ const AuthCallback = lazy(() => import("@/features/auth/AuthCallback"));
 const AuthLayout = lazy(() => import("@/theme/layouts/auth/auth"));
 const SignInPage = lazy(() => import("@/features/auth/signin/SignIn"));
 const SignUpPage = lazy(() => import("@/features/auth/signup/SignUp"));
-const ForgotPasswordPage = lazy(() => import("@/features/auth/forgot-password/ForgotPassword"));
+const ForgotPasswordPage = lazy(
+  () => import("@/features/auth/forgot-password/ForgotPassword"),
+);
 const WorkspaceLayout = lazy(() => import("@/theme/layouts/workspace"));
 const RouterGuard = lazy(() => import("@/core/guards/RouterGuard"));
 const PrivateRoute = lazy(() => import("@/contexts/PrivateRoute"));
@@ -20,7 +22,9 @@ const MyApps = lazy(() => import("@/features/myApps/MyApps"));
 
 const WorkspaceProfilePage = lazy(() => import("@/pages/workspace/Profile"));
 const WorkspaceSettingsPage = lazy(() => import("@/pages/workspace/Settings"));
-const WorkspaceHelpCenterPage = lazy(() => import("@/pages/workspace/HelpCenter"));
+const WorkspaceHelpCenterPage = lazy(
+  () => import("@/pages/workspace/HelpCenter"),
+);
 
 const routes: RouteObject[] = [
   {
@@ -65,34 +69,14 @@ const routes: RouteObject[] = [
       },
       {
         path: "callback",
-        element: <AuthCallback />,
+        element: (
+          <Suspense fallback={<AppLoader />}>
+            <AuthCallback />
+          </Suspense>
+        ),
       },
     ],
   },
-  // {
-  //   path: "onboarding/:request_code/*",
-  //   element: (
-  //     <Suspense fallback={<AppLoader />}>
-  //       <Onboarding />
-  //     </Suspense>
-  //   ),
-  // },
-  // {
-  //   path: "oauth2",
-  //   element: (
-  //     <Suspense fallback={<AppLoader />}>
-  //       <RouterGuard>
-  //         <AuthLayout />
-  //       </RouterGuard>
-  //     </Suspense>
-  //   ),
-  //   children: [
-  //     {
-  //       path: "authorize",
-  //       element: <AuthorizePage />,
-  //     },
-  //   ],
-  // },
   {
     path: "/:organization_name/workspace/*", // Multi-organization primary application route
     element: (
@@ -105,15 +89,15 @@ const routes: RouteObject[] = [
     children: [
       {
         path: "profile",
-        element: <WorkspaceProfilePage />
+        element: <WorkspaceProfilePage />,
       },
       {
         path: "settings",
-        element: <WorkspaceSettingsPage />
+        element: <WorkspaceSettingsPage />,
       },
       {
         path: "helpcenter",
-        element: <WorkspaceHelpCenterPage />
+        element: <WorkspaceHelpCenterPage />,
       },
       {
         path: "",

@@ -36,6 +36,11 @@ const AuthCallback = () => {
   const cardBorder = useColorModeValue("red.100", "red.900/40");
   const textColor = useColorModeValue("gray.800", "whiteAlpha.900");
   const mutedColor = useColorModeValue("gray.600", "gray.400");
+  // WHY: Must be declared at the top level, never inside JSX or after conditional returns.
+  // Previously this was inline inside the error JSX: bg={useColorModeValue("red.50", "red.900/30")}
+  // That caused a Hook order violation because it was only reached in the error render path
+  // (after the early return for loading/success), making hook count differ between renders.
+  const errorIconBg = useColorModeValue("red.50", "red.900/30");
 
   useEffect(() => {
     // 1. Extract the authorization code & errors from URL parameters
@@ -64,7 +69,7 @@ const AuthCallback = () => {
 
   const exchangeAuthorizationCode = async (code: string) => {
     const clientId = import.meta.env.VITE_CLIENT_ID as string;
-    const clientSecret = import.meta.env.VITE_CLIENT_SECRET as string;
+    // const clientSecret = import.meta.env.VITE_CLIENT_SECRET as string;
     const redirectUrl = (import.meta.env.VITE_REDIRECT_URL as string) || `${window.location.origin}/auth/callback`;
 
     const deviceId = getOrCreateDeviceId();
@@ -72,7 +77,6 @@ const AuthCallback = () => {
 
     const apiRequestData = {
       client_id: clientId,
-      client_secret: clientSecret,
       grant_type: "authorization_code",
       code,
       redirect_url: redirectUrl,
@@ -165,7 +169,7 @@ const AuthCallback = () => {
             w="64px"
             h="64px"
             borderRadius="full"
-            bg={useColorModeValue("red.50", "red.900/30")}
+          bg={errorIconBg}
             color="red.500"
           >
             <Icon as={LuX} boxSize="32px" />

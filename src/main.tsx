@@ -5,7 +5,7 @@ import "./assets/css/App.css";
 import "./index.css";
 import { Provider as ChakraProvider } from "./components/ui/provider.tsx";
 
-import { AuthProvider } from "./contexts/AuthProvider.tsx";
+// import { AuthProvider } from "./contexts/AuthProvider.tsx";
 import { Provider } from "react-redux";
 import { store } from "./app/store.ts";
 import Loader from "./features/ui/components/Loader/Loader.tsx";

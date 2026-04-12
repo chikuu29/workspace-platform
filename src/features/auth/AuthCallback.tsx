@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, startTransition } from "react";
 import { useNavigate } from "react-router";
 import { POSTAPI } from "../../app/api";
 import { getOrCreateDeviceId } from "../../utils/services/appServices";
@@ -7,7 +7,6 @@ import { fetchAppConfig } from "../../app/slices/appConfig/appConfigSlice";
 import { login } from "../../app/slices/auth/authSlice";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../app/store";
-// import { useAuth } from "../../contexts/AuthProvider";
 
 import {
   Flex,
@@ -22,105 +21,179 @@ import { useColorModeValue } from "@/components/ui/color-mode";
 import { LuX, LuArrowRight } from "react-icons/lu";
 
 type AuthStatus = "loading" | "error" | "success";
+type ExchangeResult = { success: boolean; [key: string]: any };
+
+// ─── Module-level exchange state ────────────────────────────────────────────
+//
+// WHY module-level instead of useRef / useState:
+//
+// React Strict Mode (dev only) does:  mount → cleanup → remount
+// A useRef resets on remount because it's bound to the component instance.
+// Module-level variables persist across both Strict Mode cycles within a
+// single page navigation — exactly the scope we need.
+//
+// Three possible timing scenarios are handled:
+//
+//  Scenario A — API responds before Strict Mode cleanup:
+//    Mount 1 handles the result → navigates away. ✅ Done.
+//
+//  Scenario B — API responds BETWEEN cleanup and remount (rare gap):
+//    _cachedResult is populated, _activeCallback is null (cleared by cleanup).
+//    Mount 2 runs, sees _cachedResult is already set → handles it immediately. ✅
+//
+//  Scenario C — API responds AFTER remount (normal case):
+//    Mount 2 registered a fresh _activeCallback.
+//    When the response arrives, _activeCallback points to mount 2's handler. ✅
+//
+// The module state is naturally reset on page reload (new OAuth flow).
+// navigate(..., { replace: true }) removes /auth/callback from history so
+// the user cannot hit Back and arrive here with stale module state.
+
+let _attempted = false;
+let _cachedResult: ExchangeResult | null = null;
+let _activeCallback: ((res: ExchangeResult) => void) | null = null;
 
 const AuthCallback = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  // const { setLoginAuthInfo } = useAuth();
 
   const [status, setStatus] = useState<AuthStatus>("loading");
   const [errorMsg, setErrorMsg] = useState<string>("");
 
-  // Aesthetics for the error card
+  // All useColorModeValue calls must be unconditionally at the top level.
+  // Calling a Hook inside JSX or after a conditional early return violates
+  // the Rules of Hooks and causes React's "change in hook order" crash.
   const cardBg = useColorModeValue("rgba(255, 255, 255, 0.9)", "rgba(15, 23, 42, 0.9)");
   const cardBorder = useColorModeValue("red.100", "red.900/40");
   const textColor = useColorModeValue("gray.800", "whiteAlpha.900");
   const mutedColor = useColorModeValue("gray.600", "gray.400");
-  // WHY: Must be declared at the top level, never inside JSX or after conditional returns.
-  // Previously this was inline inside the error JSX: bg={useColorModeValue("red.50", "red.900/30")}
-  // That caused a Hook order violation because it was only reached in the error render path
-  // (after the early return for loading/success), making hook count differ between renders.
   const errorIconBg = useColorModeValue("red.50", "red.900/30");
 
   useEffect(() => {
-    // 1. Extract the authorization code & errors from URL parameters
+    // The result handler for the CURRENT component instance.
+    // Wrapped in startTransition so Redux dispatches arriving from async
+    // RxJS callbacks don't trigger "suspended during sync input" errors
+    // when React.lazy Suspense boundaries are still loading chunks.
+    const handleResult = (res: ExchangeResult) => {
+      if (res.success) {
+        startTransition(() => {
+          dispatch(login(res));
+          dispatch(fetchAppConfig());
+          setStatus("success");
+        });
+        const stateRedirect = new URLSearchParams(window.location.search).get("state");
+        // replace: true — removes /auth/callback from history so the browser
+        // back button cannot re-trigger this page with the spent auth code.
+        navigate(stateRedirect || "/myApps", { replace: true });
+      } else {
+        startTransition(() => {
+          setStatus("error");
+          setErrorMsg(res.message || "Token exchange failed.");
+        });
+      }
+    };
+
+    // ── Scenario B: result already arrived before this mount ───────────────
+    if (_cachedResult !== null) {
+      handleResult(_cachedResult);
+      return;
+    }
+
+    // Register this instance as the active callback.
+    // If the API is already in-flight (Strict Mode second mount), the response
+    // will call this when it arrives — correctly targeting the live instance.
+    _activeCallback = handleResult;
+
+    // ── Strict Mode guard: don't fire the API call a second time ───────────
+    if (_attempted) {
+      // Cleanup: deregister so a stale reference can't call a dead instance.
+      return () => {
+        _activeCallback = null;
+      };
+    }
+
+    _attempted = true;
+
+    // ── URL parameter extraction ───────────────────────────────────────────
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
     const error = params.get("error");
     const errorDescription = params.get("error_description");
 
     if (error) {
-      // Identity Provider returned an explicit error (e.g. user denied access)
-      console.error(`OAuth Callback Error: ${error} - ${errorDescription}`);
-      setStatus("error");
-      setErrorMsg(errorDescription || `Authorization failed (${error}).`);
+      // Identity Provider returned an explicit OAuth error (e.g. user denied)
+      console.error(`[AuthCallback] OAuth error: ${error} — ${errorDescription}`);
+      const errResult: ExchangeResult = {
+        success: false,
+        message: errorDescription || `Authorization failed (${error}).`,
+      };
+      _cachedResult = errResult;
+      _activeCallback?.(errResult);
       return;
     }
 
-    if (code) {
-      exchangeAuthorizationCode(code);
-    } else {
-      // Neither code nor error is present; malformed callback
-      setStatus("error");
-      setErrorMsg("No authorization code found in the URL.");
+    if (!code) {
+      const errResult: ExchangeResult = {
+        success: false,
+        message: "No authorization code found in the URL.",
+      };
+      _cachedResult = errResult;
+      _activeCallback?.(errResult);
+      return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
-  const exchangeAuthorizationCode = async (code: string) => {
+    // ── Token Exchange (single-use auth code — fired exactly once) ─────────
     const clientId = import.meta.env.VITE_CLIENT_ID as string;
-    // const clientSecret = import.meta.env.VITE_CLIENT_SECRET as string;
-    const redirectUrl = (import.meta.env.VITE_REDIRECT_URL as string) || `${window.location.origin}/auth/callback`;
+    const redirectUrl =
+      (import.meta.env.VITE_REDIRECT_URL as string) ||
+      `${window.location.origin}/auth/callback`;
 
-    const deviceId = getOrCreateDeviceId();
-    const codeVerifier = getStoredCodeVerifier();
-
-    const apiRequestData = {
-      client_id: clientId,
-      grant_type: "authorization_code",
-      code,
-      redirect_url: redirectUrl,
-      device_id: deviceId,
-      code_verifier: codeVerifier,
-    };
-
-    POSTAPI({
+    const subscription = POSTAPI({
       path: "oauth/exchange",
-      data: apiRequestData,
+      data: {
+        client_id: clientId,
+        grant_type: "authorization_code",
+        code,
+        redirect_url: redirectUrl,
+        device_id: getOrCreateDeviceId(),
+        code_verifier: getStoredCodeVerifier(),
+      },
       isPrivateApi: true,
     }).subscribe({
       next: (res: any) => {
-        console.log("res", res);
-        if (res.success) {
-          // const loginPayload = {
-          //   success: true,
-          //   login_info: res.login_info,
-          //   access_token: res.access_token,
-          //   authProvider: res.authProvider,
-          // };
-          // setLoginAuthInfo(loginPayload);
-          dispatch(login(res));
-          dispatch(fetchAppConfig());
-          setStatus("success");
-
-          // Extract the redirect URL from the state parameter (passed from SignIn.tsx)
-          const params = new URLSearchParams(window.location.search);
-          const stateRedirect = params.get("state");
-          navigate(stateRedirect || "/myApps");
-        } else {
-          setStatus("error");
-          setErrorMsg(res.message || "Token exchange failed.");
-        }
+        // Cache result so Scenario B is handled if _activeCallback is null.
+        _cachedResult = res as ExchangeResult;
+        // Call whichever instance is currently active (mount 1 or mount 2).
+        _activeCallback?.(res as ExchangeResult);
       },
-      error: (err: any) => {
-        console.error("Error exchanging authorization code:", err);
-        setStatus("error");
-        setErrorMsg("A network error occurred during authentication exchange.");
+      error: (err: unknown) => {
+        console.error("[AuthCallback] Token exchange network error:", err);
+        const errResult: ExchangeResult = {
+          success: false,
+          message: "A network error occurred during authentication.",
+        };
+        _cachedResult = errResult;
+        _activeCallback?.(errResult);
       },
     });
-  };
 
-  // ─── Render Loading State ──────────────────────────────────────────
+    // WHY no unsubscribe:
+    // React Strict Mode cleanup fires BEFORE mount 2 registers its callback.
+    // Calling subscription.unsubscribe() here kills the in-flight HTTP request.
+    // Mount 2 then waits on _activeCallback forever — nothing ever calls it.
+    //
+    // The correct approach: let the subscription stay alive. It will
+    // self-complete naturally when the API responds. The _activeCallback
+    // pointer is swapped to mount 2's handler in time to receive the result.
+    //
+    // We only clear the callback reference so a dead instance can't be called
+    // if for some reason a stale response arrives after genuine navigation away.
+    return () => {
+      _activeCallback = null;
+    };
+  }, [dispatch, navigate]);
+
+  // ─── Loading / Success ────────────────────────────────────────────────────
   if (status === "loading" || status === "success") {
     return (
       <Flex direction="column" justify="center" align="center" minH="100vh" bg="bg.default">
@@ -139,7 +212,7 @@ const AuthCallback = () => {
     );
   }
 
-  // ─── Render Error State ────────────────────────────────────────────
+  // ─── Error State ──────────────────────────────────────────────────────────
   return (
     <Flex
       direction="column"
@@ -169,7 +242,7 @@ const AuthCallback = () => {
             w="64px"
             h="64px"
             borderRadius="full"
-          bg={errorIconBg}
+            bg={errorIconBg}
             color="red.500"
           >
             <Icon as={LuX} boxSize="32px" />

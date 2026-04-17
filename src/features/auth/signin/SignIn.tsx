@@ -31,6 +31,7 @@ import AppVersionAlert from "@/features/ui/components/alert/AppVersionAlert";
 import { AlertProps } from "@/app/types/appConfigInterface";
 import { SiAuthelia } from "react-icons/si";
 import { getOrCreateDeviceId } from "@/utils/services/appServices";
+import { env } from "@/app/env";
 import {
     generateCodeVerifier,
     generateCodeChallenge,
@@ -165,9 +166,9 @@ const SignIn = () => {
 
     const loginWithSso = async () => {
         dispatch(startLoading("Redirecting to SSO..."));
-        const clientId = import.meta.env.VITE_CLIENT_ID as string;
-        const authServerUrl = import.meta.env.VITE_OAUTH_URL as string;
-        const redirectTo = (import.meta.env.VITE_REDIRECT_URL as string) || `${window.location.origin}/auth/callback`;
+        const clientId = env('VITE_CLIENT_ID');
+        const authServerUrl = env('VITE_OAUTH_URL');
+        const redirectTo = env('VITE_REDIRECT_URL') || `${window.location.origin}/auth/callback`;
         const deviceId = getOrCreateDeviceId();
 
         // PKCE: Generate verifier, persist it, and derive the challenge (S256)

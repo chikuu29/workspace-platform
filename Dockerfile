@@ -40,8 +40,14 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 # Copy custom nginx configuration
 COPY nginx/nginx_load_balancer.conf /etc/nginx/conf.d/
 
+# Copy the entrypoint script that generates /env-config.js at startup.
+# This script reads real K8s env vars and writes window._env_ = {...} so
+# the React app can read runtime config without rebuilding the image.
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
 # Expose port 80
 EXPOSE 80
 
-# Run Nginx in the foreground
-CMD ["nginx", "-g", "daemon off;"]
+# Run the entrypoint: generates env-config.js then starts nginx
+ENTRYPOINT ["/docker-entrypoint.sh"]

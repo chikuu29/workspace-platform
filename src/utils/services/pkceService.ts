@@ -11,6 +11,8 @@
  *   3. `getStoredCodeVerifier()`   → Retrieve & remove from sessionStorage
  */
 
+import CryptoJS from "crypto-js";
+
 const PKCE_STORAGE_KEY = "pkce_code_verifier" as const;
 const VERIFIER_BYTE_LENGTH = 48; // 48 bytes → 64 base64url characters
 
@@ -54,10 +56,18 @@ export const generateCodeVerifier = (): string => {
  * @returns A promise resolving to the base64url-encoded SHA-256 hash.
  */
 export const generateCodeChallenge = async (verifier: string): Promise<string> => {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(verifier);
-    const digest = await crypto.subtle.digest("SHA-256", data);
-    return toBase64Url(digest);
+    // Prefer native Web Crypto API if available (Requires Secure Context: HTTPS or localhost)
+    if (window.crypto && window.crypto.subtle) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(verifier);
+        const digest = await crypto.subtle.digest("SHA-256", data);
+        return toBase64Url(digest);
+    }
+    
+    // Fallback for insecure development contexts (e.g., http://*.local)
+    const hash = CryptoJS.SHA256(verifier);
+    const base64 = CryptoJS.enc.Base64.stringify(hash);
+    return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 };
 
 /**

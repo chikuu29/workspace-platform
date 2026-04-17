@@ -114,7 +114,7 @@ const SignIn = () => {
 
         try {
             POSTAPI({
-                path: "/auth/login",
+                path: "auth/login",
                 data: userCredentials,
                 isPrivateApi: false,
             }).subscribe({

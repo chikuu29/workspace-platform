@@ -58,10 +58,15 @@ export default defineConfig(({ mode }) => {
       port: 5174,
       hmr: { overlay: true },
       proxy: {
-        '/api': {
+        // Single rule for all workspace backend traffic.
+        // root_path="/backend" in FastAPI ensures ALL Swagger-generated URLs use /backend/...
+        //   /backend/docs          → /docs           (Swagger UI)
+        //   /backend/openapi.json  → /openapi.json   (Swagger schema)
+        //   /backend/v1/getuser    → /v1/getuser     (API calls)
+        '/backend': {
           target: env.VITE_API_URL,
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, '/api/v1')
+          rewrite: (path) => path.replace(/^\/backend/, '')
         },
         '/ui-api': {
           target: env.VITE_UI_API_URL,

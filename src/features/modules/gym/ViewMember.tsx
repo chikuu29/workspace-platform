@@ -1,563 +1,616 @@
 /**
- * ViewMember — Gym member directory with action sidebar.
+ * ViewMember.tsx
  *
- * Uses the shared PageLayout + PageHeader pattern.
- * Layout: left member grid + right action-required panel (full height tile).
- * Responsive: stacks vertically on mobile/tablet.
- * Fetches real data from GET /gym/members.
+ * Modern SaaS member directory for the gym app.
  */
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import {
   Avatar,
   Badge,
   Box,
   Button,
+  Circle,
   Flex,
   Grid,
   GridItem,
   Heading,
   HStack,
+  Icon,
+  IconButton,
+  Separator,
   SimpleGrid,
-  Spinner,
+  Skeleton,
   Text,
   VStack,
 } from "@chakra-ui/react";
+import { useColorModeValue } from "@/components/ui/color-mode";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router";
 import {
+  LuActivity,
   LuArrowRight,
-  LuCalendarClock,
-  LuLoaderCircle,
+  LuCalendarDays,
+  LuFilter,
   LuMail,
   LuPhone,
   LuPlus,
+  LuRefreshCw,
+  LuSparkles,
+  LuUserCheck,
   LuUsers,
 } from "react-icons/lu";
-import { GETAPI } from "@/app/api";
-import { PageLayout } from "@/core/components/PageLayout";
 
-// ── Types ──────────────────────────────────────────────────────────────
+import { PageHeader } from "@/core/components/PageHeader";
+import { useGymMembers } from "./hooks/useGymMembers";
+import { MemberDocument } from "./types/Gym.types";
 
-interface MemberDocument {
-  _id: string;
-  _org: {
-    org_id: number;
-    org_uuid: string;
-    org_name: string;
-    app_code: string;
-    app_name: string;
+type MemberFilter = "all" | "active" | "attention" | "frozen";
+
+const getMemberName = (data: MemberDocument["data"]) => {
+  const first = data.memberFirstName || data.firstName || "";
+  const last = data.memberLastName || data.lastName || "";
+
+  return {
+    full: `${first} ${last}`.trim() || "Unknown Member",
+    initials: `${first?.[0] || ""}${last?.[0] || ""}` || "GM",
   };
-  _meta: {
-    entity_type: string;
-    record_id: string;
-    version: number;
-    is_deleted: boolean;
-    created: { at: string; by: string };
-    updated: { at: string; by: string };
-    deleted: { at: string; by: string } | null;
-  };
-  data: Record<string, string>;
-}
-
-interface MembersResponse {
-  success: boolean;
-  data: MemberDocument[];
-  total: number;
-  skip: number;
-  limit: number;
-}
-
-// ── Utilities ──────────────────────────────────────────────────────────
-
-const getInitials = (first?: string, last?: string): string => {
-  const f = first?.charAt(0)?.toUpperCase() ?? "";
-  const l = last?.charAt(0)?.toUpperCase() ?? "";
-  return f + l || "?";
 };
 
-const formatDate = (isoString?: string): string => {
-  if (!isoString) return "—";
-  try {
-    return new Date(isoString).toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
-  } catch {
-    return "—";
-  }
+const getMemberContact = (data: MemberDocument["data"]) => ({
+  email: data.memberEmail || data.email || "No email",
+  phone: data.memberPhone || data.phone || "No phone",
+});
+
+const formatDate = (date?: string) => {
+  if (!date) return "Recently added";
+
+  const parsed = new Date(date);
+  if (Number.isNaN(parsed.getTime())) return "Recently added";
+
+  return parsed.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 };
 
-const getFullName = (d: Record<string, string>): string =>
-  [d.firstName, d.lastName].filter(Boolean).join(" ") || "Unnamed";
+const statusStyles = {
+  active: {
+    label: "Active",
+    colorPalette: "green",
+    accent: "green.400",
+    bg: "green.500/10",
+    border: "green.500/20",
+  },
+  attention: {
+    label: "Needs attention",
+    colorPalette: "orange",
+    accent: "orange.400",
+    bg: "orange.500/10",
+    border: "orange.500/20",
+  },
+  frozen: {
+    label: "Frozen",
+    colorPalette: "blue",
+    accent: "blue.400",
+    bg: "blue.500/10",
+    border: "blue.500/20",
+  },
+} as const;
 
-// ── Member Card ────────────────────────────────────────────────────────
-
-interface MemberCardProps {
-  member: MemberDocument;
-  onView: (id: string) => void;
-}
-
-const MemberCard = ({ member, onView }: MemberCardProps) => {
-  const d = member.data;
-  const initials = getInitials(d.firstName, d.lastName);
-  const fullName = getFullName(d);
-
-  const handleClick = useCallback(() => {
-    onView(member._meta.record_id);
-  }, [member._meta.record_id, onView]);
+const StatTile = memo(({
+  label,
+  value,
+  caption,
+  icon,
+  accent,
+}: {
+  label: string;
+  value: string | number;
+  caption: string;
+  icon: React.ElementType;
+  accent: string;
+}) => {
+  const tileBg = useColorModeValue("rgba(255,255,255,0.78)", "rgba(15,23,42,0.58)");
+  const borderColor = useColorModeValue("whiteAlpha.900", "whiteAlpha.200");
 
   return (
     <Box
-      bg="app.card.bg"
+      p={{ base: 4, md: 5 }}
+      borderRadius="2xl"
+      bg={tileBg}
       border="1px solid"
-      borderColor="app.card.border"
-      borderRadius="xl"
-      p={4}
+      borderColor={borderColor}
+      backdropFilter="blur(18px) saturate(160%)"
+      boxShadow="0 18px 42px -30px rgba(15, 23, 42, 0.55)"
+    >
+      <HStack justify="space-between" align="start" gap={4}>
+        <VStack align="start" gap={1}>
+          <Text fontSize="xs" color="app.text.muted" fontWeight="800" textTransform="uppercase">
+            {label}
+          </Text>
+          <Heading size="xl" color="app.text.primary" letterSpacing="tight">
+            {value}
+          </Heading>
+          <Text fontSize="xs" color="app.text.muted" fontWeight="600">
+            {caption}
+          </Text>
+        </VStack>
+        <Circle size="11" bg={`${accent}/12`} color={accent}>
+          <Icon as={icon} boxSize={5} />
+        </Circle>
+      </HStack>
+    </Box>
+  );
+});
+StatTile.displayName = "StatTile";
+
+const FilterButton = memo(({
+  label,
+  active,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) => (
+  <Button
+    size="sm"
+    variant={active ? "solid" : "ghost"}
+    colorPalette={active ? "blue" : "gray"}
+    borderRadius="xl"
+    px={4}
+    fontWeight="800"
+    onClick={onClick}
+  >
+    {label}
+  </Button>
+));
+FilterButton.displayName = "FilterButton";
+
+const MemberTile = memo(({
+  member,
+  onClick,
+}: {
+  member: MemberDocument;
+  onClick: (id: string) => void;
+}) => {
+  const { data, _meta } = member;
+  const name = getMemberName(data);
+  const contact = getMemberContact(data);
+  const status = data.status || "active";
+  const statusTheme = statusStyles[status] || statusStyles.active;
+  const cardBg = useColorModeValue("rgba(255,255,255,0.86)", "rgba(15,23,42,0.7)");
+  const cardBorder = useColorModeValue("rgba(226,232,240,0.78)", "rgba(255,255,255,0.12)");
+  const muted = useColorModeValue("gray.500", "gray.400");
+
+  return (
+    <Box
+      role="group"
+      p={5}
+      borderRadius="2xl"
+      bg={cardBg}
+      border="1px solid"
+      borderColor={cardBorder}
+      boxShadow="0 18px 44px -34px rgba(15, 23, 42, 0.72)"
+      backdropFilter="blur(18px) saturate(150%)"
+      position="relative"
+      overflow="hidden"
       cursor="pointer"
-      onClick={handleClick}
-      transition="all 0.2s ease"
+      transition="all 0.24s cubic-bezier(0.4, 0, 0.2, 1)"
+      onClick={() => onClick(_meta.record_id)}
+      _before={{
+        content: '""',
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        h: "3px",
+        bg: statusTheme.accent,
+      }}
       _hover={{
-        transform: "translateY(-2px)",
-        boxShadow: "md",
-        borderColor: "app.text.accent",
+        transform: "translateY(-5px)",
+        borderColor: statusTheme.accent,
+        boxShadow: "0 26px 56px -34px rgba(37, 99, 235, 0.72)",
       }}
     >
-      <VStack align="stretch" gap={3.5}>
-        {/* Header: Avatar + Name */}
-        <Flex gap={3} align="center">
-          <Avatar.Root size="md">
-            <Avatar.Fallback fontWeight="700" fontSize="sm">
-              {initials}
-            </Avatar.Fallback>
-          </Avatar.Root>
+      <VStack align="stretch" gap={4}>
+        <Flex justify="space-between" align="start" gap={3}>
+          <HStack gap={3} minW={0}>
+            <Avatar.Root size="lg" shape="rounded" border="1px solid" borderColor={cardBorder}>
+              <Avatar.Fallback bg={statusTheme.bg} color={statusTheme.accent} fontWeight="900">
+                {name.initials}
+              </Avatar.Fallback>
+            </Avatar.Root>
+            <VStack align="start" gap={0.5} minW={0}>
+              <Text fontSize="md" fontWeight="900" color="app.text.primary" truncate>
+                {name.full}
+              </Text>
+              <Text fontSize="xs" color={muted} fontWeight="700" fontFamily="mono" truncate>
+                {_meta.record_id}
+              </Text>
+            </VStack>
+          </HStack>
+          <Badge
+            colorPalette={statusTheme.colorPalette}
+            variant="subtle"
+            borderRadius="full"
+            px={3}
+            py={1}
+            fontSize="10px"
+            fontWeight="900"
+          >
+            {statusTheme.label}
+          </Badge>
+        </Flex>
 
-          <VStack align="start" gap="0" flex="1" minW="0">
-            <Text
-              fontSize="sm"
-              fontWeight="700"
-              color="app.text.primary"
-              lineClamp={1}
-            >
-              {fullName}
+        <SimpleGrid columns={1} gap={2}>
+          <HStack gap={2.5} color={muted} minW={0}>
+            <Icon as={LuMail} boxSize={3.5} />
+            <Text fontSize="sm" fontWeight="700" truncate>
+              {contact.email}
             </Text>
-            <Text
-              fontSize="xs"
-              color="app.text.muted"
-              fontWeight="500"
-              fontFamily="mono"
-            >
-              {member._meta.record_id}
+          </HStack>
+          <HStack gap={2.5} color={muted}>
+            <Icon as={LuPhone} boxSize={3.5} />
+            <Text fontSize="sm" fontWeight="700">
+              {contact.phone}
+            </Text>
+          </HStack>
+          <HStack gap={2.5} color={muted}>
+            <Icon as={LuCalendarDays} boxSize={3.5} />
+            <Text fontSize="sm" fontWeight="700">
+              Joined {formatDate(_meta.created?.at)}
+            </Text>
+          </HStack>
+        </SimpleGrid>
+
+        <Separator opacity={0.35} />
+
+        <HStack justify="space-between" gap={4}>
+          <VStack align="start" gap={0.5} minW={0}>
+            <Text fontSize="10px" color={muted} fontWeight="900" textTransform="uppercase">
+              Membership
+            </Text>
+            <Text fontSize="sm" fontWeight="900" color="app.text.primary" truncate>
+              {data.plan || "Standard Plan"}
             </Text>
           </VStack>
-
-          {d.member_id && (
-            <Badge
-              colorPalette="purple"
-              variant="subtle"
-              px={2}
-              py={0.5}
-              borderRadius="full"
-              fontSize="2xs"
-              fontWeight="700"
-            >
-              {d.member_id}
-            </Badge>
-          )}
-        </Flex>
-
-        {/* Contact */}
-        <VStack align="stretch" gap={1.5}>
-          {d.email && (
-            <HStack gap={2} color="app.text.muted">
-              <LuMail size={13} />
-              <Text fontSize="xs" fontWeight="500" lineClamp={1}>
-                {d.email}
-              </Text>
-            </HStack>
-          )}
-          {d.phone && (
-            <HStack gap={2} color="app.text.muted">
-              <LuPhone size={13} />
-              <Text fontSize="xs" fontWeight="500">
-                {d.phone}
-              </Text>
-            </HStack>
-          )}
-        </VStack>
-
-        {/* Footer */}
-        <Flex justify="space-between" align="center">
-          <Text fontSize="2xs" color="app.text.muted" fontWeight="500">
-            Joined {formatDate(member._meta.created.at)}
-          </Text>
-          <Text fontSize="2xs" color="app.text.muted" fontWeight="500">
-            v{member._meta.version}
-          </Text>
-        </Flex>
+          <Circle
+            size="9"
+            bg={statusTheme.bg}
+            color={statusTheme.accent}
+            transition="all 0.2s"
+            _groupHover={{ transform: "translateX(2px)" }}
+          >
+            <LuArrowRight size={16} />
+          </Circle>
+        </HStack>
       </VStack>
     </Box>
   );
-};
+});
+MemberTile.displayName = "MemberTile";
 
-// ── Action Sidebar Item ────────────────────────────────────────────────
-
-interface ActionItemProps {
-  member: MemberDocument;
-  reason: string;
-}
-
-const ActionItem = ({ member, reason }: ActionItemProps) => {
-  const d = member.data;
-  const fullName = getFullName(d);
-
-  return (
-    <Box
-      p={3}
-      borderRadius="lg"
-      bg="app.card.bg"
-      border="1px solid"
-      borderColor="app.card.border"
-      cursor="pointer"
-      transition="all 0.2s ease"
-      _hover={{
-        borderColor: "app.text.accent",
-        transform: "translateX(2px)",
-      }}
-    >
-      <Flex gap={3} align="center">
-        <Avatar.Root size="sm">
-          <Avatar.Fallback fontWeight="700" fontSize="xs">
-            {getInitials(d.firstName, d.lastName)}
-          </Avatar.Fallback>
-        </Avatar.Root>
-
-        <VStack align="start" gap="0" flex="1" minW="0">
-          <Text fontSize="sm" fontWeight="600" color="app.text.primary" lineClamp={1}>
-            {fullName}
-          </Text>
-          <Text fontSize="xs" color="app.text.muted" fontWeight="500">
-            {reason}
-          </Text>
-        </VStack>
-
-        <Box color="app.text.muted">
-          <LuArrowRight size={14} />
-        </Box>
-      </Flex>
-    </Box>
-  );
-};
-
-// ── Empty State ────────────────────────────────────────────────────────
-
-const EmptyState = ({ hasSearch }: { hasSearch: boolean }) => (
-  <Flex direction="column" align="center" justify="center" py={16} gap={4}>
-    <Flex
-      w="14"
-      h="14"
-      borderRadius="xl"
-      bg="app.card.bg"
-      border="1px solid"
-      borderColor="app.card.border"
-      color="app.text.accent"
-      align="center"
-      justify="center"
-    >
-      <LuUsers size={24} />
-    </Flex>
-    <VStack gap={1}>
-      <Heading size="sm" fontWeight="700" color="app.text.primary">
-        {hasSearch ? "No members found" : "No members yet"}
-      </Heading>
-      <Text color="app.text.muted" textAlign="center" maxW="xs" fontSize="sm">
-        {hasSearch
-          ? "Try a different search term."
-          : "Add your first member to get started."}
-      </Text>
-    </VStack>
-  </Flex>
-);
-
-// ── Main Component ─────────────────────────────────────────────────────
-
-const ViewMember = () => {
+const ViewMember = memo(() => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { appCode } = useParams();
   const [searchParams] = useSearchParams();
 
-  const [members, setMembers] = useState<MemberDocument[]>([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [query, setQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilter, setActiveFilter] = useState<MemberFilter>("all");
 
-  // ── Path builder ──────────────────────────────────────────────────
+  const { members, total, loading, refresh } = useGymMembers();
+
   const appParam = searchParams.get("app");
-  const appName = appCode || appParam || "myGym";
-  const workspacePrefix = pathname.includes("/workspace")
-    ? `${pathname.split("/workspace")[0]}/workspace`
-    : "";
-
-  const buildViewPath = useCallback(
-    (viewName: string) => {
-      if (appCode) return `${workspacePrefix}/app/${appCode}/${viewName}`;
-      return `${workspacePrefix}/${viewName}?app=${appName}`;
-    },
-    [appCode, workspacePrefix, appName]
+  const appName = useMemo(() => appCode || appParam || "myGym", [appCode, appParam]);
+  const prefix = useMemo(
+    () => (pathname.includes("/workspace") ? `${pathname.split("/workspace")[0]}/workspace` : ""),
+    [pathname]
   );
 
-  // ── Fetch members ─────────────────────────────────────────────────
-  const fetchMembers = useCallback(() => {
-    setLoading(true);
-    const sub = GETAPI({
-      path: "gym/members",
-      isPrivateApi: true,
-    }).subscribe({
-      next: (res: MembersResponse) => {
-        if (res.success) {
-          setMembers(res.data || []);
-          setTotal(res.total || 0);
-        }
-        setLoading(false);
-      },
-      error: () => setLoading(false),
-    });
-    return () => sub.unsubscribe();
-  }, []);
+  const navigateTo = useCallback((view: string) => {
+    const path = appCode ? `${prefix}/app/${appCode}/${view}` : `${prefix}/${view}?app=${appName}`;
+    navigate(path);
+  }, [appCode, appName, navigate, prefix]);
 
-  useEffect(() => {
-    const cleanup = fetchMembers();
-    return cleanup;
-  }, [fetchMembers]);
+  const metrics = useMemo(() => {
+    const active = members.filter((member) => member.data.status === "active").length;
+    const attention = members.filter((member) => member.data.status === "attention").length;
+    const frozen = members.filter((member) => member.data.status === "frozen").length;
+    const retention = members.length ? Math.round((active / members.length) * 100) : 0;
 
-  // ── Search filter ─────────────────────────────────────────────────
-  const normalizedQuery = query.trim().toLowerCase();
-
-  const filteredMembers = useMemo(() => {
-    if (!normalizedQuery) return members;
-    return members.filter((m) => {
-      const d = m.data;
-      const haystack = [
-        d.firstName,
-        d.lastName,
-        d.email,
-        d.phone,
-        d.member_id,
-        m._meta.record_id,
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
-      return haystack.includes(normalizedQuery);
-    });
-  }, [members, normalizedQuery]);
-
-  // ── Action required members (extend with real logic later) ────────
-  const actionMembers = useMemo(() => {
-    // Placeholder: show first 5 — replace with expired/inactive rules
-    return members.slice(0, 5).map((m) => ({
-      member: m,
-      reason: "Review required",
-    }));
+    return { active, attention, frozen, retention };
   }, [members]);
 
-  // ── Handlers ──────────────────────────────────────────────────────
-  const handleAddMember = useCallback(() => {
-    navigate(buildViewPath("AddMember"));
-  }, [navigate, buildViewPath]);
+  const filteredMembers = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
 
-  const handleViewMember = useCallback(
-    (recordId: string) => {
-      navigate(buildViewPath(`members/${recordId}`));
-    },
-    [navigate, buildViewPath]
+    return members.filter((member) => {
+      const name = getMemberName(member.data);
+      const contact = getMemberContact(member.data);
+      const matchesFilter = activeFilter === "all" || member.data.status === activeFilter;
+      const matchesSearch = !q ||
+        name.full.toLowerCase().includes(q) ||
+        contact.email.toLowerCase().includes(q) ||
+        contact.phone.toLowerCase().includes(q) ||
+        member._meta.record_id.toLowerCase().includes(q);
+
+      return matchesFilter && matchesSearch;
+    });
+  }, [activeFilter, members, searchQuery]);
+
+  const membersRequiringAttention = useMemo(
+    () => members.filter((member) => member.data.status === "attention").slice(0, 5),
+    [members]
   );
 
-  const handleSearchChange = useCallback((val: string) => {
-    setQuery(val);
-  }, []);
-
-  const handleRefresh = useCallback(() => {
-    fetchMembers();
-  }, [fetchMembers]);
-
-  // ── Subtitle text ─────────────────────────────────────────────────
-  const subtitle = useMemo(() => {
-    if (loading) return "Loading…";
-    return `${total} member${total !== 1 ? "s" : ""} in your organization`;
-  }, [loading, total]);
-
-  // ── Action button for PageHeader ──────────────────────────────────
-  const headerActions = useMemo(
-    () => (
-      <Button
-        colorPalette="purple"
-        size="sm"
-        borderRadius="lg"
-        px={4}
-        fontWeight="700"
-        onClick={handleAddMember}
-      >
-        <LuPlus size={16} />
-        Add Member
-      </Button>
-    ),
-    [handleAddMember]
+  const heroBg = useColorModeValue(
+    "linear-gradient(135deg, rgba(240,249,255,0.96), rgba(255,255,255,0.92) 48%, rgba(240,253,244,0.9))",
+    "linear-gradient(135deg, rgba(15,23,42,0.94), rgba(30,41,59,0.88) 52%, rgba(6,78,59,0.42))"
   );
+  const panelBg = useColorModeValue("rgba(255,255,255,0.74)", "rgba(15,23,42,0.58)");
+  const borderColor = useColorModeValue("rgba(226,232,240,0.84)", "rgba(255,255,255,0.12)");
+  const muted = useColorModeValue("gray.500", "gray.400");
 
   return (
-    <PageLayout
-      title="Gym Members"
-      subtitle={subtitle}
-      actions={headerActions}
-      searchPlaceholder="Search by name, email, phone, or ID…"
-      searchValue={query}
-      onSearchChange={handleSearchChange}
-      showRefresh
-      onRefresh={handleRefresh}
-      isRefreshing={loading}
-    >
-      {/* Loading State */}
-      {loading && (
-        <Flex justify="center" py={16}>
-          <Spinner size="lg" color="app.text.accent" />
-        </Flex>
-      )}
-
-      {/* Main Grid: members (left) + actions (right) */}
-      {!loading && (
-        <Grid
-          templateColumns={{ base: "1fr", lg: "1fr 300px" }}
-          gap={5}
+    <Box mt={4} animation="fade-in 0.5s ease-out" w="full">
+      <PageHeader
+        title="Member Directory"
+        subtitle={`${total} registered members across plans, renewals, and attendance workflows.`}
+        actions={
+          <HStack gap={3}>
+            <IconButton
+              variant="outline"
+              borderRadius="xl"
+              onClick={refresh}
+              aria-label="Refresh members"
+              loading={loading}
+            >
+              <LuRefreshCw size={16} />
+            </IconButton>
+            <Button colorPalette="blue" borderRadius="xl" px={5} fontWeight="900" onClick={() => navigateTo("AddMember")}>
+              <LuPlus size={18} /> New Member
+            </Button>
+          </HStack>
+        }
+        onSearchChange={setSearchQuery}
+        searchValue={searchQuery}
+        searchPlaceholder="Search members, email, phone or ID..."
+      />
+      <VStack align="stretch" gap={6} pb={8}>
+        <Box
+          p={{ base: 5, lg: 7 }}
+          borderRadius="2xl"
+          bg={heroBg}
+          border="1px solid"
+          borderColor={borderColor}
+          overflow="hidden"
+          position="relative"
+          boxShadow="0 28px 64px -42px rgba(15, 23, 42, 0.7)"
         >
-          {/* ── LEFT: Member Cards ── */}
-          <GridItem>
-            {filteredMembers.length > 0 ? (
-              <SimpleGrid columns={{ base: 1, sm: 2, xl: 3 }} gap={4}>
-                {filteredMembers.map((member) => (
-                  <MemberCard
-                    key={member._id}
-                    member={member}
-                    onView={handleViewMember}
-                  />
-                ))}
-              </SimpleGrid>
-            ) : (
-              <EmptyState hasSearch={normalizedQuery.length > 0} />
-            )}
+          <Grid templateColumns={{ base: "1fr", xl: "1.1fr 1.6fr" }} gap={6} alignItems="stretch">
+            <VStack align="start" justify="space-between" gap={6}>
+              <VStack align="start" gap={3}>
+                <Badge colorPalette="blue" variant="subtle" borderRadius="full" px={3} py={1} fontWeight="900">
+                  Live Member Ops
+                </Badge>
+                <Heading size={{ base: "xl", md: "2xl" }} letterSpacing="tight" color="app.text.primary">
+                  Manage members with a cleaner operating cockpit.
+                </Heading>
+                <Text color={muted} fontSize="sm" maxW="560px" fontWeight="600">
+                  Track active members, renewal attention, frozen accounts, and member contact records from one modern SaaS view.
+                </Text>
+              </VStack>
+              <HStack gap={3} flexWrap="wrap">
+                <Button colorPalette="blue" borderRadius="xl" fontWeight="900" onClick={() => navigateTo("AddMember")}>
+                  <LuPlus size={18} /> Enroll Member
+                </Button>
+                <Button variant="outline" borderRadius="xl" fontWeight="800" onClick={refresh} loading={loading}>
+                  <LuRefreshCw size={16} /> Sync Data
+                </Button>
+              </HStack>
+            </VStack>
+
+            <SimpleGrid columns={{ base: 1, md: 2, xl: 4 }} gap={4}>
+              <StatTile label="Total members" value={total || members.length} caption="Registered profiles" icon={LuUsers} accent="blue.500" />
+              <StatTile label="Active" value={metrics.active} caption={`${metrics.retention}% retention`} icon={LuUserCheck} accent="green.500" />
+              <StatTile label="Attention" value={metrics.attention} caption="Renewal follow-up" icon={LuActivity} accent="orange.500" />
+              <StatTile label="Frozen" value={metrics.frozen} caption="Paused accounts" icon={LuSparkles} accent="cyan.500" />
+            </SimpleGrid>
+          </Grid>
+        </Box>
+
+        <Grid templateColumns={{ base: "1fr", xl: "minmax(0, 1fr) 360px" }} gap={{ base: 6, xl: 8 }}>
+          <GridItem minW={0}>
+            <VStack align="stretch" gap={5}>
+              <Flex
+                align={{ base: "start", md: "center" }}
+                justify="space-between"
+                direction={{ base: "column", md: "row" }}
+                gap={4}
+                p={4}
+                borderRadius="2xl"
+                bg={panelBg}
+                border="1px solid"
+                borderColor={borderColor}
+              >
+                <HStack gap={2}>
+                  <Circle size="9" bg="blue.500/10" color="blue.500">
+                    <LuFilter size={16} />
+                  </Circle>
+                  <VStack align="start" gap={0}>
+                    <Text fontWeight="900" color="app.text.primary">
+                      Directory
+                    </Text>
+                    <Text fontSize="xs" color={muted} fontWeight="700">
+                      Showing {filteredMembers.length} matching records
+                    </Text>
+                  </VStack>
+                </HStack>
+
+                <HStack gap={2} flexWrap="wrap">
+                  <FilterButton label="All" active={activeFilter === "all"} onClick={() => setActiveFilter("all")} />
+                  <FilterButton label="Active" active={activeFilter === "active"} onClick={() => setActiveFilter("active")} />
+                  <FilterButton label="Attention" active={activeFilter === "attention"} onClick={() => setActiveFilter("attention")} />
+                  <FilterButton label="Frozen" active={activeFilter === "frozen"} onClick={() => setActiveFilter("frozen")} />
+                </HStack>
+              </Flex>
+
+              {loading ? (
+                <SimpleGrid columns={{ base: 1, md: 2, "2xl": 3 }} gap={4}>
+                  {[1, 2, 3, 4, 5, 6].map((item) => (
+                    <Skeleton key={item} height="238px" borderRadius="2xl" />
+                  ))}
+                </SimpleGrid>
+              ) : filteredMembers.length > 0 ? (
+                <SimpleGrid columns={{ base: 1, md: 2, "2xl": 3 }} gap={4}>
+                  {filteredMembers.map((member) => (
+                    <MemberTile
+                      key={member._id}
+                      member={member}
+                      onClick={(id) => navigateTo(`members/${id}`)}
+                    />
+                  ))}
+                </SimpleGrid>
+              ) : (
+                <Flex
+                  direction="column"
+                  align="center"
+                  justify="center"
+                  py={20}
+                  gap={4}
+                  borderRadius="2xl"
+                  bg={panelBg}
+                  border="1px solid"
+                  borderColor={borderColor}
+                >
+                  <Circle size="16" bg="blue.500/10" color="blue.500">
+                    <LuUsers size={30} />
+                  </Circle>
+                  <VStack gap={1}>
+                    <Heading size="sm" fontWeight="900">
+                      No members found
+                    </Heading>
+                    <Text fontSize="sm" color={muted} fontWeight="600">
+                      Try a different search, clear the filter, or enroll a new member.
+                    </Text>
+                  </VStack>
+                </Flex>
+              )}
+            </VStack>
           </GridItem>
 
-          {/* ── RIGHT: Action Required Panel (full tile height) ── */}
           <GridItem>
-            <Box
-              position="sticky"
-              top="4"
-              bg="app.card.bg"
-              border="1px solid"
-              borderColor="app.card.border"
-              borderRadius="xl"
-              p={4}
-              h="fit-content"
-            >
-              <VStack align="stretch" gap={4}>
-                {/* Header */}
-                <HStack gap={2.5}>
-                  <Flex
-                    w="8"
-                    h="8"
-                    borderRadius="lg"
-                    bg="orange.100"
-                    color="orange.500"
-                    align="center"
-                    justify="center"
-                    flexShrink={0}
-                  >
-                    <LuLoaderCircle size={16} />
-                  </Flex>
-                  <VStack align="start" gap="0">
-                    <Text fontSize="sm" fontWeight="700" color="app.text.primary">
-                      Action Required
-                    </Text>
-                    <Text fontSize="xs" color="app.text.muted" fontWeight="500">
-                      {actionMembers.length} member{actionMembers.length !== 1 ? "s" : ""}
-                    </Text>
-                  </VStack>
-                </HStack>
-
-                {/* Action List */}
-                {actionMembers.length > 0 ? (
-                  <VStack align="stretch" gap={2}>
-                    {actionMembers.map(({ member, reason }) => (
-                      <ActionItem
-                        key={member._id}
-                        member={member}
-                        reason={reason}
-                      />
-                    ))}
-                  </VStack>
-                ) : (
-                  <VStack py={6}>
-                    <Text fontSize="sm" color="app.text.muted">
-                      All clear!
-                    </Text>
-                  </VStack>
-                )}
-
-                {/* Divider */}
-                <Box h="1px" bg="app.divider" />
-
-                {/* Quick Stats */}
-                <VStack align="stretch" gap={2}>
-                  <Text
-                    fontSize="2xs"
-                    fontWeight="700"
-                    textTransform="uppercase"
-                    letterSpacing="wider"
-                    color="app.text.accent"
-                  >
-                    Quick stats
-                  </Text>
+            <VStack align="stretch" gap={5} position={{ xl: "sticky" }} top={{ xl: "7rem" }}>
+              <Box p={5} borderRadius="2xl" bg={panelBg} border="1px solid" borderColor={borderColor}>
+                <VStack align="stretch" gap={4}>
                   <HStack justify="space-between">
-                    <Text fontSize="xs" color="app.text.muted">
-                      Total members
-                    </Text>
-                    <Text fontSize="sm" fontWeight="700" color="app.text.primary">
-                      {total}
-                    </Text>
+                    <VStack align="start" gap={0}>
+                      <Heading size="sm" fontWeight="900">
+                        Priority Queue
+                      </Heading>
+                      <Text fontSize="xs" color={muted} fontWeight="700">
+                        Members needing renewal or staff review
+                      </Text>
+                    </VStack>
+                    <Badge colorPalette="orange" borderRadius="full" variant="solid">
+                      {membersRequiringAttention.length}
+                    </Badge>
                   </HStack>
-                  <HStack justify="space-between">
-                    <Text fontSize="xs" color="app.text.muted">
-                      Showing
-                    </Text>
-                    <Text fontSize="sm" fontWeight="700" color="app.text.primary">
-                      {filteredMembers.length}
-                    </Text>
-                  </HStack>
+
+                  <VStack align="stretch" gap={3}>
+                    {membersRequiringAttention.map((member) => {
+                      const name = getMemberName(member.data);
+                      return (
+                        <HStack
+                          key={member._id}
+                          p={3}
+                          borderRadius="xl"
+                          bg="orange.500/10"
+                          border="1px solid"
+                          borderColor="orange.500/20"
+                          gap={3}
+                          cursor="pointer"
+                          transition="all 0.2s"
+                          _hover={{ transform: "translateX(2px)", bg: "orange.500/15" }}
+                          onClick={() => navigateTo(`members/${member._meta.record_id}`)}
+                        >
+                          <Avatar.Root size="sm" shape="rounded">
+                            <Avatar.Fallback fontWeight="900" color="orange.600">
+                              {name.initials}
+                            </Avatar.Fallback>
+                          </Avatar.Root>
+                          <VStack align="start" gap={0} flex={1} minW={0}>
+                            <Text fontSize="sm" fontWeight="900" truncate>
+                              {name.full}
+                            </Text>
+                            <Text fontSize="xs" color="orange.600" fontWeight="800">
+                              Renewal due
+                            </Text>
+                          </VStack>
+                          <LuArrowRight size={15} color="var(--chakra-colors-orange-500)" />
+                        </HStack>
+                      );
+                    })}
+                    {membersRequiringAttention.length === 0 && (
+                      <Box p={4} borderRadius="xl" bg="green.500/10" border="1px solid" borderColor="green.500/20">
+                        <Text fontSize="sm" color="green.600" fontWeight="800" textAlign="center">
+                          All member accounts are current.
+                        </Text>
+                      </Box>
+                    )}
+                  </VStack>
                 </VStack>
+              </Box>
 
-                {/* Divider */}
-                <Box h="1px" bg="app.divider" />
-
-                {/* Upcoming Renewals */}
-                <HStack gap={2.5} p={2}>
-                  <LuCalendarClock size={14} color="var(--chakra-colors-orange-500)" />
-                  <VStack align="start" gap="0">
-                    <Text fontSize="xs" fontWeight="600" color="app.text.primary">
-                      Upcoming renewals
-                    </Text>
-                    <Text fontSize="2xs" color="app.text.muted">
-                      Coming soon
-                    </Text>
+              <Box p={5} borderRadius="2xl" bg={panelBg} border="1px solid" borderColor={borderColor}>
+                <VStack align="stretch" gap={4}>
+                  <Heading size="sm" fontWeight="900">
+                    Retention Health
+                  </Heading>
+                  <VStack align="stretch" gap={3}>
+                    <HStack justify="space-between">
+                      <Text fontSize="sm" color={muted} fontWeight="800">
+                        Active ratio
+                      </Text>
+                      <Text fontSize="sm" color="green.500" fontWeight="900">
+                        {metrics.retention}%
+                      </Text>
+                    </HStack>
+                    <Box h="10px" bg="blackAlpha.100" borderRadius="full" overflow="hidden">
+                      <Box h="full" w={`${metrics.retention}%`} bg="green.500" borderRadius="full" />
+                    </Box>
+                    <Separator opacity={0.35} />
+                    <SimpleGrid columns={2} gap={3}>
+                      <Box p={3} borderRadius="xl" bg="blue.500/10">
+                        <Text fontSize="xs" color={muted} fontWeight="800">
+                          Search result
+                        </Text>
+                        <Text fontSize="lg" fontWeight="900">
+                          {filteredMembers.length}
+                        </Text>
+                      </Box>
+                      <Box p={3} borderRadius="xl" bg="purple.500/10">
+                        <Text fontSize="xs" color={muted} fontWeight="800">
+                          Plans tracked
+                        </Text>
+                        <Text fontSize="lg" fontWeight="900">
+                          {new Set(members.map((member) => member.data.plan || "Standard")).size}
+                        </Text>
+                      </Box>
+                    </SimpleGrid>
                   </VStack>
-                </HStack>
-              </VStack>
-            </Box>
+                </VStack>
+              </Box>
+            </VStack>
           </GridItem>
         </Grid>
-      )}
-    </PageLayout>
+      </VStack>
+    </Box>
   );
-};
+});
 
+ViewMember.displayName = "ViewMember";
 export default ViewMember;

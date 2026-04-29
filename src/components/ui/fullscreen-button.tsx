@@ -2,8 +2,9 @@
 
 import { IconButton, IconButtonProps } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
-import { BsFullscreen, BsFullscreenExit } from "react-icons/bs"
 
+
+import { Maximize2, Minimize2 } from 'lucide-react'
 
 interface FullscreenButtonProps extends IconButtonProps { }
 
@@ -40,7 +41,7 @@ export const FullscreenButton = (props: FullscreenButtonProps) => {
       // rounded="full"
       {...props}
     >
-      {isFullscreen ? <BsFullscreen /> : <BsFullscreenExit />}
+      {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
     </IconButton>
   )
 }

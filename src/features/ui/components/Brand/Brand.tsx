@@ -1,11 +1,9 @@
 import { Badge, Flex, Image } from "@chakra-ui/react";
 import { Tooltip } from '@/components/ui/tooltip';
 import { useNavigate } from "react-router";
-import { useColorModeValue } from "@/components/ui/color-mode";
 
 export default function Brand() {
   const navigate = useNavigate();
-  const hoverBg = useColorModeValue("gray.100", "whiteAlpha.100");
 
   const onClickLogo = () => {
     navigate("/myApps");
@@ -19,8 +17,10 @@ export default function Brand() {
         justifyContent="center"
         cursor="pointer"
         onClick={onClickLogo}
+        minW={0}
+        flexShrink={1}
         // bg={useColorModeValue("white", "whiteAlpha.200")}
-        p={3}
+        p={{ base: 0.5, sm: 1, md: 3 }}
         borderRadius="xl"
         // boxShadow="lg"
         transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
@@ -30,14 +30,16 @@ export default function Brand() {
         }}
       >
         <Image
-          src="/assets/icons/logo.png"
+          src="/assets/icons/workspace-logo.svg"
           alt="Workspace Logo"
 
-          h="48px"
+          h={{ base: "38px", sm: "44px", md: "52px" }}
+          maxW={{ base: "128px", sm: "172px", md: "260px" }}
           w="auto"
           objectFit="contain"
         />
         <Badge
+          display={{ base: "none", sm: "inline-flex" }}
           position="absolute"
           bottom="1px"
           right="3px"

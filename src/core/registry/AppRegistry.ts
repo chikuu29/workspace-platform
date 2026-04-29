@@ -105,12 +105,27 @@ const registry: RegistryConfig = {
     myGym: {
         layout: () => import("@/theme/layouts/workspace"),
         home: () => import("@/features/modules/gym/GymView"),
-        // AddMember: () => import("@/features/modules/gym/AddMember"),
-        Subscription: () => import("@/features/modules/gym/Subscription"),
+        // Member management
         ListMember: () => import("@/features/modules/gym/ViewMember"),
+        members: () => import("@/features/modules/gym/MemberDetail"),
+        MemberCheckIn: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.MemberCheckIn })),
+        // Billing & Subscriptions
+        Subscription: () => import("@/features/modules/gym/Subscription"),
         GymSubscriptionPlans: () => import("@/features/modules/gym/GymSubscriptionPlans"),
         AddSubscriptionPlan: () => import("@/features/modules/gym/AddSubscriptionPlan"),
         CreateSubscription: () => import("@/features/modules/gym/CreateSubscription"),
+        PaymentsHistory: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.PaymentsHistory })),
+        // Trainers
+        listTrainers: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.ListTrainers })),
+        trainerSchedules: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.TrainerSchedules })),
+        // Classes
+        listClasses: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.ListClasses })),
+        addClass: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.AddClass })),
+        classBookings: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.ClassBookings })),
+        // Reports
+        revenueReport: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.RevenueReport })),
+        attendanceReport: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.AttendanceReport })),
+        performanceReport: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.PerformanceReport })),
     },
     Default: {
         workspacePage: () => import("@/core/WorkspacePage"),

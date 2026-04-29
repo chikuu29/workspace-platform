@@ -173,7 +173,7 @@ const AppBreadcrumb = forwardRef((props, ref) => {
           </Box>
         </Box>
 
-        <HStack
+        {/* <HStack
           gap="3"
           justify={{ base: "flex-end", md: "flex-start" }}
           alignSelf={{ base: "stretch", md: "center" }}
@@ -193,7 +193,7 @@ const AppBreadcrumb = forwardRef((props, ref) => {
             <FullscreenButton variant="ghost" size="sm" rounded="lg" />
           </Flex>
 
-        </HStack>
+        </HStack> */}
       </Flex>
     </Box>
   );

@@ -1,0 +1,40 @@
+<svg width="312" height="72" viewBox="0 0 312 72" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="workspaceLogoTitle workspaceLogoDesc">
+  <title id="workspaceLogoTitle">WorkSpace logo</title>
+  <desc id="workspaceLogoDesc">Premium WorkSpace wordmark with a layered workspace icon.</desc>
+  <defs>
+    <linearGradient id="markGradient" x1="8" y1="8" x2="58" y2="62" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563EB"/>
+      <stop offset="0.48" stop-color="#14B8A6"/>
+      <stop offset="1" stop-color="#22C55E"/>
+    </linearGradient>
+    <linearGradient id="textGradient" x1="76" y1="18" x2="298" y2="54" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F172A"/>
+      <stop offset="0.52" stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#0F766E"/>
+    </linearGradient>
+    <filter id="softShadow" x="-14" y="-12" width="96" height="96" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="6"/>
+      <feGaussianBlur stdDeviation="8"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.145 0 0 0 0 0.388 0 0 0 0 0.922 0 0 0 0.22 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#softShadow)">
+    <rect x="8" y="8" width="56" height="56" rx="18" fill="url(#markGradient)"/>
+    <path d="M22 25.5C22 22.4624 24.4624 20 27.5 20H44.5C47.5376 20 50 22.4624 50 25.5V43.5C50 46.5376 47.5376 49 44.5 49H27.5C24.4624 49 22 46.5376 22 43.5V25.5Z" fill="white" fill-opacity="0.18"/>
+    <path d="M28 28.5C28 26.567 29.567 25 31.5 25H49.5C51.433 25 53 26.567 53 28.5V46.5C53 48.433 51.433 50 49.5 50H31.5C29.567 50 28 48.433 28 46.5V28.5Z" fill="white" fill-opacity="0.24"/>
+    <path d="M20 27.75C20 25.1266 22.1266 23 24.75 23H41.25C43.8734 23 46 25.1266 46 27.75V43.25C46 45.8734 43.8734 48 41.25 48H24.75C22.1266 48 20 45.8734 20 43.25V27.75Z" fill="white"/>
+    <path d="M26.25 32.25H39.75" stroke="#2563EB" stroke-width="3" stroke-linecap="round"/>
+    <path d="M26.25 39.25H34.75" stroke="#14B8A6" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="42.5" cy="43.5" r="4.5" fill="#22C55E"/>
+  </g>
+
+  <text x="78" y="46" fill="url(#textGradient)" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="32" font-weight="850" letter-spacing="-0.4">
+    WorkSpace
+  </text>
+  <path d="M80 55H218" stroke="#14B8A6" stroke-width="3" stroke-linecap="round" opacity="0.28"/>
+</svg>

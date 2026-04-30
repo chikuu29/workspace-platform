@@ -188,7 +188,7 @@ const DialogRenderer = memo(() => {
                             )}
                             {config && !loading && !error && (
                                 <Box p={4}>
-                                    <ViewRenderer config={config} />
+                                    <ViewRenderer config={config} publishActionsToBreadcrumb={false} />
                                 </Box>
                             )}
                         </Dialog.Body>

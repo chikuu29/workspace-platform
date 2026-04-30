@@ -161,13 +161,13 @@ const handleApiCall: ActionHandler = async (action, ctx) => {
         useApiResponseModalStore.getState().openModal(modalConfig);
 
         if (isSuccess && laterActions) {
-            // response.data typically holds the actual object
-            const interpolationData = { ...ctx.payload, ...(response?.result || response) };
+            // response.data holds the created resource payload
+            const interpolationData = { ...ctx.payload, ...(response?.data || response?.result || response) };
             console.log("interpolationData", interpolationData);
             const nextAction = deepInterpolate(laterActions, interpolationData);
             console.log("nextAction", nextAction);
             // Execute the next action(s) sequentially
-            await ActionEngine.execute(nextAction, { ...ctx, response: response?.result });
+            await ActionEngine.execute(nextAction, { ...ctx, response: response?.data || response?.result });
         }
 
     } catch (error) {

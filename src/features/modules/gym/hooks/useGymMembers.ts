@@ -19,7 +19,7 @@ export const useGymMembers = (skip: number = 0, limit: number = 50) => {
       next: (res) => {
         if (res.success) {
           setMembers(res.data);
-          setTotal(res.total);
+          setTotal(res.pagination?.total ?? res.total);
         }
         setLoading(false);
       },

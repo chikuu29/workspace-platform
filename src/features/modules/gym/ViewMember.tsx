@@ -47,8 +47,8 @@ import { MemberDocument } from "./types/Gym.types";
 type MemberFilter = "all" | "active" | "attention" | "frozen";
 
 const getMemberName = (data: MemberDocument["data"]) => {
-  const first = data.memberFirstName || data.firstName || "";
-  const last = data.memberLastName || data.lastName || "";
+  const first = data.firstName || "";
+  const last = data.lastName || "";
 
   return {
     full: `${first} ${last}`.trim() || "Unknown Member",
@@ -57,8 +57,8 @@ const getMemberName = (data: MemberDocument["data"]) => {
 };
 
 const getMemberContact = (data: MemberDocument["data"]) => ({
-  email: data.memberEmail || data.email || "No email",
-  phone: data.memberPhone || data.phone || "No phone",
+  email: data.email || "No email",
+  phone: data.phone || "No phone",
 });
 
 const formatDate = (date?: string) => {

@@ -1,4 +1,5 @@
 import { ColorModeButton, useColorModeValue } from "@/components/ui/color-mode";
+import { useBreadcrumbActionsStore } from "@/core/store/useBreadcrumbActionsStore";
 import { FullscreenButton } from "@/components/ui/fullscreen-button";
 import { Box, Breadcrumb, Flex, HStack, Text } from "@chakra-ui/react";
 import React, { forwardRef, useEffect, useState, useMemo } from "react";
@@ -32,6 +33,7 @@ const AppBreadcrumb = forwardRef((props, ref) => {
   const appName = useMemo(() => appCode || appParam || "Default", [appCode, appParam]);
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const breadcrumbActions = useBreadcrumbActionsStore((state) => state.actions);
 
   const [config, setConfig] = useState<ConfigItem[]>([
     {
@@ -172,6 +174,16 @@ const AppBreadcrumb = forwardRef((props, ref) => {
             </Breadcrumb.Root>
           </Box>
         </Box>
+
+        {breadcrumbActions && (
+          <Box
+            flexShrink={0}
+            alignSelf={{ base: "stretch", md: "center" }}
+            maxW={{ base: "full", md: "50%" }}
+          >
+            {breadcrumbActions}
+          </Box>
+        )}
 
         {/* <HStack
           gap="3"

@@ -40,12 +40,10 @@ export interface MemberDocument {
   data: {
     firstName?: string;
     lastName?: string;
-    memberFirstName?: string;
-    memberLastName?: string;
     email?: string;
-    memberEmail?: string;
     phone?: string;
-    memberPhone?: string;
+    gender?: string;
+    address?: string;
     status: "active" | "attention" | "frozen";
     plan: string;
     member_id?: string;

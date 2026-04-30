@@ -80,7 +80,7 @@
                         "iconName": "LuUser",
                         "widgets": [
                             {
-                                "name": "memberFirstName",
+                                "name": "firstName",
                                 "text": "First Name",
                                 "description": "Enter member's first name",
                                 "widget": "textField",
@@ -89,7 +89,7 @@
                                 "maxLength": 50
                             },
                             {
-                                "name": "memberLastName",
+                                "name": "lastName",
                                 "text": "Last Name",
                                 "description": "Enter member's last name",
                                 "widget": "textField",
@@ -98,7 +98,7 @@
                                 "maxLength": 50
                             },
                             {
-                                "name": "memberEmail",
+                                "name": "email",
                                 "text": "Email Address",
                                 "description": "Used for membership alerts and newsletters",
                                 "type": "email",
@@ -107,7 +107,7 @@
                                 "required": true
                             },
                             {
-                                "name": "memberPhone",
+                                "name": "phone",
                                 "text": "Phone Number",
                                 "description": "Primary contact number for SMS updates",
                                 "type": "tel",
@@ -116,7 +116,7 @@
                                 "required": true
                             },
                             {
-                                "name": "memberGender",
+                                "name": "gender",
                                 "text": "Gender",
                                 "description": "Select the member's gender for facilities allocation",
                                 "widget": "radioField",
@@ -138,7 +138,7 @@
                                 ]
                             },
                             {
-                                "name": "memberAddress",
+                                "name": "address",
                                 "text": "Residential Address",
                                 "description": "Current permanent residence details",
                                 "widget": "textAreaField",

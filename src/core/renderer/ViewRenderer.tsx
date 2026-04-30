@@ -5,7 +5,13 @@ import FallbackRenderer from "./FallbackRenderer";
 import "../views";
 import "../widgets"; // Ensure all widgets are registered globally
 
-const ViewRenderer = ({ config }: { config: any }) => {
+const ViewRenderer = ({
+    config,
+    publishActionsToBreadcrumb = true,
+}: {
+    config: any;
+    publishActionsToBreadcrumb?: boolean;
+}) => {
     console.log("===Rendering ViewRenderer with config===");
     const UI_TYPE = config?.UI_TYPE;
     if (!UI_TYPE) {
@@ -33,7 +39,7 @@ const ViewRenderer = ({ config }: { config: any }) => {
         );
     }
 
-    return <Component config={config} />;
+    return <Component config={config} publishActionsToBreadcrumb={publishActionsToBreadcrumb} />;
 };
 
 export default React.memo(ViewRenderer);

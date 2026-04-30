@@ -74,8 +74,8 @@ const statusMeta: Record<StatusKey, { label: string; colorPalette: string; accen
 };
 
 const getMemberName = (data?: MemberDocument["data"]) => {
-  const first = data?.memberFirstName || data?.firstName || "";
-  const last = data?.memberLastName || data?.lastName || "";
+  const first = data?.firstName || "";
+  const last = data?.lastName || "";
 
   return {
     full: `${first} ${last}`.trim() || "Unknown Member",
@@ -84,9 +84,9 @@ const getMemberName = (data?: MemberDocument["data"]) => {
 };
 
 const getContact = (data?: MemberDocument["data"]) => ({
-  email: data?.memberEmail || data?.email || "No email recorded",
-  phone: data?.memberPhone || data?.phone || "No phone recorded",
-  address: data?.memberAddress || data?.address || "Address not recorded",
+  email: data?.email || "No email recorded",
+  phone: data?.phone || "No phone recorded",
+  address: data?.address || "Address not recorded",
 });
 
 const formatDate = (date?: string) => {
@@ -382,7 +382,7 @@ const MemberDetail = memo(() => {
                     <InfoTile label="Email" value={contact.email} icon={LuMail} accent="blue.500" />
                     <InfoTile label="Phone" value={contact.phone} icon={LuPhone} accent="green.500" />
                     <InfoTile label="Address" value={contact.address} icon={LuMapPin} accent="orange.500" />
-                    <InfoTile label="Gender" value={member?.data.memberGender || member?.data.gender || "Not recorded"} icon={LuShieldCheck} accent="purple.500" />
+                    <InfoTile label="Gender" value={member?.data.gender || "Not recorded"} icon={LuShieldCheck} accent="purple.500" />
                   </SimpleGrid>
                 </VStack>
               </SurfaceCard>

@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo } from "react";
-import { Badge, Box, Button, Text, VStack, Circle, HStack, Progress } from "@chakra-ui/react";
+import React, { useCallback, useEffect, useMemo } from "react";
+import { Badge, Box, Button, HStack, Text, VStack } from "@chakra-ui/react";
 import {
   DialogBody,
   DialogContent,
@@ -8,211 +8,201 @@ import {
   DialogRoot,
 } from "@/components/ui/dialog";
 import { CloseButton } from "@/components/ui/close-button";
-import { motion } from "framer-motion";
 import { LuCircleCheck, LuCircleX, LuTriangleAlert, LuInfo } from "react-icons/lu";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { useApiResponseModalStore } from "@/core/store/useApiResponseModalStore";
 
-const MotionCircle = motion.create(Circle as any);
-const MotionBox = motion.create(Box as any);
+// ─── Status Visual Config ────────────────────────────────────────────────────
+// Maps each status type to its Chakra color palette and icon.
+// Uses the project's existing palette tokens (green, red, orange, blue).
+const STATUS_MAP = {
+  success: { palette: "green", icon: <LuCircleCheck size={24} /> },
+  error: { palette: "red", icon: <LuCircleX size={24} /> },
+  warning: { palette: "orange", icon: <LuTriangleAlert size={24} /> },
+  info: { palette: "blue", icon: <LuInfo size={24} /> },
+} as const;
 
-const getStatusConfig = (status?: "success" | "error" | "warning" | "info") => {
-  switch (status) {
-    case "success":
-      return {
-        palette: "green",
-        icon: <LuCircleCheck size="32px" />,
-        shadow: "0 18px 42px -24px var(--chakra-colors-green-500)",
-        glow: "green.500/20",
-      };
-    case "warning":
-      return {
-        palette: "orange",
-        icon: <LuTriangleAlert size="32px" />,
-        shadow: "0 18px 42px -24px var(--chakra-colors-orange-500)",
-        glow: "orange.500/20",
-      };
-    case "info":
-      return {
-        palette: "blue",
-        icon: <LuInfo size="32px" />,
-        shadow: "0 18px 42px -24px var(--chakra-colors-blue-500)",
-        glow: "blue.500/20",
-      };
-    default:
-      return {
-        palette: "red",
-        icon: <LuCircleX size="32px" />,
-        shadow: "0 18px 42px -24px var(--chakra-colors-red-500)",
-        glow: "red.500/20",
-      };
-  }
-};
+const FALLBACK_STATUS = STATUS_MAP.error;
+const AUTO_CLOSE_DEFAULT_MS = 2500;
 
 /**
  * ApiResponseModalAlert
- * A premium, state-of-the-art modal for API feedback.
- * Features glassmorphism, spring animations, and status-driven aesthetics.
+ *
+ * Minimal, user-friendly API feedback modal.
+ * Uses project semantic tokens (app.card.*, app.text.*) for consistent theming.
+ * Zustand selectors are individual for granular re-render control.
  */
 const ApiResponseModalAlert: React.FC = () => {
-  const open = useApiResponseModalStore((state) => state.open);
-  const payload = useApiResponseModalStore((state) => state.config);
-  const onClose = useApiResponseModalStore((state) => state.closeModal);
-  const bg = useColorModeValue("white", "navy.900");
-  const borderColor = useColorModeValue("secondaryGray.200", "whiteAlpha.200");
-  const textMuted = useColorModeValue("secondaryGray.700", "secondaryGray.400");
-  const surfaceBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
-  const progressTrackBg = useColorModeValue("secondaryGray.200", "whiteAlpha.200");
-  const iconSurfaceBg = useColorModeValue("white", "navy.800");
-  const titleColor = useColorModeValue("secondaryGray.900", "white");
-  const closeBtnBg = useColorModeValue("whiteAlpha.900", "blackAlpha.400");
-  const closeBtnBorder = useColorModeValue("gray.200", "whiteAlpha.300");
-  const closeBtnHoverBg = useColorModeValue("gray.100", "whiteAlpha.300");
-  const gradientTop = useColorModeValue(
-    "linear-gradient(100deg, rgba(66,42,251,0.12) 0%, rgba(57,101,255,0.10) 55%, rgba(1,181,116,0.08) 100%)",
-    "linear-gradient(100deg, rgba(66,42,251,0.28) 0%, rgba(54,82,186,0.24) 55%, rgba(1,181,116,0.20) 100%)"
+  const open = useApiResponseModalStore((s) => s.open);
+  const payload = useApiResponseModalStore((s) => s.config);
+  const closeStore = useApiResponseModalStore((s) => s.closeModal);
+
+  // ── Project semantic tokens ──
+  const cardBg = useColorModeValue("white", "navy.800");
+  const cardBorder = useColorModeValue("app.card.border", "app.card.border");
+  const textPrimary = useColorModeValue("app.text.primary", "app.text.primary");
+  const textMuted = useColorModeValue("app.text.muted", "app.text.muted");
+  const msgBg = useColorModeValue("secondaryGray.300", "whiteAlpha.50");
+
+  const status = useMemo(
+    () => STATUS_MAP[payload?.type ?? "error"] ?? FALLBACK_STATUS,
+    [payload?.type]
   );
 
-  const config = useMemo(() => getStatusConfig(payload?.type), [payload?.type]);
-
+  // ── Auto-close effect ──
   useEffect(() => {
     if (!open || !payload?.autoClose) return;
-    const timeout = setTimeout(() => onClose(), payload.duration ?? 2500);
-    return () => clearTimeout(timeout);
-  }, [open, onClose, payload?.autoClose, payload?.duration]);
+    const id = setTimeout(closeStore, payload.duration ?? AUTO_CLOSE_DEFAULT_MS);
+    return () => clearTimeout(id);
+  }, [open, payload?.autoClose, payload?.duration, closeStore]);
 
-  if (!payload) return null;
+  // ── Stable handlers ──
+  const handleConfirm = useCallback(() => {
+    payload?.onConfirm?.();
+    closeStore();
+  }, [payload, closeStore]);
 
-  const handleClose = () => {
-    payload.onConfirm?.();
-    onClose();
-  };
+  const handleOpenChange = useCallback(
+    (e: { open: boolean }) => {
+      if (!e.open) handleConfirm();
+    },
+    [handleConfirm]
+  );
 
+  // Always render DialogRoot so Chakra can properly clean up the backdrop
+  // on close. Guarding with `if (!payload) return null` would unmount the
+  // dialog mid-exit-animation, leaving an invisible overlay blocking clicks.
   return (
     <DialogRoot
       open={open}
-      onOpenChange={(e) => !e.open && handleClose()}
+      onOpenChange={handleOpenChange}
       placement="center"
       motionPreset="scale"
     >
       <DialogContent
-        maxW={{ base: "92vw", md: "500px" }}
-        rounded="3xl"
-        bg={bg}
+        maxW={{ base: "90vw", md: "420px" }}
+        rounded="2xl"
+        bg={cardBg}
         border="1px solid"
-        borderColor={borderColor}
+        borderColor={cardBorder}
         overflow="hidden"
-        boxShadow="0 30px 70px -35px rgba(17, 28, 68, 0.55)"
-        backdropFilter="blur(20px)"
+        boxShadow="0 20px 50px -12px rgba(0,0,0,0.25)"
       >
-        <DialogHeader p={0} position="relative">
-          <CloseButton
-            position="absolute"
-            top="3"
-            right="3"
-            zIndex={5}
-            bg={closeBtnBg}
-            border="1px solid"
-            borderColor={closeBtnBorder}
-            borderRadius="full"
-            boxShadow="sm"
-            _hover={{ bg: closeBtnHoverBg }}
-            onClick={handleClose}
-            aria-label="Close alert"
-          />
-          <Progress.Root
-            value={payload.autoClose ? 100 : 0}
-            size="xs"
-            colorPalette="brand"
-            striped={payload.autoClose}
-            animated={payload.autoClose}
-            visibility={payload.autoClose ? "visible" : "hidden"}
-          >
-            <Progress.Track bg={progressTrackBg}>
-              <Progress.Range />
-            </Progress.Track>
-          </Progress.Root>
-          <Box
-            w="full"
-            p={{ base: 6, md: 8 }}
-            bgImage={gradientTop}
-            position="relative"
-            overflow="hidden"
-          >
-            <Box position="absolute" top="-20px" right="-20px" w="140px" h="140px" borderRadius="full" bg="brand.500/12" filter="blur(34px)" />
-            <Box position="absolute" bottom="-26px" left="-24px" w="120px" h="120px" borderRadius="full" bg={config.glow} filter="blur(28px)" />
+        {/* ── Close ─────────────────────────────────────────────── */}
+        <CloseButton
+          position="absolute"
+          top="3"
+          right="3"
+          zIndex={5}
+          size="sm"
+          borderRadius="full"
+          onClick={handleConfirm}
+          aria-label="Close alert"
+        />
 
-            <HStack gap={4} align="center">
-              <MotionCircle
-                initial={{ scale: 0.8, opacity: 0, y: 6 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                transition={{ duration: 0.28, ease: "easeOut" }}
-                size="64px"
-                bg={iconSurfaceBg}
-                color={`${config.palette}.500`}
-                border="1px solid"
-                borderColor={`${config.palette}.500/40`}
-                boxShadow={config.shadow}
-              >
-                {config.icon}
-              </MotionCircle>
+        {/* ── Header: icon + title ──────────────────────────────── */}
+        <DialogHeader p={0}>
+          {/* Subtle accent strip at top */}
+          <Box h="3px" bg={`${status.palette}.500`} />
 
-              <VStack align="start" gap={1}>
-                <Badge
-                  colorPalette={config.palette}
-                  variant="subtle"
-                  px={3}
-                  py={1}
-                  borderRadius="full"
-                  textTransform="uppercase"
-                  fontSize="10px"
-                  fontWeight="800"
-                  letterSpacing="widest"
-                >
-                  {payload.type}
-                </Badge>
-                <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="900" letterSpacing="tight" color={titleColor}>
-                  {payload.title}
-                </Text>
-              </VStack>
-            </HStack>
-          </Box>
+          <VStack gap={3} align="center" pt={8} pb={4} px={6}>
+            {/* Status icon circle */}
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              w="56px"
+              h="56px"
+              borderRadius="full"
+              bg={`${status.palette}.500/12`}
+              color={`${status.palette}.500`}
+            >
+              {status.icon}
+            </Box>
+
+            {/* Status badge */}
+            <Badge
+              colorPalette={status.palette}
+              variant="subtle"
+              px={2.5}
+              py={0.5}
+              borderRadius="full"
+              textTransform="uppercase"
+              fontSize="xs"
+              fontWeight="700"
+              letterSpacing="wider"
+            >
+              {payload?.type ?? "error"}
+            </Badge>
+
+            {/* Title */}
+            <Text
+              fontSize="lg"
+              fontWeight="700"
+              color={textPrimary}
+              textAlign="center"
+              lineHeight="short"
+            >
+              {payload?.title ?? ""}
+            </Text>
+          </VStack>
         </DialogHeader>
 
-        <DialogBody px={{ base: 6, md: 8 }} pt={6} pb={4}>
-          {payload.message && (
-            <MotionBox
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
+        {/* ── Body: message ─────────────────────────────────────── */}
+        {payload?.message && (
+          <DialogBody px={6} pt={0} pb={2}>
+            <Box
               p={4}
-              w="full"
               borderRadius="xl"
-              bg={surfaceBg}
+              bg={msgBg}
               border="1px solid"
-              borderColor={borderColor}
+              borderColor={cardBorder}
             >
-              <Text fontSize="sm" fontWeight="600" color={textMuted} lineHeight="tall">
+              <Text
+                fontSize="sm"
+                fontWeight="500"
+                color={textMuted}
+                lineHeight="tall"
+                textAlign="center"
+              >
                 {payload.message}
               </Text>
-            </MotionBox>
-          )}
-        </DialogBody>
+            </Box>
+          </DialogBody>
+        )}
 
-        <DialogFooter px={{ base: 6, md: 8 }} pb={{ base: 6, md: 7 }} pt={2} w="full">
-          <Button
-            w="full"
-            size="lg"
-            colorPalette="brand"
-            variant="solid"
-            fontWeight="800"
-            borderRadius="xl"
-            onClick={handleClose}
-            _hover={{ transform: "translateY(-1px)", boxShadow: "0 12px 28px -16px var(--chakra-colors-brand-500)" }}
-            transition="all 0.2s ease"
-          >
-            Continue
-          </Button>
+        {/* ── Footer: actions ───────────────────────────────────── */}
+        <DialogFooter px={6} pb={6} pt={3}>
+          <HStack w="full" gap={3}>
+            <Button
+              flex={1}
+              size="lg"
+              variant="ghost"
+              fontWeight="600"
+              borderRadius="xl"
+              color={textMuted}
+              onClick={closeStore}
+            >
+              Dismiss
+            </Button>
+            <Button
+              flex={2}
+              size="lg"
+              colorPalette="brand"
+              variant="solid"
+              fontWeight="700"
+              borderRadius="xl"
+              onClick={handleConfirm}
+              _hover={{
+                transform: "translateY(-1px)",
+                boxShadow: "0 8px 24px -8px var(--chakra-colors-brand-500)",
+              }}
+              _active={{ transform: "translateY(0)" }}
+              transition="all 0.2s ease"
+            >
+              Continue
+            </Button>
+          </HStack>
         </DialogFooter>
       </DialogContent>
     </DialogRoot>

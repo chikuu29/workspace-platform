@@ -249,8 +249,8 @@ const MenuLink = memo(({ menuConfig, showFullSideBarMenu }: MenuLinkProps) => {
                 </Box>
                 <Text
                     ref={textRef}
-                    fontSize="sm"
-                    fontWeight="500"
+                    // fontSize="sm"
+                    // fontWeight="500"
                     color="text.default"
                     whiteSpace="nowrap"
                     overflow="hidden"
@@ -331,7 +331,7 @@ const MenuLink = memo(({ menuConfig, showFullSideBarMenu }: MenuLinkProps) => {
                         p={4}
                         rounded="xl"
                         minW="sm"
-                        bg="bg.default"
+                        bg="app.card.bg"
                         zIndex="popover"
                     >
                         <Stack>

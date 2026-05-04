@@ -263,7 +263,7 @@ const Subscription = () => {
     }, [navigate, buildViewPath]);
 
     const handleViewMembers = useCallback(() => {
-        navigate(buildViewPath("ListMember"));
+        navigate(buildViewPath("members"));
     }, [navigate, buildViewPath]);
 
     // ── Plan ↔ stats map for member counts ──

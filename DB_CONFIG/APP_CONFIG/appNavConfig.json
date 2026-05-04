@@ -126,7 +126,7 @@
                             {
                                 "label": "List Members",
                                 "icon": "FcTodoList",
-                                "path": "/app/myGym/ListMember"
+                                "path": "/app/myGym/members"
                             },
                             {
                                 "label": "Add Member",
@@ -148,7 +148,7 @@
                             {
                                 "label": "List Trainers",
                                 "icon": "FcReading",
-                                "path": "/app/myGym/listTrainers"
+                                "path": "/app/myGym/trainers"
                             },
                             {
                                 "label": "Add Trainer",

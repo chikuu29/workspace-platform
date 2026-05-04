@@ -106,8 +106,8 @@ const registry: RegistryConfig = {
         layout: () => import("@/theme/layouts/workspace"),
         home: () => import("@/features/modules/gym/GymView"),
         // Member management
-        ListMember: () => import("@/features/modules/gym/ViewMember"),
-        members: () => import("@/features/modules/gym/MemberDetail"),
+        members: () => import("@/features/modules/gym/ViewMember"),
+        MemberDetail: () => import("@/features/modules/gym/MemberDetail"),
         MemberCheckIn: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.MemberCheckIn })),
         // Billing & Subscriptions
         Subscription: () => import("@/features/modules/gym/Subscription"),
@@ -116,7 +116,7 @@ const registry: RegistryConfig = {
         CreateSubscription: () => import("@/features/modules/gym/CreateSubscription"),
         PaymentsHistory: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.PaymentsHistory })),
         // Trainers
-        listTrainers: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.ListTrainers })),
+        trainers: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.trainers })),
         trainerSchedules: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.TrainerSchedules })),
         // Classes
         listClasses: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.ListClasses })),

@@ -20,8 +20,8 @@ const StubPage = memo(({ title, description, icon: Icon, accent }: StubProps) =>
 
   return (
     <Flex align="center" justify="center" minH="60vh" p={6}>
-      <Box 
-        p={12} bg={bg} borderRadius="3xl" border="1px solid" borderColor={borderColor} 
+      <Box
+        p={12} bg={bg} borderRadius="3xl" border="1px solid" borderColor={borderColor}
         textAlign="center" maxW="lg" boxShadow="xl"
       >
         <VStack gap={6}>
@@ -44,7 +44,7 @@ StubPage.displayName = "StubPage";
 import { LuSquareCheck, LuUsers, LuCalendarDays, LuTrendingUp, LuChartBar, LuCreditCard } from "react-icons/lu";
 
 export const MemberCheckIn = () => <StubPage title="Member Check-In" description="Real-time scan and log system for gym entries." icon={LuSquareCheck} accent="teal" />;
-export const ListTrainers = () => <StubPage title="Trainer Directory" description="Manage staff profiles and specializations." icon={LuUsers} accent="blue" />;
+export const trainers = () => <StubPage title="Trainer Directory" description="Manage staff profiles and specializations." icon={LuUsers} accent="blue" />;
 export const TrainerSchedules = () => <StubPage title="Trainer Schedules" description="Weekly timetables and PT booking slots." icon={LuCalendarDays} accent="green" />;
 export const ListClasses = () => <StubPage title="Class Catalog" description="Group session management and capacity tracking." icon={LuCalendarDays} accent="purple" />;
 export const AddClass = () => <StubPage title="Create Class" description="Define new group workout sessions." icon={LuCalendarDays} accent="purple" />;

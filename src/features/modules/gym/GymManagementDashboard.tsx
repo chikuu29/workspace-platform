@@ -248,7 +248,7 @@ const GymManagementDashboard = memo(() => {
         subtitle="Live overview for members, renewals, floor activity, and revenue performance."
         actions={
           <HStack gap={3}>
-            <Button variant="outline" borderRadius="xl" onClick={() => navigateTo("ListMember")} fontWeight="900">
+            <Button variant="outline" borderRadius="xl" onClick={() => navigateTo("members")} fontWeight="900">
               <LuUsers size={16} /> Directory
             </Button>
             <Button colorPalette="blue" borderRadius="xl" onClick={() => navigateTo("AddMember")} fontWeight="900">
@@ -366,7 +366,7 @@ const GymManagementDashboard = memo(() => {
                     <Heading size="sm" fontWeight="900">
                       Recent Enrollments
                     </Heading>
-                    <Button variant="ghost" size="xs" borderRadius="lg" onClick={() => navigateTo("ListMember")} fontWeight="900">
+                    <Button variant="ghost" size="xs" borderRadius="lg" onClick={() => navigateTo("members")} fontWeight="900">
                       View all
                     </Button>
                   </HStack>

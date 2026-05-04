@@ -125,8 +125,8 @@ const DialogRenderer = memo(() => {
         <Dialog.Root
             open={isOpen}
             onOpenChange={handleOpenChange}
-            // size={dialogConfig.size ?? "xl"}
-            size={"full"}
+            size={dialogConfig.size ?? "full"}
+            // size={"lg"}
             placement="center"
             motionPreset="slide-in-bottom"
             scrollBehavior={dialogConfig.scrollBehavior ?? "inside"}

@@ -1,9 +1,8 @@
 /**
  * Subscription.tsx
  *
- * Subscription dashboard — API-driven overview of subscription plans,
- * subscriber stats, and quick actions. Replaces the previous version
- * that used 100% hardcoded mock data.
+ * Subscription dashboard with High-Fidelity Glassmorphism and Gradient Borders.
+ * API-driven overview of subscription plans, subscriber stats, and quick actions.
  */
 
 import { memo, useCallback, useMemo } from "react";
@@ -26,7 +25,6 @@ import { useLocation, useNavigate, useParams, useSearchParams } from "react-rout
 import {
     LuArrowRight,
     LuBadgeDollarSign,
-    LuCalendarClock,
     LuChartColumn,
     LuCircleDollarSign,
     LuCreditCard,
@@ -38,10 +36,61 @@ import {
     LuWallet,
 } from "react-icons/lu";
 import { PageLayout } from "@/core/components/PageLayout";
-import { Card } from "@/core/components/Card";
 import { useSubscriptionPlans } from "./hooks/useSubscriptionPlans";
 import { useSubscriptionStats } from "./hooks/useSubscriptionStats";
 import type { SubscriptionPlanDocument, PlanWithMembers } from "./types/Gym.types";
+
+// ─── Glassmorphic Card Wrapper ──────────────────────────────────────────────
+
+interface GlassCardProps {
+    children: React.ReactNode;
+    p?: number | string;
+    h?: string;
+    accentColor?: string;
+    onClick?: () => void;
+    cursor?: string;
+}
+
+const GlassCard = memo(({ children, p = 6, h, accentColor = "blue", onClick, cursor }: GlassCardProps) => {
+    const bg = useColorModeValue("rgba(255, 255, 255, 0.4)", "rgba(15, 23, 42, 0.6)");
+    const borderColor = useColorModeValue("rgba(255, 255, 255, 0.6)", "rgba(255, 255, 255, 0.1)");
+    const shadow = useColorModeValue(
+        "0 8px 32px 0 rgba(31, 38, 135, 0.07)",
+        "0 8px 32px 0 rgba(0, 0, 0, 0.37)"
+    );
+
+    // Gradient border logic using a wrapper and an inner box
+    return (
+        <Box
+            position="relative"
+            borderRadius="2xl"
+            p="1px" // The thickness of the gradient border
+            bgGradient={`linear(to-br, ${accentColor}.400, transparent, ${accentColor}.400)`}
+            transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+            _hover={{
+                transform: "translateY(-4px)",
+                bgGradient: `linear(to-br, ${accentColor}.500, ${accentColor}.200, ${accentColor}.500)`,
+                boxShadow: `0 12px 40px -10px var(--chakra-colors-${accentColor}-500)`,
+            }}
+            h={h}
+            onClick={onClick}
+            cursor={cursor}
+        >
+            <Box
+                bg={bg}
+                backdropFilter="blur(20px)"
+                borderRadius="calc(var(--chakra-radii-2xl) - 1px)"
+                p={p}
+                h="full"
+                border="1px solid"
+                borderColor={borderColor}
+            >
+                {children}
+            </Box>
+        </Box>
+    );
+});
+GlassCard.displayName = "GlassCard";
 
 // ─── KPI Tile ───────────────────────────────────────────────────────────────
 
@@ -54,25 +103,34 @@ interface KpiTileProps {
 }
 
 const KpiTile = memo(({ label, value, helper, icon: IconComponent, accent }: KpiTileProps) => {
-    const iconBg = useColorModeValue(`${accent}.50`, "whiteAlpha.100");
+    const iconBg = useColorModeValue(`${accent}.50`, "rgba(255, 255, 255, 0.05)");
     const iconColor = useColorModeValue(`${accent}.600`, `${accent}.300`);
-    const muted = useColorModeValue("gray.600", "gray.300");
+    const muted = useColorModeValue("gray.600", "gray.400");
 
     return (
-        <Card p={5}>
-            <VStack align="stretch" gap={3}>
-                <Circle size="10" bg={iconBg} color={iconColor}>
-                    <IconComponent size={18} />
-                </Circle>
+        <GlassCard p={5} accentColor={accent}>
+            <VStack align="stretch" gap={4}>
+                <Flex justify="space-between" align="center">
+                    <Circle size="12" bg={iconBg} color={iconColor} shadow="inner">
+                        <IconComponent size={20} />
+                    </Circle>
+                    <Badge colorPalette={accent} variant="surface" borderRadius="full">
+                        Live
+                    </Badge>
+                </Flex>
                 <VStack align="start" gap="0.5">
-                    <Text fontSize="xs" fontWeight="700" color={muted} letterSpacing="wide" textTransform="uppercase">
+                    <Text fontSize="xs" fontWeight="800" color={muted} letterSpacing="wider" textTransform="uppercase">
                         {label}
                     </Text>
-                    <Heading size="lg" letterSpacing="tighter">{value}</Heading>
-                    <Text fontSize="xs" color={muted}>{helper}</Text>
+                    <Heading size="2xl" letterSpacing="tight" fontWeight="900">
+                        {value}
+                    </Heading>
+                    <Text fontSize="xs" color={muted} fontWeight="500">
+                        {helper}
+                    </Text>
                 </VStack>
             </VStack>
-        </Card>
+        </GlassCard>
     );
 });
 KpiTile.displayName = "KpiTile";
@@ -87,118 +145,84 @@ interface PlanSummaryCardProps {
 const PlanSummaryCard = memo(({ plan, memberInfo }: PlanSummaryCardProps) => {
     const accent = plan.data.accent_color || "blue";
     const muted = useColorModeValue("gray.500", "gray.400");
-    const softSurface = useColorModeValue("rgba(0,0,0,0.02)", "whiteAlpha.50");
-    const accentBg = useColorModeValue(`${accent}.50`, "whiteAlpha.100");
+    const softSurface = useColorModeValue("rgba(0,0,0,0.03)", "whiteAlpha.100");
+    const accentBg = useColorModeValue(`${accent}.100`, "whiteAlpha.200");
     const accentColor = useColorModeValue(`${accent}.600`, `${accent}.300`);
 
     const memberCount = memberInfo?.member_count ?? 0;
     const planRevenue = memberInfo?.revenue ?? 0;
 
     return (
-        <Card p={6} h="full">
-            <VStack align="stretch" gap={5} h="full">
+        <GlassCard p={6} h="full" accentColor={accent}>
+            <VStack align="stretch" gap={6} h="full">
                 {/* Header */}
                 <Flex justify="space-between" align="start" gap={3}>
-                    <VStack align="start" gap="1">
+                    <VStack align="start" gap={2}>
                         <Badge
                             colorPalette={accent}
-                            variant="subtle"
+                            variant="solid"
                             borderRadius="full"
                             px="3"
-                            py="1"
-                            fontWeight="bold"
+                            fontSize="2xs"
+                            fontWeight="900"
                         >
-                            {plan.data.is_active ? "Live" : "Inactive"}
+                            {plan.data.is_active ? "ACTIVE PLAN" : "INACTIVE"}
                         </Badge>
-                        <Heading size="md" letterSpacing="tight">{plan.data.name}</Heading>
-                        <Text color={muted} fontSize="md" fontWeight="600">
-                            ${plan.data.price.toLocaleString()}{" "}
-                            <Text as="span" color={muted} fontSize="sm" fontWeight="normal">
+                        <Heading size="xl" fontWeight="900" letterSpacing="tight">
+                            {plan.data.name}
+                        </Heading>
+                        <HStack align="baseline" gap={1}>
+                            <Text fontSize="2xl" fontWeight="900">
+                                ${plan.data.price.toLocaleString()}
+                            </Text>
+                            <Text color={muted} fontSize="xs" fontWeight="700" textTransform="uppercase">
                                 / {plan.data.billing_cycle}
                             </Text>
-                        </Text>
+                        </HStack>
                     </VStack>
-                    <Circle size="10" bg={accentBg} color={accentColor}>
-                        <LuCreditCard size={18} />
+                    <Circle size="12" bg={accentBg} color={accentColor} shadow="md">
+                        <LuCreditCard size={22} />
                     </Circle>
                 </Flex>
 
-                {/* Stats row */}
+                {/* Stats row with glass containers */}
                 <SimpleGrid columns={2} gap={3}>
-                    <Box p={3} borderRadius="xl" bg={softSurface}>
-                        <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" color={muted} fontWeight="700">
+                    <Box p={4} borderRadius="2xl" bg={softSurface} border="1px solid" borderColor="whiteAlpha.200">
+                        <Text fontSize="2xs" textTransform="uppercase" letterSpacing="widest" color={muted} fontWeight="800">
                             Members
                         </Text>
-                        <Heading size="sm" mt={1}>{memberCount}</Heading>
+                        <Heading size="md" mt={1} fontWeight="900">{memberCount}</Heading>
                     </Box>
-                    <Box p={3} borderRadius="xl" bg={softSurface}>
-                        <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" color={muted} fontWeight="700">
+                    <Box p={4} borderRadius="2xl" bg={softSurface} border="1px solid" borderColor="whiteAlpha.200">
+                        <Text fontSize="2xs" textTransform="uppercase" letterSpacing="widest" color={muted} fontWeight="800">
                             MRR
                         </Text>
-                        <Heading size="sm" mt={1}>${planRevenue.toLocaleString()}</Heading>
+                        <Heading size="md" mt={1} fontWeight="900">${planRevenue.toLocaleString()}</Heading>
                     </Box>
                 </SimpleGrid>
 
                 {/* Features */}
-                <Separator opacity={0.08} />
-                <VStack align="stretch" gap={2} flex="1">
+                <Separator opacity={0.1} />
+                <VStack align="stretch" gap={3} flex="1">
                     {plan.data.features.slice(0, 3).map((feature) => (
-                        <HStack key={feature} gap={2} color={muted}>
-                            <Circle size="5" bg={accentBg} color={accentColor}>
-                                <LuShieldCheck size={10} />
+                        <HStack key={feature} gap={3}>
+                            <Circle size="6" bg={accentBg} color={accentColor}>
+                                <LuShieldCheck size={14} />
                             </Circle>
-                            <Text fontSize="xs" fontWeight="600">{feature}</Text>
+                            <Text fontSize="sm" fontWeight="600" color="app.text.primary">{feature}</Text>
                         </HStack>
                     ))}
                     {plan.data.features.length > 3 && (
-                        <Text fontSize="xs" color={muted} fontWeight="500">
-                            +{plan.data.features.length - 3} more features
+                        <Text fontSize="xs" color={muted} fontWeight="700" pl={9}>
+                            + {plan.data.features.length - 3} MORE PRIVILEGES
                         </Text>
                     )}
                 </VStack>
             </VStack>
-        </Card>
+        </GlassCard>
     );
 });
 PlanSummaryCard.displayName = "PlanSummaryCard";
-
-// ─── Empty State ────────────────────────────────────────────────────────────
-
-interface EmptyStateProps {
-    onCreatePlan: () => void;
-}
-
-const EmptyState = memo(({ onCreatePlan }: EmptyStateProps) => {
-    const muted = useColorModeValue("gray.500", "gray.400");
-
-    return (
-        <Card p={12} borderRadius="2xl">
-            <VStack gap={5} textAlign="center">
-                <Circle size={16} bg="blue.500/10" color="blue.500">
-                    <LuLayers size={28} />
-                </Circle>
-                <VStack gap={2}>
-                    <Heading size="lg" fontWeight="800">No subscription plans yet</Heading>
-                    <Text fontSize="sm" color={muted} maxW="md">
-                        Create your first subscription plan to start managing gym memberships,
-                        billing cycles, and member enrollments.
-                    </Text>
-                </VStack>
-                <Button
-                    colorPalette="blue"
-                    size="lg"
-                    borderRadius="xl"
-                    px={8}
-                    onClick={onCreatePlan}
-                >
-                    <LuPlus size={16} />
-                    Create First Plan
-                </Button>
-            </VStack>
-        </Card>
-    );
-});
-EmptyState.displayName = "EmptyState";
 
 // ─── Main ───────────────────────────────────────────────────────────────────
 
@@ -259,78 +283,91 @@ const Subscription = () => {
     return (
         <PageLayout
             title={
-                <HStack gap={3}>
-                    <Circle size={10} bg="blue.500" color="white" shadow="0 0 20px rgba(59, 130, 246, 0.4)">
-                        <LuWallet size={20} />
+                <HStack gap={4}>
+                    <Circle size="12" bgGradient="linear(to-br, blue.500, cyan.400)" color="white" shadow="0 0 30px rgba(59, 130, 246, 0.5)">
+                        <LuWallet size={24} />
                     </Circle>
-                    <Text>Subscription Dashboard</Text>
+                    <VStack align="start" gap={0}>
+                        <Heading size="xl" fontWeight="950" letterSpacing="tighter">
+                            Subscription Hub
+                        </Heading>
+                        <Text fontSize="xs" fontWeight="700" color={muted} letterSpacing="widest">
+                            GYM BILLING & REVENUE ANALYTICS
+                        </Text>
+                    </VStack>
                 </HStack>
             }
-            subtitle="Manage billing health across all gym plans, review subscribers, and launch plan upgrades."
+            subtitle="Real-time membership health, revenue forecasting, and plan management."
             actions={
-                <HStack gap={3} flexWrap="wrap">
+                <HStack gap={4} flexWrap="wrap">
                     <Button
                         colorPalette="blue"
-                        borderRadius="xl"
+                        borderRadius="2xl"
                         size="lg"
-                        px={6}
-                        shadow="0 10px 20px -5px rgba(59, 130, 246, 0.3)"
+                        px={8}
+                        h="56px"
+                        fontWeight="900"
+                        shadow="0 15px 35px -10px rgba(59, 130, 246, 0.4)"
                         onClick={handleCreatePlan}
+                        _hover={{ transform: "translateY(-2px)", shadow: "0 20px 40px -10px rgba(59, 130, 246, 0.6)" }}
                     >
-                        <LuPlus style={{ marginRight: "6px" }} /> New Plan
+                        <LuPlus style={{ marginRight: "8px" }} /> New Plan
                     </Button>
                     <Button
                         variant="surface"
-                        borderRadius="xl"
+                        borderRadius="2xl"
                         size="lg"
+                        h="56px"
+                        px={8}
+                        fontWeight="900"
                         onClick={handleManagePlans}
                     >
-                        <LuSettings style={{ marginRight: "6px" }} /> Manage Plans
+                        <LuSettings style={{ marginRight: "8px" }} /> Management
                     </Button>
                 </HStack>
             }
             onRefresh={handleRefresh}
             isRefreshing={plansLoading || statsLoading}
         >
-            <VStack align="stretch" gap={8} pb={4}>
+            <VStack align="stretch" gap={10} pb={8}>
 
                 {/* ── KPI Row ─────────────────────────────────────────── */}
-                <SimpleGrid columns={{ base: 2, md: 4 }} gap={4}>
+                <SimpleGrid columns={{ base: 1, sm: 2, lg: 4 }} gap={6}>
                     {statsLoading ? (
                         [1, 2, 3, 4].map((i) => (
-                            <Skeleton key={i} height="130px" borderRadius="2xl" />
+                            <Skeleton key={i} height="160px" borderRadius="3xl" />
                         ))
                     ) : (
                         <>
                             <KpiTile
-                                label="Active Plans"
+                                label="Live Portfolios"
                                 value={String(stats?.active_plans ?? 0)}
-                                helper={`${stats?.total_plans ?? 0} total plans configured`}
+                                helper={`${stats?.total_plans ?? 0} Global Tiers`}
                                 icon={LuLayers}
                                 accent="blue"
                             />
                             <KpiTile
                                 label="Subscribers"
                                 value={String(stats?.total_subscribers ?? 0)}
-                                helper="Active memberships"
+                                helper="Active Memberships"
                                 icon={LuUsers}
                                 accent="green"
                             />
                             <KpiTile
-                                label="Monthly Revenue"
+                                label="Projected MRR"
                                 value={`$${(stats?.total_mrr ?? 0).toLocaleString()}`}
-                                helper="Normalized MRR"
+                                helper="Recurring Revenue"
                                 icon={LuCircleDollarSign}
                                 accent="orange"
                             />
                             <KpiTile
-                                label="Avg Plan Value"
+                                label="Unit Economy"
                                 value={
                                     stats && stats.total_subscribers > 0
                                         ? `$${Math.round(stats.total_mrr / stats.total_subscribers)}`
                                         : "$0"
                                 }
-                                helper="Per subscriber per month"
+                                helper="Average Revenue / User"
                                 icon={LuChartColumn}
                                 accent="purple"
                             />
@@ -339,12 +376,15 @@ const Subscription = () => {
                 </SimpleGrid>
 
                 {/* ── Plans Grid ──────────────────────────────────────── */}
-                <VStack align="stretch" gap={4}>
-                    <Flex justify="space-between" align="center">
+                <VStack align="stretch" gap={6}>
+                    <Flex justify="space-between" align="end">
                         <VStack align="start" gap={1}>
-                            <Heading size="md" letterSpacing="tight">Subscription Plans</Heading>
-                            <Text fontSize="sm" color={muted}>
-                                Your active plan portfolio and subscriber distribution
+                            <HStack gap={2}>
+                                <Box w="4px" h="20px" bg="blue.500" borderRadius="full" />
+                                <Heading size="lg" fontWeight="950" letterSpacing="tight">Active Tiers</Heading>
+                            </HStack>
+                            <Text fontSize="sm" color={muted} fontWeight="600">
+                                Monitor performance and distribution across all subscription levels
                             </Text>
                         </VStack>
                         <Button
@@ -352,21 +392,20 @@ const Subscription = () => {
                             size="sm"
                             borderRadius="xl"
                             onClick={handleManagePlans}
+                            fontWeight="800"
                         >
-                            View all <LuArrowRight size={14} />
+                            Catalog Overview <LuArrowRight size={14} style={{ marginLeft: "4px" }} />
                         </Button>
                     </Flex>
 
                     {plansLoading ? (
-                        <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} gap={5}>
+                        <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} gap={6}>
                             {[1, 2, 3].map((i) => (
-                                <Skeleton key={i} height="280px" borderRadius="2xl" />
+                                <Skeleton key={i} height="320px" borderRadius="3xl" />
                             ))}
                         </SimpleGrid>
-                    ) : plans.length === 0 ? (
-                        <EmptyState onCreatePlan={handleCreatePlan} />
                     ) : (
-                        <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} gap={5}>
+                        <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} gap={8}>
                             {plans.map((plan) => (
                                 <PlanSummaryCard
                                     key={plan._id}
@@ -378,49 +417,49 @@ const Subscription = () => {
                     )}
                 </VStack>
 
-                {/* ── Quick Actions ───────────────────────────────────── */}
-                <SimpleGrid columns={{ base: 1, md: 3 }} gap={5}>
-                    <Card p={5} cursor="pointer" onClick={handleCreatePlan}>
-                        <VStack align="start" gap={3}>
-                            <Circle size="10" bg="blue.500/10" color="blue.500">
-                                <LuBadgeDollarSign size={18} />
+                {/* ── Quick Access ───────────────────────────────────── */}
+                <SimpleGrid columns={{ base: 1, md: 3 }} gap={6}>
+                    <GlassCard p={6} cursor="pointer" onClick={handleCreatePlan} accentColor="blue">
+                        <VStack align="start" gap={4}>
+                            <Circle size="12" bg="blue.500/10" color="blue.500">
+                                <LuBadgeDollarSign size={24} />
                             </Circle>
-                            <VStack align="start" gap="0.5">
-                                <Heading size="sm" letterSpacing="tight">Create New Plan</Heading>
-                                <Text fontSize="xs" color={muted}>
-                                    Design a new membership tier with pricing and features.
+                            <VStack align="start" gap="1">
+                                <Heading size="md" fontWeight="900" letterSpacing="tight">Plan Architect</Heading>
+                                <Text fontSize="xs" color={muted} fontWeight="600">
+                                    Configure new membership tiers with dynamic pricing.
                                 </Text>
                             </VStack>
                         </VStack>
-                    </Card>
+                    </GlassCard>
 
-                    <Card p={5} cursor="pointer" onClick={handleManagePlans}>
-                        <VStack align="start" gap={3}>
-                            <Circle size="10" bg="green.500/10" color="green.500">
-                                <LuSettings size={18} />
+                    <GlassCard p={6} cursor="pointer" onClick={handleManagePlans} accentColor="green">
+                        <VStack align="start" gap={4}>
+                            <Circle size="12" bg="green.500/10" color="green.500">
+                                <LuSettings size={24} />
                             </Circle>
-                            <VStack align="start" gap="0.5">
-                                <Heading size="sm" letterSpacing="tight">Manage Plans</Heading>
-                                <Text fontSize="xs" color={muted}>
-                                    Edit pricing, features, and toggle availability.
+                            <VStack align="start" gap="1">
+                                <Heading size="md" fontWeight="900" letterSpacing="tight">System Config</Heading>
+                                <Text fontSize="xs" color={muted} fontWeight="600">
+                                    Audit pricing models, features, and active statuses.
                                 </Text>
                             </VStack>
                         </VStack>
-                    </Card>
+                    </GlassCard>
 
-                    <Card p={5} cursor="pointer" onClick={handleViewMembers}>
-                        <VStack align="start" gap={3}>
-                            <Circle size="10" bg="orange.500/10" color="orange.500">
-                                <LuUsers size={18} />
+                    <GlassCard p={6} cursor="pointer" onClick={handleViewMembers} accentColor="orange">
+                        <VStack align="start" gap={4}>
+                            <Circle size="12" bg="orange.500/10" color="orange.500">
+                                <LuUsers size={24} />
                             </Circle>
-                            <VStack align="start" gap="0.5">
-                                <Heading size="sm" letterSpacing="tight">View Members</Heading>
-                                <Text fontSize="xs" color={muted}>
-                                    Browse all enrolled members and their subscription status.
+                            <VStack align="start" gap="1">
+                                <Heading size="md" fontWeight="900" letterSpacing="tight">Member Ledger</Heading>
+                                <Text fontSize="xs" color={muted} fontWeight="600">
+                                    Analyze enrollment data and subscription lifecycles.
                                 </Text>
                             </VStack>
                         </VStack>
-                    </Card>
+                    </GlassCard>
                 </SimpleGrid>
             </VStack>
         </PageLayout>

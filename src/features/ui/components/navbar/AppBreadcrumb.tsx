@@ -1,9 +1,10 @@
 import { ColorModeButton, useColorModeValue } from "@/components/ui/color-mode";
 import { useBreadcrumbActionsStore } from "@/core/store/useBreadcrumbActionsStore";
 import { FullscreenButton } from "@/components/ui/fullscreen-button";
-import { Box, Breadcrumb, Flex, HStack, Text } from "@chakra-ui/react";
+import { Box, Breadcrumb, Flex, HStack, IconButton, Text } from "@chakra-ui/react";
 import React, { forwardRef, useEffect, useState, useMemo } from "react";
 import {
+  LuArrowLeft,
   LuHouse,
   LuBox,
   LuLayers,
@@ -102,7 +103,6 @@ const AppBreadcrumb = forwardRef((props, ref) => {
     <Box
       w="100%"
       px={{ base: "3", sm: "4", md: "6" }}
-      // py={{ base: "2.5", md: "2" }}
       borderBottom="1px solid"
       borderColor={borderColorValue}
       bg={"app.card.bg"}
@@ -119,8 +119,37 @@ const AppBreadcrumb = forwardRef((props, ref) => {
         justifyContent="space-between"
         gap={{ base: "3", md: "4" }}
       >
-        <Box flex="1" minW="0" overflow="hidden">
+        <HStack gap="0" flex="1" minW="0" overflow="hidden">
+          {config.length > 1 && (
+            <HStack gap="2" align="center">
+              <HStack
+                gap={{ base: "1.5", md: "2" }}
+                px={{ base: "2.5", md: "3" }}
+                py="1.5"
+                rounded="lg"
+                transition="all 0.2s"
+                cursor="pointer"
+                onClick={() => navigate(-1)}
+                _hover={{ bg: hoverBg, transform: "translateY(-1px)" }}
+                color={inactiveColor}
+                minW="fit-content"
+              >
+                <LuArrowLeft size="14" />
+                <Text
+                  fontWeight="600"
+                  fontSize={{ base: "11px", md: "xs" }}
+                  letterSpacing="tight"
+                >
+                  Back
+                </Text>
+              </HStack>
+              <LuChevronRight size="12" color={inactiveColor} />
+            </HStack>
+          )}
+
           <Box
+            flex="1"
+            minW="0"
             overflowX="auto"
             overflowY="hidden"
             whiteSpace="nowrap"
@@ -173,7 +202,7 @@ const AppBreadcrumb = forwardRef((props, ref) => {
               </Breadcrumb.List>
             </Breadcrumb.Root>
           </Box>
-        </Box>
+        </HStack>
 
         {breadcrumbActions && (
           <Box
@@ -184,28 +213,6 @@ const AppBreadcrumb = forwardRef((props, ref) => {
             {breadcrumbActions}
           </Box>
         )}
-
-        {/* <HStack
-          gap="3"
-          justify={{ base: "flex-end", md: "flex-start" }}
-          alignSelf={{ base: "stretch", md: "center" }}
-          flexShrink={0}
-        >
-          <Flex
-            p="1"
-            bg={controlsBg}
-            rounded="xl"
-            border="1px solid"
-            borderColor={controlsBorder}
-            justify="center"
-            align="center"
-            w={{ base: "full", sm: "auto" }}
-          >
-            <ColorModeButton variant="ghost" size="sm" rounded="lg" />
-            <FullscreenButton variant="ghost" size="sm" rounded="lg" />
-          </Flex>
-
-        </HStack> */}
       </Flex>
     </Box>
   );

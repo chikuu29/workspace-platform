@@ -20,10 +20,10 @@ import {
   IconButton,
   Separator,
   SimpleGrid,
-  Skeleton,
   Text,
   VStack,
 } from "@chakra-ui/react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router";
 import {
@@ -267,15 +267,57 @@ const MemberTile = memo(({
 
         <Separator opacity={0.35} />
 
-        <HStack justify="space-between" gap={4}>
-          <VStack align="start" gap={0.5} minW={0}>
-            <Text fontSize="10px" color={muted} fontWeight="900" textTransform="uppercase">
-              Membership
-            </Text>
-            <Text fontSize="sm" fontWeight="900" color="app.text.primary" truncate>
-              {data.plan || "Standard Plan"}
-            </Text>
-          </VStack>
+        <HStack justify="space-between" gap={3}>
+          {member.has_plan === false ? (
+            <HStack
+              flex={1} p={2.5} borderRadius="xl"
+              bg="red.500/8" border="1px solid" borderColor="red.500/15"
+              gap={2.5}
+            >
+              <Circle size="7" bg="red.500/15" color="red.500">
+                <LuActivity size={12} />
+              </Circle>
+              <VStack align="start" gap={0} minW={0}>
+                <Text fontSize="xs" fontWeight="900" color="red.500">
+                  No Plan Assigned
+                </Text>
+                <Text fontSize="2xs" color={muted} fontWeight="700">
+                  Enroll in a subscription
+                </Text>
+              </VStack>
+            </HStack>
+          ) : (
+            <HStack
+              flex={1} p={2.5} borderRadius="xl"
+              bg={statusTheme.bg} border="1px solid" borderColor={statusTheme.border}
+              gap={2.5} minW={0}
+            >
+              <Circle size="7" bg={statusTheme.bg} color={statusTheme.accent}>
+                <LuCalendarDays size={12} />
+              </Circle>
+              <VStack align="start" gap={0} flex={1} minW={0}>
+                <Text fontSize="xs" fontWeight="900" color="app.text.primary" truncate>
+                  {member.subscription?.plan_name || data.plan || "Standard Plan"}
+                </Text>
+                {member.subscription && (
+                  <Text fontSize="2xs" color={muted} fontWeight="700">
+                    {new Intl.NumberFormat(undefined, {
+                      style: "currency",
+                      currency: member.subscription.currency || "USD",
+                      maximumFractionDigits: 0,
+                    }).format(member.subscription.price)}
+                    {" / "}
+                    {member.subscription.billing_cycle}
+                    {member.subscription.is_paid
+                      ? " · ✓ Paid"
+                      : " · Unpaid"}
+                    {" · Exp "}
+                    {formatDate(member.subscription.end_date)}
+                  </Text>
+                )}
+              </VStack>
+            </HStack>
+          )}
           <Circle
             size="9"
             bg={statusTheme.bg}
@@ -470,7 +512,7 @@ const ViewMember = memo(() => {
                     <MemberTile
                       key={member._id}
                       member={member}
-                      onClick={(id) => navigateTo(`members/${id}`)}
+                      onClick={(id) => navigateTo(`memberDetails/${id}`)}
                     />
                   ))}
                 </SimpleGrid>

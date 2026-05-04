@@ -107,8 +107,8 @@ const registry: RegistryConfig = {
         home: () => import("@/features/modules/gym/GymView"),
         // Member management
         members: () => import("@/features/modules/gym/ViewMember"),
-        MemberDetail: () => import("@/features/modules/gym/MemberDetail"),
-        MemberCheckIn: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.MemberCheckIn })),
+        memberDetails: () => import("@/features/modules/gym/MemberDetail"),
+        MemberCheckIn: () => import("@/features/modules/gym/MemberCheckIn"),
         // Billing & Subscriptions
         Subscription: () => import("@/features/modules/gym/Subscription"),
         GymSubscriptionPlans: () => import("@/features/modules/gym/GymSubscriptionPlans"),
@@ -123,8 +123,8 @@ const registry: RegistryConfig = {
         addClass: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.AddClass })),
         classBookings: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.ClassBookings })),
         // Reports
-        revenueReport: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.RevenueReport })),
-        attendanceReport: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.AttendanceReport })),
+        revenueReport: () => import("@/features/modules/gym/RevenueReport"),
+        attendanceReport: () => import("@/features/modules/gym/AttendanceReport"),
         performanceReport: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.PerformanceReport })),
     },
     Default: {

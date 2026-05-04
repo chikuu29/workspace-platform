@@ -157,7 +157,7 @@
                                     "type": "modal",
                                     "templateName": "AddTrainer",
                                     "config": {
-                                        "size": "fulls",
+                                        "size": "full",
                                         "closeOnOverlayClick": true,
                                         "closeOnEsc": true,
                                         "scrollBehavior": "inside"

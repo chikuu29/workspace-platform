@@ -19,6 +19,7 @@ import type {
   ActivateSubscriptionPayload,
   ActivateSubscriptionResponse,
   SubscriptionStats,
+  AttendanceStats,
 } from "../types/Gym.types";
 
 export const GymApiService = {
@@ -114,5 +115,24 @@ export const GymApiService = {
       path: "/v1/gym/subscription/stats",
       isPrivateApi: true,
     }).pipe(map((res: any) => res.data as SubscriptionStats));
+  },
+
+  // ── Attendance ──────────────────────────────────────────────────────
+
+  /** Records a member check-in. */
+  checkin: (memberId: string) => {
+    return POSTAPI({
+      path: "/v1/gym/checkin",
+      data: { member_id: memberId },
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as { success: boolean; message: string; data: any }));
+  },
+
+  /** Fetches attendance analytics and heatmap. */
+  getAttendanceStats: () => {
+    return GETAPI({
+      path: "/v1/gym/attendance/stats",
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res.data as AttendanceStats));
   },
 };

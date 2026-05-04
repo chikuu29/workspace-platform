@@ -2,24 +2,38 @@
  * gymApi.service.ts
  *
  * Dedicated service for gym module API interactions.
+ * Covers members, subscription plans, subscription activation, and stats.
+ *
+ * All methods return RxJS Observables for consistency with the
+ * platform's GETAPI/POSTAPI/PUTAPI/DELETEAPI layer.
  */
-import { GETAPI } from "@/app/api";
+import { GETAPI, POSTAPI, PUTAPI, DELETEAPI } from "@/app/api";
 import { map } from "rxjs/operators";
-import { GymDashboardStats, MemberDocument, MembersResponse } from "../types/Gym.types";
+import type {
+  GymDashboardStats,
+  MemberDocument,
+  MembersResponse,
+  SubscriptionPlanDocument,
+  PlansResponse,
+  CreatePlanPayload,
+  ActivateSubscriptionPayload,
+  ActivateSubscriptionResponse,
+  SubscriptionStats,
+} from "../types/Gym.types";
 
 export const GymApiService = {
-  /**
-   * Fetches aggregated dashboard statistics.
-   */
+  // ── Dashboard ───────────────────────────────────────────────────────
+
+  /** Fetches aggregated dashboard statistics. */
   getDashboardStats: () => {
     return GETAPI({ path: "/v1/gym/dashboard/stats", isPrivateApi: true }).pipe(
       map((res: any) => res.data as GymDashboardStats)
     );
   },
 
-  /**
-   * Fetches the paginated list of gym members.
-   */
+  // ── Members ─────────────────────────────────────────────────────────
+
+  /** Fetches the paginated list of gym members. */
   getMembers: (skip: number = 0, limit: number = 50) => {
     return GETAPI({
       path: "/v1/gym/members",
@@ -28,13 +42,77 @@ export const GymApiService = {
     }).pipe(map((res: any) => res as MembersResponse));
   },
 
-  /**
-   * Fetches a single member by record_id or member_id.
-   */
+  /** Fetches a single member by record_id or member_id. */
   getMember: (identifier: string) => {
     return GETAPI({
       path: `/v1/gym/members/${identifier}`,
       isPrivateApi: true,
     }).pipe(map((res: any) => res.data as MemberDocument));
+  },
+
+  // ── Subscription Plans ──────────────────────────────────────────────
+
+  /** Fetches the paginated list of subscription plans. */
+  getPlans: (skip: number = 0, limit: number = 50, activeOnly: boolean = false) => {
+    return GETAPI({
+      path: "/v1/gym/plans",
+      params: { skip, limit, active_only: activeOnly },
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as PlansResponse));
+  },
+
+  /** Fetches a single subscription plan by record_id, code, or ObjectId. */
+  getPlan: (identifier: string) => {
+    return GETAPI({
+      path: `/v1/gym/plans/${identifier}`,
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res.data as SubscriptionPlanDocument));
+  },
+
+  /** Creates a new subscription plan. */
+  createPlan: (payload: CreatePlanPayload) => {
+    return POSTAPI({
+      path: "/v1/gym/plans",
+      data: payload,
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as { success: boolean; message: string; data: SubscriptionPlanDocument }));
+  },
+
+  /** Updates an existing subscription plan. */
+  updatePlan: (identifier: string, payload: Partial<CreatePlanPayload>) => {
+    return PUTAPI({
+      path: `/v1/gym/plans/${identifier}`,
+      data: payload,
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as { success: boolean; message: string; data: SubscriptionPlanDocument }));
+  },
+
+  /** Soft-deletes a subscription plan. */
+  deletePlan: (identifier: string) => {
+    return DELETEAPI({
+      path: `/v1/gym/plans/${identifier}`,
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as { success: boolean; message: string }));
+  },
+
+  // ── Subscription Activation ─────────────────────────────────────────
+
+  /** Activates a subscription — links a member to a plan. */
+  activateSubscription: (payload: ActivateSubscriptionPayload) => {
+    return POSTAPI({
+      path: "/v1/gym/subscriptions/activate",
+      data: payload,
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as ActivateSubscriptionResponse));
+  },
+
+  // ── Subscription Stats ──────────────────────────────────────────────
+
+  /** Fetches aggregated subscription/billing KPIs. */
+  getSubscriptionStats: () => {
+    return GETAPI({
+      path: "/v1/gym/subscription/stats",
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res.data as SubscriptionStats));
   },
 };

@@ -1,8 +1,11 @@
 /**
- * GymDashboard.types.ts
+ * Gym.types.ts
  *
- * Strict typing for the Gym Management Dashboard.
+ * Strict typing for the Gym Management module.
+ * Covers dashboard stats, members, subscription plans, and subscriptions.
  */
+
+// ─── Dashboard ───────────────────────────────────────────────────────────────
 
 export interface GymKpiData {
   total_members: number;
@@ -27,6 +30,8 @@ export interface GymDashboardStats {
   recent_members: RecentMember[];
 }
 
+// ─── Members ─────────────────────────────────────────────────────────────────
+
 export interface MemberDocument {
   _id: string;
   _meta: {
@@ -46,6 +51,8 @@ export interface MemberDocument {
     address?: string;
     status: "active" | "attention" | "frozen";
     plan: string;
+    plan_code?: string;
+    subscription_id?: string;
     member_id?: string;
     [key: string]: any;
   };
@@ -57,4 +64,134 @@ export interface MembersResponse {
   total: number;
   skip: number;
   limit: number;
+}
+
+// ─── Subscription Plans ──────────────────────────────────────────────────────
+
+/** Shape of a subscription plan stored in MongoDB via OrgRepository */
+export interface SubscriptionPlanDocument {
+  _id: string;
+  _meta: {
+    entity_type: string;
+    record_id: string;
+    version: number;
+    is_deleted: boolean;
+    created: { at: string; by: string };
+    updated: { at: string; by: string };
+  };
+  data: SubscriptionPlanData;
+}
+
+export interface SubscriptionPlanData {
+  name: string;
+  code: string;
+  description: string;
+  price: number;
+  currency: string;
+  billing_cycle: "monthly" | "quarterly" | "yearly";
+  is_active: boolean;
+  features: string[];
+  accent_color: string;
+  max_members?: number | null;
+}
+
+export interface PlansResponse {
+  success: boolean;
+  data: SubscriptionPlanDocument[];
+  pagination: {
+    total: number;
+    skip: number;
+    limit: number;
+    has_more: boolean;
+  };
+}
+
+// ─── Subscriptions (member ↔ plan link) ──────────────────────────────────────
+
+export interface SubscriptionDocument {
+  _id: string;
+  _meta: {
+    entity_type: string;
+    record_id: string;
+    version: number;
+    is_deleted: boolean;
+    created: { at: string; by: string };
+    updated: { at: string; by: string };
+  };
+  data: {
+    member_id: string;
+    member_name: string;
+    plan_code: string;
+    plan_name: string;
+    plan_record_id: string;
+    subscription_id: string;
+    price: number;
+    currency: string;
+    billing_cycle: string;
+    start_date: string;
+    end_date: string;
+    status: "active" | "expired" | "cancelled";
+    is_paid: boolean;
+    payment_amount: number;
+    notes: string;
+  };
+}
+
+/** Payload sent to POST /gym/subscriptions/activate */
+export interface ActivateSubscriptionPayload {
+  member_id: string;
+  plan_code: string;
+  start_date?: string;
+  is_paid?: boolean;
+  payment_amount?: number;
+  notes?: string;
+}
+
+/** Response from POST /gym/subscriptions/activate */
+export interface ActivateSubscriptionResponse {
+  success: boolean;
+  message: string;
+  data: {
+    subscription: SubscriptionDocument;
+    subscription_id: string;
+    member_id: string;
+    plan_name: string;
+    start_date: string;
+    end_date: string;
+  };
+}
+
+// ─── Subscription Stats ─────────────────────────────────────────────────────
+
+export interface PlanWithMembers {
+  plan_code: string;
+  plan_name: string;
+  price: number;
+  billing_cycle: string;
+  member_count: number;
+  revenue: number;
+  accent_color: string;
+}
+
+export interface SubscriptionStats {
+  total_plans: number;
+  active_plans: number;
+  total_subscribers: number;
+  total_mrr: number;
+  plans_with_members: PlanWithMembers[];
+}
+
+// ─── Create Plan Payload ────────────────────────────────────────────────────
+
+/** Payload sent to POST /gym/plans */
+export interface CreatePlanPayload {
+  name: string;
+  code: string;
+  description?: string;
+  price: number;
+  currency?: string;
+  billing_cycle: "monthly" | "quarterly" | "yearly";
+  is_active?: boolean;
+  features?: string[];
+  accent_color?: string;
 }

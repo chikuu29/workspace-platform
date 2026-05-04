@@ -1,8 +1,11 @@
 /**
  * CreateSubscription.tsx
  *
- * Subscription enrollment page — post-registration landing.
- * Displays active plans as selectable pricing cards with a sticky checkout sidebar.
+ * Subscription enrollment page — post-member-registration landing.
+ * Displays active plans fetched from the backend as selectable pricing cards
+ * with a sticky checkout sidebar. On confirmation, calls the
+ * POST /gym/subscriptions/activate API to persist the member ↔ plan link.
+ *
  * `member_id` query param identifies the enrolling member.
  */
 
@@ -19,6 +22,7 @@ import {
     Separator,
     SimpleGrid,
     Skeleton,
+    Spinner,
     Text,
     VStack,
 } from "@chakra-ui/react";
@@ -30,7 +34,6 @@ import {
     LuCalendarDays,
     LuCheck,
     LuCrown,
-    LuReceipt,
     LuShieldCheck,
     LuZap,
 } from "react-icons/lu";
@@ -39,65 +42,26 @@ import { Field } from "@/components/ui/field";
 import { toaster } from "@/components/ui/toaster";
 import { Card } from "@/core/components/Card";
 import { useGymMember } from "./hooks/useGymMember";
+import { useSubscriptionPlans } from "./hooks/useSubscriptionPlans";
+import { GymApiService } from "./services/gymApi.service";
+import type { SubscriptionPlanDocument, ActivateSubscriptionPayload } from "./types/Gym.types";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-interface SubscriptionPlan {
-    id: string;
-    name: string;
-    tagline: string;
-    price: number;
-    billing_cycle: "monthly" | "quarterly" | "yearly";
-    accent: string;
-    features: string[];
-    recommended?: boolean;
-}
-
-// ─── Plans (replace with API when backend ready) ─────────────────────────────
-
-const PLANS: SubscriptionPlan[] = [
-    {
-        id: "P1",
-        name: "Starter",
-        tagline: "Everything you need to get moving",
-        price: 49,
-        billing_cycle: "monthly",
-        accent: "blue",
-        features: ["Gym Floor Access", "Locker Room", "1 PT Session / mo"],
-    },
-    {
-        id: "P2",
-        name: "Pro",
-        tagline: "For committed athletes who want more",
-        price: 89,
-        billing_cycle: "monthly",
-        accent: "green",
-        features: ["Full Gym Access", "Group Classes", "Nutrition Guide", "2 PT Sessions / mo"],
-        recommended: true,
-    },
-    {
-        id: "P3",
-        name: "Platinum",
-        tagline: "The ultimate all-inclusive experience",
-        price: 899,
-        billing_cycle: "yearly",
-        accent: "purple",
-        features: ["Priority PT Slots", "Unlimited Classes", "Nutrition Review", "Free Supplements", "Spa Access"],
-    },
-];
+// ─── Constants ──────────────────────────────────────────────────────────────
 
 const TAX_RATE = 0.18;
 
 // ─── Plan Card ──────────────────────────────────────────────────────────────
 
 interface PlanCardProps {
-    plan: SubscriptionPlan;
+    plan: SubscriptionPlanDocument;
     isSelected: boolean;
-    onSelect: (plan: SubscriptionPlan) => void;
+    onSelect: (plan: SubscriptionPlanDocument) => void;
 }
 
 const PlanCard = memo(({ plan, isSelected, onSelect }: PlanCardProps) => {
     const muted = useColorModeValue("gray.500", "gray.400");
+    const planData = plan.data;
+    const accent = planData.accent_color || "blue";
 
     const handleClick = useCallback(() => onSelect(plan), [plan, onSelect]);
 
@@ -105,7 +69,7 @@ const PlanCard = memo(({ plan, isSelected, onSelect }: PlanCardProps) => {
         <Card
             p={0}
             border="2px solid"
-            borderColor={isSelected ? `${plan.accent}.500` : "transparent"}
+            borderColor={isSelected ? `${accent}.500` : "transparent"}
             borderRadius="2xl"
             cursor="pointer"
             overflow="hidden"
@@ -113,39 +77,32 @@ const PlanCard = memo(({ plan, isSelected, onSelect }: PlanCardProps) => {
             transition="all 0.25s cubic-bezier(0.16,1,0.3,1)"
             _hover={{
                 transform: "translateY(-6px)",
-                borderColor: `${plan.accent}.500`,
-                boxShadow: `0 20px 40px -16px var(--chakra-colors-${plan.accent}-500)`,
+                borderColor: `${accent}.500`,
+                boxShadow: `0 20px 40px -16px var(--chakra-colors-${accent}-500)`,
             }}
             onClick={handleClick}
         >
-            {/* Recommended ribbon */}
-            {plan.recommended && (
-                <HStack justify="center" gap={1.5} bg={`${plan.accent}.500`} color="white" py={1.5}>
-                    <LuCrown size={13} />
-                    <Text fontSize="xs" fontWeight="800" letterSpacing="wider" textTransform="uppercase">
-                        Recommended
-                    </Text>
-                </HStack>
-            )}
-
-            {/* Top accent line for non-recommended */}
-            {!plan.recommended && (
-                <Box h="3px" bg={`${plan.accent}.500`} opacity={isSelected ? 1 : 0.3} transition="opacity 0.2s" />
-            )}
+            {/* Top accent line */}
+            <Box
+                h="3px"
+                bg={`${accent}.500`}
+                opacity={isSelected ? 1 : 0.3}
+                transition="opacity 0.2s"
+            />
 
             <VStack align="stretch" gap={4} p={6}>
                 {/* Name + selected check */}
                 <Flex justify="space-between" align="start">
                     <VStack align="start" gap={0}>
                         <Text fontSize="lg" fontWeight="900" color="app.text.primary">
-                            {plan.name}
+                            {planData.name}
                         </Text>
                         <Text fontSize="xs" color={muted} fontWeight="500">
-                            {plan.tagline}
+                            {planData.description || planData.code}
                         </Text>
                     </VStack>
                     {isSelected && (
-                        <Circle size={7} bg={`${plan.accent}.500`} color="white" flexShrink={0}>
+                        <Circle size={7} bg={`${accent}.500`} color="white" flexShrink={0}>
                             <LuCheck size={15} />
                         </Circle>
                     )}
@@ -154,10 +111,10 @@ const PlanCard = memo(({ plan, isSelected, onSelect }: PlanCardProps) => {
                 {/* Price */}
                 <HStack align="baseline" gap={1}>
                     <Text fontSize="3xl" fontWeight="900" color="app.text.primary" lineHeight="1">
-                        ${plan.price}
+                        ${planData.price.toLocaleString()}
                     </Text>
                     <Text fontSize="xs" color={muted} fontWeight="600">
-                        /{plan.billing_cycle}
+                        /{planData.billing_cycle}
                     </Text>
                 </HStack>
 
@@ -165,9 +122,9 @@ const PlanCard = memo(({ plan, isSelected, onSelect }: PlanCardProps) => {
 
                 {/* Features */}
                 <VStack align="stretch" gap={2}>
-                    {plan.features.map((f) => (
+                    {planData.features.map((f) => (
                         <HStack key={f} gap={2}>
-                            <Box color={`${plan.accent}.500`} flexShrink={0}>
+                            <Box color={`${accent}.500`} flexShrink={0}>
                                 <LuCheck size={14} />
                             </Box>
                             <Text fontSize="sm" fontWeight="600" color="app.text.primary">
@@ -184,7 +141,7 @@ const PlanCard = memo(({ plan, isSelected, onSelect }: PlanCardProps) => {
                     size="md"
                     borderRadius="xl"
                     fontWeight="700"
-                    colorPalette={plan.accent}
+                    colorPalette={accent}
                     variant={isSelected ? "solid" : "outline"}
                     transition="all 0.2s"
                 >
@@ -195,6 +152,51 @@ const PlanCard = memo(({ plan, isSelected, onSelect }: PlanCardProps) => {
     );
 });
 PlanCard.displayName = "PlanCard";
+
+// ─── Empty State ────────────────────────────────────────────────────────────
+
+const EmptyPlansState = memo(() => {
+    const muted = useColorModeValue("gray.500", "gray.400");
+    const navigate = useNavigate();
+    const { pathname } = useLocation();
+    const { appCode } = useParams();
+    const [searchParams] = useSearchParams();
+
+    const appName = appCode || searchParams.get("app") || "myGym";
+    const workspacePrefix = pathname.includes("/workspace")
+        ? `${pathname.split("/workspace")[0]}/workspace`
+        : "";
+
+    const handleCreatePlan = useCallback(() => {
+        const path = appCode
+            ? `${workspacePrefix}/app/${appCode}/AddSubscriptionPlan`
+            : `${workspacePrefix}/AddSubscriptionPlan?app=${appName}`;
+        navigate(path);
+    }, [appCode, appName, workspacePrefix, navigate]);
+
+    return (
+        <Card p={10} borderRadius="2xl" gap={0}>
+            <VStack gap={4} textAlign="center">
+                <Circle size={16} bg="blue.500/10" color="blue.500">
+                    <LuCrown size={28} />
+                </Circle>
+                <Heading size="md" fontWeight="800">No plans available</Heading>
+                <Text fontSize="sm" color={muted} maxW="sm">
+                    Create your first subscription plan before enrolling members.
+                </Text>
+                <Button
+                    colorPalette="blue"
+                    borderRadius="xl"
+                    size="lg"
+                    onClick={handleCreatePlan}
+                >
+                    Create First Plan
+                </Button>
+            </VStack>
+        </Card>
+    );
+});
+EmptyPlansState.displayName = "EmptyPlansState";
 
 // ─── Main ───────────────────────────────────────────────────────────────────
 
@@ -207,9 +209,13 @@ const CreateSubscription = memo(() => {
     const memberId = searchParams.get("member_id") ?? undefined;
     const { member, loading: memberLoading } = useGymMember(memberId);
 
-    const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
+    // Fetch active plans from backend
+    const { plans, loading: plansLoading } = useSubscriptionPlans({ activeOnly: true });
+
+    const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlanDocument | null>(null);
     const [startDate, setStartDate] = useState(() => new Date().toISOString().split("T")[0]);
     const [isPaid, setIsPaid] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // ── Derived ──
     const workspacePrefix = useMemo(() => {
@@ -227,15 +233,16 @@ const CreateSubscription = memo(() => {
         return `${first} ${last}`.trim() || memberId || "New Member";
     }, [member, memberId]);
 
-    const subtotal = selectedPlan?.price ?? 0;
+    const subtotal = selectedPlan?.data.price ?? 0;
     const tax = subtotal * TAX_RATE;
     const total = subtotal + tax;
 
     const renewalDate = useMemo(() => {
         if (!selectedPlan) return "";
         const d = new Date(startDate);
-        if (selectedPlan.billing_cycle === "monthly") d.setMonth(d.getMonth() + 1);
-        else if (selectedPlan.billing_cycle === "quarterly") d.setMonth(d.getMonth() + 3);
+        const cycle = selectedPlan.data.billing_cycle;
+        if (cycle === "monthly") d.setMonth(d.getMonth() + 1);
+        else if (cycle === "quarterly") d.setMonth(d.getMonth() + 3);
         else d.setFullYear(d.getFullYear() + 1);
         return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
     }, [startDate, selectedPlan]);
@@ -248,7 +255,7 @@ const CreateSubscription = memo(() => {
         navigate(back);
     }, [appCode, appName, workspacePrefix, navigate]);
 
-    const handleSelectPlan = useCallback((plan: SubscriptionPlan) => {
+    const handleSelectPlan = useCallback((plan: SubscriptionPlanDocument) => {
         setSelectedPlan(plan);
     }, []);
 
@@ -265,25 +272,63 @@ const CreateSubscription = memo(() => {
             toaster.create({ title: "Select a Plan", description: "Pick a subscription plan first.", type: "warning" });
             return;
         }
-        toaster.create({
-            title: "Subscription Activated!",
-            description: `${memberName} is now on the ${selectedPlan.name} plan.`,
-            type: "success",
+        if (!memberId) {
+            toaster.create({ title: "No Member", description: "Member ID is missing from the URL.", type: "error" });
+            return;
+        }
+
+        setIsSubmitting(true);
+
+        const payload: ActivateSubscriptionPayload = {
+            member_id: memberId,
+            plan_code: selectedPlan.data.code,
+            start_date: startDate,
+            is_paid: isPaid,
+            payment_amount: total,
+        };
+
+        const sub = GymApiService.activateSubscription(payload).subscribe({
+            next: (res) => {
+                setIsSubmitting(false);
+                if (res.success) {
+                    toaster.create({
+                        title: "Subscription Activated!",
+                        description: `${memberName} is now on the ${res.data.plan_name} plan until ${new Date(res.data.end_date).toLocaleDateString()}.`,
+                        type: "success",
+                    });
+                    // Navigate to subscription dashboard
+                    handleBack();
+                } else {
+                    toaster.create({
+                        title: "Activation Failed",
+                        description: (res as any).message ?? "Something went wrong.",
+                        type: "error",
+                    });
+                }
+            },
+            error: (err) => {
+                setIsSubmitting(false);
+                toaster.create({
+                    title: "Network Error",
+                    description: err?.message ?? "Failed to reach the server.",
+                    type: "error",
+                });
+            },
         });
-        handleBack();
-    }, [selectedPlan, memberName, handleBack]);
+
+        // Cleanup subscription on unmount (edge case)
+        return () => sub.unsubscribe();
+    }, [selectedPlan, memberId, startDate, isPaid, total, memberName, handleBack]);
 
     // ── Theme ──
     const muted = useColorModeValue("gray.500", "gray.400");
-    const panelBg = useColorModeValue("rgba(255,255,255,0.82)", "rgba(15,23,42,0.66)");
-    const panelBorder = useColorModeValue("rgba(226,232,240,0.86)", "rgba(255,255,255,0.12)");
     const settingBg = useColorModeValue("gray.50", "whiteAlpha.50");
 
     return (
         <Box mt={4} w="full" animation="fade-in 0.5s ease-out">
 
             {/* ═══════════════════════════════════════════════════════════
-                PAGE HEADER — single-line with back, title, member, CTA
+                PAGE HEADER
             ═══════════════════════════════════════════════════════════ */}
             <Flex
                 justify="space-between"
@@ -343,7 +388,7 @@ const CreateSubscription = memo(() => {
                     fontWeight="800"
                     px={7}
                     onClick={handleConfirm}
-                    disabled={!selectedPlan}
+                    disabled={!selectedPlan || isSubmitting}
                     _hover={{
                         transform: "translateY(-1px)",
                         boxShadow: "0 10px 24px -8px var(--chakra-colors-brand-500)",
@@ -351,8 +396,17 @@ const CreateSubscription = memo(() => {
                     _active={{ transform: "translateY(0)" }}
                     transition="all 0.2s ease"
                 >
-                    <LuZap size={16} />
-                    Activate
+                    {isSubmitting ? (
+                        <HStack gap={2}>
+                            <Spinner size="sm" />
+                            <Text>Activating...</Text>
+                        </HStack>
+                    ) : (
+                        <>
+                            <LuZap size={16} />
+                            Activate
+                        </>
+                    )}
                 </Button>
             </Flex>
 
@@ -371,25 +425,37 @@ const CreateSubscription = memo(() => {
                             <Text fontSize="sm" fontWeight="800" color="app.text.primary">
                                 Membership Plans
                             </Text>
-                            <Badge variant="subtle" colorPalette="brand" borderRadius="full" fontSize="xs" fontWeight="700">
-                                {PLANS.length} active
-                            </Badge>
+                            {!plansLoading && (
+                                <Badge variant="subtle" colorPalette="brand" borderRadius="full" fontSize="xs" fontWeight="700">
+                                    {plans.length} active
+                                </Badge>
+                            )}
                             <Text fontSize="xs" color={muted} fontWeight="500">
                                 — compare and select one to continue
                             </Text>
                         </HStack>
 
-                        {/* Plan cards */}
-                        <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={5}>
-                            {PLANS.map((plan) => (
-                                <PlanCard
-                                    key={plan.id}
-                                    plan={plan}
-                                    isSelected={selectedPlan?.id === plan.id}
-                                    onSelect={handleSelectPlan}
-                                />
-                            ))}
-                        </SimpleGrid>
+                        {/* Plan cards — loading / empty / data */}
+                        {plansLoading ? (
+                            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={5}>
+                                {[1, 2, 3].map((i) => (
+                                    <Skeleton key={i} height="320px" borderRadius="2xl" />
+                                ))}
+                            </SimpleGrid>
+                        ) : plans.length === 0 ? (
+                            <EmptyPlansState />
+                        ) : (
+                            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={5}>
+                                {plans.map((plan) => (
+                                    <PlanCard
+                                        key={plan._id}
+                                        plan={plan}
+                                        isSelected={selectedPlan?._id === plan._id}
+                                        onSelect={handleSelectPlan}
+                                    />
+                                ))}
+                            </SimpleGrid>
+                        )}
 
                         {/* Activation settings */}
                         <Card p={6} borderRadius="2xl" gap={5}>
@@ -444,20 +510,25 @@ const CreateSubscription = memo(() => {
                                 <Box
                                     p={4}
                                     borderRadius="xl"
-                                    bg={`${selectedPlan.accent}.500/8`}
+                                    bg={`${selectedPlan.data.accent_color || "blue"}.500/8`}
                                     border="1px solid"
-                                    borderColor={`${selectedPlan.accent}.500/20`}
+                                    borderColor={`${selectedPlan.data.accent_color || "blue"}.500/20`}
                                 >
                                     <Flex justify="space-between" align="center" mb={1}>
                                         <Text fontWeight="800" fontSize="sm" color="app.text.primary">
-                                            {selectedPlan.name}
+                                            {selectedPlan.data.name}
                                         </Text>
-                                        <Badge colorPalette={selectedPlan.accent} borderRadius="full" variant="subtle" fontSize="xs">
-                                            {selectedPlan.billing_cycle}
+                                        <Badge
+                                            colorPalette={selectedPlan.data.accent_color || "blue"}
+                                            borderRadius="full"
+                                            variant="subtle"
+                                            fontSize="xs"
+                                        >
+                                            {selectedPlan.data.billing_cycle}
                                         </Badge>
                                     </Flex>
                                     <Text fontSize="xs" color={muted} fontWeight="600">
-                                        {selectedPlan.features.length} features included
+                                        {selectedPlan.data.features.length} features included
                                     </Text>
                                 </Box>
                             ) : (
@@ -501,7 +572,7 @@ const CreateSubscription = memo(() => {
                                 borderRadius="xl"
                                 fontWeight="800"
                                 onClick={handleConfirm}
-                                disabled={!selectedPlan}
+                                disabled={!selectedPlan || isSubmitting}
                                 _hover={{
                                     transform: "translateY(-1px)",
                                     boxShadow: "0 10px 24px -8px var(--chakra-colors-brand-500)",
@@ -509,8 +580,17 @@ const CreateSubscription = memo(() => {
                                 _active={{ transform: "translateY(0)" }}
                                 transition="all 0.2s ease"
                             >
-                                Confirm & Activate
-                                <LuArrowRight size={16} />
+                                {isSubmitting ? (
+                                    <HStack gap={2}>
+                                        <Spinner size="sm" />
+                                        <Text>Processing...</Text>
+                                    </HStack>
+                                ) : (
+                                    <>
+                                        Confirm & Activate
+                                        <LuArrowRight size={16} />
+                                    </>
+                                )}
                             </Button>
 
                             {/* Footer info */}

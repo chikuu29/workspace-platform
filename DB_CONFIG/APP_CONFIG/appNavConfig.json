@@ -109,33 +109,33 @@
             },
             "myApps": {},
             "myGym": {
-                "SHOW_SIDE_NAV_MENU": false,
+                "SHOW_SIDE_NAV_MENU": true,
                 "SHOW_TOP_NAV_MENU": true,
                 "MENU": [
                     {
                         "label": "Home",
-                        "icon": "FcHome",
+                        "icon": "Home",
                         "path": "/app/myGym/home",
                         "isMaster": true
                     },
                     {
                         "label": "Members",
                         "isMaster": false,
-                        "icon": "FcBusinessman",
+                        "icon": "Users",
                         "menu": [
                             {
                                 "label": "List Members",
-                                "icon": "FcTodoList",
+                                "icon": "List",
                                 "path": "/app/myGym/members"
                             },
                             {
                                 "label": "Add Member",
-                                "icon": "FcPlus",
+                                "icon": "UserPlus",
                                 "path": "/app/myGym/AddMember"
                             },
                             {
                                 "label": "Member Check-In",
-                                "icon": "FcCheckmark",
+                                "icon": "UserCheck",
                                 "path": "/app/myGym/MemberCheckIn"
                             }
                         ]
@@ -143,21 +143,21 @@
                     {
                         "label": "Trainers & Staff",
                         "isMaster": false,
-                        "icon": "FcManager",
+                        "icon": "Dumbbell",
                         "menu": [
                             {
                                 "label": "List Trainers",
-                                "icon": "FcReading",
+                                "icon": "ClipboardList",
                                 "path": "/app/myGym/trainers"
                             },
                             {
                                 "label": "Add Trainer",
-                                "icon": "FcPlus",
+                                "icon": "UserPlus",
                                 "path": "/app/myGym/AddTrainer"
                             },
                             {
                                 "label": "Manage Schedules",
-                                "icon": "FcCalendar",
+                                "icon": "CalendarDays",
                                 "path": "/app/myGym/trainerSchedules"
                             }
                         ]
@@ -165,21 +165,21 @@
                     {
                         "label": "Classes & Scheduling",
                         "isMaster": false,
-                        "icon": "FcCalendar",
+                        "icon": "Calendar",
                         "menu": [
                             {
                                 "label": "List Classes",
-                                "icon": "FcTodoList",
+                                "icon": "LayoutList",
                                 "path": "/app/myGym/listClasses"
                             },
                             {
                                 "label": "Add Class",
-                                "icon": "FcPlus",
+                                "icon": "CalendarPlus",
                                 "path": "/app/myGym/addClass"
                             },
                             {
                                 "label": "Class Bookings",
-                                "icon": "FcBookmark",
+                                "icon": "Bookmark",
                                 "path": "/app/myGym/classBookings"
                             }
                         ]
@@ -187,21 +187,21 @@
                     {
                         "label": "Reports",
                         "isMaster": false,
-                        "icon": "FcBarChart",
+                        "icon": "BarChart3",
                         "menu": [
                             {
                                 "label": "Revenue Report",
-                                "icon": "FcMoneyTransfer",
+                                "icon": "DollarSign",
                                 "path": "/app/myGym/revenueReport"
                             },
                             {
                                 "label": "Attendance Report",
-                                "icon": "FcClock",
+                                "icon": "Clock",
                                 "path": "/app/myGym/attendanceReport"
                             },
                             {
                                 "label": "Performance Report",
-                                "icon": "FcStatistics",
+                                "icon": "TrendingUp",
                                 "path": "/app/myGym/performanceReport"
                             }
                         ]
@@ -209,16 +209,16 @@
                     {
                         "label": "Billing & Payments",
                         "isMaster": false,
-                        "icon": "FcMoneyTransfer",
+                        "icon": "CreditCard",
                         "menu": [
                             {
                                 "label": "Subscription Plans",
-                                "icon": "FcPlanner",
+                                "icon": "Layers",
                                 "path": "/app/myGym/Subscription"
                             },
                             {
                                 "label": "Payment History",
-                                "icon": "FcList",
+                                "icon": "Receipt",
                                 "path": "/app/myGym/PaymentsHistory"
                             }
                         ]

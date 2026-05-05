@@ -42,6 +42,8 @@ interface MenuConfig {
     key: string;
     label: string;
     icon: string;
+    /** Raw SVG markup string — rendered instantly by AsyncLoadIcon when present */
+    svgIcon?: string;
     path?: string;
     target?: string;
     /** Legacy onClick/onHover handlers */
@@ -245,7 +247,7 @@ const MenuLink = memo(({ menuConfig, showFullSideBarMenu }: MenuLinkProps) => {
                 onMouseEnter={checkTruncation}
             >
                 <Box flexShrink={0} display="flex" alignItems="center" justifyContent="center">
-                    <AsyncLoadIcon iconName={menuConfig.icon} />
+                    <AsyncLoadIcon iconName={menuConfig.icon} svgIcon={menuConfig.svgIcon} />
                 </Box>
                 <Text
                     ref={textRef}
@@ -278,7 +280,7 @@ const MenuLink = memo(({ menuConfig, showFullSideBarMenu }: MenuLinkProps) => {
                 _active={collapsedActive}
             >
                 <Box display="flex" alignItems="center" justifyContent="center" h="24px">
-                    <AsyncLoadIcon iconName={menuConfig.icon} />
+                    <AsyncLoadIcon iconName={menuConfig.icon} svgIcon={menuConfig.svgIcon} />
                 </Box>
                 <Text
                     fontSize="0.6rem"

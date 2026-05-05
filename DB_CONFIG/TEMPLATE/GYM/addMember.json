@@ -77,7 +77,7 @@
                     {
                         "title": "Personal Details",
                         "description": "Basic identification and contact information.",
-                        "iconName": "LuUser",
+                        "iconName": "userRoundPen",
                         "widgets": [
                             {
                                 "name": "firstName",
@@ -149,7 +149,7 @@
                     },
                     {
                         "title": "Fitness Goals",
-                        "iconName": "LuActivity",
+                        "iconName": "activity",
                         "widgets": [
                             {
                                 "name": "appointmentTime",
@@ -172,7 +172,7 @@
                     {
                         "title": "Verification",
                         "description": "Security documents and profile setup.",
-                        "iconName": "LuShieldCheck",
+                        "iconName": "shieldCheck",
                         "widgets": [
                             {
                                 "name": "idProof",

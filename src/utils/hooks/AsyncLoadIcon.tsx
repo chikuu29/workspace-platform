@@ -38,46 +38,44 @@ const normalizeSvgSize = (raw: string): string => {
   return svg;
 };
 
-// ── Component ────────────────────────────────────────────────────────
+// ── Cache ────────────────────────────────────────────────────────────
+// Static cache to store loaded icon components and avoid redundant imports
+const iconCache: Record<string, ComponentType<any>> = {};
 
-/**
- * AsyncLoadIcon
- *
- * Priority rendering order:
- *  1. `svgIcon` — if provided and valid SVG markup, render instantly (no spinner)
- *  2. `iconName` — async-load from react-icons via DynamicIcon
- *
- * Error handling:
- *  - Malformed / empty `svgIcon` → silently falls through to async loader
- *  - Async loader failure → renders a red dot fallback
- */
 const AsyncLoadIcon = React.memo(({ iconName, svgIcon }: AsyncLoadIconProps) => {
+  console.debug("[AsyncLoadIcon] Rendering with iconName:", iconName);
   // ── Fast path: inline SVG from config ──────────────────────────────
   const sanitizedSvg = useMemo(() => {
     if (!svgIcon || !isValidSvgMarkup(svgIcon)) return null;
     try {
       return normalizeSvgSize(svgIcon);
     } catch {
-      // Malformed string — fall through to async loader
       return null;
     }
   }, [svgIcon]);
 
-  // Stable HTML object for dangerouslySetInnerHTML (avoids re-creation)
   const svgHtml = useMemo(
     () => (sanitizedSvg ? { __html: sanitizedSvg } : null),
     [sanitizedSvg],
   );
 
-  // ── Slow path: async react-icons loader ────────────────────────────
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [IconComponent, setIconComponent] = useState<ComponentType<any> | null>(null);
-  const [loading, setLoading] = useState(!svgHtml);
+  // ── Slow path: async loader ────────────────────────────
+  const [IconComponent, setIconComponent] = useState<ComponentType<any> | null>(
+    () => (iconName && iconCache[iconName] ? iconCache[iconName] : null)
+  );
+  const [loading, setLoading] = useState(!svgHtml && !IconComponent);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    // Skip async loading if we have a valid inline SVG
-    if (svgHtml) {
+    // Skip if we have SVG or no icon name
+    if (svgHtml || !iconName) {
+      if (svgHtml) setLoading(false);
+      return;
+    }
+
+    // Use cached version if available
+    if (iconCache[iconName]) {
+      setIconComponent(() => iconCache[iconName]);
       setLoading(false);
       return;
     }
@@ -90,7 +88,8 @@ const AsyncLoadIcon = React.memo(({ iconName, svgIcon }: AsyncLoadIconProps) => 
       try {
         const icon = await DynamicIcon(iconName);
         if (isMounted) {
-          setIconComponent(() => icon);
+          iconCache[iconName] = icon as ComponentType<any>;
+          setIconComponent(() => icon as ComponentType<any>);
           setLoading(false);
         }
       } catch {
@@ -130,13 +129,17 @@ const AsyncLoadIcon = React.memo(({ iconName, svgIcon }: AsyncLoadIconProps) => 
 
   // ── Render: error fallback ─────────────────────────────────────────
   if (error || !IconComponent) {
-    return <Box boxSize="4" bg="red.100" borderRadius="full" />;
+    return (
+      <Box boxSize="4" display="flex" alignItems="center" justifyContent="center">
+        <Box boxSize="1.5" borderRadius="full" bg="red.400" />
+      </Box>
+    );
   }
 
-  // ── Render: async-loaded react-icons icon ──────────────────────────
+  // ── Render: async-loaded icon ──────────────────────────
   return (
     <Box boxSize="4" display="flex" alignItems="center" justifyContent="center">
-      <IconComponent size="16px" />
+      <IconComponent size={16} />
     </Box>
   );
 });

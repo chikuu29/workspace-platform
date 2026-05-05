@@ -362,8 +362,8 @@ const FormView = ({ config, publishActionsToBreadcrumb = true }: any) => {
                   {description}
                 </Text>
               </VStack>
-               </VStack>
-              {visibleActionButtons.length > 0 && !publishActionsToBreadcrumb && (
+            </VStack>
+            {visibleActionButtons.length > 0 && !publishActionsToBreadcrumb && (
               <Box
                 w={{ base: "full", xl: "auto" }}
                 minW={{ xl: "320px" }}
@@ -433,7 +433,7 @@ const FormView = ({ config, publishActionsToBreadcrumb = true }: any) => {
                           minW={{ xl: "160px" }}
                           justifyContent="center"
                           gap="2.5"
-                          
+
                           variant={
                             customStyles.variant ||
                             (isSubmit ? "solid" : "subtle")
@@ -457,7 +457,8 @@ const FormView = ({ config, publishActionsToBreadcrumb = true }: any) => {
                             //   justifyContent="center"
                             //   boxSize="4"
                             // >
-                              <AsyncLoadIcon iconName={btn.iconName} />
+                            <AsyncLoadIcon iconName={btn.iconName} />
+
                             // </Box>
                           )}
                           <Text fontWeight="inherit">{btn.text}</Text>
@@ -468,7 +469,7 @@ const FormView = ({ config, publishActionsToBreadcrumb = true }: any) => {
                 </VStack>
               </Box>
             )}
-           
+
           </Flex>
         </Box>
 

@@ -153,7 +153,17 @@
                             {
                                 "label": "Add Trainer",
                                 "icon": "FcPlus",
-                                "path": "/app/myGym/AddTrainer"
+                                "path": "/app/myGym/AddMember",
+                                "action": {
+                                    "type": "modal",
+                                    "templateName": "AddTrainer",
+                                    "config": {
+                                        "size": "full",
+                                        "closeOnOverlayClick": true,
+                                        "closeOnEsc": true,
+                                        "scrollBehavior": "inside"
+                                    }
+                                }
                             },
                             {
                                 "label": "Manage Schedules",

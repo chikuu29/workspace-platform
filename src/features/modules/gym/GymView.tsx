@@ -317,7 +317,24 @@ const GymView = memo(() => {
     <Box w="full" animation="fade-in 0.4s ease-out">
       {/* ── Page Header ──────────────────────────────────────────── */}
       <PageHeader
-        title="Operational Intelligence"
+        title={
+          <HStack gap={4}>
+            <Flex
+              align="center"
+              justify="center"
+              w="48px"
+              h="48px"
+              bg="linear-gradient(135deg, #3182ce, #6366f1)"
+              borderRadius="xl"
+              color="white"
+              boxShadow="0 8px 16px rgba(49, 130, 206, 0.25)"
+              flexShrink={0}
+            >
+              <Zap size={24} fill="white" />
+            </Flex>
+            <Text>Operational Intelligence</Text>
+          </HStack>
+        }
         subtitle="Real-time control center for memberships, high-frequency gym workflows, and floor density analytics."
       />
 

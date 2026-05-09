@@ -25,7 +25,7 @@
             },
             {
                 "id": "MY_GYM",
-                "app_slug": "MY_GYM",
+                "app_slug": "myGym",
                 "hidden": false,
                 "name": "Gym Management",
                 "target": "/workspace/app/myGym/home",

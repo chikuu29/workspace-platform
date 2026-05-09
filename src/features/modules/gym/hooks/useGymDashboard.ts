@@ -3,7 +3,7 @@
  *
  * Custom hook to manage gym dashboard state and data fetching.
  */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { GymApiService } from "../services/gymApi.service";
 import { GymDashboardStats } from "../types/Gym.types";
 
@@ -12,9 +12,9 @@ export const useGymDashboard = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchData = useCallback(() => {
     setLoading(true);
-    const subscription = GymApiService.getDashboardStats().subscribe({
+    return GymApiService.getGymKPIs().subscribe({
       next: (data) => {
         setStats(data);
         setLoading(false);
@@ -25,9 +25,16 @@ export const useGymDashboard = () => {
         setLoading(false);
       },
     });
-
-    return () => subscription.unsubscribe();
   }, []);
 
-  return { stats, loading, error };
+  useEffect(() => {
+    const subscription = fetchData();
+    return () => subscription.unsubscribe();
+  }, [fetchData]);
+
+  const refresh = useCallback(() => {
+    fetchData();
+  }, [fetchData]);
+
+  return { stats, loading, error, refresh };
 };

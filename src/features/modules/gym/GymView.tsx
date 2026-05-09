@@ -29,6 +29,7 @@ import {
   SimpleGrid,
   Text,
   VStack,
+  IconButton,
 } from "@chakra-ui/react";
 import {
   Activity,
@@ -49,6 +50,9 @@ import {
 import { PageHeader } from "@/core/components/PageHeader";
 import { useGymDashboard } from "./hooks/useGymDashboard";
 import { useGymNavigation } from "./hooks/useGymNavigation";
+import { useNavActionStore } from "@/core/store/useNavActionStore";
+import { useEffect } from "react";
+import { LuPlus, LuRefreshCw, LuUsers } from "react-icons/lu";
 
 // Sub-components
 import StatCard from "./components/StatCard";
@@ -56,11 +60,12 @@ import QuickActionCard from "./components/QuickActionCard";
 import ActionRequiredList, { type AlertItem } from "./components/ActionRequiredList";
 import RecentEnrollmentsList from "./components/RecentEnrollmentsList";
 import FloorCapacityGauge from "./components/FloorCapacityGauge";
+import { useColorModeValue } from "@/components/ui/color-mode";
 
 // ── Helpers ──────────────────────────────────────────────────────────
 
 const formatCurrency = (value?: number): string =>
-  `$${(value || 0).toLocaleString()}`;
+  `₹${(value || 0).toLocaleString("en-IN")}`;
 
 // ── Quick Actions config (stable — defined outside component) ────────
 
@@ -131,6 +136,9 @@ interface QuickActionsSectionProps {
 }
 
 const QuickActionsSection = memo(({ onNavigate }: QuickActionsSectionProps) => {
+  const panelBg = useColorModeValue("rgba(255,255,255,0.74)", "rgba(15,23,42,0.58)");
+  const borderColor = useColorModeValue("rgba(226,232,240,0.84)", "rgba(255,255,255,0.12)");
+
   /** Stable callbacks map — one per action */
   const handlers = useMemo(
     () =>
@@ -144,10 +152,11 @@ const QuickActionsSection = memo(({ onNavigate }: QuickActionsSectionProps) => {
     <Box
       p={5}
       borderRadius="2xl"
-      bg="app.card.bg"
+      bg={panelBg}
       border="1px solid"
-      borderColor="app.card.border"
-      boxShadow="0 1px 3px rgba(0,0,0,0.04)"
+      borderColor={borderColor}
+      backdropFilter="blur(16px) saturate(140%)"
+      boxShadow={useColorModeValue("0 4px 12px rgba(0, 0, 0, 0.05)", "0 1px 3px rgba(0,0,0,0.04)")}
     >
       <VStack align="stretch" gap={4}>
         <HStack justify="space-between" align="center">
@@ -189,50 +198,61 @@ const QuickActionsSection = memo(({ onNavigate }: QuickActionsSectionProps) => {
 });
 QuickActionsSection.displayName = "QuickActionsSection";
 
-// ── Page Header Actions (memoized) ───────────────────────────────────
-
-interface HeaderActionsProps {
-  onDirectory: () => void;
-  onEnroll: () => void;
-}
-
-const HeaderActions = memo(({ onDirectory, onEnroll }: HeaderActionsProps) => (
-  <HStack gap={3}>
-    <Button
-      variant="outline"
-      borderRadius="sm"
-      fontWeight="800"
-      onClick={onDirectory}
-      h="46px"
-      px={6}
-      borderColor="app.card.border"
-      _hover={{ bg: "app.card.bg", borderColor: "app.text.accent", color: "app.text.accent" }}
-    >
-      <Users size={18} /> Directory
-    </Button>
-    <Button
-      colorPalette="blue"
-      borderRadius="sm"
-      fontWeight="800"
-      onClick={onEnroll}
-      h="46px"
-      px={6}
-      boxShadow="0 4px 12px rgba(49, 130, 206, 0.3)"
-      _hover={{ transform: "translateY(-1px)", boxShadow: "0 6px 16px rgba(49, 130, 206, 0.4)" }}
-    >
-      <UserPlus size={18} /> Enroll Member
-    </Button>
-  </HStack>
-));
-HeaderActions.displayName = "HeaderActions";
 
 // ═══════════════════════════════════════════════════════════════════════
 // ── Main Page Component ──────────────────────────────────────────────
 // ═══════════════════════════════════════════════════════════════════════
 
 const GymView = memo(() => {
-  const { stats, loading } = useGymDashboard();
+  const { stats, loading, refresh } = useGymDashboard();
   const { navigateTo } = useGymNavigation();
+
+  const panelBg = useColorModeValue("rgba(255,255,255,0.74)", "rgba(15,23,42,0.58)");
+  const borderColor = useColorModeValue("rgba(226,232,240,0.84)", "rgba(255,255,255,0.12)");
+
+  const mountNavActions = useNavActionStore((state) => state.setActions);
+  const unmountNavActions = useNavActionStore((state) => state.clearActions);
+
+  useEffect(() => {
+    mountNavActions(
+      <HStack gap={2}>
+        <IconButton
+          variant="subtle"
+          colorPalette="yellow"
+          borderRadius="sm"
+          size="sm"
+          onClick={refresh}
+          aria-label="Refresh dashboard"
+          loading={loading}
+          h="32px"
+          w="32px"
+        >
+          <LuRefreshCw size={14} />
+        </IconButton>
+        <Button
+          variant="outline"
+          borderRadius="sm"
+          fontWeight="800"
+          size="sm"
+          onClick={() => navigateTo("members")}
+          h="32px"
+        >
+          <LuUsers size={14} /> Directory
+        </Button>
+        <Button
+          colorPalette="blue"
+          borderRadius="sm"
+          fontWeight="800"
+          size="sm"
+          onClick={() => navigateTo("AddMember")}
+          h="32px"
+        >
+          <LuPlus size={14} /> Enroll Member
+        </Button>
+      </HStack>
+    );
+    return () => unmountNavActions();
+  }, [mountNavActions, unmountNavActions, refresh, loading, navigateTo]);
 
   // ── Derived KPI values ────────────────────────────────────────────
   const kpis = stats?.kpis;
@@ -297,36 +317,13 @@ const GymView = memo(() => {
     <Box w="full" animation="fade-in 0.4s ease-out">
       {/* ── Page Header ──────────────────────────────────────────── */}
       <PageHeader
-        title={
-          <HStack gap={4}>
-            <Flex
-              align="center"
-              justify="center"
-              w="54px"
-              h="54px"
-              bg="linear-gradient(135deg, #3182ce, #6366f1)"
-              borderRadius="xl"
-              color="white"
-              boxShadow="0 8px 20px rgba(49, 130, 206, 0.3)"
-              flexShrink={0}
-            >
-              <Zap size={28} fill="white" />
-            </Flex>
-            <Text>Operational Intelligence</Text>
-          </HStack>
-        }
+        title="Operational Intelligence"
         subtitle="Real-time control center for memberships, high-frequency gym workflows, and floor density analytics."
-        actions={
-          <HeaderActions
-            onDirectory={handleDirectory}
-            onEnroll={handleEnroll}
-          />
-        }
       />
 
       <VStack align="stretch" gap={6} pb={8}>
         {/* ── KPI Row ──────────────────────────────────────────────── */}
-        <SimpleGrid columns={{ base: 2, md: 4 }} gap={4}>
+        <SimpleGrid columns={{ base: 2, md: 3, xl: 5 }} gap={4}>
           <StatCard
             label="Total Members"
             value={totalMembers.toLocaleString()}
@@ -344,7 +341,15 @@ const GymView = memo(() => {
             loading={loading}
           />
           <StatCard
-            label="Active Trainers"
+            label="Total Trainers"
+            value={(kpis?.total_trainers || 0).toLocaleString()}
+            subtitle="Total staff strength"
+            icon={Users}
+            accentColor="teal.500"
+            loading={loading}
+          />
+          <StatCard
+            label="Staff Capacity"
             value={`${utilization}%`}
             subtitle="Floor capacity signal"
             icon={Dumbbell}

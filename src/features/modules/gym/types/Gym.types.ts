@@ -13,6 +13,7 @@ export interface GymKpiData {
   attention_members: number;
   frozen_members: number;
   members_added_this_month: number;
+  total_trainers: number;
   revenue_mrr: number;
   checkins_today: number;
   trainer_utilization: number;
@@ -88,6 +89,48 @@ export interface MemberDocument {
 export interface MembersResponse {
   success: boolean;
   data: MemberDocument[];
+  total: number;
+  skip: number;
+  limit: number;
+}
+
+// ─── Trainers ────────────────────────────────────────────────────────────────
+
+export interface TrainerDocument {
+  _id: string;
+  _meta: {
+    entity_type: string;
+    record_id: string;
+    version: number;
+    is_deleted: boolean;
+    created: { at: string; by: string };
+    updated: { at: string; by: string };
+  };
+  data: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    gender?: string;
+    address?: string;
+    trainer_id: string;
+    specialization: string;
+    experienceYears: number | string;
+    joiningDate: string;
+    availableSlot?: string;
+    bio?: string;
+    idProof?: string;
+    certifications?: string;
+    profilePic?: string;
+    paymentMode?: string;
+    status: "active" | "on_leave" | "terminated";
+    [key: string]: any;
+  };
+}
+
+export interface TrainersResponse {
+  success: boolean;
+  data: TrainerDocument[];
   total: number;
   skip: number;
   limit: number;

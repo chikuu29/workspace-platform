@@ -13,6 +13,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { ArrowRight, type LucideIcon } from "lucide-react";
+import { useColorModeValue } from "@/components/ui/color-mode";
 
 // ── Types ────────────────────────────────────────────────────────────
 
@@ -38,6 +39,9 @@ const QuickActionCard = memo(({
   accentColor,
   onClick,
 }: QuickActionCardProps) => {
+  const panelBg = useColorModeValue("rgba(255,255,255,0.74)", "rgba(15,23,42,0.58)");
+  const borderColor = useColorModeValue("rgba(226,232,240,0.84)", "rgba(255,255,255,0.12)");
+
   return (
     <Box
       as="button"
@@ -45,10 +49,11 @@ const QuickActionCard = memo(({
       textAlign="left"
       p={4}
       borderRadius="xl"
-      bg="app.card.bg"
+      bg={panelBg}
       border="1px solid"
-      borderColor="app.card.border"
-      boxShadow="0 1px 3px rgba(0,0,0,0.04)"
+      borderColor={borderColor}
+      backdropFilter="blur(16px) saturate(140%)"
+      boxShadow={useColorModeValue("0 4px 12px rgba(0, 0, 0, 0.05)", "0 1px 3px rgba(0,0,0,0.04)")}
       cursor="pointer"
       transition="all 0.22s cubic-bezier(0.4, 0, 0.2, 1)"
       _hover={{

@@ -8,16 +8,18 @@
 import { memo, useMemo } from "react";
 import {
   Badge, Box, Circle, Flex, Grid, GridItem, Heading, HStack, Icon,
-  Separator, SimpleGrid, Text, VStack,
+  Separator, SimpleGrid, Text, VStack, IconButton,
 } from "@chakra-ui/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import {
   LuActivity, LuArrowUpRight, LuCheck, LuCreditCard,
-  LuTrendingUp, LuUsers, LuWallet, LuX,
+  LuTrendingUp, LuUsers, LuWallet, LuX, LuRefreshCw,
 } from "react-icons/lu";
 import { PageHeader } from "@/core/components/PageHeader";
 import { useSubscriptionStats } from "./hooks/useSubscriptionStats";
+import { useNavActionStore } from "@/core/store/useNavActionStore";
+import { useEffect } from "react";
 import type { PlanWithMembers } from "./types/Gym.types";
 
 // ─── Helpers ────────────────────────────────────────────────────────
@@ -36,7 +38,7 @@ const StatTile = memo(({ label, value, caption, icon, accent }: {
 
   return (
     <Box p={{ base: 4, md: 5 }} borderRadius="2xl" bg={tileBg} border="1px solid" borderColor={border}
-      backdropFilter="blur(18px) saturate(160%)" boxShadow="0 18px 42px -30px rgba(15,23,42,0.55)">
+      backdropFilter="blur(18px) saturate(160%)" boxShadow={useColorModeValue("0 4px 12px rgba(0, 0, 0, 0.05)", "0 1px 3px rgba(0,0,0,0.04)")}>
       <HStack justify="space-between" align="start" gap={4}>
         <VStack align="start" gap={1}>
           <Text fontSize="xs" color={muted} fontWeight="800" textTransform="uppercase">{label}</Text>
@@ -96,6 +98,30 @@ PlanRevenueRow.displayName = "PlanRevenueRow";
 const RevenueReport = memo(() => {
   const { stats, loading, refetch } = useSubscriptionStats();
 
+  const mountNavActions = useNavActionStore((state) => state.setActions);
+  const unmountNavActions = useNavActionStore((state) => state.clearActions);
+
+  useEffect(() => {
+    mountNavActions(
+      <HStack gap={2}>
+        <IconButton
+          variant="subtle"
+          colorPalette="yellow"
+          borderRadius="sm"
+          size="sm"
+          onClick={refetch}
+          aria-label="Refresh revenue"
+          loading={loading}
+          h="32px"
+          w="32px"
+        >
+          <LuRefreshCw size={14} />
+        </IconButton>
+      </HStack>
+    );
+    return () => unmountNavActions();
+  }, [mountNavActions, unmountNavActions, refetch, loading]);
+
   const plansData = stats?.plans_with_members || [];
 
   // ── Derived metrics ──
@@ -121,55 +147,54 @@ const RevenueReport = memo(() => {
 
   return (
     <Box mt={4} animation="fade-in 0.5s ease-out" w="full">
+      {/* ── Hero Stats ──────────────────────────────── */}
+      <Box p={{ base: 5, lg: 7 }} borderRadius="2xl" bg={heroBg} border="1px solid"
+        borderColor={borderColor} boxShadow={useColorModeValue("0 4px 12px rgba(0, 0, 0, 0.05)", "0 1px 3px rgba(0,0,0,0.04)")} mb="3">
+        <Grid templateColumns={{ base: "1fr", xl: "1.1fr 1.6fr" }} gap={6} alignItems="stretch">
+          <VStack align="start" justify="space-between" gap={6}>
+            <VStack align="start" gap={3}>
+              <Badge colorPalette="green" variant="subtle" borderRadius="full" px={3} py={1} fontWeight="900">
+                Financial Intelligence
+              </Badge>
+              <Heading size={{ base: "xl", md: "2xl" }} letterSpacing="tight" color="app.text.primary">
+                Revenue at a glance.
+              </Heading>
+              <Text color={muted} fontSize="sm" maxW="560px" fontWeight="600">
+                Track MRR, plan-level revenue distribution, and collection health across your gym's subscription base.
+              </Text>
+            </VStack>
+            {derived.topPlan && (
+              <HStack px={4} py={2} borderRadius="xl" bg="green.500/10" border="1px solid" borderColor="green.500/15">
+                <LuArrowUpRight size={16} color="var(--chakra-colors-green-500)" />
+                <Text fontSize="sm" fontWeight="900" color="green.500">
+                  Top plan: {derived.topPlan.plan_name} — {fmtCurrency(derived.topPlan.revenue)}
+                </Text>
+              </HStack>
+            )}
+          </VStack>
+          <SimpleGrid columns={{ base: 1, md: 2, xl: 4 }} gap={4}>
+            <Skeleton loading={loading} borderRadius="2xl">
+              <StatTile label="Total MRR" value={fmtCurrency(derived.totalRevenue)} caption="Monthly recurring" icon={LuWallet} accent="green.500" />
+            </Skeleton>
+            <Skeleton loading={loading} borderRadius="2xl">
+              <StatTile label="Subscribers" value={derived.totalSubs} caption="Active plans" icon={LuUsers} accent="blue.500" />
+            </Skeleton>
+            <Skeleton loading={loading} borderRadius="2xl">
+              <StatTile label="Avg / Member" value={fmtCurrency(derived.avgRevPerMember)} caption="Revenue per head" icon={LuTrendingUp} accent="purple.500" />
+            </Skeleton>
+            <Skeleton loading={loading} borderRadius="2xl">
+              <StatTile label="Collection" value={`${derived.collectionRate}%`} caption="Payment success" icon={LuCreditCard} accent="teal.500" />
+            </Skeleton>
+          </SimpleGrid>
+        </Grid>
+      </Box>
       <PageHeader
         title="Revenue Report"
         subtitle={`Financial overview — ${derived.totalSubs} active subscribers generating recurring revenue.`}
-        onRefresh={refetch}
-        isRefreshing={loading}
       />
 
       <VStack align="stretch" gap={6} pb={8}>
-        {/* ── Hero Stats ──────────────────────────────── */}
-        <Box p={{ base: 5, lg: 7 }} borderRadius="2xl" bg={heroBg} border="1px solid"
-          borderColor={borderColor} boxShadow="0 28px 64px -42px rgba(15,23,42,0.7)">
-          <Grid templateColumns={{ base: "1fr", xl: "1.1fr 1.6fr" }} gap={6} alignItems="stretch">
-            <VStack align="start" justify="space-between" gap={6}>
-              <VStack align="start" gap={3}>
-                <Badge colorPalette="green" variant="subtle" borderRadius="full" px={3} py={1} fontWeight="900">
-                  Financial Intelligence
-                </Badge>
-                <Heading size={{ base: "xl", md: "2xl" }} letterSpacing="tight" color="app.text.primary">
-                  Revenue at a glance.
-                </Heading>
-                <Text color={muted} fontSize="sm" maxW="560px" fontWeight="600">
-                  Track MRR, plan-level revenue distribution, and collection health across your gym's subscription base.
-                </Text>
-              </VStack>
-              {derived.topPlan && (
-                <HStack px={4} py={2} borderRadius="xl" bg="green.500/10" border="1px solid" borderColor="green.500/15">
-                  <LuArrowUpRight size={16} color="var(--chakra-colors-green-500)" />
-                  <Text fontSize="sm" fontWeight="900" color="green.500">
-                    Top plan: {derived.topPlan.plan_name} — {fmtCurrency(derived.topPlan.revenue)}
-                  </Text>
-                </HStack>
-              )}
-            </VStack>
-            <SimpleGrid columns={{ base: 1, md: 2, xl: 4 }} gap={4}>
-              <Skeleton loading={loading} borderRadius="2xl">
-                <StatTile label="Total MRR" value={fmtCurrency(derived.totalRevenue)} caption="Monthly recurring" icon={LuWallet} accent="green.500" />
-              </Skeleton>
-              <Skeleton loading={loading} borderRadius="2xl">
-                <StatTile label="Subscribers" value={derived.totalSubs} caption="Active plans" icon={LuUsers} accent="blue.500" />
-              </Skeleton>
-              <Skeleton loading={loading} borderRadius="2xl">
-                <StatTile label="Avg / Member" value={fmtCurrency(derived.avgRevPerMember)} caption="Revenue per head" icon={LuTrendingUp} accent="purple.500" />
-              </Skeleton>
-              <Skeleton loading={loading} borderRadius="2xl">
-                <StatTile label="Collection" value={`${derived.collectionRate}%`} caption="Payment success" icon={LuCreditCard} accent="teal.500" />
-              </Skeleton>
-            </SimpleGrid>
-          </Grid>
-        </Box>
+
 
         {/* ── Main Grid ───────────────────────────────── */}
         <Grid templateColumns={{ base: "1fr", xl: "minmax(0, 1fr) 380px" }} gap={{ base: 6, xl: 8 }}>

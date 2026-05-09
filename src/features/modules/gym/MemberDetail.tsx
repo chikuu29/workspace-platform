@@ -8,7 +8,7 @@
 import { memo, useCallback, useMemo, type ElementType } from "react";
 import {
   Avatar, Badge, Box, Button, Circle, Flex, Grid, GridItem, Heading,
-  HStack, Icon, Separator, SimpleGrid, Text, VStack,
+  HStack, Icon, Separator, SimpleGrid, Text, VStack, IconButton,
 } from "@chakra-ui/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useColorModeValue } from "@/components/ui/color-mode";
@@ -23,6 +23,8 @@ import {
 import { PageHeader } from "@/core/components/PageHeader";
 import { useGymMember } from "./hooks/useGymMember";
 import type { MemberDocument } from "./types/Gym.types";
+import { useNavActionStore } from "@/core/store/useNavActionStore";
+import { useEffect } from "react";
 
 // ─── Status Config ──────────────────────────────────────────────────
 
@@ -48,7 +50,7 @@ const fmtDate = (d?: string) => {
 };
 
 const fmtCurrency = (amount: number, currency = "INR") =>
-  new Intl.NumberFormat(undefined, { style: "currency", currency, maximumFractionDigits: 0 }).format(amount);
+  new Intl.NumberFormat("en-IN", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount);
 
 // ─── Sub-Components ─────────────────────────────────────────────────
 
@@ -57,7 +59,7 @@ const SurfaceCard = memo(({ children, p = { base: 4, md: 5 }, ...props }: { chil
   const border = useColorModeValue("rgba(226,232,240,0.86)", "rgba(255,255,255,0.12)");
   return (
     <Box p={p} borderRadius="2xl" bg={bg} border="1px solid" borderColor={border}
-      backdropFilter="blur(18px) saturate(150%)" boxShadow="0 22px 52px -38px rgba(15,23,42,0.72)" {...props}>
+      backdropFilter="blur(18px) saturate(150%)" boxShadow="0 1px 3px rgba(0,0,0,0.04)" {...props}>
       {children}
     </Box>
   );
@@ -121,6 +123,40 @@ const MemberDetail = memo(() => {
   );
   const borderColor = useColorModeValue("rgba(226,232,240,0.86)", "rgba(255,255,255,0.12)");
   const muted = useColorModeValue("gray.500", "gray.400");
+
+  const mountNavActions = useNavActionStore((state) => state.setActions);
+  const unmountNavActions = useNavActionStore((state) => state.clearActions);
+
+  useEffect(() => {
+    mountNavActions(
+      <HStack gap={2}>
+        <Button
+          variant="outline"
+          borderRadius="sm"
+          fontWeight="800"
+          size="sm"
+          onClick={handleBack}
+          h="32px"
+        >
+          <LuArrowLeft size={14} /> Directory
+        </Button>
+        <IconButton
+          variant="subtle"
+          colorPalette="yellow"
+          borderRadius="sm"
+          size="sm"
+          onClick={refresh}
+          aria-label="Refresh profile"
+          loading={loading}
+          h="32px"
+          w="32px"
+        >
+          <LuRefreshCw size={14} />
+        </IconButton>
+      </HStack>
+    );
+    return () => unmountNavActions();
+  }, [mountNavActions, unmountNavActions, handleBack, refresh, loading]);
 
   // ── Not found ──
   if (!loading && !member) {
@@ -186,14 +222,6 @@ const MemberDetail = memo(() => {
                   </Skeleton>
                 </HStack>
               </VStack>
-            </HStack>
-            {/* <HStack gap={3} flexWrap="wrap">
-              <Button colorPalette="blue" borderRadius="xl" fontWeight="900"><LuMessageSquare size={17} /> Message</Button>
-              <Button variant="outline" borderRadius="xl" fontWeight="900"><LuFileText size={17} /> Export</Button>
-            </HStack> */}
-            <HStack gap={3}>
-              <Button variant="outline" borderRadius="xl" onClick={handleBack} fontWeight="900"><LuArrowLeft size={16} /> Directory</Button>
-              <Button variant="outline" borderRadius="xl" onClick={refresh} loading={loading} fontWeight="900"><LuRefreshCw size={16} /> Refresh</Button>
             </HStack>
           </Flex>
         </SurfaceCard>

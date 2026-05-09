@@ -43,6 +43,8 @@ import {
 import { PageHeader } from "@/core/components/PageHeader";
 import { useGymMembers } from "./hooks/useGymMembers";
 import { MemberDocument } from "./types/Gym.types";
+import { useNavActionStore } from "@/core/store/useNavActionStore";
+import { useEffect } from "react";
 
 type MemberFilter = "all" | "active" | "attention" | "frozen";
 
@@ -357,6 +359,38 @@ const ViewMember = memo(() => {
     navigate(path);
   }, [appCode, appName, navigate, prefix]);
 
+  const mountNavActions = useNavActionStore((state) => state.setActions);
+  const unmountNavActions = useNavActionStore((state) => state.clearActions);
+
+  useEffect(() => {
+    mountNavActions(
+      <HStack gap={2}>
+        <IconButton
+          variant="subtle"
+          colorPalette="yellow"
+          borderRadius="sm"
+          size="sm"
+          onClick={refresh}
+          aria-label="Refresh members"
+          loading={loading}
+        >
+          <LuRefreshCw size={14} />
+        </IconButton>
+        <Button
+          colorPalette="blue"
+          borderRadius="sm"
+          px={4}
+          size="sm"
+          fontWeight="800"
+          onClick={() => navigateTo("AddMember")}
+        >
+          <LuPlus size={16} /> New Member
+        </Button>
+      </HStack>
+    );
+    return () => unmountNavActions();
+  }, [mountNavActions, unmountNavActions, refresh, loading, navigateTo]);
+
   const metrics = useMemo(() => {
     const active = members.filter((member) => member.data.status === "active").length;
     const attention = members.filter((member) => member.data.status === "attention").length;
@@ -398,71 +432,49 @@ const ViewMember = memo(() => {
 
   return (
     <Box mt={4} animation="fade-in 0.5s ease-out" w="full">
+      <Box
+        p={{ base: 5, lg: 7 }}
+        mb="3"
+        borderRadius="2xl"
+        bg={heroBg}
+        border="1px solid"
+        borderColor={borderColor}
+        overflow="hidden"
+        position="relative"
+        boxShadow="0 1px 3px rgba(0,0,0,0.04)"
+      >
+        <Grid templateColumns={{ base: "1fr", xl: "1.1fr 1.6fr" }} gap={6} alignItems="stretch">
+          <VStack align="start" gap={3}>
+            <VStack align="start" gap={3}>
+              <Badge colorPalette="blue" variant="subtle" borderRadius="full" px={3} py={1} fontWeight="900">
+                Live Member Ops
+              </Badge>
+              <Heading size={{ base: "xl", md: "2xl" }} letterSpacing="tight" color="app.text.primary">
+                Manage members with a cleaner operating cockpit.
+              </Heading>
+              <Text color={muted} fontSize="sm" maxW="560px" fontWeight="600">
+                Track active members, renewal attention, frozen accounts, and member contact records from one modern SaaS view.
+              </Text>
+            </VStack>
+          </VStack>
+
+          <SimpleGrid columns={{ base: 1, md: 2, xl: 4 }} gap={4}>
+            <StatTile label="Total members" value={total || members.length} caption="Registered profiles" icon={LuUsers} accent="blue.500" />
+            <StatTile label="Active" value={metrics.active} caption={`${metrics.retention}% retention`} icon={LuUserCheck} accent="green.500" />
+            <StatTile label="Attention" value={metrics.attention} caption="Renewal follow-up" icon={LuActivity} accent="orange.500" />
+            <StatTile label="Frozen" value={metrics.frozen} caption="Paused accounts" icon={LuSparkles} accent="cyan.500" />
+          </SimpleGrid>
+        </Grid>
+      </Box>
       <PageHeader
         title="Member Directory"
         subtitle={`${total} registered members across plans, renewals, and attendance workflows.`}
-        actions={
-          <HStack gap={3}>
-            <IconButton
-              variant="outline"
-              borderRadius="xl"
-              onClick={refresh}
-              aria-label="Refresh members"
-              loading={loading}
-            >
-              <LuRefreshCw size={16} />
-            </IconButton>
-            <Button colorPalette="blue" borderRadius="xl" px={5} fontWeight="900" onClick={() => navigateTo("AddMember")}>
-              <LuPlus size={18} /> New Member
-            </Button>
-          </HStack>
-        }
         onSearchChange={setSearchQuery}
         searchValue={searchQuery}
         searchPlaceholder="Search members, email, phone or ID..."
       />
       <VStack align="stretch" gap={6} pb={8}>
-        <Box
-          p={{ base: 5, lg: 7 }}
-          borderRadius="2xl"
-          bg={heroBg}
-          border="1px solid"
-          borderColor={borderColor}
-          overflow="hidden"
-          position="relative"
-          boxShadow="0 28px 64px -42px rgba(15, 23, 42, 0.7)"
-        >
-          <Grid templateColumns={{ base: "1fr", xl: "1.1fr 1.6fr" }} gap={6} alignItems="stretch">
-            <VStack align="start" justify="space-between" gap={6}>
-              <VStack align="start" gap={3}>
-                <Badge colorPalette="blue" variant="subtle" borderRadius="full" px={3} py={1} fontWeight="900">
-                  Live Member Ops
-                </Badge>
-                <Heading size={{ base: "xl", md: "2xl" }} letterSpacing="tight" color="app.text.primary">
-                  Manage members with a cleaner operating cockpit.
-                </Heading>
-                <Text color={muted} fontSize="sm" maxW="560px" fontWeight="600">
-                  Track active members, renewal attention, frozen accounts, and member contact records from one modern SaaS view.
-                </Text>
-              </VStack>
-              <HStack gap={3} flexWrap="wrap">
-                <Button colorPalette="blue" borderRadius="xl" fontWeight="900" onClick={() => navigateTo("AddMember")}>
-                  <LuPlus size={18} /> Enroll Member
-                </Button>
-                <Button variant="outline" borderRadius="xl" fontWeight="800" onClick={refresh} loading={loading}>
-                  <LuRefreshCw size={16} /> Sync Data
-                </Button>
-              </HStack>
-            </VStack>
 
-            <SimpleGrid columns={{ base: 1, md: 2, xl: 4 }} gap={4}>
-              <StatTile label="Total members" value={total || members.length} caption="Registered profiles" icon={LuUsers} accent="blue.500" />
-              <StatTile label="Active" value={metrics.active} caption={`${metrics.retention}% retention`} icon={LuUserCheck} accent="green.500" />
-              <StatTile label="Attention" value={metrics.attention} caption="Renewal follow-up" icon={LuActivity} accent="orange.500" />
-              <StatTile label="Frozen" value={metrics.frozen} caption="Paused accounts" icon={LuSparkles} accent="cyan.500" />
-            </SimpleGrid>
-          </Grid>
-        </Box>
 
         <Grid templateColumns={{ base: "1fr", xl: "minmax(0, 1fr) 360px" }} gap={{ base: 6, xl: 8 }}>
           <GridItem minW={0}>

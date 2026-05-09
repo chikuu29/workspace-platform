@@ -8,17 +8,19 @@
 import { memo, useMemo } from "react";
 import {
   Badge, Box, Circle, Grid, GridItem, Heading, HStack, Icon,
-  Separator, SimpleGrid, Text, VStack,
+  Separator, SimpleGrid, Text, VStack, IconButton,
 } from "@chakra-ui/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProgressRoot, ProgressBar } from "@/components/ui/progress";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import {
   LuActivity, LuArrowUpRight, LuClock,
-  LuTrendingUp, LuUsers, LuUserX, LuZap,
+  LuTrendingUp, LuUsers, LuUserX, LuZap, LuRefreshCw,
 } from "react-icons/lu";
 import { PageHeader } from "@/core/components/PageHeader";
 import { useAttendanceStats } from "./hooks/useAttendanceStats";
+import { useNavActionStore } from "@/core/store/useNavActionStore";
+import { useEffect } from "react";
 
 // ─── Helpers ────────────────────────────────────────────────────────
 
@@ -39,7 +41,7 @@ const StatTile = memo(({ label, value, caption, icon, accent }: {
 
   return (
     <Box p={{ base: 4, md: 5 }} borderRadius="2xl" bg={tileBg} border="1px solid" borderColor={border}
-      backdropFilter="blur(18px) saturate(160%)" boxShadow="0 18px 42px -30px rgba(15,23,42,0.55)">
+      backdropFilter="blur(18px) saturate(160%)" boxShadow={useColorModeValue("0 4px 12px rgba(0, 0, 0, 0.05)", "0 1px 3px rgba(0,0,0,0.04)")}>
       <HStack justify="space-between" align="start" gap={4}>
         <VStack align="start" gap={1}>
           <Text fontSize="2xs" color={muted} fontWeight="800" textTransform="uppercase" letterSpacing="wider">{label}</Text>
@@ -79,6 +81,30 @@ const HourlyBar = memo(({ hour, count, maxCount, active }: { hour: number; count
 const AttendanceReport = memo(() => {
   const { stats, loading, refetch } = useAttendanceStats();
 
+  const mountNavActions = useNavActionStore((state) => state.setActions);
+  const unmountNavActions = useNavActionStore((state) => state.clearActions);
+
+  useEffect(() => {
+    mountNavActions(
+      <HStack gap={2}>
+        <IconButton
+          variant="subtle"
+          colorPalette="yellow"
+          borderRadius="sm"
+          size="sm"
+          onClick={refetch}
+          aria-label="Refresh stats"
+          loading={loading}
+          h="32px"
+          w="32px"
+        >
+          <LuRefreshCw size={14} />
+        </IconButton>
+      </HStack>
+    );
+    return () => unmountNavActions();
+  }, [mountNavActions, unmountNavActions, refetch, loading]);
+
   const muted = useColorModeValue("gray.500", "gray.400");
   const borderColor = useColorModeValue("rgba(226,232,240,0.84)", "rgba(255,255,255,0.12)");
   const panelBg = useColorModeValue("rgba(255,255,255,0.74)", "rgba(15,23,42,0.58)");
@@ -103,14 +129,12 @@ const AttendanceReport = memo(() => {
       <PageHeader
         title="Attendance Report"
         subtitle="Tracking visit frequency and member engagement levels."
-        onRefresh={refetch}
-        isRefreshing={loading}
       />
 
       <VStack align="stretch" gap={6} pb={8}>
         {/* ── Hero Stats ──────────────────────────────── */}
         <Box p={{ base: 5, lg: 7 }} borderRadius="2xl" bg={heroBg} border="1px solid"
-          borderColor={borderColor} boxShadow="0 28px 64px -42px rgba(15,23,42,0.7)">
+          borderColor={borderColor} boxShadow={useColorModeValue("0 4px 12px rgba(0, 0, 0, 0.05)", "0 1px 3px rgba(0,0,0,0.04)")}>
           <Grid templateColumns={{ base: "1fr", xl: "1.1fr 1.6fr" }} gap={6} alignItems="stretch">
             <VStack align="start" justify="space-between" gap={6}>
               <VStack align="start" gap={3}>
@@ -187,7 +211,7 @@ const AttendanceReport = memo(() => {
           {/* Engagement Matrix */}
           <GridItem>
             <VStack align="stretch" gap={6} h="full">
-              <Box p={6} borderRadius="3xl" bg="blue.600" color="white" boxShadow="xl" flex="1">
+              <Box p={6} borderRadius="3xl" bg="blue.600" color="white" boxShadow={useColorModeValue("0 4px 12px rgba(0, 0, 0, 0.05)", "0 1px 3px rgba(0,0,0,0.04)")} flex="1">
                 <VStack align="stretch" gap={6} h="full" justify="center">
                   <HStack justify="space-between">
                     <Heading size="xs" fontWeight="800" opacity={0.8} textTransform="uppercase" letterSpacing="widest">Engagement Index</Heading>

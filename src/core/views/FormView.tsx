@@ -20,7 +20,7 @@ import { startLoading, stopLoading } from "@/app/slices/loader/appLoaderSlice";
 import { useNavigate } from "react-router";
 import { useModalStore } from "@/core/store/useModalStore";
 import { RootState } from "@/app/store";
-import { useBreadcrumbActionsStore } from "@/core/store/useBreadcrumbActionsStore";
+import { useNavActionStore } from "@/core/store/useNavActionStore";
 
 interface FormBreadcrumbActionsProps {
   buttons: any[];
@@ -89,8 +89,8 @@ const FormView = ({ config, publishActionsToBreadcrumb = true }: any) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const openModal = useModalStore((s) => s.openModal);
-  const setBreadcrumbActions = useBreadcrumbActionsStore((s) => s.setActions);
-  const clearBreadcrumbActions = useBreadcrumbActionsStore((s) => s.clearActions);
+  const setBreadcrumbActions = useNavActionStore((s) => s.setActions);
+  const clearBreadcrumbActions = useNavActionStore((s) => s.clearActions);
   const organizationName = useSelector(
     (state: RootState) => state.organizations?.organization?.name ?? "GHOST_ORG"
   );

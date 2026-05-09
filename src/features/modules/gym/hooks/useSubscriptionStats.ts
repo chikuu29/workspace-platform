@@ -26,7 +26,7 @@ export const useSubscriptionStats = (): UseSubscriptionStatsResult => {
     setLoading(true);
     setError(null);
 
-    const subscription = GymApiService.getSubscriptionStats().subscribe({
+    const subscription = GymApiService.getSubscriptionAnalytics().subscribe({
       next: (data) => {
         if (!mountedRef.current) return;
         setStats(data);

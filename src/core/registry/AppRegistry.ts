@@ -117,6 +117,7 @@ const registry: RegistryConfig = {
         PaymentsHistory: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.PaymentsHistory })),
         // Trainers
         trainers: () => import("@/features/modules/gym/TrainersStaff"),
+        TrainerProfile: () => import("@/features/modules/gym/TrainerProfile"),
         trainerSchedules: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.TrainerSchedules })),
         // Classes
         listClasses: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.ListClasses })),

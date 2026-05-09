@@ -19,6 +19,7 @@ import {
     Skeleton,
     Text,
     VStack,
+    IconButton,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router";
@@ -38,6 +39,9 @@ import {
 import { PageLayout } from "@/core/components/PageLayout";
 import { useSubscriptionPlans } from "./hooks/useSubscriptionPlans";
 import { useSubscriptionStats } from "./hooks/useSubscriptionStats";
+import { useNavActionStore } from "@/core/store/useNavActionStore";
+import { useEffect } from "react";
+import { LuRefreshCw } from "react-icons/lu";
 import type { SubscriptionPlanDocument, PlanWithMembers } from "./types/Gym.types";
 
 // ─── Glassmorphic Card Wrapper ──────────────────────────────────────────────
@@ -52,12 +56,9 @@ interface GlassCardProps {
 }
 
 const GlassCard = memo(({ children, p = 6, h, accentColor = "blue", onClick, cursor }: GlassCardProps) => {
-    const bg = useColorModeValue("rgba(255, 255, 255, 0.4)", "rgba(15, 23, 42, 0.6)");
-    const borderColor = useColorModeValue("rgba(255, 255, 255, 0.6)", "rgba(255, 255, 255, 0.1)");
-    const shadow = useColorModeValue(
-        "0 8px 32px 0 rgba(31, 38, 135, 0.07)",
-        "0 8px 32px 0 rgba(0, 0, 0, 0.37)"
-    );
+    const bg = useColorModeValue("rgba(255, 255, 255, 0.74)", "rgba(15, 23, 42, 0.58)");
+    const borderColor = useColorModeValue("rgba(226, 232, 240, 0.84)", "rgba(255, 255, 255, 0.12)");
+    const shadow = useColorModeValue("0 4px 12px rgba(0, 0, 0, 0.05)", "0 1px 3px rgba(0,0,0,0.04)");
 
     // Gradient border logic using a wrapper and an inner box
     return (
@@ -65,13 +66,14 @@ const GlassCard = memo(({ children, p = 6, h, accentColor = "blue", onClick, cur
             position="relative"
             borderRadius="2xl"
             p="1px" // The thickness of the gradient border
-            bgGradient={`linear(to-br, ${accentColor}.400, transparent, ${accentColor}.400)`}
+            bgGradient={`linear(to-br, ${accentColor}.400/20, transparent, ${accentColor}.400/20)`}
             transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
             _hover={{
-                transform: "translateY(-4px)",
-                bgGradient: `linear(to-br, ${accentColor}.500, ${accentColor}.200, ${accentColor}.500)`,
-                boxShadow: `0 12px 40px -10px var(--chakra-colors-${accentColor}-500)`,
+                transform: "translateY(-2px)",
+                bgGradient: `linear(to-br, ${accentColor}.400/40, transparent, ${accentColor}.400/40)`,
+                boxShadow: `0 8px 24px -12px var(--chakra-colors-${accentColor}-500)`,
             }}
+            boxShadow={shadow}
             h={h}
             onClick={onClick}
             cursor={cursor}
@@ -173,7 +175,7 @@ const PlanSummaryCard = memo(({ plan, memberInfo }: PlanSummaryCardProps) => {
                         </Heading>
                         <HStack align="baseline" gap={1}>
                             <Text fontSize="2xl" fontWeight="900">
-                                ${plan.data.price.toLocaleString()}
+                                ₹{plan.data.price.toLocaleString("en-IN")}
                             </Text>
                             <Text color={muted} fontSize="xs" fontWeight="700" textTransform="uppercase">
                                 / {plan.data.billing_cycle}
@@ -197,7 +199,7 @@ const PlanSummaryCard = memo(({ plan, memberInfo }: PlanSummaryCardProps) => {
                         <Text fontSize="2xs" textTransform="uppercase" letterSpacing="widest" color={muted} fontWeight="800">
                             MRR
                         </Text>
-                        <Heading size="md" mt={1} fontWeight="900">${planRevenue.toLocaleString()}</Heading>
+                        <Heading size="md" mt={1} fontWeight="900">₹{planRevenue.toLocaleString("en-IN")}</Heading>
                     </Box>
                 </SimpleGrid>
 
@@ -262,6 +264,50 @@ const Subscription = () => {
         navigate(buildViewPath("GymSubscriptionPlans"));
     }, [navigate, buildViewPath]);
 
+    const mountNavActions = useNavActionStore((state) => state.setActions);
+    const unmountNavActions = useNavActionStore((state) => state.clearActions);
+
+    useEffect(() => {
+        mountNavActions(
+            <HStack gap={2}>
+                <IconButton
+                    variant="subtle"
+                    colorPalette="yellow"
+                    borderRadius="sm"
+                    size="sm"
+                    onClick={handleRefresh}
+                    aria-label="Refresh hub"
+                    loading={plansLoading || statsLoading}
+                    h="32px"
+                    w="32px"
+                >
+                    <LuRefreshCw size={14} />
+                </IconButton>
+                <Button
+                    variant="outline"
+                    borderRadius="sm"
+                    size="sm"
+                    onClick={handleManagePlans}
+                    h="32px"
+                    fontWeight="800"
+                >
+                    <LuSettings /> Management
+                </Button>
+                <Button
+                    colorPalette="blue"
+                    borderRadius="sm"
+                    size="sm"
+                    onClick={handleCreatePlan}
+                    h="32px"
+                    fontWeight="800"
+                >
+                    <LuPlus /> New Plan
+                </Button>
+            </HStack>
+        );
+        return () => unmountNavActions();
+    }, [mountNavActions, unmountNavActions, handleRefresh, handleManagePlans, handleCreatePlan, plansLoading, statsLoading]);
+
     const handleViewMembers = useCallback(() => {
         navigate(buildViewPath("members"));
     }, [navigate, buildViewPath]);
@@ -282,52 +328,8 @@ const Subscription = () => {
 
     return (
         <PageLayout
-            title={
-                <HStack gap={4}>
-                    <Circle size="12" bgGradient="linear(to-br, blue.500, cyan.400)" color="white" shadow="0 0 30px rgba(59, 130, 246, 0.5)">
-                        <LuWallet size={24} />
-                    </Circle>
-                    <VStack align="start" gap={0}>
-                        <Heading size="xl" fontWeight="950" letterSpacing="tighter">
-                            Subscription Hub
-                        </Heading>
-                        <Text fontSize="xs" fontWeight="700" color={muted} letterSpacing="widest">
-                            GYM BILLING & REVENUE ANALYTICS
-                        </Text>
-                    </VStack>
-                </HStack>
-            }
+            title="Subscription Hub"
             subtitle="Real-time membership health, revenue forecasting, and plan management."
-            actions={
-                <HStack gap={4} flexWrap="wrap">
-                    <Button
-                        colorPalette="blue"
-                        borderRadius="2xl"
-                        size="lg"
-                        px={8}
-                        h="56px"
-                        fontWeight="900"
-                        shadow="0 15px 35px -10px rgba(59, 130, 246, 0.4)"
-                        onClick={handleCreatePlan}
-                        _hover={{ transform: "translateY(-2px)", shadow: "0 20px 40px -10px rgba(59, 130, 246, 0.6)" }}
-                    >
-                        <LuPlus style={{ marginRight: "8px" }} /> New Plan
-                    </Button>
-                    <Button
-                        variant="surface"
-                        borderRadius="2xl"
-                        size="lg"
-                        h="56px"
-                        px={8}
-                        fontWeight="900"
-                        onClick={handleManagePlans}
-                    >
-                        <LuSettings style={{ marginRight: "8px" }} /> Management
-                    </Button>
-                </HStack>
-            }
-            onRefresh={handleRefresh}
-            isRefreshing={plansLoading || statsLoading}
         >
             <VStack align="stretch" gap={10} pb={8}>
 
@@ -355,7 +357,7 @@ const Subscription = () => {
                             />
                             <KpiTile
                                 label="Projected MRR"
-                                value={`$${(stats?.total_mrr ?? 0).toLocaleString()}`}
+                                value={`₹${(stats?.total_mrr ?? 0).toLocaleString("en-IN")}`}
                                 helper="Recurring Revenue"
                                 icon={LuCircleDollarSign}
                                 accent="orange"
@@ -364,8 +366,8 @@ const Subscription = () => {
                                 label="Unit Economy"
                                 value={
                                     stats && stats.total_subscribers > 0
-                                        ? `$${Math.round(stats.total_mrr / stats.total_subscribers)}`
-                                        : "$0"
+                                        ? `₹${Math.round(stats.total_mrr / stats.total_subscribers).toLocaleString("en-IN")}`
+                                        : "₹0"
                                 }
                                 helper="Average Revenue / User"
                                 icon={LuChartColumn}

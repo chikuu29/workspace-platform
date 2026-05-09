@@ -25,7 +25,7 @@ export const useAttendanceStats = (): UseAttendanceStatsResult => {
     setLoading(true);
     setError(null);
 
-    const subscription = GymApiService.getAttendanceStats().subscribe({
+    const subscription = GymApiService.getAttendanceAnalytics().subscribe({
       next: (data) => {
         if (!mountedRef.current) return;
         setStats(data);

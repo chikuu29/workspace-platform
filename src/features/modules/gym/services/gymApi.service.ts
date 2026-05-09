@@ -20,14 +20,16 @@ import type {
   ActivateSubscriptionResponse,
   SubscriptionStats,
   AttendanceStats,
+  TrainerDocument,
+  TrainersResponse,
 } from "../types/Gym.types";
 
 export const GymApiService = {
   // ── Dashboard ───────────────────────────────────────────────────────
 
-  /** Fetches aggregated dashboard statistics. */
-  getDashboardStats: () => {
-    return GETAPI({ path: "/v1/gym/dashboard/stats", isPrivateApi: true }).pipe(
+  /** Fetches aggregated dashboard statistics and KPIs. */
+  getGymKPIs: () => {
+    return GETAPI({ path: "/v1/gym/analytics/kpis", isPrivateApi: true }).pipe(
       map((res: any) => res.data as GymDashboardStats)
     );
   },
@@ -110,9 +112,9 @@ export const GymApiService = {
   // ── Subscription Stats ──────────────────────────────────────────────
 
   /** Fetches aggregated subscription/billing KPIs. */
-  getSubscriptionStats: () => {
+  getSubscriptionAnalytics: () => {
     return GETAPI({
-      path: "/v1/gym/subscription/stats",
+      path: "/v1/gym/analytics/subscriptions",
       isPrivateApi: true,
     }).pipe(map((res: any) => res.data as SubscriptionStats));
   },
@@ -129,10 +131,46 @@ export const GymApiService = {
   },
 
   /** Fetches attendance analytics and heatmap. */
-  getAttendanceStats: () => {
+  getAttendanceAnalytics: () => {
     return GETAPI({
-      path: "/v1/gym/attendance/stats",
+      path: "/v1/gym/analytics/attendance",
       isPrivateApi: true,
     }).pipe(map((res: any) => res.data as AttendanceStats));
+  },
+
+  // ── Trainers ────────────────────────────────────────────────────────
+  
+  /** Fetches the paginated list of gym trainers. */
+  getTrainers: (skip: number = 0, limit: number = 50) => {
+    return GETAPI({
+      path: "/v1/gym/trainers",
+      params: { skip, limit },
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as TrainersResponse));
+  },
+
+  /** Fetches a single trainer by record_id or trainer_id. */
+  getTrainer: (identifier: string) => {
+    return GETAPI({
+      path: `/v1/gym/trainers/${identifier}`,
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res.data as TrainerDocument));
+  },
+
+  /** Updates an existing trainer. */
+  updateTrainer: (identifier: string, payload: any) => {
+    return PUTAPI({
+      path: `/v1/gym/trainers/${identifier}`,
+      data: payload,
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as { success: boolean; message: string; data: TrainerDocument }));
+  },
+
+  /** Soft-deletes a trainer. */
+  deleteTrainer: (identifier: string) => {
+    return DELETEAPI({
+      path: `/v1/gym/trainers/${identifier}`,
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as { success: boolean; message: string }));
   },
 };

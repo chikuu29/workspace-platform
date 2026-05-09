@@ -18,6 +18,7 @@ import {
 } from "@chakra-ui/react";
 import { CircleCheck } from "lucide-react";
 import type { RecentMember } from "../types/Gym.types";
+import { useColorModeValue } from "@/components/ui/color-mode";
 
 const formatDate = (date?: string): string => {
   if (!date) return "Recently";
@@ -79,9 +80,19 @@ MemberRow.displayName = "MemberRow";
 
 const RecentEnrollmentsList = memo(({ members, loading, onViewAll, onMemberClick }: RecentEnrollmentsListProps) => {
   const displayMembers = members.slice(0, 5);
+  const panelBg = useColorModeValue("rgba(255,255,255,0.74)", "rgba(15,23,42,0.58)");
+  const borderColor = useColorModeValue("rgba(226,232,240,0.84)", "rgba(255,255,255,0.12)");
 
   return (
-    <Box p={5} borderRadius="2xl" bg="app.card.bg" border="1px solid" borderColor="app.card.border" boxShadow="0 1px 3px rgba(0,0,0,0.04)">
+    <Box
+      p={5}
+      borderRadius="2xl"
+      bg={panelBg}
+      border="1px solid"
+      borderColor={borderColor}
+      backdropFilter="blur(16px) saturate(140%)"
+      boxShadow={useColorModeValue("0 4px 12px rgba(0, 0, 0, 0.05)", "0 1px 3px rgba(0,0,0,0.04)")}
+    >
       <VStack align="stretch" gap={4}>
         <HStack justify="space-between">
           <Heading size="sm" fontWeight="900" color="app.text.primary">Recent Enrollments</Heading>

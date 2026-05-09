@@ -5,7 +5,7 @@
  * Fetches plans via useSubscriptionPlans hook.
  */
 
-import { memo, useState, useCallback, useMemo } from "react";
+import { memo, useState, useCallback, useMemo, useEffect } from "react";
 import {
   Box, Heading, Text, VStack, HStack, Button, Badge, IconButton, Input,
   Textarea, SimpleGrid, Spinner, Center, Separator, Flex, Circle, Icon,
@@ -22,6 +22,7 @@ import { toaster } from "@/components/ui/toaster";
 import {
   LuPlus, LuPencil, LuTrash2, LuCheck, LuArrowRight,
   LuActivity, LuTimer, LuCoins, LuCreditCard, LuFilter, LuUsers, LuTrendingUp,
+  LuRefreshCw,
 } from "react-icons/lu";
 import { Field } from "@/components/ui/field";
 import { Switch } from "@/components/ui/switch";
@@ -29,11 +30,12 @@ import { PageHeader } from "@/core/components/PageHeader";
 import { useSubscriptionPlans } from "./hooks/useSubscriptionPlans";
 import { GymApiService } from "./services/gymApi.service";
 import type { SubscriptionPlanDocument } from "./types/Gym.types";
+import { useNavActionStore } from "@/core/store/useNavActionStore";
 
 // ─── Helpers ────────────────────────────────────────────────────────
 
 const fmtCurrency = (amount: number, currency = "INR") =>
-  new Intl.NumberFormat(undefined, { style: "currency", currency, maximumFractionDigits: 0 }).format(amount);
+  new Intl.NumberFormat("en-IN", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount);
 
 type PlanFilter = "all" | "active" | "inactive";
 
@@ -55,7 +57,8 @@ const PlanCard = memo(({
   return (
     <Box
       role="group" p={6} borderRadius="2xl" bg={cardBg} border="1px solid" borderColor={cardBorder}
-      boxShadow="0 18px 44px -34px rgba(15,23,42,0.72)" backdropFilter="blur(18px) saturate(150%)"
+      boxShadow={useColorModeValue("0 4px 12px rgba(0, 0, 0, 0.05)", "0 1px 3px rgba(0,0,0,0.04)")}
+      backdropFilter="blur(18px) saturate(150%)"
       position="relative" overflow="hidden" transition="all 0.24s cubic-bezier(0.4,0,0.2,1)"
       _before={{
         content: '""', position: "absolute", top: 0, left: 0, right: 0, h: "3px",
@@ -63,7 +66,7 @@ const PlanCard = memo(({
       }}
       _hover={{
         transform: "translateY(-5px)", borderColor: `${accent}.400`,
-        boxShadow: "0 26px 56px -34px rgba(37,99,235,0.72)",
+        boxShadow: useColorModeValue("0 12px 24px rgba(0,0,0,0.08)", "0 8px 24px rgba(0,0,0,0.2)"),
       }}
     >
       <VStack align="stretch" gap={5} h="full">
@@ -214,7 +217,7 @@ const GymSubscriptionPlans = memo(() => {
       name: fd.get("name") as string,
       description: fd.get("description") as string,
       price: parseFloat(fd.get("price") as string) || 0,
-      billing_cycle: fd.get("billing_cycle") as string,
+      billing_cycle: fd.get("billing_cycle") as "monthly" | "quarterly" | "yearly",
       is_active: fd.get("is_active") === "on",
     };
     GymApiService.updatePlan(selectedPlan._meta.record_id, payload).subscribe({
@@ -229,6 +232,38 @@ const GymSubscriptionPlans = memo(() => {
 
   const handleDrawerOpenChange = useCallback((e: { open: boolean }) => setIsOpen(e.open), []);
 
+  const mountNavActions = useNavActionStore((state) => state.setActions);
+  const unmountNavActions = useNavActionStore((state) => state.clearActions);
+
+  useEffect(() => {
+    mountNavActions(
+      <HStack gap={2}>
+        <IconButton
+          variant="subtle"
+          colorPalette="yellow"
+          borderRadius="sm"
+          size="sm"
+          onClick={refetch}
+          aria-label="Refresh plans"
+          loading={isLoading}
+        >
+          <LuRefreshCw size={14} />
+        </IconButton>
+        <Button
+          colorPalette="blue"
+          borderRadius="sm"
+          px={4}
+          size="sm"
+          fontWeight="800"
+          onClick={handleAddClick}
+        >
+          <LuPlus size={16} /> New Plan
+        </Button>
+      </HStack>
+    );
+    return () => unmountNavActions();
+  }, [mountNavActions, unmountNavActions, refetch, isLoading, handleAddClick]);
+
   // ── Stable handlers for cards ──
   const createEditHandler = useCallback((plan: SubscriptionPlanDocument) => () => handleEditClick(plan), [handleEditClick]);
   const createDeleteHandler = useCallback((plan: SubscriptionPlanDocument) => () => handleDelete(plan), [handleDelete]);
@@ -239,7 +274,7 @@ const GymSubscriptionPlans = memo(() => {
       label: string; value: string | number; caption: string; icon: React.ElementType; accent: string;
     }) => (
       <Box p={{ base: 4, md: 5 }} borderRadius="2xl" bg={panelBg} border="1px solid" borderColor={borderColor}
-        backdropFilter="blur(18px) saturate(160%)" boxShadow="0 18px 42px -30px rgba(15,23,42,0.55)">
+        backdropFilter="blur(18px) saturate(160%)" boxShadow={useColorModeValue("0 4px 12px rgba(0, 0, 0, 0.05)", "0 1px 3px rgba(0,0,0,0.04)")}>
         <HStack justify="space-between" align="start" gap={4}>
           <VStack align="start" gap={1}>
             <Text fontSize="xs" color={muted} fontWeight="800" textTransform="uppercase">{label}</Text>
@@ -260,24 +295,15 @@ const GymSubscriptionPlans = memo(() => {
         <PageHeader
           title="Subscription Plans"
           subtitle={`${metrics.total} plans configured — ${metrics.active} active`}
-          actions={
-            <HStack gap={3}>
-              <Button colorPalette="blue" borderRadius="xl" px={5} fontWeight="900" onClick={handleAddClick}>
-                <LuPlus size={18} style={{ marginRight: "6px" }} /> New Plan
-              </Button>
-            </HStack>
-          }
-          onRefresh={refetch}
-          isRefreshing={isLoading}
         />
 
         <VStack align="stretch" gap={6} pb={8}>
           {/* ── Hero Stats ──────────────────────────────── */}
           <Box p={{ base: 5, lg: 7 }} borderRadius="2xl" bg={heroBg} border="1px solid"
             borderColor={borderColor} overflow="hidden" position="relative"
-            boxShadow="0 28px 64px -42px rgba(15,23,42,0.7)">
+            boxShadow={useColorModeValue("0 4px 12px rgba(0, 0, 0, 0.05)", "0 1px 3px rgba(0,0,0,0.04)")}>
             <Grid templateColumns={{ base: "1fr", xl: "1.1fr 1.6fr" }} gap={6} alignItems="stretch">
-              <VStack align="start" justify="space-between" gap={6}>
+              <VStack align="start" gap={3}>
                 <VStack align="start" gap={3}>
                   <Badge colorPalette="blue" variant="subtle" borderRadius="full" px={3} py={1} fontWeight="900">
                     Plan Management
@@ -289,11 +315,6 @@ const GymSubscriptionPlans = memo(() => {
                     Create and manage pricing models, billing cycles, and plan features for your gym memberships.
                   </Text>
                 </VStack>
-                <HStack gap={3} flexWrap="wrap">
-                  <Button colorPalette="blue" borderRadius="xl" fontWeight="900" onClick={handleAddClick}>
-                    <LuPlus size={18} style={{ marginRight: "6px" }} /> Create Plan
-                  </Button>
-                </HStack>
               </VStack>
               <SimpleGrid columns={{ base: 1, md: 2, xl: 4 }} gap={4}>
                 <StatTile label="Total Plans" value={metrics.total} caption="All configured" icon={LuCreditCard} accent="blue.500" />

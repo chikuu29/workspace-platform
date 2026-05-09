@@ -125,14 +125,14 @@ const Navbar = () => {
                     onClick={toggleSidebar}
                     size="sm"
                     borderRadius="xl"
-                  color="app.text.primary"
-                  bg={toggleBtnBg}
-                  border="1px solid"
-                  borderColor="app.card.border"
-                  boxShadow="0 12px 24px -20px rgba(15, 23, 42, 0.35)"
-                  _hover={iconBtnHover}
-                  transition={TRANSITION}
-                >
+                    color="app.text.primary"
+                    bg={toggleBtnBg}
+                    border="1px solid"
+                    borderColor="app.card.border"
+                    boxShadow="0 12px 24px -20px rgba(15, 23, 42, 0.35)"
+                    _hover={iconBtnHover}
+                    transition={TRANSITION}
+                  >
                     <ToggleIcon size={18} strokeWidth={2.4} />
                   </IconButton>
                 )}

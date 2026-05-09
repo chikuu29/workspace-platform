@@ -13,6 +13,8 @@
                     "onClick": ""
                 },
                 "logo": {
+                    "ShowSvg": true,
+                    "svgIcon": "<svg viewBox=\"0 0 24 24\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z\"/></svg>",
                     "url": "../assets/icons/3d-casual-life-secure-document.png",
                     "style": {
                         "mb": "4px",
@@ -31,6 +33,8 @@
                     "onClick": ""
                 },
                 "logo": {
+                    "ShowSvg": true,
+                    "svgIcon": "<svg viewBox=\"0 0 24 24\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m6.5 6.5 11 11\"/><path d=\"m11.5 4-7.5 7.5\"/><path d=\"m20 12.5-7.5 7.5\"/><path d=\"m11.5 6.5-5 5\"/><path d=\"m17.5 12.5-5 5\"/><path d=\"m6.5 11.5 5-5\"/><path d=\"m12.5 17.5 5-5\"/></svg>",
                     "url": "../assets/icons/smart-gym-water-bottle-and-dumbbells-for-a-healthy-lifestyle.png",
                     "style": {
                         "mb": "4px",
@@ -49,6 +53,8 @@
                     "onClick": ""
                 },
                 "logo": {
+                    "ShowSvg": true,
+                    "svgIcon": "<svg viewBox=\"0 0 24 24\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 21h18\"/><path d=\"M9 8h1\"/><path d=\"M9 12h1\"/><path d=\"M9 16h1\"/><path d=\"M14 8h1\"/><path d=\"M14 12h1\"/><path d=\"M14 16h1\"/><path d=\"M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16\"/></svg>",
                     "url": "../assets/icons/3d-casual-life-secure-document.png",
                     "style": {
                         "mb": "4px",
@@ -67,6 +73,8 @@
                     "onClick": ""
                 },
                 "logo": {
+                    "ShowSvg": true,
+                    "svgIcon": "<svg viewBox=\"0 0 24 24\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2\"/><path d=\"M7 2v20\"/><path d=\"M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7\"/></svg>",
                     "url": "../assets/icons/3d-casual-life-secure-document.png",
                     "style": {
                         "mb": "4px",

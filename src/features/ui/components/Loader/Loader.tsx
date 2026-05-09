@@ -167,28 +167,64 @@ const Loader = memo(() => {
   );
 });
 
+// ─── Segmented Progress (Bar of Box) ──────────────────────────────────
+const SegmentedProgress = memo(({ value }: { value: number }) => {
+  const activeColor = useColorModeValue("brand.500", "brand.400");
+  const inactiveColor = useColorModeValue("gray.100", "whiteAlpha.50");
+  const segments = 12; // More segments for a finer "box bar" look
+
+  return (
+    <VStack gap={3}>
+      <Flex gap="4px">
+        {Array.from({ length: segments }).map((_, i) => {
+          const threshold = ((i + 1) / segments) * 100;
+          const isActive = value >= threshold;
+          return (
+            <Box
+              key={i}
+              w="18px"
+              h="10px"
+              borderRadius="2px"
+              bg={isActive ? activeColor : inactiveColor}
+              boxShadow={isActive ? `0 0 15px var(--chakra-colors-brand-500)` : "none"}
+              transition="all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
+              transform={isActive ? "scaleY(1.1)" : "scaleY(1)"}
+              opacity={isActive ? 1 : 0.3}
+            />
+          );
+        })}
+      </Flex>
+      <Text
+        fontSize="xs"
+        fontWeight="bold"
+        color="brand.500"
+        letterSpacing="0.1em"
+        fontFamily="mono"
+      >
+        {Math.round(value)}%
+      </Text>
+    </VStack>
+  );
+});
+
 // ─── AppLoader (Suspense fallback / initial page load) ───────────────
 /**
  * Full-page loader used as Suspense fallback and initial app load.
- * Features a simulated progress bar, orbital spinner, and animated text.
+ * Features a modern segmented progress bar and orbital spinner.
  */
 export const AppLoader = memo(() => {
   const [progress, setProgress] = useState(0);
-  const textColor = useColorModeValue("gray.600", "whiteAlpha.700");
-  const subtleText = useColorModeValue("gray.400", "whiteAlpha.400");
-  const progressTrackBg = useColorModeValue("gray.100", "whiteAlpha.100");
+  const textColor = useColorModeValue("gray.800", "white");
+  const subtleText = useColorModeValue("gray.500", "whiteAlpha.500");
 
-  // Simulate non-linear progress for a more natural feel
   useEffect(() => {
     const timer = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) return 100;
-        // Slow down as we approach 100% for realistic feel
-        const increment = prev < 60 ? 12 : prev < 85 ? 5 : 2;
+        const increment = prev < 50 ? 8 : prev < 80 ? 4 : 1;
         return Math.min(prev + increment, 100);
       });
-    }, 400);
-
+    }, 300);
     return () => clearInterval(timer);
   }, []);
 
@@ -199,71 +235,94 @@ export const AppLoader = memo(() => {
       align="center"
       height="100vh"
       bg="bg.default"
-      css={{ animation: "loader-fade-in 0.3s ease-out" }}
+      position="relative"
+      overflow="hidden"
+      css={{
+        animation: "loader-fade-in 0.5s ease-out",
+        background: useColorModeValue(
+          "radial-gradient(circle at center, white 0%, #f8fafc 100%)",
+          "radial-gradient(circle at center, #0f172a 0%, #020617 100%)"
+        ),
+      }}
     >
-      <VStack gap={8}>
-        {/* Logo with pulse */}
-        {/* <Box css={{ animation: "loader-pulse 2.5s ease-in-out infinite" }}>
-          <Image
-            src="/assets/icons/logo.png"
-            alt="Workspace Logo"
-            h="56px"
-            w="auto"
-            objectFit="contain"
-          />
-        </Box> */}
+      {/* Decorative background elements */}
+      <Box
+        position="absolute"
+        top="-10%"
+        left="-10%"
+        w="40%"
+        h="40%"
+        borderRadius="full"
+        bg="brand.500"
+        filter="blur(120px)"
+        opacity={0.05}
+      />
+      <Box
+        position="absolute"
+        bottom="-10%"
+        right="-10%"
+        w="40%"
+        h="40%"
+        borderRadius="full"
+        bg="blue.500"
+        filter="blur(120px)"
+        opacity={0.05}
+      />
 
-        {/* Spinner */}
-        <OrbitalSpinner size="56px" />
-
-        {/* Text */}
-        <VStack gap={2}>
-          <Text
-            fontSize="md"
-            fontWeight="600"
-            color={textColor}
-            textAlign="center"
-            css={{
-              background:
-                "linear-gradient(90deg, currentColor 25%, transparent 50%, currentColor 75%)",
-              backgroundSize: "200% auto",
-              WebkitBackgroundClip: "text",
-              animation: "loader-shimmer 3s linear infinite",
-            }}
+      <VStack gap={12} zIndex={1}>
+        <VStack gap={6}>
+          <Box
+            p={1}
+            borderRadius="full"
+            border="1px solid"
+            borderColor="whiteAlpha.200"
+            boxShadow="0 0 40px rgba(99, 102, 241, 0.1)"
           >
-            Preparing your workspace...
-          </Text>
-          <Text fontSize="xs" color={subtleText}>
-            This will only take a moment
-          </Text>
+            <OrbitalSpinner size="64px" />
+          </Box>
+          <VStack gap={1}>
+            <Text
+              fontSize="xl"
+              fontWeight="800"
+              color={textColor}
+              textAlign="center"
+              letterSpacing="-0.02em"
+            >
+              System Initializing
+            </Text>
+            {/* <Text
+              fontSize="sm"
+              color={subtleText}
+              fontWeight="500"
+              letterSpacing="0.05em"
+            >
+              NEXUS SAAS ENGINE
+            </Text> */}
+            <Text
+              fontSize="xs"
+              color={subtleText}
+              fontWeight="400"
+              fontStyle="italic"
+              opacity={0.8}
+            >
+              Please wait...
+            </Text>
+          </VStack>
         </VStack>
 
-        {/* Progress Bar */}
-        <Box w="240px">
-          <Progress.Root
-            value={progress}
-            size="xs"
-            colorPalette="brand"
-          >
-            <Progress.Track
-              borderRadius="full"
-              bg={progressTrackBg}
-            >
-              <Progress.Range
-                borderRadius="full"
-                transition="width 0.4s ease"
-              />
-            </Progress.Track>
-          </Progress.Root>
+        <SegmentedProgress value={progress} />
+
+        <Box mt={4}>
           <Text
             fontSize="10px"
+            fontWeight="bold"
             color={subtleText}
-            textAlign="center"
-            mt={2}
-            fontWeight="600"
-            letterSpacing="wider"
+            textTransform="uppercase"
+            letterSpacing="0.2em"
+            opacity={0.6}
+            css={{ animation: "loader-pulse 2s infinite" }}
           >
-            {progress}%
+            Decrypting workspace assets...
           </Text>
         </Box>
       </VStack>

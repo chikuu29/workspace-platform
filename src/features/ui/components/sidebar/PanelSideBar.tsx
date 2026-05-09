@@ -124,11 +124,12 @@ export function SidebarResponsive() {
         minW={{ base: "8", sm: "9", md: "10" }}
         borderRadius={{ base: "lg", sm: "xl" }}
         color="app.text.primary"
-        bg={triggerBg}
+        // bg={triggerBg}
+        bg="app.card.bg"
         border="1px solid"
         borderColor={triggerBorder}
-        boxShadow={triggerShadow}
-        backdropFilter="blur(18px) saturate(160%)"
+        // boxShadow={triggerShadow}
+        // backdropFilter="blur(18px) saturate(160%)"
         _hover={{
           transform: "translateY(-1px)",
           borderColor: "brand.300",

@@ -81,7 +81,7 @@ const AppCard: React.FC<AppCardProps> = memo(
               w="48px"
               h="48px"
               borderRadius="xl"
-              bg="white"
+              bg={useColorModeValue("white", "whiteAlpha.100")}
               p={2}
               display="flex"
               alignItems="center"
@@ -89,13 +89,33 @@ const AppCard: React.FC<AppCardProps> = memo(
               boxShadow="0 4px 12px rgba(0,0,0,0.08)"
               overflow="hidden"
             >
-              <Image
-                src={logo?.url}
-                alt={`${name} logo`}
-                objectFit="contain"
-                maxH="100%"
-                maxW="100%"
-              />
+              {logo?.ShowSvg ? (
+                <Box
+                  w="full"
+                  h="full"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  color="brand.500"
+                  dangerouslySetInnerHTML={{ __html: logo.svgIcon }}
+                  css={{
+                    "& svg": {
+                      width: "26px",
+                      height: "26px",
+                      stroke: "currentColor",
+                      fill: "none",
+                    },
+                  }}
+                />
+              ) : (
+                <Image
+                  src={logo?.url}
+                  alt={`${name} logo`}
+                  objectFit="contain"
+                  maxH="100%"
+                  maxW="100%"
+                />
+              )}
             </Box>
             <Icon as={LuChevronRight} color="app.text.muted" opacity={0.4} />
           </Flex>

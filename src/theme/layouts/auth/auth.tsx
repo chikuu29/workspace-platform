@@ -7,21 +7,10 @@ import { ColorModeButton } from "@/components/ui/color-mode";
 export default function Auth(props: any) {
   return (
     <Flex position="relative" h="max-content">
-      <Flex
-
-        w="100%"
-
-        justifyContent="start"
-        direction="column"
-      >
-
-
+      <Flex w="100%" justifyContent="start" direction="column">
         <Outlet />
-
-
-
       </Flex>
-      <Flex position="fixed" bottom="30px" right="10" gap={3}>
+      <Flex position="fixed" bottom="30px" right="10" gap={3} zIndex={999}>
         <ColorModeButton />
         <FullscreenButton />
       </Flex>

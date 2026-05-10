@@ -100,10 +100,10 @@ const MemberDetail = memo(() => {
   const navigate = useNavigate();
   const { params: memberId } = useParams();
   const { member, loading, refresh } = useGymMember(memberId);
-  
-  const { 
-    goToSelectPlan, 
-    goBack 
+
+  const {
+    goToSelectPlan,
+    goBack
   } = useGymNavigation();
 
   const name = useMemo(() => getName(member?.data), [member]);
@@ -142,25 +142,29 @@ const MemberDetail = memo(() => {
     mountNavActions(
       <HStack gap={2}>
         <Button
-          variant="outline"
-          borderRadius="sm"
+          // variant="outline"
+          // borderRadius="sm"
           fontWeight="800"
-          size="sm"
+          size="md"
+          h="40px"
+          px={6}
           onClick={handleBack}
-          h="32px"
+        // h="32px"
         >
           <LuArrowLeft size={14} /> Directory
         </Button>
         <IconButton
-          variant="subtle"
+          // variant="subtle"
           colorPalette="yellow"
-          borderRadius="sm"
-          size="sm"
+          // borderRadius="sm"
+          size="md"
+          h="40px"
+          px={6}
           onClick={refresh}
           aria-label="Refresh profile"
           loading={loading}
-          h="32px"
-          w="32px"
+        // h="32px"
+        // w="32px"
         >
           <LuRefreshCw size={14} />
         </IconButton>
@@ -365,10 +369,10 @@ const MemberDetail = memo(() => {
                       <Circle size="14" bg="red.500/10" color="red.500"><LuCreditCard size={28} /></Circle>
                       <Text fontWeight="900" color="red.500">No Active Subscription</Text>
                       <Text fontSize="sm" color={muted} fontWeight="600">Enroll this member in a plan to activate their account.</Text>
-                      <Button 
-                        colorPalette="blue" 
-                        borderRadius="xl" 
-                        mt={2} 
+                      <Button
+                        colorPalette="blue"
+                        borderRadius="xl"
+                        mt={2}
                         fontWeight="900"
                         onClick={handleAssignPlan}
                       >

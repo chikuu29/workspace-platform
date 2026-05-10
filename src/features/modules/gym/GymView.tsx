@@ -217,25 +217,28 @@ const GymView = memo(() => {
     mountNavActions(
       <HStack gap={2}>
         <IconButton
-          variant="subtle"
+          // variant=""
           colorPalette="yellow"
           borderRadius="sm"
-          size="sm"
+          // size="sm"
           onClick={refresh}
           aria-label="Refresh dashboard"
           loading={loading}
-          h="32px"
-          w="32px"
+          size="md"
+          h="40px"
+          px={6}
         >
           <LuRefreshCw size={14} />
         </IconButton>
         <Button
-          variant="outline"
+          // variant="outline"
           borderRadius="sm"
           fontWeight="800"
-          size="sm"
+          size="md"
+          h="40px"
+          px={6}
           onClick={() => navigateTo("members")}
-          h="32px"
+        // h="32px"
         >
           <LuUsers size={14} /> Directory
         </Button>
@@ -243,9 +246,11 @@ const GymView = memo(() => {
           colorPalette="blue"
           borderRadius="sm"
           fontWeight="800"
-          size="sm"
+          size="md"
+          h="40px"
+          px={6}
           onClick={() => navigateTo("AddMember")}
-          h="32px"
+        // h="32px"
         >
           <LuPlus size={14} /> Enroll Member
         </Button>

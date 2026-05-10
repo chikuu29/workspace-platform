@@ -58,7 +58,9 @@ const FormBreadcrumbActions = React.memo(
             onClick={isSubmit ? undefined : () => onActionButtonClick(btn)}
             type={isSubmit ? "submit" : "button"}
             form={isSubmit ? formId : undefined}
-            size="sm"
+            size="md"
+            h="40px"
+            px={6}
             loading={isEventInProgress && pendingEventName === btn.event}
             disabled={isEventInProgress}
             borderRadius={customStyles.borderRadius || "sm"}

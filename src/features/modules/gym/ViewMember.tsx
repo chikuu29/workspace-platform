@@ -366,10 +366,12 @@ const ViewMember = memo(() => {
     mountNavActions(
       <HStack gap={2}>
         <IconButton
-          variant="subtle"
+          // variant="ghost"
           colorPalette="yellow"
           borderRadius="sm"
-          size="sm"
+          size="md"
+          h="40px"
+          px={6}
           onClick={refresh}
           aria-label="Refresh members"
           loading={loading}
@@ -379,8 +381,9 @@ const ViewMember = memo(() => {
         <Button
           colorPalette="blue"
           borderRadius="sm"
-          px={4}
-          size="sm"
+          size="md"
+          h="40px"
+          px={6}
           fontWeight="800"
           onClick={() => navigateTo("AddMember")}
         >

@@ -274,6 +274,7 @@ const SelectPlan = memo(() => {
     const { params: memberId } = useParams();
     const { member, loading: memberLoading } = useGymMember(memberId);
 
+
     // Fetch active plans from backend
     const { plans, loading: plansLoading } = useSubscriptionPlans({ activeOnly: true });
 
@@ -281,13 +282,13 @@ const SelectPlan = memo(() => {
     const [startDate, setStartDate] = useState(() => new Date().toISOString().split("T")[0]);
     const [isPaid, setIsPaid] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    
+
     // ── Navigation ──
-    const { 
-        workspacePrefix, 
-        appCode, 
+    const {
+        workspacePrefix,
+        appCode,
         goToMembers,
-        goBack 
+        goBack
     } = useGymNavigation();
 
     const appName = appCode || "myGym";

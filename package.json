@@ -16,6 +16,7 @@
     "@chakra-ui/cli": "^3.33.0",
     "@chakra-ui/react": "^3.33.0",
     "@reduxjs/toolkit": "^2.5.1",
+    "@tanstack/react-virtual": "^3.13.24",
     "@types/canvas-confetti": "^1.9.0",
     "@vitejs/plugin-react": "^6.0.1",
     "axios": "^1.7.9",

@@ -2,9 +2,11 @@
  * ViewMember.tsx
  *
  * Modern SaaS member directory for the gym app.
+ * Supports card/table view toggle, client-side pagination,
+ * and virtualized table scrolling via @tanstack/react-virtual.
  */
 
-import { memo, useCallback, useMemo, useState } from "react";
+import { memo, useCallback, useMemo, useRef, useState } from "react";
 import {
   Avatar,
   Badge,
@@ -31,6 +33,8 @@ import {
   LuArrowRight,
   LuCalendarDays,
   LuFilter,
+  LuLayoutGrid,
+  LuList,
   LuMail,
   LuPhone,
   LuPlus,
@@ -39,12 +43,17 @@ import {
   LuUserCheck,
   LuUsers,
 } from "react-icons/lu";
+import { useVirtualizer } from "@tanstack/react-virtual";
 
 import { PageHeader } from "@/core/components/PageHeader";
 import { useGymMembers } from "./hooks/useGymMembers";
 import { MemberDocument } from "./types/Gym.types";
 import { useNavActionStore } from "@/core/store/useNavActionStore";
 import { useEffect } from "react";
+import MemberTableRow from "./components/MemberTableRow";
+import Pagination, { PAGE_SIZES, type PageSize } from "./components/Pagination";
+
+type ViewMode = "card" | "table";
 
 type MemberFilter = "all" | "active" | "attention" | "frozen";
 
@@ -405,6 +414,40 @@ const ViewMember = memo(() => {
     });
   }, [activeFilter, members, searchQuery]);
 
+  // ── View mode + Pagination ──
+  const [viewMode, setViewMode] = useState<ViewMode>("card");
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize, setPageSize] = useState<PageSize>(24);
+
+  // Reset to page 0 when filter/search/pageSize changes
+  useEffect(() => { setCurrentPage(0); }, [searchQuery, activeFilter, pageSize]);
+
+  const totalPages = Math.ceil(filteredMembers.length / pageSize);
+  // console.log(filteredMembers);
+
+
+
+
+  // Paginated slice for card view
+  const paginatedMembers = useMemo(() => {
+    const start = currentPage * pageSize;
+    return filteredMembers.slice(start, start + pageSize);
+  }, [filteredMembers, currentPage, pageSize]);
+
+  // Virtual scrolling for table view
+  const tableRef = useRef<HTMLDivElement>(null);
+  const virtualizer = useVirtualizer({
+    count: filteredMembers.length,
+    getScrollElement: () => tableRef.current,
+    estimateSize: () => 56,
+    overscan: 15,
+  });
+
+  const handleViewCard = useCallback(() => setViewMode("card"), []);
+  const handleViewTable = useCallback(() => setViewMode("table"), []);
+  const handlePageChange = useCallback((p: number) => setCurrentPage(p), []);
+  const handlePageSizeChange = useCallback((s: PageSize) => setPageSize(s), []);
+
   const membersRequiringAttention = useMemo(
     () => members.filter((member) => member.data.status === "attention").slice(0, 5),
     [members]
@@ -417,6 +460,7 @@ const ViewMember = memo(() => {
   const panelBg = useColorModeValue("rgba(255,255,255,0.74)", "rgba(15,23,42,0.58)");
   const borderColor = useColorModeValue("rgba(226,232,240,0.84)", "rgba(255,255,255,0.12)");
   const muted = useColorModeValue("gray.500", "gray.400");
+  const tableHeaderBg = useColorModeValue("rgba(241,245,249,0.9)", "rgba(30,41,59,0.7)");
 
   return (
     <Box mt={4} animation="fade-in 0.5s ease-out" w="full">
@@ -497,25 +541,124 @@ const ViewMember = memo(() => {
                   <FilterButton label="Active" active={activeFilter === "active"} onClick={() => setActiveFilter("active")} />
                   <FilterButton label="Attention" active={activeFilter === "attention"} onClick={() => setActiveFilter("attention")} />
                   <FilterButton label="Frozen" active={activeFilter === "frozen"} onClick={() => setActiveFilter("frozen")} />
+
+                  <Separator orientation="vertical" h="24px" mx={1} opacity={0.3} />
+
+                  {/* View toggle */}
+                  <HStack gap={0.5} p={1} borderRadius="xl" bg={useColorModeValue("blackAlpha.50", "whiteAlpha.50")}>
+                    <IconButton
+                      aria-label="Card view"
+                      size="xs"
+                      variant={viewMode === "card" ? "solid" : "ghost"}
+                      colorPalette={viewMode === "card" ? "blue" : "gray"}
+                      borderRadius="lg"
+                      onClick={handleViewCard}
+                    >
+                      <LuLayoutGrid size={14} />
+                    </IconButton>
+                    <IconButton
+                      aria-label="Table view"
+                      size="xs"
+                      variant={viewMode === "table" ? "solid" : "ghost"}
+                      colorPalette={viewMode === "table" ? "blue" : "gray"}
+                      borderRadius="lg"
+                      onClick={handleViewTable}
+                    >
+                      <LuList size={14} />
+                    </IconButton>
+                  </HStack>
                 </HStack>
               </Flex>
 
+              {/* ── Content: Card or Table ── */}
               {loading ? (
                 <SimpleGrid columns={{ base: 1, md: 2, "2xl": 3 }} gap={4}>
                   {[1, 2, 3, 4, 5, 6].map((item) => (
-                    <Skeleton key={item} height="238px" borderRadius="2xl" />
+                    <Skeleton key={item} height={viewMode === "card" ? "238px" : "56px"} borderRadius="2xl" />
                   ))}
                 </SimpleGrid>
               ) : filteredMembers.length > 0 ? (
-                <SimpleGrid columns={{ base: 1, md: 2, "2xl": 3 }} gap={4}>
-                  {filteredMembers.map((member) => (
-                    <MemberTile
-                      key={member._id}
-                      member={member}
-                      onClick={(id) => navigateTo(`memberDetails/${id}`)}
+                <>
+                  {viewMode === "card" ? (
+                    /* ── Card View (paginated) ── */
+                    <SimpleGrid columns={{ base: 1, md: 2, "2xl": 3 }} gap={4}>
+                      {paginatedMembers.map((member) => (
+                        <MemberTile
+                          key={member._id}
+                          member={member}
+                          onClick={(id) => navigateTo(`memberDetails/${id}`)}
+                        />
+                      ))}
+                    </SimpleGrid>
+                  ) : (
+                    /* ── Table View (virtual scroll) ── */
+                    <Box
+                      borderRadius="2xl"
+                      border="1px solid"
+                      borderColor={borderColor}
+                      overflow="hidden"
+                    >
+                      {/* Table header */}
+                      <HStack
+                        px={4}
+                        py={3}
+                        bg={tableHeaderBg}
+                        borderBottom="1px solid"
+                        borderColor={borderColor}
+                        gap={4}
+                      >
+                        <Text fontSize="xs" fontWeight="900" color={muted} textTransform="uppercase" minW="200px" flex={1.4}>Member</Text>
+                        <Text fontSize="xs" fontWeight="900" color={muted} textTransform="uppercase" minW="90px">Status</Text>
+                        <Text fontSize="xs" fontWeight="900" color={muted} textTransform="uppercase" minW="160px" flex={1} display={{ base: "none", lg: "block" }}>Email</Text>
+                        <Text fontSize="xs" fontWeight="900" color={muted} textTransform="uppercase" minW="120px" display={{ base: "none", xl: "block" }}>Phone</Text>
+                        <Text fontSize="xs" fontWeight="900" color={muted} textTransform="uppercase" minW="110px" display={{ base: "none", xl: "block" }}>Joined</Text>
+                        <Text fontSize="xs" fontWeight="900" color={muted} textTransform="uppercase" minW="120px" flex={0.8} display={{ base: "none", lg: "block" }}>Plan</Text>
+                        <Box minW="14px" />
+                      </HStack>
+
+                      {/* Virtualized rows */}
+                      <Box
+                        ref={tableRef}
+                        overflowY="auto"
+                        maxH="600px"
+                        css={{ scrollbarWidth: "thin" }}
+                      >
+                        <Box h={`${virtualizer.getTotalSize()}px`} position="relative" w="full">
+                          {virtualizer.getVirtualItems().map((vRow) => {
+                            const member = filteredMembers[vRow.index];
+                            return (
+                              <Box
+                                key={vRow.key}
+                                position="absolute"
+                                top={0}
+                                left={0}
+                                w="full"
+                                transform={`translateY(${vRow.start}px)`}
+                              >
+                                <MemberTableRow
+                                  member={member}
+                                  onClick={(id) => navigateTo(`memberDetails/${id}`)}
+                                />
+                              </Box>
+                            );
+                          })}
+                        </Box>
+                      </Box>
+                    </Box>
+                  )}
+
+                  {/* Pagination — shown for card view, or as info bar for table */}
+                  {viewMode === "card" && totalPages > 1 && (
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      totalItems={filteredMembers.length}
+                      pageSize={pageSize}
+                      onPageChange={handlePageChange}
+                      onPageSizeChange={handlePageSizeChange}
                     />
-                  ))}
-                </SimpleGrid>
+                  )}
+                </>
               ) : (
                 <Flex
                   direction="column"

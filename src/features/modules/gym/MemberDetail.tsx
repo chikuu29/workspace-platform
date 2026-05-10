@@ -98,7 +98,7 @@ ActionRow.displayName = "ActionRow";
 
 const MemberDetail = memo(() => {
   const { params: memberId } = useParams();
-  const { member, loading, refresh } = useGymMember(memberId);
+  const { member, loading, notFound, error, refresh } = useGymMember(memberId);
 
   const { navigateTo, goBack } = useWorkspaceRouter();
 
@@ -169,19 +169,50 @@ const MemberDetail = memo(() => {
     return () => unmountNavActions();
   }, [mountNavActions, unmountNavActions, handleBack, refresh, loading]);
 
-  // ── Not found ──
-  if (!loading && !member) {
+  // ── Not found / Error ──
+  if (!loading && (notFound || error || !member)) {
     return (
       <Box mt={4} w="full">
-        <PageHeader title="Member Not Found" subtitle={`No profile found for ${memberId || "this record"}.`}
-          actions={<Button variant="outline" borderRadius="xl" onClick={handleBack} fontWeight="900"><LuArrowLeft size={16} /> Back</Button>} />
-        <SurfaceCard>
-          <Flex direction="column" align="center" justify="center" py={20} gap={4}>
-            <Circle size="16" bg="red.500/10" color="red.500"><LuShieldCheck size={30} /></Circle>
+        <PageHeader
+          title="Record Not Found"
+          subtitle={`No member profile found for "${memberId || "unknown"}".`}
+          actions={
+            <Button variant="outline" borderRadius="xl" onClick={handleBack} fontWeight="900">
+              <LuArrowLeft size={16} /> Back
+            </Button>
+          }
+        />
+        <Box
+          p={10}
+          mt={4}
+          borderRadius="2xl"
+          border="1px solid"
+          borderColor={borderColor}
+          bg={useColorModeValue("rgba(255,255,255,0.74)", "rgba(15,23,42,0.58)")}
+          backdropFilter="blur(16px) saturate(140%)"
+        >
+          <Flex direction="column" align="center" justify="center" py={16} gap={4}>
+            <Circle size="16" bg="red.500/10" color="red.500">
+              <LuShieldCheck size={30} />
+            </Circle>
             <Heading size="md" fontWeight="900">Profile unavailable</Heading>
-            <Text color={muted} fontWeight="600">The member may have been archived or deleted.</Text>
+            <Text color={muted} fontWeight="600" textAlign="center" maxW="md">
+              {error
+                ? `An error occurred: ${error}`
+                : "The member may have been archived, deleted, or the ID is invalid."}
+            </Text>
+            <Button
+              colorPalette="blue"
+              borderRadius="xl"
+              fontWeight="900"
+              size="md"
+              mt={2}
+              onClick={handleBack}
+            >
+              <LuArrowLeft size={14} /> Return to Directory
+            </Button>
           </Flex>
-        </SurfaceCard>
+        </Box>
       </Box>
     );
   }

@@ -29,7 +29,7 @@ import {
     Icon,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 import {
     LuArrowLeft,
     LuArrowRight,
@@ -261,9 +261,8 @@ EmptyPlansState.displayName = "EmptyPlansState";
 // ─── Main Component ──────────────────────────────────────────────────────────
 
 const SelectPlan = memo(() => {
-    const navigate = useNavigate();
     const { params: memberId } = useParams();
-    const { member, loading: memberLoading } = useGymMember(memberId);
+    const { member, loading: memberLoading, notFound: memberNotFound, error: memberError } = useGymMember(memberId);
 
 
     // Fetch active plans from backend
@@ -407,8 +406,8 @@ const SelectPlan = memo(() => {
         return () => clearNavActions();
     }, [setNavActions, clearNavActions, handleBack, handleConfirm, selectedPlan, isSubmitting, member]);
 
-    // ── Not found ──
-    if (!memberLoading && !member) {
+    // ── Not found / Error ──
+    if (!memberLoading && (memberNotFound || memberError || !member)) {
         return (
             <PageLayout
                 title="Member Not Found"
@@ -422,7 +421,9 @@ const SelectPlan = memo(() => {
                         <VStack gap={1}>
                             <Heading size="xl" fontWeight="900">Profile Unavailable</Heading>
                             <Text color={muted} fontWeight="600" fontSize="lg">
-                                We couldn't find a member profile matching the ID: <Text as="span" color="app.text.primary" fontWeight="900">"{memberId}"</Text>.
+                                {memberError
+                                    ? `An error occurred: ${memberError}`
+                                    : <>We couldn't find a member profile matching the ID: <Text as="span" color="app.text.primary" fontWeight="900">"{memberId}"</Text>.</>}
                             </Text>
                         </VStack>
                         <Button 

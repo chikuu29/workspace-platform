@@ -38,7 +38,7 @@ const StatusIndicator = memo(({ status }: { status: "idle" | "success" | "error"
       boxShadow={status !== "idle" ? `0 0 40px ${current.bg}` : "none"}
       transform={status !== "idle" ? "scale(1.05)" : "scale(1)"}
     >
-      {status === "loading" ? <Spinner size="xl" /> : <Icon as={current.icon} boxSize={current.status === "idle" ? 14 : 16} />}
+      {status === "loading" ? <Spinner size="xl" /> : <Icon as={current.icon} boxSize={status === "idle" ? 14 : 16} />}
     </Circle>
   );
 });

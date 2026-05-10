@@ -113,7 +113,7 @@ const registry: RegistryConfig = {
         Subscription: () => import("@/features/modules/gym/Subscription"),
         GymSubscriptionPlans: () => import("@/features/modules/gym/GymSubscriptionPlans"),
         AddSubscriptionPlan: () => import("@/features/modules/gym/AddSubscriptionPlan"),
-        CreateSubscription: () => import("@/features/modules/gym/CreateSubscription"),
+        selectPlan: () => import("@/features/modules/gym/SelectPlan"),
         PaymentsHistory: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.PaymentsHistory })),
         // Trainers
         trainers: () => import("@/features/modules/gym/TrainersStaff"),

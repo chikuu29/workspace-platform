@@ -41,7 +41,7 @@
                 "errorMessage": "Registration failed. Please check the details and try again.",
                 "laterActions": {
                     "type": "NAVIGATION",
-                    "path": "/app/myGym/CreateSubscription?member_id={{member_id}}"
+                    "path": "/app/myGym/SelectPlan?member_id={{member_id}}"
                 }
             }
         },

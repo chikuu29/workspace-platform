@@ -41,7 +41,7 @@
                 "errorMessage": "Registration failed. Please check the details and try again.",
                 "laterActions": {
                     "type": "NAVIGATION",
-                    "path": "/app/myGym/CreateSubscription?member_id={{member_id}}"
+                    "path": "/app/myGym/selectPlan/{{member_id}}"
                 }
             }
         },
@@ -67,7 +67,7 @@
         "description": "Register new members with a premium, guided experience.",
         "target": "forms",
         "layoutStyles": {
-            "p":"0"
+            "p": "0"
         }
     },
     "UI_VIEW": {

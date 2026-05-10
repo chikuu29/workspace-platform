@@ -25,6 +25,7 @@ import { useGymMember } from "./hooks/useGymMember";
 import type { MemberDocument } from "./types/Gym.types";
 import { useNavActionStore } from "@/core/store/useNavActionStore";
 import { useEffect } from "react";
+import { useGymNavigation } from "./utils/useGymNavigation";
 
 // ─── Status Config ──────────────────────────────────────────────────
 
@@ -97,8 +98,13 @@ ActionRow.displayName = "ActionRow";
 
 const MemberDetail = memo(() => {
   const navigate = useNavigate();
-  const { params } = useParams();
-  const { member, loading, refresh } = useGymMember(params);
+  const { params: memberId } = useParams();
+  const { member, loading, refresh } = useGymMember(memberId);
+  
+  const { 
+    goToSelectPlan, 
+    goBack 
+  } = useGymNavigation();
 
   const name = useMemo(() => getName(member?.data), [member]);
   const status = (member?.data.status || "frozen") as StatusKey;
@@ -107,7 +113,12 @@ const MemberDetail = memo(() => {
   const planDetails = member?.plan_details;
   const history = member?.subscription_history || [];
 
-  const handleBack = useCallback(() => navigate(-1), [navigate]);
+  const handleBack = useCallback(() => goBack(), [goBack]);
+
+  const handleAssignPlan = useCallback(() => {
+    if (!memberId) return;
+    goToSelectPlan(memberId);
+  }, [goToSelectPlan, memberId]);
 
   // ── Days remaining calc ──
   const daysRemaining = useMemo(() => {
@@ -162,7 +173,7 @@ const MemberDetail = memo(() => {
   if (!loading && !member) {
     return (
       <Box mt={4} w="full">
-        <PageHeader title="Member Not Found" subtitle={`No profile found for ${params || "this record"}.`}
+        <PageHeader title="Member Not Found" subtitle={`No profile found for ${memberId || "this record"}.`}
           actions={<Button variant="outline" borderRadius="xl" onClick={handleBack} fontWeight="900"><LuArrowLeft size={16} /> Back</Button>} />
         <SurfaceCard>
           <Flex direction="column" align="center" justify="center" py={20} gap={4}>
@@ -208,7 +219,7 @@ const MemberDetail = memo(() => {
                   <Skeleton loading={loading}>
                     <HStack px={4} py={2} borderRadius="xl" bg="blackAlpha.50" color={muted}>
                       <LuFingerprint size={15} />
-                      <Text fontSize="sm" fontWeight="900" fontFamily="mono">{member?._meta.record_id || params}</Text>
+                      <Text fontSize="sm" fontWeight="900" fontFamily="mono">{member?._meta.record_id || memberId}</Text>
                     </HStack>
                   </Skeleton>
                   <Skeleton loading={loading}>
@@ -354,7 +365,15 @@ const MemberDetail = memo(() => {
                       <Circle size="14" bg="red.500/10" color="red.500"><LuCreditCard size={28} /></Circle>
                       <Text fontWeight="900" color="red.500">No Active Subscription</Text>
                       <Text fontSize="sm" color={muted} fontWeight="600">Enroll this member in a plan to activate their account.</Text>
-                      <Button colorPalette="blue" borderRadius="xl" mt={2} fontWeight="900"><LuZap size={16} /> Assign Plan</Button>
+                      <Button 
+                        colorPalette="blue" 
+                        borderRadius="xl" 
+                        mt={2} 
+                        fontWeight="900"
+                        onClick={handleAssignPlan}
+                      >
+                        <LuZap size={16} /> Assign Plan
+                      </Button>
                     </Flex>
                   )}
                 </VStack>

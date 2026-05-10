@@ -60,7 +60,7 @@ const getMemberName = (data: MemberDocument["data"]) => {
 
 const getMemberContact = (data: MemberDocument["data"]) => ({
   email: data.email || "No email",
-  phone: data.phone || "No phone",
+  phone: data.phone || "No phone"
 });
 
 const formatDate = (date?: string) => {
@@ -229,7 +229,7 @@ const MemberTile = memo(({
                 {name.full}
               </Text>
               <Text fontSize="xs" color={muted} fontWeight="700" fontFamily="mono" truncate>
-                {_meta.record_id}
+                {data?.member_id}
               </Text>
             </VStack>
           </HStack>

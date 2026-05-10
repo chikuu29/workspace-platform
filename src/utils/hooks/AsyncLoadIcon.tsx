@@ -43,7 +43,7 @@ const normalizeSvgSize = (raw: string): string => {
 const iconCache: Record<string, ComponentType<any>> = {};
 
 const AsyncLoadIcon = React.memo(({ iconName, svgIcon }: AsyncLoadIconProps) => {
-  console.debug("[AsyncLoadIcon] Rendering with iconName:", iconName);
+  // console.debug("[AsyncLoadIcon] Rendering with iconName:", iconName);
   // ── Fast path: inline SVG from config ──────────────────────────────
   const sanitizedSvg = useMemo(() => {
     if (!svgIcon || !isValidSvgMarkup(svgIcon)) return null;

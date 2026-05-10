@@ -30,15 +30,15 @@ import {
 } from "@/components/ui/drawer";
 import { toaster } from "@/components/ui/toaster";
 import {
-  LuShieldCheck,
-  LuPlus,
-  LuPencil,
-  LuTrash2,
-  LuShield,
-  LuFileText,
-  LuUsers,
-  LuLock,
-} from "react-icons/lu";
+  ShieldCheck,
+  Plus,
+  Pencil,
+  Trash2,
+  Shield,
+  FileText,
+  Users,
+  Lock,
+} from "lucide-react";
 import { GETAPI, POSTAPI, PUTAPI, DELETEAPI } from "@/app/api";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PageLayout } from "@/core/components/PageLayout";
@@ -170,7 +170,7 @@ const RoleCard = memo(({ role, onEdit, onDelete }: RoleCardProps) => {
                 borderRadius="full"
                 bg="rgba(255,255,255,0.22)"
               />
-              <Icon as={LuShieldCheck} boxSize={4} color="white" zIndex={1} />
+              <Icon as={ShieldCheck} boxSize={4} color="white" zIndex={1} />
             </Box>
 
             <VStack gap={0} align="start" overflow="hidden">
@@ -227,7 +227,7 @@ const RoleCard = memo(({ role, onEdit, onDelete }: RoleCardProps) => {
         {/* ── Attached Policies ───────────────────────────────────── */}
         <Box mb={4}>
           <HStack gap={1.5} mb={2}>
-            <Icon as={LuFileText} boxSize={3} color="app.text.muted" />
+            <Icon as={FileText} boxSize={3} color="app.text.muted" />
             <Text
               fontSize="2xs"
               fontWeight="700"
@@ -269,7 +269,7 @@ const RoleCard = memo(({ role, onEdit, onDelete }: RoleCardProps) => {
                   alignItems="center"
                   gap={1}
                 >
-                  <Icon as={LuLock} boxSize={2.5} />
+                  <Icon as={Lock} boxSize={2.5} />
                   {policy.name}
                 </Badge>
               ))}
@@ -308,7 +308,7 @@ const RoleCard = memo(({ role, onEdit, onDelete }: RoleCardProps) => {
                   color="app.text.accent"
                   _hover={{ bg: "rgba(99,102,241,0.08)" }}
                 >
-                  <LuPencil />
+                  <Pencil />
                 </IconButton>
               </Tooltip>
               {/* </UIPermissionGuard> */}
@@ -324,7 +324,7 @@ const RoleCard = memo(({ role, onEdit, onDelete }: RoleCardProps) => {
                     aria-label="Delete role"
                     _hover={{ bg: "rgba(239,68,68,0.08)" }}
                   >
-                    <LuTrash2 />
+                    <Trash2 />
                   </IconButton>
                 </Tooltip>
                 // </UIPermissionGuard>
@@ -333,7 +333,7 @@ const RoleCard = memo(({ role, onEdit, onDelete }: RoleCardProps) => {
 
             {role.is_system_role && (
               <HStack gap={1}>
-                <Icon as={LuLock} boxSize={3} color="app.text.muted" />
+                <Icon as={Lock} boxSize={3} color="app.text.muted" />
                 <Text fontSize="2xs" color="app.text.muted" fontWeight="600">
                   Protected
                 </Text>
@@ -509,7 +509,7 @@ const OrganizationRolesView = memo(() => {
             size="sm"
             onClick={handleAddClick}
           >
-            <LuPlus style={{ marginRight: "6px" }} /> New Role
+            <Plus style={{ marginRight: "6px" }} /> New Role
           </Button>
           // </UIPermissionGuard>
         }
@@ -539,7 +539,7 @@ const OrganizationRolesView = memo(() => {
                 alignItems="center"
                 justifyContent="center"
               >
-                <Icon as={LuUsers} boxSize={7} color="app.text.muted" />
+                <Icon as={Users} boxSize={7} color="app.text.muted" />
               </Box>
               <Text fontWeight="600" color="app.text.primary">
                 No roles found
@@ -555,7 +555,7 @@ const OrganizationRolesView = memo(() => {
                 mt={2}
                 onClick={handleAddClick}
               >
-                <LuPlus style={{ marginRight: "6px" }} /> Create Role
+                <Plus style={{ marginRight: "6px" }} /> Create Role
               </Button>
               {/* </UIPermissionGuard> */}
             </VStack>
@@ -566,7 +566,7 @@ const OrganizationRolesView = memo(() => {
             {systemRoles.length > 0 && (
               <Box>
                 <HStack gap={2} mb={4}>
-                  <Icon as={LuShield} boxSize={4} color="app.text.muted" />
+                  <Icon as={Shield} boxSize={4} color="app.text.muted" />
                   <Text
                     fontSize="xs"
                     fontWeight="700"
@@ -599,7 +599,7 @@ const OrganizationRolesView = memo(() => {
             {customRoles.length > 0 && (
               <Box>
                 <HStack gap={2} mb={4}>
-                  <Icon as={LuShieldCheck} boxSize={4} color="app.text.muted" />
+                  <Icon as={ShieldCheck} boxSize={4} color="app.text.muted" />
                   <Text
                     fontSize="xs"
                     fontWeight="700"
@@ -836,7 +836,7 @@ const OrganizationRolesView = memo(() => {
                                         color="app.text.muted"
                                         transition="all 0.2s"
                                       >
-                                        <Icon as={LuFileText} boxSize={3.5} />
+                                        <Icon as={FileText} boxSize={3.5} />
                                       </Box>
                                     </Tooltip>
                                   </HStack>

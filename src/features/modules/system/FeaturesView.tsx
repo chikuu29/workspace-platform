@@ -39,22 +39,22 @@ import {
 import { NativeSelectField, NativeSelectRoot } from "@/components/ui/native-select";
 import { toaster } from "@/components/ui/toaster";
 import {
-    LuZap,
-    LuPlus,
-    LuPencil,
-    LuTrash2,
-    LuRefreshCw,
-    LuShield,
-    LuCheck,
-    LuEye,
-    LuSave,
-    LuStar,
-    LuCode,
-    LuSearch,
-    LuChevronDown,
-    LuChevronRight,
-    LuLayoutGrid
-} from "react-icons/lu";
+    Zap,
+    Plus,
+    Pencil,
+    Trash2,
+    RefreshCw,
+    Shield,
+    Check,
+    Eye,
+    Save,
+    Star,
+    Code,
+    Search,
+    ChevronDown,
+    ChevronRight,
+    LayoutGrid
+} from "lucide-react";
 import { GETAPI, POSTAPI, PUTAPI, DELETEAPI } from "@/app/api";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field } from "@/components/ui/field";
@@ -239,7 +239,7 @@ const FeaturesView = memo(() => {
                                 borderColor="rgba(139,92,246,0.2)"
                                 boxShadow="inner"
                             >
-                                <Icon as={LuZap} boxSize={5} color="purple.400" />
+                                <Icon as={Zap} boxSize={5} color="purple.400" />
                             </Center>
                             <VStack align="start" gap={0} flex={1}>
                                 <Text fontWeight="800" color="app.text.primary" fontSize="md" letterSpacing="tight">
@@ -258,12 +258,12 @@ const FeaturesView = memo(() => {
                         {/* Metadata Details */}
                         <HStack gap={4} fontSize="10px" color="app.text.muted" fontWeight="600">
                             <HStack gap={1}>
-                                <LuCode size={12} />
+                                <Code size={12} />
                                 <Text>{feat.id.split('-')[0]}...</Text>
                             </HStack>
                             {feat.created_at && (
                                 <HStack gap={1}>
-                                    <LuRefreshCw size={10} />
+                                    <RefreshCw size={10} />
                                     <Text>{new Date(feat.created_at as string).toLocaleDateString()}</Text>
                                 </HStack>
                             )}
@@ -288,7 +288,7 @@ const FeaturesView = memo(() => {
                                     onClick={() => handleEditClick(feat)}
                                     _hover={{ bg: "purple.500/10", color: "purple.400" }}
                                 >
-                                    <LuPencil size={14} />
+                                    <Pencil size={14} />
                                 </IconButton>
                                 <IconButton
                                     aria-label="Delete"
@@ -299,7 +299,7 @@ const FeaturesView = memo(() => {
                                     onClick={() => handleDelete(feat.id)}
                                     _hover={{ bg: "red.500/10", color: "red.400" }}
                                 >
-                                    <LuTrash2 size={14} />
+                                    <Trash2 size={14} />
                                 </IconButton>
                             </HStack>
                         </HStack>
@@ -318,7 +318,7 @@ const FeaturesView = memo(() => {
                         {selectedAppId && (
                             <Badge colorPalette="purple" variant="subtle" size="lg" borderRadius="full" px={3} py={1} border="1px solid" borderColor="purple.500/20">
                                 <HStack gap={1.5}>
-                                    <Icon as={LuLayoutGrid} boxSize={3} />
+                                    <Icon as={LayoutGrid} boxSize={3} />
                                     <Text fontSize="xs" fontWeight="700">
                                         {apps.find(a => a.id === selectedAppId)?.code}
                                     </Text>
@@ -352,18 +352,18 @@ const FeaturesView = memo(() => {
                                             transition="all 0.2s"
                                         >
                                             <HStack>
-                                                <Icon as={LuLayoutGrid} color="purple.400" />
+                                                <Icon as={LayoutGrid} color="purple.400" />
                                                 <Text fontWeight="600">
                                                     {apps.find(a => a.id === selectedAppId)?.name || "Select Application"}
                                                 </Text>
                                             </HStack>
-                                            <LuChevronDown />
+                                            <ChevronDown />
                                         </Button>
                                     </PopoverTrigger>
                                     <PopoverContent bg="app.bg.primary" borderColor="app.card.border" w="320px" boxShadow="2xl" borderRadius="2xl" p={0} overflow="hidden">
                                         <Box p={3} borderBottom="1px solid" borderColor="app.card.border" bg="rgba(255,255,255,0.02)">
                                             <HStack gap={2}>
-                                                <LuSearch color="var(--chakra-colors-app-text-muted)" />
+                                                <Search color="var(--chakra-colors-app-text-muted)" />
                                                 <Input
                                                     placeholder="Search by name or code..."
                                                     size="sm"
@@ -446,7 +446,7 @@ const FeaturesView = memo(() => {
                                 transform: "none",
                             }}
                         >
-                            <LuPlus strokeWidth={3} />
+                            <Plus strokeWidth={3} />
                             Create Feature
                         </Button>
                     </HStack>
@@ -458,7 +458,7 @@ const FeaturesView = memo(() => {
                     <Center py={32}>
                         <VStack gap={6} maxW="400px" textAlign="center">
                             <Center boxSize="80px" borderRadius="3xl" bg="rgba(139,92,246,0.05)" border="2px dashed" borderColor="purple.500/20">
-                                <Icon as={LuLayoutGrid} boxSize={8} color="purple.400" />
+                                <Icon as={LayoutGrid} boxSize={8} color="purple.400" />
                             </Center>
                             <VStack gap={2}>
                                 <Heading size="lg" fontWeight="800">No App Selected</Heading>
@@ -479,7 +479,7 @@ const FeaturesView = memo(() => {
                     <Center py={32}>
                         <VStack gap={6} maxW="400px" textAlign="center">
                             <Center boxSize="80px" borderRadius="3xl" bg="rgba(139,92,246,0.05)" border="2px dashed" borderColor="purple.500/20">
-                                <Icon as={LuZap} boxSize={8} color="purple.400" />
+                                <Icon as={Zap} boxSize={8} color="purple.400" />
                             </Center>
                             <VStack gap={2}>
                                 <Heading size="lg" fontWeight="800">Empty Modules</Heading>
@@ -487,7 +487,7 @@ const FeaturesView = memo(() => {
                                     You haven't defined any functional features for <strong>{apps.find(a => a.id === selectedAppId)?.name}</strong> yet.
                                 </Text>
                                 <Button variant="ghost" size="sm" mt={2} colorPalette="purple" onClick={handleAddClick} fontWeight="700">
-                                    Define your first module <LuChevronRight />
+                                    Define your first module <ChevronRight />
                                 </Button>
                             </VStack>
                         </VStack>
@@ -515,7 +515,7 @@ const FeaturesView = memo(() => {
                     <DrawerHeader borderBottom="1px solid" borderColor="app.card.border" py={8} px={10}>
                         <HStack gap={5}>
                             <Center w={10} h={10} borderRadius="xl" bg="purple.500" color="white">
-                                <Icon as={selectedFeature ? LuPencil : LuPlus} boxSize={5} />
+                                <Icon as={selectedFeature ? Pencil : Plus} boxSize={5} />
                             </Center>
                             <VStack align="start" gap={0}>
                                 <Heading size="xl" fontWeight="900" letterSpacing="tight" color="app.text.primary">
@@ -547,12 +547,12 @@ const FeaturesView = memo(() => {
                                                 _hover={{ borderColor: "purple.500/50", bg: "rgba(139,92,246,0.05)" }}
                                             >
                                                 <HStack>
-                                                    <Icon as={LuLayoutGrid} color="purple.400" />
+                                                    <Icon as={LayoutGrid} color="purple.400" />
                                                     <Text color={selectedAppId ? "app.text.primary" : "app.text.muted"}>
                                                         {apps.find(a => a.id === selectedAppId)?.name || "Select Application"}
                                                     </Text>
                                                 </HStack>
-                                                <LuChevronDown />
+                                                <ChevronDown />
                                             </Button>
                                         </PopoverTrigger>
                                         <PopoverContent
@@ -738,7 +738,7 @@ const FeaturesView = memo(() => {
                             boxShadow="0 8px 16px rgba(139,92,246,0.2)"
                             _active={{ transform: "scale(0.98)" }}
                         >
-                            <LuSave style={{ marginRight: '8px' }} />
+                            <Save style={{ marginRight: '8px' }} />
                             {selectedFeature ? "Update Feature" : "Generate Module"}
                         </Button>
                     </DrawerFooter>

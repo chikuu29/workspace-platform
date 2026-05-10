@@ -2,7 +2,7 @@ import { Box, Flex, RadioGroup, Stack, Field, Text, Button, IconButton } from "@
 import { useColorModeValue } from "../../components/ui/color-mode";
 import { useEffect, useState, memo, useCallback } from "react";
 import { FieldError, useFormContext, useWatch } from "react-hook-form";
-import { LuX } from "react-icons/lu";
+import { X } from "lucide-react";
 import { ruleEngine } from "../engine/logicEngine";
 import React from "react";
 
@@ -170,7 +170,7 @@ const RadioField = ({
                       _hover={{ bg: "red.50", color: "red.500" }}
                       _dark={{ _hover: { bg: "red.900/30", color: "red.400" } }}
                     >
-                      <LuX />
+                      <X />
                     </IconButton>
                   )}
                 </Stack>

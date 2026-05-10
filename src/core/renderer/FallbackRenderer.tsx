@@ -11,7 +11,7 @@ import {
     HStack as ChakraHStack,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { LuTriangleAlert, LuFileSearch, LuSettings, LuArrowLeft, LuHouse } from "react-icons/lu";
+import { AlertTriangle, FileSearch, Settings, ArrowLeft, Home } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router";
 
@@ -36,21 +36,21 @@ const FallbackRenderer: React.FC<FallbackRendererProps> = ({ reason, type, confi
                 return {
                     title: "Missing Configuration",
                     description: "The renderer found no 'UI_TYPE' defined in the configuration object.",
-                    icon: LuSettings,
+                    icon: Settings,
                     badge: "Config Error"
                 };
             case "INVALID_TYPE":
                 return {
                     title: "Invalid View Type",
                     description: "The specified 'UI_TYPE.type' is empty or invalid.",
-                    icon: LuTriangleAlert,
+                    icon: AlertTriangle,
                     badge: "Definition Error"
                 };
             case "COMPONENT_NOT_FOUND":
                 return {
                     title: "Unknown View Component",
                     description: `The component type "${type}" is not registered in ViewRegistry.`,
-                    icon: LuFileSearch,
+                    icon: FileSearch,
                     badge: "Registry Error"
                 };
             case "TEMPLATE_NOT_FOUND":
@@ -59,7 +59,7 @@ const FallbackRenderer: React.FC<FallbackRendererProps> = ({ reason, type, confi
                     description: type
                         ? `Could not load template "${type}". Please check the template name and try again.`
                         : "The requested template could not be found or loaded.",
-                    icon: LuFileSearch,
+                    icon: FileSearch,
                     badge: "Template Error"
                 };
             case "UNAUTHORIZED":
@@ -68,21 +68,21 @@ const FallbackRenderer: React.FC<FallbackRendererProps> = ({ reason, type, confi
                     description: type 
                         ? `You are not authorized to access "${type}". Please contact your administrator.`
                         : "You do not have permission to view this resource or organization data.",
-                    icon: LuTriangleAlert,
+                    icon: AlertTriangle,
                     badge: "Security Block"
                 };
             case "PBAC_UNAUTHORIZED":
                 return {
                     title: "Policy Access Denied",
                     description: "Your assigned policies do not grant you access to this specific view or page.",
-                    icon: LuTriangleAlert,
+                    icon: AlertTriangle,
                     badge: "PBAC Block"
                 };
             default:
                 return {
                     title: "System Error",
                     description: "An unexpected rendering error occurred.",
-                    icon: LuTriangleAlert,
+                    icon: AlertTriangle,
                     badge: "Unknown Error"
                 };
         }
@@ -184,7 +184,7 @@ const FallbackRenderer: React.FC<FallbackRendererProps> = ({ reason, type, confi
                             _hover={{ transform: "translateX(-2px)" }}
                             transition="all 0.2s"
                         >
-                            <LuArrowLeft size={16} />
+                            <ArrowLeft size={16} />
                             Go Back
                         </Button>
                         <Button 
@@ -196,7 +196,7 @@ const FallbackRenderer: React.FC<FallbackRendererProps> = ({ reason, type, confi
                             _hover={{ transform: "scale(1.02)", boxShadow: "0 10px 20px -5px rgba(245, 158, 11, 0.4)" }}
                             transition="all 0.2s"
                         >
-                            <LuHouse size={16} />
+                            <Home size={16} />
                             Return Home
                         </Button>
                     </ChakraHStack>

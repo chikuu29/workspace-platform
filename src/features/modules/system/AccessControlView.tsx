@@ -14,12 +14,12 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import {
-  LuBuilding2,
-  LuShieldCheck,
-  LuShield,
-  LuUsers,
-  LuChevronRight,
-} from "react-icons/lu";
+  Building2,
+  ShieldCheck,
+  Shield,
+  Users,
+  ChevronRight,
+} from "lucide-react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams, useSearchParams } from "react-router";
 import { RootState } from "@/app/store";
@@ -117,7 +117,7 @@ const OrganizationCard = memo(({ organization, onNavigate }: OrganizationCardPro
                 borderRadius="full"
                 bg="rgba(255,255,255,0.22)"
               />
-              <Icon as={LuBuilding2} boxSize={4} color="white" zIndex={1} />
+              <Icon as={Building2} boxSize={4} color="white" zIndex={1} />
             </Box>
 
             <Text
@@ -175,7 +175,7 @@ const OrganizationCard = memo(({ organization, onNavigate }: OrganizationCardPro
                 alignItems="center"
                 gap={1}
               >
-                <Icon as={LuShield} boxSize={3} />
+                <Icon as={Shield} boxSize={3} />
                 {role}
               </Badge>
             ))}
@@ -211,7 +211,7 @@ const OrganizationCard = memo(({ organization, onNavigate }: OrganizationCardPro
             >
               Manage Permissions
             </Text>
-            <LuChevronRight size={14} color="var(--chakra-colors-app-text-accent)" />
+            <ChevronRight size={14} color="var(--chakra-colors-app-text-accent)" />
           </Flex>
         </Box>
       </VStack>
@@ -281,7 +281,7 @@ const AccessControlView = memo(() => {
               bg="rgba(99,102,241,0.08)" border="1px dashed" borderColor="app.card.border"
               display="flex" alignItems="center" justifyContent="center"
             >
-              <Icon as={LuUsers} boxSize={7} color="app.text.muted" />
+              <Icon as={Users} boxSize={7} color="app.text.muted" />
             </Box>
             <Text fontWeight="600" color="app.text.primary">No organizations found</Text>
             <Text fontSize="sm" color="app.text.muted">No organizations with roles have been configured yet.</Text>

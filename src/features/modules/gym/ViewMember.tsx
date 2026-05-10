@@ -29,20 +29,20 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 import {
-  LuActivity,
-  LuArrowRight,
-  LuCalendarDays,
-  LuFilter,
-  LuLayoutGrid,
-  LuList,
-  LuMail,
-  LuPhone,
-  LuPlus,
-  LuRefreshCw,
-  LuSparkles,
-  LuUserCheck,
-  LuUsers,
-} from "react-icons/lu";
+  Activity,
+  ArrowRight,
+  CalendarDays,
+  Filter,
+  LayoutGrid,
+  List,
+  Mail,
+  Phone,
+  Plus,
+  RefreshCw,
+  Sparkles,
+  UserCheck,
+  Users,
+} from "lucide-react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
 import { PageHeader } from "@/core/components/PageHeader";
@@ -257,19 +257,19 @@ const MemberTile = memo(({
 
         <SimpleGrid columns={1} gap={2}>
           <HStack gap={2.5} color={muted} minW={0}>
-            <Icon as={LuMail} boxSize={3.5} />
+            <Icon as={Mail} boxSize={3.5} />
             <Text fontSize="sm" fontWeight="700" truncate>
               {contact.email}
             </Text>
           </HStack>
           <HStack gap={2.5} color={muted}>
-            <Icon as={LuPhone} boxSize={3.5} />
+            <Icon as={Phone} boxSize={3.5} />
             <Text fontSize="sm" fontWeight="700">
               {contact.phone}
             </Text>
           </HStack>
           <HStack gap={2.5} color={muted}>
-            <Icon as={LuCalendarDays} boxSize={3.5} />
+            <Icon as={CalendarDays} boxSize={3.5} />
             <Text fontSize="sm" fontWeight="700">
               Joined {formatDate(_meta.created?.at)}
             </Text>
@@ -286,7 +286,7 @@ const MemberTile = memo(({
               gap={2.5}
             >
               <Circle size="7" bg="red.500/15" color="red.500">
-                <LuActivity size={12} />
+                <Activity size={12} />
               </Circle>
               <VStack align="start" gap={0} minW={0}>
                 <Text fontSize="xs" fontWeight="900" color="red.500">
@@ -304,7 +304,7 @@ const MemberTile = memo(({
               gap={2.5} minW={0}
             >
               <Circle size="7" bg={statusTheme.bg} color={statusTheme.accent}>
-                <LuCalendarDays size={12} />
+                <CalendarDays size={12} />
               </Circle>
               <VStack align="start" gap={0} flex={1} minW={0}>
                 <Text fontSize="xs" fontWeight="900" color="app.text.primary" truncate>
@@ -336,7 +336,7 @@ const MemberTile = memo(({
             transition="all 0.2s"
             _groupHover={{ transform: "translateX(2px)" }}
           >
-            <LuArrowRight size={16} />
+            <ArrowRight size={16} />
           </Circle>
         </HStack>
       </VStack>
@@ -370,7 +370,7 @@ const ViewMember = memo(() => {
           aria-label="Refresh members"
           loading={loading}
         >
-          <LuRefreshCw size={14} />
+          <RefreshCw size={14} />
         </IconButton>
         <Button
           colorPalette="blue"
@@ -381,7 +381,7 @@ const ViewMember = memo(() => {
           fontWeight="800"
           onClick={() => navigateTo("AddMember")}
         >
-          <LuPlus size={16} /> New Member
+          <Plus size={16} /> New Member
         </Button>
       </HStack>
     );
@@ -491,10 +491,10 @@ const ViewMember = memo(() => {
           </VStack>
 
           <SimpleGrid columns={{ base: 1, md: 2, xl: 4 }} gap={4}>
-            <StatTile label="Total members" value={total || members.length} caption="Registered profiles" icon={LuUsers} accent="blue.500" />
-            <StatTile label="Active" value={metrics.active} caption={`${metrics.retention}% retention`} icon={LuUserCheck} accent="green.500" />
-            <StatTile label="Attention" value={metrics.attention} caption="Renewal follow-up" icon={LuActivity} accent="orange.500" />
-            <StatTile label="Frozen" value={metrics.frozen} caption="Paused accounts" icon={LuSparkles} accent="cyan.500" />
+            <StatTile label="Total members" value={total || members.length} caption="Registered profiles" icon={Users} accent="blue.500" />
+            <StatTile label="Active" value={metrics.active} caption={`${metrics.retention}% retention`} icon={UserCheck} accent="green.500" />
+            <StatTile label="Attention" value={metrics.attention} caption="Renewal follow-up" icon={Activity} accent="orange.500" />
+            <StatTile label="Frozen" value={metrics.frozen} caption="Paused accounts" icon={Sparkles} accent="cyan.500" />
           </SimpleGrid>
         </Grid>
       </Box>
@@ -524,7 +524,7 @@ const ViewMember = memo(() => {
               >
                 <HStack gap={2}>
                   <Circle size="9" bg="blue.500/10" color="blue.500">
-                    <LuFilter size={16} />
+                    <Filter size={16} />
                   </Circle>
                   <VStack align="start" gap={0}>
                     <Text fontWeight="900" color="app.text.primary">
@@ -554,7 +554,7 @@ const ViewMember = memo(() => {
                       borderRadius="lg"
                       onClick={handleViewCard}
                     >
-                      <LuLayoutGrid size={14} />
+                      <LayoutGrid size={14} />
                     </IconButton>
                     <IconButton
                       aria-label="Table view"
@@ -564,7 +564,7 @@ const ViewMember = memo(() => {
                       borderRadius="lg"
                       onClick={handleViewTable}
                     >
-                      <LuList size={14} />
+                      <List size={14} />
                     </IconButton>
                   </HStack>
                 </HStack>
@@ -672,7 +672,7 @@ const ViewMember = memo(() => {
                   borderColor={borderColor}
                 >
                   <Circle size="16" bg="blue.500/10" color="blue.500">
-                    <LuUsers size={30} />
+                    <Users size={30} />
                   </Circle>
                   <VStack gap={1}>
                     <Heading size="sm" fontWeight="900">
@@ -735,7 +735,7 @@ const ViewMember = memo(() => {
                               Renewal due
                             </Text>
                           </VStack>
-                          <LuArrowRight size={15} color="var(--chakra-colors-orange-500)" />
+                          <ArrowRight size={15} color="var(--chakra-colors-orange-500)" />
                         </HStack>
                       );
                     })}

@@ -29,21 +29,21 @@ import {
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 import {
-    LuArrowLeft,
-    LuCheck,
-    LuCoins,
-    LuCrown,
-    LuGripVertical,
-    LuPalette,
-    LuPlus,
-    LuRocket,
-    LuSave,
-    LuShieldCheck,
-    LuSparkles,
-    LuTag,
-    LuTrash2,
-    LuX,
-} from "react-icons/lu";
+    ArrowLeft,
+    Check,
+    Coins,
+    Crown,
+    GripVertical,
+    Palette,
+    Plus,
+    Rocket,
+    Save,
+    ShieldCheck,
+    Sparkles,
+    Tag,
+    Trash2,
+    X,
+} from "lucide-react";
 import { Field } from "@/components/ui/field";
 import { Card } from "@/core/components/Card";
 import { NativeSelectRoot, NativeSelectField } from "@/components/ui/native-select";
@@ -114,7 +114,7 @@ const PreviewCard = memo(({
                         </Heading>
                     </VStack>
                     <Circle size={10} bg={`${accent}.500/10`} color={`${accent}.500`}>
-                        <LuCrown size={18} />
+                        <Crown size={18} />
                     </Circle>
                 </Flex>
 
@@ -142,7 +142,7 @@ const PreviewCard = memo(({
                     {cleanFeatures.length > 0 ? cleanFeatures.map((f, i) => (
                         <HStack key={i} gap={2.5}>
                             <Circle size={5} bg={`${accent}.500/12`} color={`${accent}.500`} flexShrink={0}>
-                                <LuCheck size={10} />
+                                <Check size={10} />
                             </Circle>
                             <Text fontSize="sm" fontWeight="600">{f}</Text>
                         </HStack>
@@ -338,7 +338,7 @@ const AddSubscriptionPlan = memo(() => {
                         onClick={handleBack}
                         aria-label="Go back"
                     >
-                        <LuArrowLeft size={18} />
+                        <ArrowLeft size={18} />
                     </Button>
                     <Separator orientation="vertical" h="20px" opacity={0.15} />
                     <VStack align="start" gap={0}>
@@ -353,7 +353,7 @@ const AddSubscriptionPlan = memo(() => {
 
                 <HStack gap={3}>
                     <Button variant="ghost" borderRadius="xl" onClick={handleBack}>
-                        <LuX size={14} />
+                        <X size={14} />
                         <Text ml={1}>Discard</Text>
                     </Button>
                     <Button
@@ -377,7 +377,7 @@ const AddSubscriptionPlan = memo(() => {
                         {isSubmitting ? (
                             <HStack gap={2}><Spinner size="sm" /><Text>Publishing…</Text></HStack>
                         ) : (
-                            <><LuRocket size={14} /><Text ml={1}>Publish Plan</Text></>
+                            <><Rocket size={14} /><Text ml={1}>Publish Plan</Text></>
                         )}
                     </Button>
                 </HStack>
@@ -393,7 +393,7 @@ const AddSubscriptionPlan = memo(() => {
 
                             {/* Section 1 — Identity */}
                             <Card p={6} borderRadius="2xl" gap={5} _hover={{ transform: "none" }}>
-                                <SectionHeader icon={LuTag} title="Plan Identity" subtitle="Name and internal code" />
+                                <SectionHeader icon={Tag} title="Plan Identity" subtitle="Name and internal code" />
                                 <SimpleGrid columns={{ base: 1, md: 2 }} gap={5}>
                                     <Field label="Plan Name" required>
                                         <Input
@@ -432,7 +432,7 @@ const AddSubscriptionPlan = memo(() => {
 
                             {/* Section 2 — Pricing */}
                             <Card p={6} borderRadius="2xl" gap={5} _hover={{ transform: "none" }}>
-                                <SectionHeader icon={LuCoins} title="Pricing & Billing" subtitle="Set base price and cycle" />
+                                <SectionHeader icon={Coins} title="Pricing & Billing" subtitle="Set base price and cycle" />
                                 <SimpleGrid columns={{ base: 1, md: 3 }} gap={5}>
                                     <Field label="Base Price" required>
                                         <Input
@@ -482,7 +482,7 @@ const AddSubscriptionPlan = memo(() => {
                             {/* Section 3 — Features */}
                             <Card p={6} borderRadius="2xl" gap={5} _hover={{ transform: "none" }}>
                                 <Flex justify="space-between" align="center">
-                                    <SectionHeader icon={LuSparkles} title="Plan Features" subtitle="What members get" />
+                                    <SectionHeader icon={Sparkles} title="Plan Features" subtitle="What members get" />
                                     <Button
                                         size="sm"
                                         variant="surface"
@@ -490,7 +490,7 @@ const AddSubscriptionPlan = memo(() => {
                                         borderRadius="full"
                                         onClick={handleAddFeature}
                                     >
-                                        <LuPlus size={14} />
+                                        <Plus size={14} />
                                         <Text ml={1}>Add</Text>
                                     </Button>
                                 </Flex>
@@ -498,7 +498,7 @@ const AddSubscriptionPlan = memo(() => {
                                     {features.map((feature, idx) => (
                                         <HStack key={idx} gap={3}>
                                             <Box color={muted} flexShrink={0} cursor="grab">
-                                                <LuGripVertical size={14} />
+                                                <GripVertical size={14} />
                                             </Box>
                                             <Input
                                                 value={feature}
@@ -516,7 +516,7 @@ const AddSubscriptionPlan = memo(() => {
                                                 borderRadius="full"
                                                 onClick={mkFeatureRemove(idx)}
                                             >
-                                                <LuTrash2 size={14} />
+                                                <Trash2 size={14} />
                                             </IconButton>
                                         </HStack>
                                     ))}
@@ -532,7 +532,7 @@ const AddSubscriptionPlan = memo(() => {
 
                             {/* Section 4 — Branding & Status */}
                             <Card p={6} borderRadius="2xl" gap={5} _hover={{ transform: "none" }}>
-                                <SectionHeader icon={LuPalette} title="Branding & Status" />
+                                <SectionHeader icon={Palette} title="Branding & Status" />
                                 <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
                                     {/* Color picker */}
                                     <VStack align="start" gap={3} p={5} borderRadius="xl" bg={fieldBg}>
@@ -556,7 +556,7 @@ const AddSubscriptionPlan = memo(() => {
                                                     transition="all 0.2s"
                                                     onClick={mkColorSelect(color)}
                                                 >
-                                                    {accentColor === color && <LuCheck size={14} color="white" />}
+                                                    {accentColor === color && <Check size={14} color="white" />}
                                                 </Circle>
                                             ))}
                                         </HStack>

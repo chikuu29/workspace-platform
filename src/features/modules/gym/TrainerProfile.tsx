@@ -15,12 +15,12 @@ import { useColorModeValue } from "@/components/ui/color-mode";
 import { useSearchParams } from "react-router";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 import {
-  LuActivity, LuArrowLeft, LuCalendarDays, LuCheck, LuCreditCard,
-  LuDumbbell, LuFileText, LuFingerprint, LuMail, LuMapPin,
-  LuMessageSquare, LuPhone, LuRefreshCw, LuShieldCheck, LuSnowflake,
-  LuStar, LuTrash2, LuTrendingUp, LuUserCheck, LuUsers, LuX, LuZap,
-  LuAward, LuBriefcase, LuClock, LuContact, LuUser
-} from "react-icons/lu";
+  Activity, ArrowLeft, CalendarDays, Check, CreditCard,
+  Dumbbell, FileText, Fingerprint, Mail, MapPin,
+  MessageSquare, Phone, RefreshCw, ShieldCheck, Snowflake,
+  Star, Trash2, TrendingUp, UserCheck, Users, X, Zap,
+  Award, Briefcase, Clock, Contact, User
+} from "lucide-react";
 
 import { PageHeader } from "@/core/components/PageHeader";
 import { useGymTrainer } from "./hooks/useGymTrainer";
@@ -127,7 +127,7 @@ const TrainerProfile = memo(() => {
           onClick={handleBack}
           h="32px"
         >
-          <LuArrowLeft size={14} /> Directory
+          <ArrowLeft size={14} /> Directory
         </Button>
         <IconButton
           variant="subtle"
@@ -140,7 +140,7 @@ const TrainerProfile = memo(() => {
           h="32px"
           w="32px"
         >
-          <LuRefreshCw size={14} />
+          <RefreshCw size={14} />
         </IconButton>
       </HStack>
     );
@@ -151,10 +151,10 @@ const TrainerProfile = memo(() => {
     return (
       <Box mt={4} w="full">
         <PageHeader title="Trainer Not Found" subtitle={`No profile found for ID: ${trainerId || "Unknown"}.`}
-          actions={<Button variant="outline" borderRadius="xl" onClick={handleBack} fontWeight="900"><LuArrowLeft size={16} /> Back</Button>} />
+          actions={<Button variant="outline" borderRadius="xl" onClick={handleBack} fontWeight="900"><ArrowLeft size={16} /> Back</Button>} />
         <SurfaceCard>
           <Flex direction="column" align="center" justify="center" py={20} gap={4}>
-            <Circle size="16" bg="red.500/10" color="red.500"><LuShieldCheck size={30} /></Circle>
+            <Circle size="16" bg="red.500/10" color="red.500"><ShieldCheck size={30} /></Circle>
             <Heading size="md" fontWeight="900">Profile unavailable</Heading>
             <Text color={muted} fontWeight="600">This trainer record may have been removed or the ID is incorrect.</Text>
           </Flex>
@@ -186,13 +186,13 @@ const TrainerProfile = memo(() => {
                 <HStack gap={3} flexWrap="wrap">
                   <Skeleton loading={loading}>
                     <HStack px={4} py={2} borderRadius="xl" bg="blackAlpha.50" color={muted}>
-                      <LuFingerprint size={15} />
+                      <Fingerprint size={15} />
                       <Text fontSize="sm" fontWeight="900" fontFamily="mono">{trainer?._meta.record_id || trainerId}</Text>
                     </HStack>
                   </Skeleton>
                   <Skeleton loading={loading}>
                     <HStack px={4} py={2} borderRadius="xl" bg="blue.500/10" color="blue.500">
-                      <LuAward size={15} />
+                      <Award size={15} />
                       <Text fontSize="sm" fontWeight="900">{trainer?.data.specialization || "General Trainer"}</Text>
                     </HStack>
                   </Skeleton>
@@ -211,7 +211,7 @@ const TrainerProfile = memo(() => {
                 <Heading size="lg" color="app.text.primary">{trainer?.data.experienceYears} Years</Heading>
                 <Text fontSize="xs" color={muted} fontWeight="700">Expert Level</Text>
               </VStack>
-              <Circle size="10" bg="blue.500/10" color="blue.500"><Icon as={LuBriefcase} boxSize={4} /></Circle>
+              <Circle size="10" bg="blue.500/10" color="blue.500"><Icon as={Briefcase} boxSize={4} /></Circle>
             </HStack>
           </SurfaceCard>
           <SurfaceCard p={4}>
@@ -221,7 +221,7 @@ const TrainerProfile = memo(() => {
                 <Heading size="lg" color="app.text.primary">{(Number(trainer?.data.experienceYears) || 1) * 4 + 2}</Heading>
                 <Text fontSize="xs" color={muted} fontWeight="700">Active sessions</Text>
               </VStack>
-              <Circle size="10" bg="green.500/10" color="green.500"><Icon as={LuUsers} boxSize={4} /></Circle>
+              <Circle size="10" bg="green.500/10" color="green.500"><Icon as={Users} boxSize={4} /></Circle>
             </HStack>
           </SurfaceCard>
           <SurfaceCard p={4}>
@@ -231,7 +231,7 @@ const TrainerProfile = memo(() => {
                 <Heading size="lg" color="app.text.primary">{trainer?.data.paymentMode || "Bank"}</Heading>
                 <Text fontSize="xs" color={muted} fontWeight="700">Salary disbursement</Text>
               </VStack>
-              <Circle size="10" bg="purple.500/10" color="purple.500"><Icon as={LuCreditCard} boxSize={4} /></Circle>
+              <Circle size="10" bg="purple.500/10" color="purple.500"><Icon as={CreditCard} boxSize={4} /></Circle>
             </HStack>
           </SurfaceCard>
           <SurfaceCard p={4}>
@@ -241,7 +241,7 @@ const TrainerProfile = memo(() => {
                 <Heading size="lg" color="app.text.primary">{new Date().getFullYear() - new Date(trainer?.data.joiningDate || Date.now()).getFullYear()}y ago</Heading>
                 <Text fontSize="xs" color={muted} fontWeight="700">{fmtDate(trainer?.data.joiningDate)}</Text>
               </VStack>
-              <Circle size="10" bg="orange.500/10" color="orange.500"><Icon as={LuCalendarDays} boxSize={4} /></Circle>
+              <Circle size="10" bg="orange.500/10" color="orange.500"><Icon as={CalendarDays} boxSize={4} /></Circle>
             </HStack>
           </SurfaceCard>
         </SimpleGrid>
@@ -258,15 +258,15 @@ const TrainerProfile = memo(() => {
                       <Heading size="md" fontWeight="900">Personal Information</Heading>
                       <Text fontSize="sm" color={muted} fontWeight="700">Contact and identity details.</Text>
                     </VStack>
-                    <Circle size="10" bg="blue.500/10" color="blue.500"><LuContact size={18} /></Circle>
+                    <Circle size="10" bg="blue.500/10" color="blue.500"><Contact size={18} /></Circle>
                   </HStack>
                   <SimpleGrid columns={{ base: 1, md: 2 }} gap={5}>
-                    <InfoTile label="Email" value={trainer?.data.email} icon={LuMail} accent="blue.500" />
-                    <InfoTile label="Phone" value={trainer?.data.phone} icon={LuPhone} accent="green.500" />
-                    <InfoTile label="Address" value={trainer?.data.address} icon={LuMapPin} accent="orange.500" />
-                    <InfoTile label="Gender" value={trainer?.data.gender || "Not recorded"} icon={LuUser} accent="purple.500" />
-                    <InfoTile label="Trainer ID" value={trainer?.data.trainer_id} icon={LuFingerprint} accent="cyan.500" />
-                    <InfoTile label="Joining Date" value={fmtDate(trainer?.data.joiningDate)} icon={LuCalendarDays} accent="teal.500" />
+                    <InfoTile label="Email" value={trainer?.data.email} icon={Mail} accent="blue.500" />
+                    <InfoTile label="Phone" value={trainer?.data.phone} icon={Phone} accent="green.500" />
+                    <InfoTile label="Address" value={trainer?.data.address} icon={MapPin} accent="orange.500" />
+                    <InfoTile label="Gender" value={trainer?.data.gender || "Not recorded"} icon={User} accent="purple.500" />
+                    <InfoTile label="Trainer ID" value={trainer?.data.trainer_id} icon={Fingerprint} accent="cyan.500" />
+                    <InfoTile label="Joining Date" value={fmtDate(trainer?.data.joiningDate)} icon={CalendarDays} accent="teal.500" />
                   </SimpleGrid>
                 </VStack>
               </SurfaceCard>
@@ -279,7 +279,7 @@ const TrainerProfile = memo(() => {
                       <Heading size="md" fontWeight="900">Bio & Expertise</Heading>
                       <Text fontSize="sm" color={muted} fontWeight="700">Professional background and philosophy.</Text>
                     </VStack>
-                    <Circle size="10" bg="purple.500/10" color="purple.500"><LuAward size={18} /></Circle>
+                    <Circle size="10" bg="purple.500/10" color="purple.500"><Award size={18} /></Circle>
                   </HStack>
                   <VStack align="start" gap={4}>
                     <Box w="full" p={4} borderRadius="xl" bg="blackAlpha.50" border="1px solid" borderColor={borderColor}>
@@ -289,8 +289,8 @@ const TrainerProfile = memo(() => {
                       </Text>
                     </Box>
                     <SimpleGrid columns={{ base: 1, md: 2 }} gap={4} w="full">
-                      <InfoTile label="Specialization" value={trainer?.data.specialization} icon={LuDumbbell} accent="blue.500" />
-                      <InfoTile label="Available Slot" value={trainer?.data.availableSlot || "Flexible"} icon={LuClock} accent="orange.500" />
+                      <InfoTile label="Specialization" value={trainer?.data.specialization} icon={Dumbbell} accent="blue.500" />
+                      <InfoTile label="Available Slot" value={trainer?.data.availableSlot || "Flexible"} icon={Clock} accent="orange.500" />
                     </SimpleGrid>
                   </VStack>
                 </VStack>
@@ -304,12 +304,12 @@ const TrainerProfile = memo(() => {
                       <Heading size="md" fontWeight="900">Verification & Documents</Heading>
                       <Text fontSize="sm" color={muted} fontWeight="700">Compliance and certification records.</Text>
                     </VStack>
-                    <Circle size="10" bg="green.500/10" color="green.500"><LuShieldCheck size={18} /></Circle>
+                    <Circle size="10" bg="green.500/10" color="green.500"><ShieldCheck size={18} /></Circle>
                   </HStack>
                   <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
                     <Box p={4} borderRadius="xl" bg="blue.500/8" border="1px solid" borderColor="blue.500/15" cursor="pointer" _hover={{ bg: "blue.500/12" }}>
                       <VStack align="center" gap={2}>
-                        <Icon as={LuShieldCheck} boxSize={6} color="blue.500" />
+                        <Icon as={ShieldCheck} boxSize={6} color="blue.500" />
                         <Text fontSize="xs" fontWeight="900">ID PROOF</Text>
                         <Badge colorPalette={trainer?.data.idProof ? "green" : "orange"} size="xs">
                           {trainer?.data.idProof ? "VERIFIED" : "PENDING"}
@@ -318,7 +318,7 @@ const TrainerProfile = memo(() => {
                     </Box>
                     <Box p={4} borderRadius="xl" bg="green.500/8" border="1px solid" borderColor="green.500/15" cursor="pointer" _hover={{ bg: "green.500/12" }}>
                       <VStack align="center" gap={2}>
-                        <Icon as={LuAward} boxSize={6} color="green.500" />
+                        <Icon as={Award} boxSize={6} color="green.500" />
                         <Text fontSize="xs" fontWeight="900">CERTIFICATIONS</Text>
                         <Badge colorPalette={trainer?.data.certifications ? "green" : "orange"} size="xs">
                           {trainer?.data.certifications ? "VERIFIED" : "PENDING"}
@@ -327,7 +327,7 @@ const TrainerProfile = memo(() => {
                     </Box>
                     <Box p={4} borderRadius="xl" bg="orange.500/8" border="1px solid" borderColor="orange.500/15" cursor="pointer" _hover={{ bg: "orange.500/12" }}>
                       <VStack align="center" gap={2}>
-                        <Icon as={LuFileText} boxSize={6} color="orange.500" />
+                        <Icon as={FileText} boxSize={6} color="orange.500" />
                         <Text fontSize="xs" fontWeight="900">CONTRACT</Text>
                         <Badge colorPalette={trainer?.data.status === "active" ? "green" : "gray"} size="xs">
                           {trainer?.data.status === "active" ? "SIGNED" : "PENDING"}
@@ -347,12 +347,12 @@ const TrainerProfile = memo(() => {
                 <VStack align="stretch" gap={4}>
                   <Heading size="sm" fontWeight="900">Quick Actions</Heading>
                   <VStack align="stretch" gap={2}>
-                    <ActionRow icon={LuMessageSquare} label="Send Message" color="blue" />
-                    <ActionRow icon={LuCalendarDays} label="Manage Schedule" color="green" />
-                    <ActionRow icon={LuStar} label="Performance Review" color="orange" />
-                    <ActionRow icon={LuFileText} label="View Salary Slips" color="purple" />
-                    <ActionRow icon={LuSnowflake} label="Request Leave" color="cyan" />
-                    <ActionRow icon={LuTrash2} label="Terminate Contract" danger />
+                    <ActionRow icon={MessageSquare} label="Send Message" color="blue" />
+                    <ActionRow icon={CalendarDays} label="Manage Schedule" color="green" />
+                    <ActionRow icon={Star} label="Performance Review" color="orange" />
+                    <ActionRow icon={FileText} label="View Salary Slips" color="purple" />
+                    <ActionRow icon={Snowflake} label="Request Leave" color="cyan" />
+                    <ActionRow icon={Trash2} label="Terminate Contract" danger />
                   </VStack>
                 </VStack>
               </SurfaceCard>
@@ -363,7 +363,7 @@ const TrainerProfile = memo(() => {
                   <HStack justify="space-between">
                     <Heading size="sm" fontWeight="900">Trainer Quality</Heading>
                     <HStack gap={1} color="orange.400">
-                      <LuStar size={14} fill="currentColor" />
+                      <Star size={14} fill="currentColor" />
                       <Text fontSize="sm" fontWeight="900">4.9</Text>
                     </HStack>
                   </HStack>

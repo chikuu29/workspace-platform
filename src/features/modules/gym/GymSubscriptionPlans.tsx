@@ -20,10 +20,10 @@ import {
 import { NativeSelectRoot, NativeSelectField } from "@/components/ui/native-select";
 import { toaster } from "@/components/ui/toaster";
 import {
-  LuPlus, LuPencil, LuTrash2, LuCheck, LuArrowRight,
-  LuActivity, LuTimer, LuCoins, LuCreditCard, LuFilter, LuUsers, LuTrendingUp,
-  LuRefreshCw,
-} from "react-icons/lu";
+  Plus, Pencil, Trash2, Check, ArrowRight,
+  Activity, Timer, Coins, CreditCard, Filter, Users, TrendingUp,
+  RefreshCw,
+} from "lucide-react";
 import { Field } from "@/components/ui/field";
 import { Switch } from "@/components/ui/switch";
 import { PageHeader } from "@/core/components/PageHeader";
@@ -79,10 +79,10 @@ const PlanCard = memo(({
           <HStack gap={1} opacity={0.6} _groupHover={{ opacity: 1 }} transition="opacity 0.2s">
             <IconButton aria-label="Edit" variant="ghost" size="sm" onClick={onEdit}
               _hover={{ bg: "blue.500/10", color: "blue.500" }}>
-              <LuPencil size={15} />
+              <Pencil size={15} />
             </IconButton>
             <IconButton aria-label="Delete" variant="ghost" size="sm" colorPalette="red" onClick={onDelete}>
-              <LuTrash2 size={15} />
+              <Trash2 size={15} />
             </IconButton>
           </HStack>
         </Flex>
@@ -122,7 +122,7 @@ const PlanCard = memo(({
           {plan.data.features.length > 0 ? plan.data.features.map((f) => (
             <HStack key={f} gap={2.5}>
               <Circle size="5" bg={`${accent}.500/12`} color={`${accent}.500`}>
-                <LuCheck size={10} />
+                <Check size={10} />
               </Circle>
               <Text fontSize="sm" fontWeight="700">{f}</Text>
             </HStack>
@@ -135,7 +135,7 @@ const PlanCard = memo(({
         <Button variant="outline" w="full" borderRadius="xl" fontWeight="900" h="44px"
           borderColor={`${accent}.500/30`} color={`${accent}.500`}
           _hover={{ bg: `${accent}.500/10` }} onClick={onEdit}>
-          Modify Plan <LuArrowRight size={16} style={{ marginLeft: "6px" }} />
+          Modify Plan <ArrowRight size={16} style={{ marginLeft: "6px" }} />
         </Button>
       </VStack>
     </Box>
@@ -236,7 +236,7 @@ const GymSubscriptionPlans = memo(() => {
           aria-label="Refresh plans"
           loading={isLoading}
         >
-          <LuRefreshCw size={14} />
+          <RefreshCw size={14} />
         </IconButton>
         <Button
           colorPalette="blue"
@@ -246,7 +246,7 @@ const GymSubscriptionPlans = memo(() => {
           fontWeight="800"
           onClick={handleAddClick}
         >
-          <LuPlus size={16} /> New Plan
+          <Plus size={16} /> New Plan
         </Button>
       </HStack>
     );
@@ -306,10 +306,10 @@ const GymSubscriptionPlans = memo(() => {
                 </VStack>
               </VStack>
               <SimpleGrid columns={{ base: 1, md: 2, xl: 4 }} gap={4}>
-                <StatTile label="Total Plans" value={metrics.total} caption="All configured" icon={LuCreditCard} accent="blue.500" />
-                <StatTile label="Active" value={metrics.active} caption="Accepting signups" icon={LuActivity} accent="green.500" />
-                <StatTile label="Inactive" value={metrics.inactive} caption="Paused plans" icon={LuTimer} accent="orange.500" />
-                <StatTile label="Plan Revenue" value={fmtCurrency(metrics.totalRevenue)} caption="Active plan total" icon={LuTrendingUp} accent="purple.500" />
+                <StatTile label="Total Plans" value={metrics.total} caption="All configured" icon={CreditCard} accent="blue.500" />
+                <StatTile label="Active" value={metrics.active} caption="Accepting signups" icon={Activity} accent="green.500" />
+                <StatTile label="Inactive" value={metrics.inactive} caption="Paused plans" icon={Timer} accent="orange.500" />
+                <StatTile label="Plan Revenue" value={fmtCurrency(metrics.totalRevenue)} caption="Active plan total" icon={TrendingUp} accent="purple.500" />
               </SimpleGrid>
             </Grid>
           </Box>
@@ -320,7 +320,7 @@ const GymSubscriptionPlans = memo(() => {
               direction={{ base: "column", md: "row" }} gap={4} p={4} borderRadius="2xl"
               bg={panelBg} border="1px solid" borderColor={borderColor}>
               <HStack gap={2}>
-                <Circle size="9" bg="blue.500/10" color="blue.500"><LuFilter size={16} /></Circle>
+                <Circle size="9" bg="blue.500/10" color="blue.500"><Filter size={16} /></Circle>
                 <VStack align="start" gap={0}>
                   <Text fontWeight="900" color="app.text.primary">Plans</Text>
                   <Text fontSize="xs" color={muted} fontWeight="700">Showing {filteredPlans.length} plans</Text>
@@ -347,13 +347,13 @@ const GymSubscriptionPlans = memo(() => {
             ) : filteredPlans.length === 0 ? (
               <Flex direction="column" align="center" justify="center" py={20} gap={4}
                 borderRadius="2xl" bg={panelBg} border="1px solid" borderColor={borderColor}>
-                <Circle size="16" bg="blue.500/10" color="blue.500"><LuCreditCard size={30} /></Circle>
+                <Circle size="16" bg="blue.500/10" color="blue.500"><CreditCard size={30} /></Circle>
                 <VStack gap={1}>
                   <Heading size="sm" fontWeight="900">No plans found</Heading>
                   <Text fontSize="sm" color={muted} fontWeight="600">Create your first plan or adjust filters.</Text>
                 </VStack>
                 <Button colorPalette="blue" borderRadius="xl" fontWeight="900" mt={2} onClick={handleAddClick}>
-                  <LuPlus size={16} style={{ marginRight: "6px" }} /> Create Plan
+                  <Plus size={16} style={{ marginRight: "6px" }} /> Create Plan
                 </Button>
               </Flex>
             ) : (
@@ -387,7 +387,7 @@ const GymSubscriptionPlans = memo(() => {
               <VStack gap={8} align="stretch">
                 <VStack align="stretch" gap={4}>
                   <HStack gap={2} mb={2}>
-                    <LuTimer color="blue" />
+                    <Timer color="blue" />
                     <Text fontSize="sm" fontWeight="bold">Identity & Identification</Text>
                   </HStack>
                   <SimpleGrid columns={2} gap={4}>
@@ -407,7 +407,7 @@ const GymSubscriptionPlans = memo(() => {
 
                 <VStack align="stretch" gap={4}>
                   <HStack gap={2} mb={2}>
-                    <LuCoins color="blue" />
+                    <Coins color="blue" />
                     <Text fontSize="sm" fontWeight="bold">Pricing Model</Text>
                   </HStack>
                   <SimpleGrid columns={2} gap={4}>
@@ -447,7 +447,7 @@ const GymSubscriptionPlans = memo(() => {
               {isSaving ? (
                 <HStack gap={2}><Spinner size="sm" /><Text>Saving...</Text></HStack>
               ) : (
-                <>Save Plan Changes <LuArrowRight style={{ marginLeft: "8px" }} /></>
+                <>Save Plan Changes <ArrowRight style={{ marginLeft: "8px" }} /></>
               )}
             </Button>
           </DrawerFooter>

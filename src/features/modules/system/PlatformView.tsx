@@ -15,16 +15,16 @@ import { useNavigate } from "react-router";
 import { RootState } from "@/app/store";
 import { PageLayout } from "@/core/components/PageLayout";
 import {
-  LuShieldCheck,
-  LuUsers,
-  LuBuilding2,
-  LuKeyRound,
-  LuChevronRight,
-  LuLayoutGrid,
-  LuSparkles,
-  LuCreditCard,
-  LuDatabase,
-} from "react-icons/lu";
+  ShieldCheck,
+  Users,
+  Building2,
+  KeyRound,
+  ChevronRight,
+  LayoutGrid,
+  Sparkles,
+  CreditCard,
+  Database,
+} from "lucide-react";
 
 import { NavigationAction } from "@/core/action-engine/types";
 import { useModalStore } from "@/core/store/useModalStore";
@@ -53,7 +53,7 @@ const ADMIN_MODULES: AdminModule[] = [
     name: "OAuth Applications",
     description: "Manage client credentials and authorization flows",
     action: { type: "route", path: "app/system/ApplicationClients" } as NavigationAction,
-    icon: LuKeyRound,
+    icon: KeyRound,
     gradient: "linear-gradient(135deg,#6366f1,#8b5cf6)",
     accentColor: "purple",
     category: "Access & Security",
@@ -64,7 +64,7 @@ const ADMIN_MODULES: AdminModule[] = [
     name: "Organizations",
     description: "Create and configure multi-organization workspaces",
     action: { type: "route", path: "app/system/Organizations" } as NavigationAction,
-    icon: LuBuilding2,
+    icon: Building2,
     gradient: "linear-gradient(135deg,#3b82f6,#6366f1)",
     accentColor: "blue",
     category: "Platform Settings",
@@ -75,7 +75,7 @@ const ADMIN_MODULES: AdminModule[] = [
     name: "Auth Users",
     description: "Manage user accounts, roles and access",
     action: { type: "route", path: "app/system/AuthUsers" } as NavigationAction,
-    icon: LuUsers,
+    icon: Users,
     gradient: "linear-gradient(135deg,#10b981,#3b82f6)",
     accentColor: "green",
     category: "Access & Security",
@@ -85,7 +85,7 @@ const ADMIN_MODULES: AdminModule[] = [
     name: "Access Control",
     description: "Configure permissions and policy rules",
     action: { type: "route", path: "app/system/accesscontrol" } as NavigationAction,
-    icon: LuShieldCheck,
+    icon: ShieldCheck,
     gradient: "linear-gradient(135deg,#f59e0b,#ef4444)",
     accentColor: "orange",
     category: "Access & Security",
@@ -95,7 +95,7 @@ const ADMIN_MODULES: AdminModule[] = [
     name: "SaaS Applications",
     description: "Define and manage platform applications and pricing",
     action: { type: "route", path: "app/system/SaasApps" } as NavigationAction,
-    icon: LuLayoutGrid,
+    icon: LayoutGrid,
     gradient: "linear-gradient(135deg,#06b6d4,#3b82f6)",
     accentColor: "cyan",
     category: "Products & Billing",
@@ -106,7 +106,7 @@ const ADMIN_MODULES: AdminModule[] = [
     name: "Features",
     description: "Manage feature flags and addon capabilities",
     action: { type: "route", path: "app/system/Features" } as NavigationAction,
-    icon: LuSparkles,
+    icon: Sparkles,
     gradient: "linear-gradient(135deg,#a855f7,#ec4899)",
     accentColor: "pink",
     category: "Products & Billing",
@@ -117,7 +117,7 @@ const ADMIN_MODULES: AdminModule[] = [
     name: "Subscription Plans",
     description: "Create and version subscription plans with limits",
     action: { type: "route", path: "app/system/SubscriptionPlans" } as NavigationAction,
-    icon: LuCreditCard,
+    icon: CreditCard,
     gradient: "linear-gradient(135deg,#14b8a6,#22c55e)",
     accentColor: "teal",
     category: "Products & Billing",
@@ -128,7 +128,7 @@ const ADMIN_MODULES: AdminModule[] = [
     name: "Database Statistics",
     description: "Monitor database health, tables and connections",
     action: { type: "route", path: "app/system/DatabaseStatistics" } as NavigationAction,
-    icon: LuDatabase,
+    icon: Database,
     gradient: "linear-gradient(135deg,#64748b,#475569)",
     accentColor: "gray",
     category: "Platform Settings",
@@ -139,7 +139,7 @@ const ADMIN_MODULES: AdminModule[] = [
     name: "Global Permissions",
     description: "Definition registry for system and feature access codes",
     action: { type: "route", path: "app/system/Permissions" } as NavigationAction,
-    icon: LuShieldCheck,
+    icon: ShieldCheck,
     gradient: "linear-gradient(135deg,#8b5cf6,#6366f1)",
     accentColor: "purple",
     category: "Access & Security",
@@ -150,7 +150,7 @@ const ADMIN_MODULES: AdminModule[] = [
     name: "Policy Management",
     description: "Configure IAM-style access policies with Allow and Deny rules",
     action: { type: "route", path: "app/system/PolicyManagement" } as NavigationAction,
-    icon: LuShieldCheck,
+    icon: ShieldCheck,
     gradient: "linear-gradient(135deg,#06b6d4,#6366f1)",
     accentColor: "cyan",
     category: "Access & Security",
@@ -161,7 +161,7 @@ const ADMIN_MODULES: AdminModule[] = [
     name: "Team Management",
     description: "Manage your team members and their assigned roles",
     action: { type: "route", path: "app/system/OrganizationUsers" } as NavigationAction,
-    icon: LuUsers,
+    icon: Users,
     gradient: "linear-gradient(135deg,#10b981,#3b82f6)",
     accentColor: "green",
     category: "Workspace Organization",
@@ -171,7 +171,7 @@ const ADMIN_MODULES: AdminModule[] = [
     name: "Roles Management",
     description: "Configure custom roles and assign policies",
     action: { type: "route", path: "app/system/OrganizationRoles" } as NavigationAction,
-    icon: LuShieldCheck,
+    icon: ShieldCheck,
     gradient: "linear-gradient(135deg,#f59e0b,#ef4444)",
     accentColor: "orange",
     category: "Workspace Organization",
@@ -181,7 +181,7 @@ const ADMIN_MODULES: AdminModule[] = [
     name: "Organization Access",
     description: "Premium multi-role management and user security control",
     action: { type: "route", path: "app/system/OrganizationAccess" } as NavigationAction,
-    icon: LuUsers,
+    icon: Users,
     gradient: "linear-gradient(135deg,#6366f1,#a855f7)",
     accentColor: "purple",
     category: "Workspace Organization",
@@ -278,7 +278,7 @@ const AdminModuleCard = memo(({ module, onNavigate }: AdminModuleCardProps) => {
             transition="all 0.2s"
             _groupHover={{ opacity: 1, transform: "translateX(3px)" }}
           >
-            <LuChevronRight size={16} />
+            <ChevronRight size={16} />
           </Box>
         </Flex>
 

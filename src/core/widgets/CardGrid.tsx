@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Box, SimpleGrid, Center, Icon, VStack, HStack, Separator, Badge, Text, IconButton } from "@chakra-ui/react";
 import { GETAPI } from "@/app/api";
-import { LuPencil, LuTrash2, LuLayoutGrid, LuZap, LuShieldCheck } from "react-icons/lu";
+import { Pencil, Trash2, LayoutGrid, Zap, ShieldCheck } from "lucide-react";
 import { Card } from "@/core/components/Card";
 import { actionEngine } from "@/core/engine/logicEngine";
 
@@ -74,7 +74,7 @@ const CardGrid = (props: any) => {
                                 borderColor="rgba(6,182,212,0.2)"
                                 boxShadow="inner"
                             >
-                                <Icon as={LuLayoutGrid} boxSize={5} color="cyan.400" />
+                                <Icon as={LayoutGrid} boxSize={5} color="cyan.400" />
                             </Center>
                             <VStack align="start" gap={0} flex={1}>
                                 <Text fontWeight="800" color="app.text.primary" fontSize="md" letterSpacing="tight">
@@ -131,7 +131,7 @@ const CardGrid = (props: any) => {
                                         onClick={() => handleAction("onCustom1", item)}
                                         _hover={{ bg: "cyan.500/10", color: "cyan.400" }}
                                     >
-                                        <LuZap size={16} />
+                                        <Zap size={16} />
                                     </IconButton>
                                 )}
                                 {props.events?.onCustom2 && (
@@ -143,7 +143,7 @@ const CardGrid = (props: any) => {
                                         onClick={() => handleAction("onCustom2", item)}
                                         _hover={{ bg: "purple.500/10", color: "purple.400" }}
                                     >
-                                        <LuShieldCheck size={16} />
+                                        <ShieldCheck size={16} />
                                     </IconButton>
                                 )}
                             </HStack>
@@ -158,7 +158,7 @@ const CardGrid = (props: any) => {
                                         onClick={() => handleAction("onEdit", item)}
                                         _hover={{ bg: "white/10", color: "white" }}
                                     >
-                                        <LuPencil size={14} />
+                                        <Pencil size={14} />
                                     </IconButton>
                                 )}
                                 {props.events?.onDelete && (
@@ -171,7 +171,7 @@ const CardGrid = (props: any) => {
                                         onClick={() => handleAction("onDelete", item)}
                                         _hover={{ bg: "red.500/10", color: "red.400" }}
                                     >
-                                        <LuTrash2 size={14} />
+                                        <Trash2 size={14} />
                                     </IconButton>
                                 )}
                             </HStack>

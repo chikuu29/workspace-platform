@@ -24,24 +24,24 @@ import {
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 import {
-    LuArrowRight,
-    LuBadgeDollarSign,
-    LuChartColumn,
-    LuCircleDollarSign,
-    LuCreditCard,
-    LuLayers,
-    LuPlus,
-    LuSettings,
-    LuShieldCheck,
-    LuUsers,
-    LuWallet,
-} from "react-icons/lu";
+    ArrowRight,
+    BadgeDollarSign,
+    ChartColumn,
+    CircleDollarSign,
+    CreditCard,
+    Layers,
+    Plus,
+    Settings,
+    ShieldCheck,
+    Users,
+    Wallet,
+} from "lucide-react";
 import { PageLayout } from "@/core/components/PageLayout";
 import { useSubscriptionPlans } from "./hooks/useSubscriptionPlans";
 import { useSubscriptionStats } from "./hooks/useSubscriptionStats";
 import { useNavActionStore } from "@/core/store/useNavActionStore";
 import { useEffect } from "react";
-import { LuRefreshCw } from "react-icons/lu";
+import { RefreshCw } from "lucide-react";
 import type { SubscriptionPlanDocument, PlanWithMembers } from "./types/Gym.types";
 
 // ─── Glassmorphic Card Wrapper ──────────────────────────────────────────────
@@ -183,7 +183,7 @@ const PlanSummaryCard = memo(({ plan, memberInfo }: PlanSummaryCardProps) => {
                         </HStack>
                     </VStack>
                     <Circle size="12" bg={accentBg} color={accentColor} shadow="md">
-                        <LuCreditCard size={22} />
+                        <CreditCard size={22} />
                     </Circle>
                 </Flex>
 
@@ -209,7 +209,7 @@ const PlanSummaryCard = memo(({ plan, memberInfo }: PlanSummaryCardProps) => {
                     {plan.data.features.slice(0, 3).map((feature) => (
                         <HStack key={feature} gap={3}>
                             <Circle size="6" bg={accentBg} color={accentColor}>
-                                <LuShieldCheck size={14} />
+                                <ShieldCheck size={14} />
                             </Circle>
                             <Text fontSize="sm" fontWeight="600" color="app.text.primary">{feature}</Text>
                         </HStack>
@@ -266,7 +266,7 @@ const Subscription = () => {
                     h="32px"
                     w="32px"
                 >
-                    <LuRefreshCw size={14} />
+                    <RefreshCw size={14} />
                 </IconButton>
                 <Button
                     variant="outline"
@@ -276,7 +276,7 @@ const Subscription = () => {
                     h="32px"
                     fontWeight="800"
                 >
-                    <LuSettings /> Management
+                    <Settings /> Management
                 </Button>
                 <Button
                     colorPalette="blue"
@@ -286,7 +286,7 @@ const Subscription = () => {
                     h="32px"
                     fontWeight="800"
                 >
-                    <LuPlus /> New Plan
+                    <Plus /> New Plan
                 </Button>
             </HStack>
         );
@@ -330,21 +330,21 @@ const Subscription = () => {
                                 label="Live Portfolios"
                                 value={String(stats?.active_plans ?? 0)}
                                 helper={`${stats?.total_plans ?? 0} Global Tiers`}
-                                icon={LuLayers}
+                                icon={Layers}
                                 accent="blue"
                             />
                             <KpiTile
                                 label="Subscribers"
                                 value={String(stats?.total_subscribers ?? 0)}
                                 helper="Active Memberships"
-                                icon={LuUsers}
+                                icon={Users}
                                 accent="green"
                             />
                             <KpiTile
                                 label="Projected MRR"
                                 value={`₹${(stats?.total_mrr ?? 0).toLocaleString("en-IN")}`}
                                 helper="Recurring Revenue"
-                                icon={LuCircleDollarSign}
+                                icon={CircleDollarSign}
                                 accent="orange"
                             />
                             <KpiTile
@@ -355,7 +355,7 @@ const Subscription = () => {
                                         : "₹0"
                                 }
                                 helper="Average Revenue / User"
-                                icon={LuChartColumn}
+                                icon={ChartColumn}
                                 accent="purple"
                             />
                         </>
@@ -381,7 +381,7 @@ const Subscription = () => {
                             onClick={handleManagePlans}
                             fontWeight="800"
                         >
-                            Catalog Overview <LuArrowRight size={14} style={{ marginLeft: "4px" }} />
+                            Catalog Overview <ArrowRight size={14} style={{ marginLeft: "4px" }} />
                         </Button>
                     </Flex>
 
@@ -409,7 +409,7 @@ const Subscription = () => {
                     <GlassCard p={6} cursor="pointer" onClick={handleCreatePlan} accentColor="blue">
                         <VStack align="start" gap={4}>
                             <Circle size="12" bg="blue.500/10" color="blue.500">
-                                <LuBadgeDollarSign size={24} />
+                                <BadgeDollarSign size={24} />
                             </Circle>
                             <VStack align="start" gap="1">
                                 <Heading size="md" fontWeight="900" letterSpacing="tight">Plan Architect</Heading>
@@ -423,7 +423,7 @@ const Subscription = () => {
                     <GlassCard p={6} cursor="pointer" onClick={handleManagePlans} accentColor="green">
                         <VStack align="start" gap={4}>
                             <Circle size="12" bg="green.500/10" color="green.500">
-                                <LuSettings size={24} />
+                                <Settings size={24} />
                             </Circle>
                             <VStack align="start" gap="1">
                                 <Heading size="md" fontWeight="900" letterSpacing="tight">System Config</Heading>
@@ -437,7 +437,7 @@ const Subscription = () => {
                     <GlassCard p={6} cursor="pointer" onClick={handleViewMembers} accentColor="orange">
                         <VStack align="start" gap={4}>
                             <Circle size="12" bg="orange.500/10" color="orange.500">
-                                <LuUsers size={24} />
+                                <Users size={24} />
                             </Circle>
                             <VStack align="start" gap="1">
                                 <Heading size="md" fontWeight="900" letterSpacing="tight">Member Ledger</Heading>

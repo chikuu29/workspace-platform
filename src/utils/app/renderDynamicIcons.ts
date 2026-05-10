@@ -1,61 +1,76 @@
-import { IconType } from "react-icons";
-import { type LucideIcon, Info } from "lucide-react";
+import { type LucideIcon, Info, icons } from "lucide-react";
 
 /**
- * Common icon component type that covers both react-icons and lucide-react.
+ * Common icon component type. We've migrated to lucide-react.
  */
-export type AnyIconComponent = IconType | LucideIcon;
+export type AnyIconComponent = LucideIcon;
 
 /**
- * Optimized Dynamic Loader for Vite.
- * Explicit imports are required for Vite to trace and bundle modules.
+ * Normalizes icon names from various react-icons formats to Lucide format.
+ * Strips common prefixes like Lu, Fi, Md, Fa, etc.
+ * Example: "LuUsers" -> "Users", "FiSearch" -> "Search"
  */
-const DynamicIcon = async (iconName: string): Promise<AnyIconComponent> => {
-  if (!iconName) return Info as AnyIconComponent;
-
-  try {
-    // ── Path 1: react-icons (prefixed names) ─────────────────────────
-    const prefix = iconName.substring(0, 2);
-
-    switch (prefix) {
-      case "Lu": {
-        const mod = await import("react-icons/lu");
-        return mod[iconName as keyof typeof mod] as IconType;
-      }
-      case "Fc": {
-        const mod = await import("react-icons/fc");
-        return mod[iconName as keyof typeof mod] as IconType;
-      }
-      case "Fi": {
-        const mod = await import("react-icons/fi");
-        return mod[iconName as keyof typeof mod] as IconType;
-      }
-      case "Md": {
-        const mod = await import("react-icons/md");
-        return mod[iconName as keyof typeof mod] as IconType;
-      }
-      case "Fa": {
-        const mod = await import("react-icons/fa");
-        return mod[iconName as keyof typeof mod] as IconType;
-      }
-      case "Ri": {
-        const mod = await import("react-icons/ri");
-        return mod[iconName as keyof typeof mod] as IconType;
+const normalizeIconName = (name: string): string => {
+  if (!name) return "";
+  
+  // List of prefixes to strip (ordered by length descending)
+  const prefixes = ["Lu", "Fi", "Md", "Fa", "Io", "Ai", "Tb", "Ci", "Ri", "Gr", "Ti", "Hi", "Bs", "Vsc"];
+  
+  for (const prefix of prefixes) {
+    if (name.startsWith(prefix) && name.length > prefix.length) {
+      const potentialName = name.substring(prefix.length);
+      // Check if the stripped name exists in Lucide
+      if (icons[potentialName as keyof typeof icons]) {
+        return potentialName;
       }
     }
+  }
 
-    // ── Path 2: lucide-react (bare names / fallback) ────────────────
-    // We import the whole lucide-react module dynamically. 
-    // Vite handles this efficiently via tree-shaking and chunks.
-    const lucideMod = await import("lucide-react");
-    const LucideIcon = lucideMod[iconName as keyof typeof lucideMod] as LucideIcon;
+  // Handle some manual mappings if necessary
+  const manualMap: Record<string, string> = {
+    "FaPlus": "Plus",
+    "FaFilter": "Filter",
+    "FaEdit": "Pencil",
+    "FaEye": "Eye",
+    "FaTrash": "Trash2",
+    "MdNotificationsNone": "Bell",
+    "IoShieldCheckmarkOutline": "ShieldCheck",
+    "AiTwotoneCloseCircle": "CircleX",
+    "TbLockAccess": "Lock",
+    "SiAuthelia": "ShieldCheck", // Brand fallback
+    "FcHome": "Home",
+    "FcHighPriority": "AlertTriangle",
+  };
+
+  if (manualMap[name]) return manualMap[name];
+
+  return name;
+};
+
+/**
+ * Optimized Dynamic Loader for Lucide Icons.
+ * Provides backwards compatibility for react-icons names used in database configs.
+ */
+const DynamicIcon = async (iconName: string): Promise<AnyIconComponent> => {
+  if (!iconName) return Info;
+
+  try {
+    const normalizedName = normalizeIconName(iconName);
+    const LucideIcon = icons[normalizedName as keyof typeof icons];
 
     if (LucideIcon) return LucideIcon;
 
-    return Info as AnyIconComponent;
+    // Fallback for names that might already be in Lucide format but didn't match case
+    // (Lucide uses PascalCase)
+    const pascalName = normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1);
+    const FallbackIcon = icons[pascalName as keyof typeof icons];
+    
+    if (FallbackIcon) return FallbackIcon;
+
+    return Info;
   } catch (error) {
-    console.error(`Failed to load icon: ${iconName}`, error);
-    return Info as AnyIconComponent;
+    console.error(`Failed to resolve icon: ${iconName}`, error);
+    return Info;
   }
 };
 

@@ -14,11 +14,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { useParams } from "react-router";
 import {
-  LuActivity, LuArrowLeft, LuCalendarDays, LuCheck, LuCreditCard,
-  LuDumbbell, LuFileText, LuFingerprint, LuMail, LuMapPin,
-  LuMessageSquare, LuPhone, LuRefreshCw, LuShieldCheck, LuSnowflake,
-  LuStar, LuTrash2, LuTrendingUp, LuUserCheck, LuUsers, LuX, LuZap,
-} from "react-icons/lu";
+  Activity, ArrowLeft, CalendarDays, Check, CreditCard,
+  Dumbbell, FileText, Fingerprint, Mail, MapPin,
+  MessageSquare, Phone, RefreshCw, ShieldCheck, Snowflake,
+  Star, Trash2, TrendingUp, UserCheck, Users, X, Zap,
+} from "lucide-react";
 
 import { PageHeader } from "@/core/components/PageHeader";
 import { useGymMember } from "./hooks/useGymMember";
@@ -147,7 +147,7 @@ const MemberDetail = memo(() => {
           onClick={handleBack}
         // h="32px"
         >
-          <LuArrowLeft size={14} /> Directory
+          <ArrowLeft size={14} /> Directory
         </Button>
         <IconButton
           // variant="subtle"
@@ -162,7 +162,7 @@ const MemberDetail = memo(() => {
         // h="32px"
         // w="32px"
         >
-          <LuRefreshCw size={14} />
+          <RefreshCw size={14} />
         </IconButton>
       </HStack>
     );
@@ -178,7 +178,7 @@ const MemberDetail = memo(() => {
           subtitle={`No member profile found for "${memberId || "unknown"}".`}
           actions={
             <Button variant="outline" borderRadius="xl" onClick={handleBack} fontWeight="900">
-              <LuArrowLeft size={16} /> Back
+              <ArrowLeft size={16} /> Back
             </Button>
           }
         />
@@ -193,7 +193,7 @@ const MemberDetail = memo(() => {
         >
           <Flex direction="column" align="center" justify="center" py={16} gap={4}>
             <Circle size="16" bg="red.500/10" color="red.500">
-              <LuShieldCheck size={30} />
+              <ShieldCheck size={30} />
             </Circle>
             <Heading size="md" fontWeight="900">Profile unavailable</Heading>
             <Text color={muted} fontWeight="600" textAlign="center" maxW="md">
@@ -209,7 +209,7 @@ const MemberDetail = memo(() => {
               mt={2}
               onClick={handleBack}
             >
-              <LuArrowLeft size={14} /> Return to Directory
+              <ArrowLeft size={14} /> Return to Directory
             </Button>
           </Flex>
         </Box>
@@ -223,8 +223,8 @@ const MemberDetail = memo(() => {
         subtitle={loading ? "Loading..." : `Operational profile for ${name.full}.`}
         actions={
           <HStack gap={3}>
-            <Button variant="outline" borderRadius="xl" onClick={handleBack} fontWeight="900"><LuArrowLeft size={16} /> Directory</Button>
-            <Button variant="outline" borderRadius="xl" onClick={refresh} loading={loading} fontWeight="900"><LuRefreshCw size={16} /> Refresh</Button>
+            <Button variant="outline" borderRadius="xl" onClick={handleBack} fontWeight="900"><ArrowLeft size={16} /> Directory</Button>
+            <Button variant="outline" borderRadius="xl" onClick={refresh} loading={loading} fontWeight="900"><RefreshCw size={16} /> Refresh</Button>
           </HStack>
         }
       /> */}
@@ -249,14 +249,14 @@ const MemberDetail = memo(() => {
                 <HStack gap={3} flexWrap="wrap">
                   <Skeleton loading={loading}>
                     <HStack px={4} py={2} borderRadius="xl" bg="blackAlpha.50" color={muted}>
-                      <LuFingerprint size={15} />
+                      <Fingerprint size={15} />
                       <Text fontSize="sm" fontWeight="900" fontFamily="mono">{member?._meta.record_id || memberId}</Text>
                     </HStack>
                   </Skeleton>
                   <Skeleton loading={loading}>
                     <HStack px={4} py={2} borderRadius="xl" bg={member?.has_plan ? sm.bg : "red.500/10"}
                       color={member?.has_plan ? sm.accent : "red.500"}>
-                      <LuDumbbell size={15} />
+                      <Dumbbell size={15} />
                       <Text fontSize="sm" fontWeight="900">
                         {member?.has_plan ? (sub?.plan_name || member?.data.plan || "Active Plan") : "No Plan"}
                       </Text>
@@ -277,7 +277,7 @@ const MemberDetail = memo(() => {
                 <Heading size="lg" color="app.text.primary">{sub?.plan_name || "None"}</Heading>
                 <Text fontSize="xs" color={muted} fontWeight="700">{sub ? fmtCurrency(sub.price, sub.currency) + " / " + sub.billing_cycle : "Not subscribed"}</Text>
               </VStack>
-              <Circle size="10" bg="blue.500/10" color="blue.500"><Icon as={LuCreditCard} boxSize={4} /></Circle>
+              <Circle size="10" bg="blue.500/10" color="blue.500"><Icon as={CreditCard} boxSize={4} /></Circle>
             </HStack>
           </SurfaceCard>
           <SurfaceCard p={4}>
@@ -287,7 +287,7 @@ const MemberDetail = memo(() => {
                 <Heading size="lg" color="app.text.primary">{daysRemaining !== null ? `${daysRemaining}d` : "N/A"}</Heading>
                 <Text fontSize="xs" color={muted} fontWeight="700">{sub ? fmtDate(sub.end_date) : "No active sub"}</Text>
               </VStack>
-              <Circle size="10" bg="orange.500/10" color="orange.500"><Icon as={LuCalendarDays} boxSize={4} /></Circle>
+              <Circle size="10" bg="orange.500/10" color="orange.500"><Icon as={CalendarDays} boxSize={4} /></Circle>
             </HStack>
           </SurfaceCard>
           <SurfaceCard p={4}>
@@ -298,7 +298,7 @@ const MemberDetail = memo(() => {
                 <Text fontSize="xs" color={muted} fontWeight="700">{sub ? fmtCurrency(sub.price, sub.currency) : "No dues"}</Text>
               </VStack>
               <Circle size="10" bg={sub?.is_paid ? "green.500/10" : "red.500/10"} color={sub?.is_paid ? "green.500" : "red.500"}>
-                <Icon as={sub?.is_paid ? LuCheck : LuX} boxSize={4} />
+                <Icon as={sub?.is_paid ? Check : X} boxSize={4} />
               </Circle>
             </HStack>
           </SurfaceCard>
@@ -309,7 +309,7 @@ const MemberDetail = memo(() => {
                 <Heading size="lg" color="app.text.primary">{sm.label}</Heading>
                 <Text fontSize="xs" color={muted} fontWeight="700">Joined {fmtDate(member?._meta.created?.at)}</Text>
               </VStack>
-              <Circle size="10" bg={sm.bg} color={sm.accent}><Icon as={LuUserCheck} boxSize={4} /></Circle>
+              <Circle size="10" bg={sm.bg} color={sm.accent}><Icon as={UserCheck} boxSize={4} /></Circle>
             </HStack>
           </SurfaceCard>
         </SimpleGrid>
@@ -326,15 +326,15 @@ const MemberDetail = memo(() => {
                       <Heading size="md" fontWeight="900">Contact & Identity</Heading>
                       <Text fontSize="sm" color={muted} fontWeight="700">Primary member information.</Text>
                     </VStack>
-                    <Circle size="10" bg="blue.500/10" color="blue.500"><LuUsers size={18} /></Circle>
+                    <Circle size="10" bg="blue.500/10" color="blue.500"><Users size={18} /></Circle>
                   </HStack>
                   <SimpleGrid columns={{ base: 1, md: 2 }} gap={5}>
-                    <InfoTile label="Email" value={member?.data.email} icon={LuMail} accent="blue.500" />
-                    <InfoTile label="Phone" value={member?.data.phone} icon={LuPhone} accent="green.500" />
-                    <InfoTile label="Address" value={member?.data.address} icon={LuMapPin} accent="orange.500" />
-                    <InfoTile label="Gender" value={member?.data.gender || "Not recorded"} icon={LuShieldCheck} accent="purple.500" />
-                    <InfoTile label="Member ID" value={member?.data.member_id} icon={LuFingerprint} accent="cyan.500" />
-                    <InfoTile label="Joined" value={fmtDate(member?._meta.created?.at)} icon={LuCalendarDays} accent="teal.500" />
+                    <InfoTile label="Email" value={member?.data.email} icon={Mail} accent="blue.500" />
+                    <InfoTile label="Phone" value={member?.data.phone} icon={Phone} accent="green.500" />
+                    <InfoTile label="Address" value={member?.data.address} icon={MapPin} accent="orange.500" />
+                    <InfoTile label="Gender" value={member?.data.gender || "Not recorded"} icon={ShieldCheck} accent="purple.500" />
+                    <InfoTile label="Member ID" value={member?.data.member_id} icon={Fingerprint} accent="cyan.500" />
+                    <InfoTile label="Joined" value={fmtDate(member?._meta.created?.at)} icon={CalendarDays} accent="teal.500" />
                   </SimpleGrid>
                 </VStack>
               </SurfaceCard>
@@ -383,7 +383,7 @@ const MemberDetail = memo(() => {
                           <SimpleGrid columns={{ base: 1, md: 2 }} gap={2}>
                             {planDetails.features.map((f) => (
                               <HStack key={f} gap={2}>
-                                <Circle size="5" bg="purple.500/15" color="purple.500"><LuCheck size={10} /></Circle>
+                                <Circle size="5" bg="purple.500/15" color="purple.500"><Check size={10} /></Circle>
                                 <Text fontSize="sm" fontWeight="700">{f}</Text>
                               </HStack>
                             ))}
@@ -393,7 +393,7 @@ const MemberDetail = memo(() => {
                     </VStack>
                   ) : (
                     <Flex direction="column" align="center" py={10} gap={3}>
-                      <Circle size="14" bg="red.500/10" color="red.500"><LuCreditCard size={28} /></Circle>
+                      <Circle size="14" bg="red.500/10" color="red.500"><CreditCard size={28} /></Circle>
                       <Text fontWeight="900" color="red.500">No Active Subscription</Text>
                       <Text fontSize="sm" color={muted} fontWeight="600">Enroll this member in a plan to activate their account.</Text>
                       <Button
@@ -403,7 +403,7 @@ const MemberDetail = memo(() => {
                         fontWeight="900"
                         onClick={handleAssignPlan}
                       >
-                        <LuZap size={16} /> Assign Plan
+                        <Zap size={16} /> Assign Plan
                       </Button>
                     </Flex>
                   )}
@@ -419,7 +419,7 @@ const MemberDetail = memo(() => {
                         <Heading size="md" fontWeight="900">Subscription History</Heading>
                         <Text fontSize="sm" color={muted} fontWeight="700">{history.length} record(s)</Text>
                       </VStack>
-                      <Circle size="10" bg="purple.500/10" color="purple.500"><LuTrendingUp size={18} /></Circle>
+                      <Circle size="10" bg="purple.500/10" color="purple.500"><TrendingUp size={18} /></Circle>
                     </HStack>
                     <VStack align="stretch" gap={3}>
                       {history.map((h, i) => {
@@ -467,7 +467,7 @@ const MemberDetail = memo(() => {
                       <Heading size="md" fontWeight="900">Fitness Snapshot</Heading>
                       <Text fontSize="sm" color={muted} fontWeight="700">Goals and engagement signals.</Text>
                     </VStack>
-                    <Circle size="10" bg="cyan.500/10" color="cyan.500"><LuActivity size={18} /></Circle>
+                    <Circle size="10" bg="cyan.500/10" color="cyan.500"><Activity size={18} /></Circle>
                   </HStack>
                   <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
                     <Box p={4} borderRadius="xl" bg="blue.500/10">
@@ -495,11 +495,11 @@ const MemberDetail = memo(() => {
                 <VStack align="stretch" gap={4}>
                   <Heading size="sm" fontWeight="900">Quick Actions</Heading>
                   <VStack align="stretch" gap={2}>
-                    <ActionRow icon={LuMessageSquare} label="Send Message" color="blue" />
-                    <ActionRow icon={LuZap} label="Renew Membership" color="green" />
-                    <ActionRow icon={LuSnowflake} label="Freeze Account" color="cyan" />
-                    <ActionRow icon={LuFileText} label="Export Profile" color="purple" />
-                    <ActionRow icon={LuTrash2} label="Deactivate Member" danger />
+                    <ActionRow icon={MessageSquare} label="Send Message" color="blue" />
+                    <ActionRow icon={Zap} label="Renew Membership" color="green" />
+                    <ActionRow icon={Snowflake} label="Freeze Account" color="cyan" />
+                    <ActionRow icon={FileText} label="Export Profile" color="purple" />
+                    <ActionRow icon={Trash2} label="Deactivate Member" danger />
                   </VStack>
                 </VStack>
               </SurfaceCard>

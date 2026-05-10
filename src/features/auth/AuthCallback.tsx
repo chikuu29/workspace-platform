@@ -18,7 +18,7 @@ import {
   Icon,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { LuX, LuArrowRight } from "react-icons/lu";
+import { X, ArrowRight } from "lucide-react";
 
 type AuthStatus = "loading" | "error" | "success";
 type ExchangeResult = { success: boolean; [key: string]: any };
@@ -245,7 +245,7 @@ const AuthCallback = () => {
             bg={errorIconBg}
             color="red.500"
           >
-            <Icon as={LuX} boxSize="32px" />
+            <Icon as={X} boxSize="32px" />
           </Flex>
 
           <VStack gap={3}>
@@ -277,7 +277,7 @@ const AuthCallback = () => {
             }}
           >
             Return to Login
-            <LuArrowRight style={{ marginLeft: "8px", strokeWidth: "3px" }} />
+            <ArrowRight style={{ marginLeft: "8px", strokeWidth: "3px" }} />
           </Button>
         </VStack>
       </Box>

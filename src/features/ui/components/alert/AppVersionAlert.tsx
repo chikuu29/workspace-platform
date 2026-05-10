@@ -1,6 +1,6 @@
 import { Button, useDisclosure, Dialog, Portal, Icon } from "@chakra-ui/react";
 import React, { useEffect, useRef } from "react";
-import { LuRepeat } from 'react-icons/lu';
+import { Repeat } from 'lucide-react';
 
 interface AppVersionInterface {
   isNewVersionAvailable: boolean;
@@ -63,7 +63,7 @@ const AppVersionAlert: React.FC<AppVersionInterface> = ({
                 variant="outline"
                 onClick={handleRefresh}
                 ml={3}
-                width="100%"><Icon as={LuRepeat} style={{ animation: "spin 2s linear infinite" }} />Refresh Now
+                width="100%"><Icon as={Repeat} style={{ animation: "spin 2s linear infinite" }} />Refresh Now
               </Button>
             </Dialog.Footer>
           </Dialog.Content>

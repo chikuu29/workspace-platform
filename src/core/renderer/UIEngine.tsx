@@ -18,8 +18,7 @@ import { Button, Text, VStack, Box, Icon, Flex, Circle, Badge, HStack, Portal } 
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { motion } from "framer-motion";
 import { useState } from 'react';
-import { FiAlertCircle } from "react-icons/fi";
-import { LuCornerDownRight } from "react-icons/lu";
+import { AlertCircle, CornerDownRight } from "lucide-react";
 
 interface UIEngineProps {
     config: any[]; // Array of widget configs
@@ -154,7 +153,7 @@ const UIEngineComponent: React.FC<UIEngineProps> = ({ config, initialData = EMPT
                                             // color="white"
                                             shadow="lg"
                                         >
-                                            <Icon as={FiAlertCircle} boxSize={6} />
+                                            <Icon as={AlertCircle} boxSize={6} />
                                         </Circle>
                                     </motion.div>
                                     <VStack align="start" gap={0}>
@@ -234,7 +233,7 @@ const UIEngineComponent: React.FC<UIEngineProps> = ({ config, initialData = EMPT
                                 >
                                     <HStack gap={2}>
                                         <Text>Acknowledge & Fix</Text>
-                                        <Icon as={LuCornerDownRight} />
+                                        <Icon as={CornerDownRight} />
                                     </HStack>
                                 </Button>
                             </DialogFooter>

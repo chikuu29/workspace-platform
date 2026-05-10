@@ -14,9 +14,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ProgressRoot, ProgressBar } from "@/components/ui/progress";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import {
-  LuActivity, LuArrowUpRight, LuClock,
-  LuTrendingUp, LuUsers, LuUserX, LuZap, LuRefreshCw,
-} from "react-icons/lu";
+  Activity, ArrowUpRight, Clock,
+  TrendingUp, Users, UserX, Zap, RefreshCw,
+} from "lucide-react";
 import { PageHeader } from "@/core/components/PageHeader";
 import { useAttendanceStats } from "./hooks/useAttendanceStats";
 import { useNavActionStore } from "@/core/store/useNavActionStore";
@@ -98,7 +98,7 @@ const AttendanceReport = memo(() => {
           h="32px"
           w="32px"
         >
-          <LuRefreshCw size={14} />
+          <RefreshCw size={14} />
         </IconButton>
       </HStack>
     );
@@ -149,7 +149,7 @@ const AttendanceReport = memo(() => {
                 </Text>
               </VStack>
               <HStack px={4} py={2} borderRadius="xl" bg="blue.500/10" border="1px solid" borderColor="blue.500/15">
-                <LuZap size={16} color="var(--chakra-colors-blue-500)" />
+                <Zap size={16} color="var(--chakra-colors-blue-500)" />
                 <Text fontSize="sm" fontWeight="900" color="blue.500">
                   Peak hour: {getHourLabel(derived.peakHour)} — Staffing recommended.
                 </Text>
@@ -157,16 +157,16 @@ const AttendanceReport = memo(() => {
             </VStack>
             <SimpleGrid columns={{ base: 1, md: 2, xl: 4 }} gap={4}>
               <Skeleton loading={loading} borderRadius="2xl">
-                <StatTile label="Weekly Active" value={stats?.active_last_7_days ?? 0} caption="Visited in 7d" icon={LuUsers} accent="blue.500" />
+                <StatTile label="Weekly Active" value={stats?.active_last_7_days ?? 0} caption="Visited in 7d" icon={Users} accent="blue.500" />
               </Skeleton>
               <Skeleton loading={loading} borderRadius="2xl">
-                <StatTile label="Engagement" value={`${derived.engagementRate}%`} caption="Member pulse" icon={LuTrendingUp} accent="green.500" />
+                <StatTile label="Engagement" value={`${derived.engagementRate}%`} caption="Member pulse" icon={TrendingUp} accent="green.500" />
               </Skeleton>
               <Skeleton loading={loading} borderRadius="2xl">
-                <StatTile label="Slipping" value={stats?.slipping_members ?? 0} caption="7+ days idle" icon={LuUserX} accent="orange.500" />
+                <StatTile label="Slipping" value={stats?.slipping_members ?? 0} caption="7+ days idle" icon={UserX} accent="orange.500" />
               </Skeleton>
               <Skeleton loading={loading} borderRadius="2xl">
-                <StatTile label="Total Members" value={stats?.total_members ?? 0} caption="System total" icon={LuActivity} accent="purple.500" />
+                <StatTile label="Total Members" value={stats?.total_members ?? 0} caption="System total" icon={Activity} accent="purple.500" />
               </Skeleton>
             </SimpleGrid>
           </Grid>
@@ -183,7 +183,7 @@ const AttendanceReport = memo(() => {
                     <Heading size="md" fontWeight="900">Hourly Density</Heading>
                     <Text fontSize="sm" color={muted} fontWeight="700">Check-in distribution across 24 hours</Text>
                   </VStack>
-                  <Circle size="10" bg="blue.500/10" color="blue.500"><LuClock size={18} /></Circle>
+                  <Circle size="10" bg="blue.500/10" color="blue.500"><Clock size={18} /></Circle>
                 </HStack>
 
                 <Skeleton loading={loading} flex="1">
@@ -215,7 +215,7 @@ const AttendanceReport = memo(() => {
                 <VStack align="stretch" gap={6} h="full" justify="center">
                   <HStack justify="space-between">
                     <Heading size="xs" fontWeight="800" opacity={0.8} textTransform="uppercase" letterSpacing="widest">Engagement Index</Heading>
-                    <LuZap size={18} />
+                    <Zap size={18} />
                   </HStack>
                   <VStack align="center" gap={1}>
                     <Text fontSize="5xl" fontWeight="900">{derived.engagementRate}%</Text>
@@ -249,10 +249,10 @@ const AttendanceReport = memo(() => {
                   <Separator opacity={0.1} />
                   <HStack justify="space-between" p={3} borderRadius="xl" bg="orange.500/10" color="orange.600">
                     <HStack gap={3}>
-                      <LuUserX size={16} />
+                      <UserX size={16} />
                       <Text fontSize="sm" fontWeight="900">Re-engagement needed</Text>
                     </HStack>
-                    <LuArrowUpRight size={16} />
+                    <ArrowUpRight size={16} />
                   </HStack>
                 </VStack>
               </Box>

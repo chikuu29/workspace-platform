@@ -16,11 +16,11 @@ import {
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import {
-  LuArrowRight,
-  LuCalendarDays,
-  LuMail,
-  LuPhone,
-} from "react-icons/lu";
+  ArrowRight,
+  CalendarDays,
+  Mail,
+  Phone,
+} from "lucide-react";
 import type { MemberDocument } from "../types/Gym.types";
 
 // ── Status theme map (shared with MemberTile) ────────────────────────
@@ -108,19 +108,19 @@ const MemberTableRow = memo(({ member, onClick, style }: MemberTableRowProps) =>
 
       {/* Email */}
       <HStack gap={1.5} color={muted} minW="160px" flex={1} display={{ base: "none", lg: "flex" }}>
-        <Icon as={LuMail} boxSize={3} />
+        <Icon as={Mail} boxSize={3} />
         <Text fontSize="xs" fontWeight="700" lineClamp={1}>{data.email || "—"}</Text>
       </HStack>
 
       {/* Phone */}
       <HStack gap={1.5} color={muted} minW="120px" display={{ base: "none", xl: "flex" }}>
-        <Icon as={LuPhone} boxSize={3} />
+        <Icon as={Phone} boxSize={3} />
         <Text fontSize="xs" fontWeight="700">{data.phone || "—"}</Text>
       </HStack>
 
       {/* Joined */}
       <HStack gap={1.5} color={muted} minW="110px" display={{ base: "none", xl: "flex" }}>
-        <Icon as={LuCalendarDays} boxSize={3} />
+        <Icon as={CalendarDays} boxSize={3} />
         <Text fontSize="xs" fontWeight="700">{formatDate(_meta.created?.at)}</Text>
       </HStack>
 
@@ -141,7 +141,7 @@ const MemberTableRow = memo(({ member, onClick, style }: MemberTableRowProps) =>
         transition="all 0.2s"
         _groupHover={{ color: theme.accent, transform: "translateX(3px)" }}
       >
-        <LuArrowRight size={14} />
+        <ArrowRight size={14} />
       </Box>
     </HStack>
   );

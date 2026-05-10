@@ -14,19 +14,23 @@ import {
   Separator,
 } from "@chakra-ui/react";
 import { memo, useState, useEffect } from "react";
-import { AiOutlineWechatWork, AiOutlineRobot } from "react-icons/ai";
-import { CiEdit, CiShare1, CiBookmark, CiSettings } from "react-icons/ci";
-import { FaRobot, FaShare, FaDownload, FaCopy } from "react-icons/fa";
-import { FiShare, FiMoreHorizontal, FiSidebar } from "react-icons/fi";
 import {
-  MdOutlineHistoryToggleOff,
-  MdMoreVert,
-  MdBookmark,
-  MdBookmarkBorder,
-} from "react-icons/md";
-import { PiSidebar, PiSparkle } from "react-icons/pi";
-import { RiRobot2Fill } from "react-icons/ri";
-import { SiHomepage } from "react-icons/si";
+  MessageSquare,
+  Bot,
+  Edit3,
+  Share,
+  Bookmark,
+  BookmarkPlus,
+  Settings,
+  Download,
+  Copy,
+  MoreHorizontal,
+  MoreVertical,
+  PanelLeft,
+  History,
+  Sparkles,
+  Home
+} from "lucide-react";
 import { useNavigate } from "react-router";
 
 interface AIChatNavBarProps {
@@ -107,7 +111,7 @@ const AIChatNavBar = ({
                 transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
                 borderRadius="lg"
               >
-                <FiSidebar size={18} />
+                <PanelLeft size={18} />
               </IconButton>
             </Tooltip>
           )}
@@ -134,7 +138,7 @@ const AIChatNavBar = ({
                   borderRadius="lg"
                   transition="all 0.2s"
                 >
-                  <CiEdit size={20} />
+                  <Edit3 size={20} />
                 </IconButton>
               </Tooltip>
 
@@ -148,7 +152,7 @@ const AIChatNavBar = ({
                     color="blue.500"
                     boxShadow="inner"
                   >
-                    <RiRobot2Fill size={18} />
+                    <Bot size={18} />
                   </Box>
                   <VStack align="start" gap={0} minW={0}>
                     <Text
@@ -187,7 +191,7 @@ const AIChatNavBar = ({
               // color={isBookmarked ? "yellow.500" : subtextColor}
               colorPalette={"orange"}
             >
-              <SiHomepage size={18} />
+              <Home size={18} />
             </IconButton>
           </Tooltip>
           <Tooltip content={isBookmarked ? "Remove bookmark" : "Bookmark chat"}>
@@ -201,9 +205,9 @@ const AIChatNavBar = ({
               color={isBookmarked ? "yellow.500" : subtextColor}
             >
               {isBookmarked ? (
-                <MdBookmark size={18} />
+                <Bookmark size={18} />
               ) : (
-                <MdBookmarkBorder size={18} />
+                <BookmarkPlus size={18} />
               )}
             </IconButton>
           </Tooltip>
@@ -240,7 +244,7 @@ const AIChatNavBar = ({
               _hover={{ bg: hoverBg }}
               borderRadius="lg"
             >
-              <MdMoreVert size={18} />
+              <MoreVertical size={18} />
             </IconButton>
           </Tooltip>
 

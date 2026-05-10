@@ -16,12 +16,12 @@ import { RootState } from "@/app/store";
 import { logout } from "@/app/slices/auth/authSlice";
 import { POSTAPI } from "@/app/api";
 import {
-  FiLogOut,
-  FiSettings,
-  FiUser,
-  FiHelpCircle,
-  FiRefreshCw,
-} from "react-icons/fi";
+  LogOut,
+  Settings,
+  User,
+  HelpCircle,
+  RefreshCw,
+} from "lucide-react";
 import React, { useCallback } from "react";
 import NotificationMenu from "./NotificationMenu";
 import { FullscreenButton } from "@/components/ui/fullscreen-button";
@@ -133,7 +133,7 @@ const NavbarActions = () => {
         onClick={handleRefresh}
         {...navActionButton}
       >
-        <Icon as={FiRefreshCw} boxSize={{ base: 3.5, md: 5 }} />
+        <Icon as={RefreshCw} boxSize={{ base: 3.5, md: 5 }} />
       </IconButton>
 
       <FullscreenButton variant="ghost" size="md" display={{ base: "none", sm: "inline-flex" }} {...navActionButton} />
@@ -221,7 +221,7 @@ const NavbarActions = () => {
                   transition="all 0.15s"
                   onClick={() => orgName && navigate(`/${orgName}/workspace/profile`)}
                 >
-                  <Icon as={FiUser} boxSize={4} color={iconColor} />
+                  <Icon as={User} boxSize={4} color={iconColor} />
                   <Text fontSize="sm" fontWeight="600">
                     Profile
                   </Text>
@@ -238,7 +238,7 @@ const NavbarActions = () => {
                   transition="all 0.15s"
                   onClick={() => orgName && navigate(`/${orgName}/workspace/settings`)}
                 >
-                  <Icon as={FiSettings} boxSize={4} color={iconColor} />
+                  <Icon as={Settings} boxSize={4} color={iconColor} />
                   <Text fontSize="sm" fontWeight="600">
                     Settings
                   </Text>
@@ -255,7 +255,7 @@ const NavbarActions = () => {
                   transition="all 0.15s"
                   onClick={() => orgName && navigate(`/${orgName}/workspace/helpcenter`)}
                 >
-                  <Icon as={FiHelpCircle} boxSize={4} color={iconColor} />
+                  <Icon as={HelpCircle} boxSize={4} color={iconColor} />
                   <Text fontSize="sm" fontWeight="600">
                     Help Center
                   </Text>
@@ -276,7 +276,7 @@ const NavbarActions = () => {
                 onClick={handleLogout}
                 transition="all 0.15s"
               >
-                <Icon as={FiLogOut} boxSize={4} />
+                <Icon as={LogOut} boxSize={4} />
                 <Text fontSize="sm" fontWeight="700">
                   Log Out
                 </Text>

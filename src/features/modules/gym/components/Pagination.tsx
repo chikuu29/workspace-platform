@@ -14,11 +14,11 @@ import { memo, useCallback, useMemo } from "react";
 import { Box, Button, Flex, HStack, Text, IconButton } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import {
-  LuChevronLeft,
-  LuChevronRight,
-  LuChevronsLeft,
-  LuChevronsRight,
-} from "react-icons/lu";
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
 
 // ── Types ────────────────────────────────────────────────────────────
 export const PAGE_SIZES = [12, 24, 48] as const;
@@ -118,7 +118,7 @@ const Pagination = memo(({
           onClick={goFirst}
           borderRadius="lg"
         >
-          <LuChevronsLeft size={14} />
+          <ChevronsLeft size={14} />
         </IconButton>
         <IconButton
           aria-label="Previous page"
@@ -128,7 +128,7 @@ const Pagination = memo(({
           onClick={goPrev}
           borderRadius="lg"
         >
-          <LuChevronLeft size={14} />
+          <ChevronLeft size={14} />
         </IconButton>
 
         {pageNumbers.map((p, idx) =>
@@ -161,7 +161,7 @@ const Pagination = memo(({
           onClick={goNext}
           borderRadius="lg"
         >
-          <LuChevronRight size={14} />
+          <ChevronRight size={14} />
         </IconButton>
         <IconButton
           aria-label="Last page"
@@ -171,7 +171,7 @@ const Pagination = memo(({
           onClick={goLast}
           borderRadius="lg"
         >
-          <LuChevronsRight size={14} />
+          <ChevronsRight size={14} />
         </IconButton>
       </HStack>
 

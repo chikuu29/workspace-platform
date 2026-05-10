@@ -11,7 +11,7 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
-import { LuPlus, LuRefreshCw, LuEye, LuPencil } from "react-icons/lu";
+import { Plus, RefreshCw, Eye, Pencil } from "lucide-react";
 import { RootState } from "@/app/store";
 import { GETAPI, POSTAPI } from "@/app/api";
 import { UserDirectoryGrid } from "@/core/widgets/UserDirectoryGrid";
@@ -25,13 +25,13 @@ import { PageLayout } from "@/core/components/PageLayout";
 const USER_ACTIONS: UserCardAction[] = [
   {
     label: "View Details",
-    icon: <LuEye />,
+    icon: <Eye />,
     colorPalette: "blue",
     actionType: "VIEW",
   },
   {
     label: "Edit User",
-    icon: <LuPencil />,
+    icon: <Pencil />,
     colorPalette: "yellow",
     actionType: "EDIT",
   },
@@ -143,7 +143,7 @@ const AuthUsers: React.FC = () => {
           onClick={() => fetchUsers()}
           loading={isLoading}
         >
-          <LuRefreshCw />
+          <RefreshCw />
         </IconButton>
         <Button
           size="sm"
@@ -157,7 +157,7 @@ const AuthUsers: React.FC = () => {
           transition="all 0.2s"
           onClick={() => { setEditUser(null); setModalOpen(true); }}
         >
-          <LuPlus />
+          <Plus />
           Add User
         </Button>
       </HStack>

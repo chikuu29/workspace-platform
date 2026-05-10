@@ -47,23 +47,23 @@ import { toaster } from "@/components/ui/toaster";
 import { Field } from "@/components/ui/field";
 import UIPermissionGuard from "@/core/guards/UIPermissionGuard";
 import {
-  LuShieldCheck,
-  LuPlus,
-  LuPencil,
-  LuTrash2,
-  LuSearch,
-  LuSave,
-  LuShieldAlert,
-  LuShieldX,
-  LuFileText,
-  LuLock,
-  LuGlobe,
-  LuBuilding2,
-  LuChevronDown,
-  LuChevronRight,
-  LuX,
-  LuLayoutGrid,
-} from "react-icons/lu";
+  ShieldCheck,
+  Plus,
+  Pencil,
+  Trash2,
+  Search,
+  Save,
+  ShieldAlert,
+  ShieldX,
+  FileText,
+  Lock,
+  Globe,
+  Building2,
+  ChevronDown,
+  ChevronRight,
+  X,
+  LayoutGrid,
+} from "lucide-react";
 import { GETAPI, POSTAPI, PUTAPI, DELETEAPI } from "@/app/api";
 import { PageLayout } from "@/core/components/PageLayout";
 import { Card } from "@/core/components/Card";
@@ -249,7 +249,7 @@ const PermissionRow = memo(({ permission, effect, onEffectChange }: PermissionRo
               : { bg: "green.500/10", color: "green.400" }
           }
         >
-          <Icon as={LuShieldCheck} boxSize={3} mr={1} />
+          <Icon as={ShieldCheck} boxSize={3} mr={1} />
           ALLOW
         </Button>
         <Button
@@ -268,7 +268,7 @@ const PermissionRow = memo(({ permission, effect, onEffectChange }: PermissionRo
               : { bg: "red.500/10", color: "red.400" }
           }
         >
-          <Icon as={LuShieldX} boxSize={3} mr={1} />
+          <Icon as={ShieldX} boxSize={3} mr={1} />
           DENY
         </Button>
       </HStack>
@@ -353,7 +353,7 @@ const AppGroupSection = memo(({ group, permEffects, onEffectChange }: AppGroupSe
       >
         <HStack gap={3}>
           <Icon
-            as={isExpanded ? LuChevronDown : LuChevronRight}
+            as={isExpanded ? ChevronDown : ChevronRight}
             boxSize={4}
             color="app.text.muted"
             transition="transform 0.2s"
@@ -376,7 +376,7 @@ const AppGroupSection = memo(({ group, permEffects, onEffectChange }: AppGroupSe
               borderRadius="full"
               bg="rgba(255,255,255,0.2)"
             />
-            <Icon as={LuLayoutGrid} boxSize={3.5} color="white" zIndex={1} />
+            <Icon as={LayoutGrid} boxSize={3.5} color="white" zIndex={1} />
           </Center>
           <VStack align="start" gap={0}>
             <Text fontSize="sm" fontWeight="700" color="app.text.primary" letterSpacing="-0.2px">
@@ -554,7 +554,7 @@ const PolicyCard = memo(({ policy, onEdit, onDelete }: PolicyCardProps) => {
                 bg="rgba(255,255,255,0.22)"
               />
               <Icon
-                as={policy.is_system_policy ? LuLock : LuFileText}
+                as={policy.is_system_policy ? Lock : FileText}
                 boxSize={4}
                 color="white"
                 zIndex={1}
@@ -580,7 +580,7 @@ const PolicyCard = memo(({ policy, onEdit, onDelete }: PolicyCardProps) => {
                   colorPalette={policy.is_system_policy ? "purple" : "blue"}
                 >
                   <Icon
-                    as={policy.is_system_policy ? LuLock : policy.organization_id ? LuBuilding2 : LuGlobe}
+                    as={policy.is_system_policy ? Lock : policy.organization_id ? Building2 : Globe}
                     boxSize={2.5}
                     mr={1}
                   />
@@ -619,7 +619,7 @@ const PolicyCard = memo(({ policy, onEdit, onDelete }: PolicyCardProps) => {
             border="1px solid"
             borderColor="green.500/20"
           >
-            <Icon as={LuShieldCheck} boxSize={3} color="green.400" />
+            <Icon as={ShieldCheck} boxSize={3} color="green.400" />
             <Text fontSize="2xs" fontWeight="700" color="green.400">
               {allowCount} Allow
             </Text>
@@ -634,7 +634,7 @@ const PolicyCard = memo(({ policy, onEdit, onDelete }: PolicyCardProps) => {
               border="1px solid"
               borderColor="red.500/20"
             >
-              <Icon as={LuShieldX} boxSize={3} color="red.400" />
+              <Icon as={ShieldX} boxSize={3} color="red.400" />
               <Text fontSize="2xs" fontWeight="700" color="red.400">
                 {denyCount} Deny
               </Text>
@@ -667,13 +667,13 @@ const PolicyCard = memo(({ policy, onEdit, onDelete }: PolicyCardProps) => {
           <HStack gap={2}>
             <UIPermissionGuard permissions={["ACCOUNT.POLICIES.EDIT"]}>
               <Button size="xs" variant="ghost" onClick={handleEdit}>
-                <LuPencil /> Edit
-              </Button>
-            </UIPermissionGuard>
-            {!policy.is_system_policy && (
-              <UIPermissionGuard permissions={["ACCOUNT.POLICIES.DELETE"]}>
-                <Button colorPalette="red" size="xs" variant="ghost" onClick={handleDelete}>
-                  <LuTrash2 /> Delete
+                <Pencil /> Edit
+                </Button>
+              </UIPermissionGuard>
+              {!policy.is_system_policy && (
+                <UIPermissionGuard permissions={["ACCOUNT.POLICIES.DELETE"]}>
+                  <Button colorPalette="red" size="xs" variant="ghost" onClick={handleDelete}>
+                    <Trash2 /> Delete
                 </Button>
               </UIPermissionGuard>
             )}
@@ -980,11 +980,11 @@ const PolicyManagementView = memo(() => {
     return groups;
   }, [filteredPolicies]);
 
-  const categoryConfig: Record<string, { icon: typeof LuLock; gradient: string }> = useMemo(
+  const categoryConfig: Record<string, { icon: typeof Lock; gradient: string }> = useMemo(
     () => ({
-      "System Policies": { icon: LuLock, gradient: POLICY_GRADIENTS.system },
-      "Organization Policies": { icon: LuBuilding2, gradient: POLICY_GRADIENTS.organization },
-      "Global Templates": { icon: LuGlobe, gradient: POLICY_GRADIENTS.global },
+      "System Policies": { icon: Lock, gradient: POLICY_GRADIENTS.system },
+      "Organization Policies": { icon: Building2, gradient: POLICY_GRADIENTS.organization },
+      "Global Templates": { icon: Globe, gradient: POLICY_GRADIENTS.global },
     }),
     []
   );
@@ -1017,7 +1017,7 @@ const PolicyManagementView = memo(() => {
                 onClick={handleAddClick}
                 boxShadow="0 4px 12px rgba(139,92,246,0.3)"
               >
-                <LuPlus style={{ marginRight: "8px" }} /> Create Policy
+                <Plus style={{ marginRight: "8px" }} /> Create Policy
               </Button>
             </UIPermissionGuard>
           </HStack>
@@ -1052,7 +1052,7 @@ const PolicyManagementView = memo(() => {
                 alignItems="center"
                 justifyContent="center"
               >
-                <Icon as={LuShieldAlert} boxSize={7} color="app.text.muted" />
+                <Icon as={ShieldAlert} boxSize={7} color="app.text.muted" />
               </Box>
               <Text fontWeight="600" color="app.text.primary">
                 {searchQuery ? "No policies match your search" : "No policies configured yet"}
@@ -1071,7 +1071,7 @@ const PolicyManagementView = memo(() => {
                     borderRadius="xl"
                     onClick={handleAddClick}
                   >
-                    <LuPlus style={{ marginRight: "6px" }} /> Create First Policy
+                    <Plus style={{ marginRight: "6px" }} /> Create First Policy
                   </Button>
                 </UIPermissionGuard>
               )}
@@ -1081,7 +1081,7 @@ const PolicyManagementView = memo(() => {
           <VStack align="stretch" gap={8} w="full">
             {Object.entries(categorizedPolicies).map(([category, catPolicies]) => {
               const config = categoryConfig[category] || {
-                icon: LuFileText,
+                icon: FileText,
                 gradient: POLICY_GRADIENTS.organization,
               };
               return (
@@ -1185,7 +1185,7 @@ const PolicyManagementView = memo(() => {
                   color="white"
                   boxShadow="0 4px 14px rgba(99,102,241,0.3)"
                 >
-                  <Icon as={editingPolicy ? LuPencil : LuPlus} boxSize={5} />
+                  <Icon as={editingPolicy ? Pencil : Plus} boxSize={5} />
                 </Center>
                 <VStack align="start" gap={0}>
                   <Heading size="md" color="app.text.primary" letterSpacing="-0.3px">
@@ -1212,7 +1212,7 @@ const PolicyManagementView = memo(() => {
                       fontSize="xs"
                       fontWeight="700"
                     >
-                      <Icon as={LuShieldCheck} boxSize={3.5} mr={1.5} />
+                      <Icon as={ShieldCheck} boxSize={3.5} mr={1.5} />
                       {selectionSummary.allow} Allowed
                     </Badge>
                   )}
@@ -1226,7 +1226,7 @@ const PolicyManagementView = memo(() => {
                       fontSize="xs"
                       fontWeight="700"
                     >
-                      <Icon as={LuShieldX} boxSize={3.5} mr={1.5} />
+                      <Icon as={ShieldX} boxSize={3.5} mr={1.5} />
                       {selectionSummary.deny} Denied
                     </Badge>
                   )}
@@ -1354,7 +1354,7 @@ const PolicyManagementView = memo(() => {
                         <HStack justify="space-between">
                           <VStack align="start" gap={0}>
                             <HStack gap={2}>
-                              <Icon as={LuLock} color="orange.400" boxSize={4} />
+                              <Icon as={Lock} color="orange.400" boxSize={4} />
                               <Text color="app.text.primary" fontSize="sm" fontWeight="600">
                                 System Policy
                               </Text>
@@ -1404,7 +1404,7 @@ const PolicyManagementView = memo(() => {
                         borderColor="green.500/15"
                       >
                         <HStack gap={2}>
-                          <Icon as={LuShieldCheck} boxSize={4} color="green.400" />
+                          <Icon as={ShieldCheck} boxSize={4} color="green.400" />
                           <Text fontSize="sm" fontWeight="600" color="green.400">
                             Allowed
                           </Text>
@@ -1425,7 +1425,7 @@ const PolicyManagementView = memo(() => {
                         borderColor="red.500/15"
                       >
                         <HStack gap={2}>
-                          <Icon as={LuShieldX} boxSize={4} color="red.400" />
+                          <Icon as={ShieldX} boxSize={4} color="red.400" />
                           <Text fontSize="sm" fontWeight="600" color="red.400">
                             Denied
                           </Text>
@@ -1453,7 +1453,7 @@ const PolicyManagementView = memo(() => {
                     borderColor="rgba(99,102,241,0.15)"
                   >
                     <HStack gap={3} align="start">
-                      <Icon as={LuFileText} boxSize={4} color="rgba(99,102,241,0.7)" mt={0.5} />
+                      <Icon as={FileText} boxSize={4} color="rgba(99,102,241,0.7)" mt={0.5} />
                       <Text fontSize="xs" color="app.text.muted" lineHeight="1.6">
                         Select permissions from the right panel. Use ALLOW to grant access,
                         DENY to explicitly block access. Unselected permissions are implicitly denied.
@@ -1492,7 +1492,7 @@ const PolicyManagementView = memo(() => {
                       }}
                       transition="all 0.2s"
                     >
-                      <Icon as={LuSearch} color="app.text.muted" boxSize={4} />
+                      <Icon as={Search} color="app.text.muted" boxSize={4} />
                       <Input
                         value={permSearchQuery}
                         onChange={(e) => setPermSearchQuery(e.target.value)}
@@ -1513,7 +1513,7 @@ const PolicyManagementView = memo(() => {
                           onClick={() => setPermSearchQuery("")}
                           color="app.text.muted"
                         >
-                          <LuX />
+                          <X />
                         </IconButton>
                       )}
                     </HStack>
@@ -1537,7 +1537,7 @@ const PolicyManagementView = memo(() => {
                   {filteredAppGroups.length === 0 ? (
                     <Center py={16}>
                       <VStack gap={3}>
-                        <Icon as={LuSearch} boxSize={8} color="app.text.muted" />
+                        <Icon as={Search} boxSize={8} color="app.text.muted" />
                         <Text fontWeight="600" color="app.text.primary">
                           {permSearchQuery ? "No permissions match" : "No permissions available"}
                         </Text>
@@ -1607,7 +1607,7 @@ const PolicyManagementView = memo(() => {
                   {isSaving ? (
                     <Spinner size="sm" mr={2} />
                   ) : (
-                    <LuSave style={{ marginRight: "8px" }} />
+                    <Save style={{ marginRight: "8px" }} />
                   )}
                   {editingPolicy ? "Update Policy" : "Create Policy"}
                 </Button>

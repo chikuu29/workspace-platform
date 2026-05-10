@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Heading, Text, Button, Container, VStack, Icon } from "@chakra-ui/react";
 import { Link } from "react-router";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { LuGhost } from "react-icons/lu";
+import { Ghost } from "lucide-react";
 
 const NoPageFound = () => {
   const bg = useColorModeValue("gray.50", "gray.900");
@@ -20,7 +20,7 @@ const NoPageFound = () => {
       <Container maxW="container.md" textAlign="center">
         <VStack gap={6}>
           <Box position="relative">
-            <Icon as={LuGhost} boxSize="150px" color="teal.100" />
+            <Icon as={Ghost} boxSize="150px" color="teal.100" />
             <Heading
               as="h1"
               fontSize="9xl"

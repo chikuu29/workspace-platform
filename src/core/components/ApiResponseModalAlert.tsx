@@ -8,7 +8,7 @@ import {
   DialogRoot,
 } from "@/components/ui/dialog";
 import { CloseButton } from "@/components/ui/close-button";
-import { LuCircleCheck, LuCircleX, LuTriangleAlert, LuInfo } from "react-icons/lu";
+import { CheckCircle, XCircle, AlertTriangle, Info } from "lucide-react";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { useApiResponseModalStore } from "@/core/store/useApiResponseModalStore";
 
@@ -16,10 +16,10 @@ import { useApiResponseModalStore } from "@/core/store/useApiResponseModalStore"
 // Maps each status type to its Chakra color palette and icon.
 // Uses the project's existing palette tokens (green, red, orange, blue).
 const STATUS_MAP = {
-  success: { palette: "green", icon: <LuCircleCheck size={24} /> },
-  error: { palette: "red", icon: <LuCircleX size={24} /> },
-  warning: { palette: "orange", icon: <LuTriangleAlert size={24} /> },
-  info: { palette: "blue", icon: <LuInfo size={24} /> },
+  success: { palette: "green", icon: <CheckCircle size={24} /> },
+  error: { palette: "red", icon: <XCircle size={24} /> },
+  warning: { palette: "orange", icon: <AlertTriangle size={24} /> },
+  info: { palette: "blue", icon: <Info size={24} /> },
 } as const;
 
 const FALLBACK_STATUS = STATUS_MAP.error;

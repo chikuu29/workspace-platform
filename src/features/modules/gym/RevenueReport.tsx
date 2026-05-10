@@ -13,9 +13,9 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import {
-  LuActivity, LuArrowUpRight, LuCheck, LuCreditCard,
-  LuTrendingUp, LuUsers, LuWallet, LuX, LuRefreshCw,
-} from "react-icons/lu";
+  Activity, ArrowUpRight, Check, CreditCard,
+  TrendingUp, Users, Wallet, X, RefreshCw,
+} from "lucide-react";
 import { PageHeader } from "@/core/components/PageHeader";
 import { useSubscriptionStats } from "./hooks/useSubscriptionStats";
 import { useNavActionStore } from "@/core/store/useNavActionStore";
@@ -115,7 +115,7 @@ const RevenueReport = memo(() => {
           h="32px"
           w="32px"
         >
-          <LuRefreshCw size={14} />
+          <RefreshCw size={14} />
         </IconButton>
       </HStack>
     );
@@ -165,7 +165,7 @@ const RevenueReport = memo(() => {
             </VStack>
             {derived.topPlan && (
               <HStack px={4} py={2} borderRadius="xl" bg="green.500/10" border="1px solid" borderColor="green.500/15">
-                <LuArrowUpRight size={16} color="var(--chakra-colors-green-500)" />
+                <ArrowUpRight size={16} color="var(--chakra-colors-green-500)" />
                 <Text fontSize="sm" fontWeight="900" color="green.500">
                   Top plan: {derived.topPlan.plan_name} — {fmtCurrency(derived.topPlan.revenue)}
                 </Text>
@@ -174,16 +174,16 @@ const RevenueReport = memo(() => {
           </VStack>
           <SimpleGrid columns={{ base: 1, md: 2, xl: 4 }} gap={4}>
             <Skeleton loading={loading} borderRadius="2xl">
-              <StatTile label="Total MRR" value={fmtCurrency(derived.totalRevenue)} caption="Monthly recurring" icon={LuWallet} accent="green.500" />
+              <StatTile label="Total MRR" value={fmtCurrency(derived.totalRevenue)} caption="Monthly recurring" icon={Wallet} accent="green.500" />
             </Skeleton>
             <Skeleton loading={loading} borderRadius="2xl">
-              <StatTile label="Subscribers" value={derived.totalSubs} caption="Active plans" icon={LuUsers} accent="blue.500" />
+              <StatTile label="Subscribers" value={derived.totalSubs} caption="Active plans" icon={Users} accent="blue.500" />
             </Skeleton>
             <Skeleton loading={loading} borderRadius="2xl">
-              <StatTile label="Avg / Member" value={fmtCurrency(derived.avgRevPerMember)} caption="Revenue per head" icon={LuTrendingUp} accent="purple.500" />
+              <StatTile label="Avg / Member" value={fmtCurrency(derived.avgRevPerMember)} caption="Revenue per head" icon={TrendingUp} accent="purple.500" />
             </Skeleton>
             <Skeleton loading={loading} borderRadius="2xl">
-              <StatTile label="Collection" value={`${derived.collectionRate}%`} caption="Payment success" icon={LuCreditCard} accent="teal.500" />
+              <StatTile label="Collection" value={`${derived.collectionRate}%`} caption="Payment success" icon={CreditCard} accent="teal.500" />
             </Skeleton>
           </SimpleGrid>
         </Grid>
@@ -210,7 +210,7 @@ const RevenueReport = memo(() => {
                         {plansData.length} plan(s) generating revenue
                       </Text>
                     </VStack>
-                    <Circle size="10" bg="green.500/10" color="green.500"><LuActivity size={18} /></Circle>
+                    <Circle size="10" bg="green.500/10" color="green.500"><Activity size={18} /></Circle>
                   </HStack>
 
                   {loading ? (
@@ -223,7 +223,7 @@ const RevenueReport = memo(() => {
                     </VStack>
                   ) : (
                     <Flex direction="column" align="center" py={10} gap={3}>
-                      <Circle size="14" bg="blue.500/10" color="blue.500"><LuActivity size={28} /></Circle>
+                      <Circle size="14" bg="blue.500/10" color="blue.500"><Activity size={28} /></Circle>
                       <Text fontWeight="900">No revenue data yet</Text>
                       <Text fontSize="sm" color={muted} fontWeight="600">Revenue will appear when members subscribe to plans.</Text>
                     </Flex>
@@ -286,7 +286,7 @@ const RevenueReport = memo(() => {
                 <VStack align="stretch" gap={4}>
                   <HStack justify="space-between">
                     <Heading size="sm" fontWeight="900">Revenue Health</Heading>
-                    <LuActivity size={16} />
+                    <Activity size={16} />
                   </HStack>
                   <VStack align="center" py={4} gap={1}>
                     <Text fontSize="4xl" fontWeight="900">

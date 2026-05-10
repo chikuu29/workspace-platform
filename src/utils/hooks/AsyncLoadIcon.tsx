@@ -5,7 +5,7 @@ import { Box, Spinner } from "@chakra-ui/react";
 // ── Types ────────────────────────────────────────────────────────────
 
 interface AsyncLoadIconProps {
-  /** react-icons name (e.g. "FcHome", "LuUsers") — async fallback */
+  /** Icon name (e.g. "Users", "Search") — supports legacy Lu/Fi prefixes for compatibility */
   iconName: string;
   /** Raw SVG markup string from config — rendered instantly when valid */
   svgIcon?: string;

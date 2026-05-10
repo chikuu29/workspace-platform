@@ -13,7 +13,7 @@ import {
   Button,
 
 } from "@chakra-ui/react";
-import { FiSearch, FiBookOpen, FiLifeBuoy, FiMessageCircle, FiArrowRight } from "react-icons/fi";
+import { Search, BookOpen, LifeBuoy, MessageCircle, ArrowRight } from "lucide-react";
 import { useColorModeValue } from "@/components/ui/color-mode";
 
 const HelpCenterPage = () => {
@@ -25,19 +25,19 @@ const HelpCenterPage = () => {
     {
       title: "Knowledge Base",
       description: "Read detailed guides, tutorials, and API documentation to get the most out of our platform.",
-      icon: FiBookOpen,
+      icon: BookOpen,
       color: "blue"
     },
     {
       title: "Developer Community",
       description: "Connect with other developers, share solutions, and ask questions in our active forums.",
-      icon: FiMessageCircle,
+      icon: MessageCircle,
       color: "purple"
     },
     {
       title: "Technical Support",
       description: "Open a support ticket with our engineering team for specialized assistance with your workspace.",
-      icon: FiLifeBuoy,
+      icon: LifeBuoy,
       color: "teal"
     },
   ];
@@ -74,7 +74,7 @@ const HelpCenterPage = () => {
 
           <Box maxW="lg" mx="auto" position="relative">
             <Box position="absolute" left="20px" top="50%" transform="translateY(-50%)" zIndex={2}>
-              <Icon as={FiSearch} color="gray.400" boxSize={6} />
+              <Icon as={Search} color="gray.400" boxSize={6} />
             </Box>
             <Input
               placeholder="Search for articles, guides, or topics..."
@@ -136,7 +136,7 @@ const HelpCenterPage = () => {
                 </Card.Body>
                 <Card.Footer p={8} pt={0}>
                   <Button variant="ghost" colorPalette={card.color as any} alignSelf="flex-start" px={0} _hover={{ bg: "transparent", transform: "translateX(4px)" }} transition="all 0.2s">
-                    Learn more <FiArrowRight />
+                    Learn more <ArrowRight />
                   </Button>
                 </Card.Footer>
               </Card.Root>

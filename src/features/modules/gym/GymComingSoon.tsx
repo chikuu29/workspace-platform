@@ -41,15 +41,15 @@ const StubPage = memo(({ title, description, icon: Icon, accent }: StubProps) =>
 StubPage.displayName = "StubPage";
 
 // Named exports for the registry
-import { LuSquareCheck, LuUsers, LuCalendarDays, LuTrendingUp, LuChartBar, LuCreditCard } from "react-icons/lu";
+import { SquareCheck, Users, CalendarDays, TrendingUp, BarChart3, CreditCard } from "lucide-react";
 
-export const MemberCheckIn = () => <StubPage title="Member Check-In" description="Real-time scan and log system for gym entries." icon={LuSquareCheck} accent="teal" />;
-export const trainers = () => <StubPage title="Trainer Directory" description="Manage staff profiles and specializations." icon={LuUsers} accent="blue" />;
-export const TrainerSchedules = () => <StubPage title="Trainer Schedules" description="Weekly timetables and PT booking slots." icon={LuCalendarDays} accent="green" />;
-export const ListClasses = () => <StubPage title="Class Catalog" description="Group session management and capacity tracking." icon={LuCalendarDays} accent="purple" />;
-export const AddClass = () => <StubPage title="Create Class" description="Define new group workout sessions." icon={LuCalendarDays} accent="purple" />;
-export const ClassBookings = () => <StubPage title="Class Bookings" description="Registration and waitlist management." icon={LuSquareCheck} accent="cyan" />;
-export const RevenueReport = () => <StubPage title="Revenue Report" description="Deep dive into MRR and collection rates." icon={LuTrendingUp} accent="green" />;
-export const AttendanceReport = () => <StubPage title="Attendance Report" description="Visits analysis and peak hour heatmaps." icon={LuChartBar} accent="orange" />;
-export const PerformanceReport = () => <StubPage title="Performance Report" description="Retention score and churn analysis." icon={LuChartBar} accent="blue" />;
-export const PaymentsHistory = () => <StubPage title="Payment Ledger" description="Complete history of all membership dues." icon={LuCreditCard} accent="teal" />;
+export const MemberCheckIn = () => <StubPage title="Member Check-In" description="Real-time scan and log system for gym entries." icon={SquareCheck} accent="teal" />;
+export const trainers = () => <StubPage title="Trainer Directory" description="Manage staff profiles and specializations." icon={Users} accent="blue" />;
+export const TrainerSchedules = () => <StubPage title="Trainer Schedules" description="Weekly timetables and PT booking slots." icon={CalendarDays} accent="green" />;
+export const ListClasses = () => <StubPage title="Class Catalog" description="Group session management and capacity tracking." icon={CalendarDays} accent="purple" />;
+export const AddClass = () => <StubPage title="Create Class" description="Define new group workout sessions." icon={CalendarDays} accent="purple" />;
+export const ClassBookings = () => <StubPage title="Class Bookings" description="Registration and waitlist management." icon={SquareCheck} accent="cyan" />;
+export const RevenueReport = () => <StubPage title="Revenue Report" description="Deep dive into MRR and collection rates." icon={TrendingUp} accent="green" />;
+export const AttendanceReport = () => <StubPage title="Attendance Report" description="Visits analysis and peak hour heatmaps." icon={BarChart3} accent="orange" />;
+export const PerformanceReport = () => <StubPage title="Performance Report" description="Retention score and churn analysis." icon={BarChart3} accent="blue" />;
+export const PaymentsHistory = () => <StubPage title="Payment Ledger" description="Complete history of all membership dues." icon={CreditCard} accent="teal" />;

@@ -16,7 +16,7 @@
  *
  * @module features/modules/gym/GymView
  */
-import { memo, useCallback, useMemo } from "react";
+import { memo, useCallback, useMemo, useEffect } from "react";
 import {
   Badge,
   Box,
@@ -30,6 +30,7 @@ import {
   Text,
   VStack,
   IconButton,
+  Icon,
 } from "@chakra-ui/react";
 import {
   Activity,
@@ -45,14 +46,14 @@ import {
   UserPlus,
   Users,
   Zap,
+  Plus,
+  RefreshCw,
 } from "lucide-react";
 
 import { PageHeader } from "@/core/components/PageHeader";
 import { useGymDashboard } from "./hooks/useGymDashboard";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 import { useNavActionStore } from "@/core/store/useNavActionStore";
-import { useEffect } from "react";
-import { LuPlus, LuRefreshCw, LuUsers } from "react-icons/lu";
 
 // Sub-components
 import StatCard from "./components/StatCard";
@@ -228,19 +229,17 @@ const GymView = memo(() => {
           h="40px"
           px={6}
         >
-          <LuRefreshCw size={14} />
+          <RefreshCw size={16} /> Sync
         </IconButton>
         <Button
-          // variant="outline"
           borderRadius="sm"
           fontWeight="800"
           size="md"
           h="40px"
           px={6}
           onClick={() => navigateTo("members")}
-        // h="32px"
         >
-          <LuUsers size={14} /> Directory
+          <Icon as={Users} /> Directory
         </Button>
         <Button
           colorPalette="blue"
@@ -250,9 +249,8 @@ const GymView = memo(() => {
           h="40px"
           px={6}
           onClick={() => navigateTo("AddMember")}
-        // h="32px"
         >
-          <LuPlus size={14} /> Enroll Member
+          <Plus size={16} /> Enroll Member
         </Button>
       </HStack>
     );

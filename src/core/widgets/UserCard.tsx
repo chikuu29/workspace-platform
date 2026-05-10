@@ -9,7 +9,7 @@ import {
     IconButton,
     Avatar,
 } from "@chakra-ui/react";
-import { LuMail, LuShield } from "react-icons/lu";
+import { Mail, Shield } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -222,7 +222,7 @@ export const UserCard = memo(({ user, actions = [], onAction }: UserCardProps) =
                                     alignItems="center"
                                     gap={1}
                                 >
-                                    <LuShield size={10} />
+                                    <Shield size={10} />
                                     {r.role_name}
                                 </Badge>
                             ))
@@ -240,7 +240,7 @@ export const UserCard = memo(({ user, actions = [], onAction }: UserCardProps) =
                                 alignItems="center"
                                 gap={1}
                             >
-                                <LuShield size={10} />
+                                <Shield size={10} />
                                 {role}
                             </Badge>
                         )}
@@ -288,7 +288,7 @@ export const UserCard = memo(({ user, actions = [], onAction }: UserCardProps) =
                     transition="color 0.15s"
                     cursor="default"
                 >
-                    <LuMail size={12} style={{ flexShrink: 0 }} />
+                    <Mail size={12} style={{ flexShrink: 0 }} />
                     <Text lineClamp={1} flex={1} title={user.email}>
                         {user.email || "No email"}
                     </Text>

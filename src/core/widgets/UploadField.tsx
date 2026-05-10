@@ -21,18 +21,18 @@ import { useColorModeValue } from "@/components/ui/color-mode";
 import React, { useRef, useState, useCallback, memo, useMemo, useEffect } from "react";
 import { FieldError, useFormContext } from "react-hook-form";
 import {
-  LuUpload,
-  LuCamera,
-  LuX,
-  LuEye,
-  LuDownload,
-  LuTrash2,
-  LuRotateCcw,
-  LuCheck,
-  LuFile,
-  LuImage,
-  LuVideo,
-} from "react-icons/lu";
+  Upload,
+  Camera,
+  X,
+  Eye,
+  Download,
+  Trash2,
+  RotateCcw,
+  Check,
+  File as FileIcon,
+  Image as ImageIcon,
+  Video,
+} from "lucide-react";
 import { POSTAPI } from "../../app/api";
 import { ruleEngine } from "../engine/logicEngine";
 
@@ -88,7 +88,7 @@ const FileItem = memo(({
       _hover={{ transform: "translateY(-2px)", boxShadow: "sm" }}
     >
       <Center boxSize="40px" borderRadius="lg" bg={isUploaded ? "green.100" : "indigo.50"} color={isUploaded ? "green.600" : "indigo.500"}>
-        {isImg ? <LuImage size={20} /> : <LuFile size={20} />}
+        {isImg ? <ImageIcon size={20} /> : <FileIcon size={20} />}
       </Center>
 
       <VStack align="stretch" gap={0} flex="1">
@@ -104,11 +104,11 @@ const FileItem = memo(({
       <HStack gap={1}>
         {onView && (
           <IconButton size="xs" variant="ghost" onClick={onView} _hover={{ bg: "whiteAlpha.300" }}>
-            <LuEye />
+            <Eye />
           </IconButton>
         )}
         <IconButton size="xs" variant="ghost" colorPalette="red" onClick={onRemove} _hover={{ bg: "red.50", color: "red.600" }}>
-          <LuTrash2 />
+          <Trash2 />
         </IconButton>
       </HStack>
     </Flex>
@@ -328,7 +328,7 @@ const UploadField = ({
                     _focus={{ borderColor: "indigo.500", boxShadow: "0 0 0 1px var(--chakra-colors-indigo-500)" }}
                   />
                   <Center position="absolute" right="3" top="50%" transform="translateY(-50%)" color="gray.400">
-                    <LuCamera size={18} />
+                    <Camera size={18} />
                   </Center>
                 </Box>
               </Box>
@@ -341,7 +341,7 @@ const UploadField = ({
                   onClick={handleClear}
                   _hover={{ bg: "transparent", color: "red.500" }}
                 >
-                  <LuX />
+                  <X />
                 </IconButton>
               )}
             </HStack>
@@ -377,7 +377,7 @@ const UploadField = ({
                 zIndex="docked"
                 colorPalette="indigo"
               >
-                <LuX />
+                <X />
               </IconButton>
 
               <Dialog.Header borderBottomWidth="1px" p={5} bg={useColorModeValue("gray.50", "whiteAlpha.50")}>
@@ -412,7 +412,7 @@ const UploadField = ({
                     >
                       <VStack gap={2}>
                         <Center boxSize="50px" borderRadius="full" bg="indigo.100" color="indigo.600" _dark={{ bg: "indigo.900/40" }}>
-                          <LuUpload size={24} />
+                          <Upload size={24} />
                         </Center>
                         <VStack gap={0}>
                           <Text fontWeight="bold" fontSize="sm">Click or Drag to Upload</Text>
@@ -430,7 +430,7 @@ const UploadField = ({
                         onClick={startCamere}
                         colorPalette="indigo"
                       >
-                        <LuCamera /> Take a Photo
+                        <Camera /> Take a Photo
                       </Button>
                     )}
 
@@ -484,13 +484,13 @@ const UploadField = ({
                     <HStack w="full" gap={3}>
                       {!capturedImage ? (
                         <Button flex="1" size="lg" colorPalette="blue" borderRadius="xl" onClick={capturePhoto} boxShadow="0 4px 12px rgba(66, 153, 225, 0.4)">
-                          <LuCamera /> Capture
+                          <Camera /> Capture
                         </Button>
                       ) : (
-                        <>
-                          <Button flex="1" size="lg" variant="outline" borderRadius="xl" onClick={startCamere}><LuRotateCcw /> Retake</Button>
+                          <>
+                          <Button flex="1" size="lg" variant="outline" borderRadius="xl" onClick={startCamere}><RotateCcw /> Retake</Button>
                           <Button flex="1" size="lg" colorPalette="green" borderRadius="xl" onClick={confirmPhoto} boxShadow="0 4px 12px rgba(72, 187, 120, 0.4)">
-                            <LuCheck /> Use Photo
+                            <Check /> Use Photo
                           </Button>
                         </>
                       )}
@@ -505,7 +505,7 @@ const UploadField = ({
                   <Button variant="ghost" flex="1" onClick={onClose} borderRadius="xl">Cancel</Button>
                   {selectedFiles.length > 0 && (
                     <Button flex="2" colorPalette="indigo" size="lg" borderRadius="xl" onClick={handleModalConfirm} fontWeight="extrabold" boxShadow="0 8px 20px -4px var(--chakra-colors-indigo-500)">
-                      <LuUpload /> Upload {selectedFiles.length} {selectedFiles.length === 1 ? "File" : "Files"}
+                      <Upload /> Upload {selectedFiles.length} {selectedFiles.length === 1 ? "File" : "Files"}
                     </Button>
                   )}
                 </HStack>

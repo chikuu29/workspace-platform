@@ -27,20 +27,20 @@ import {
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 import {
-  LuArrowRight,
-  LuAward,
-  LuCalendarDays,
-  LuDumbbell,
-  LuFilter,
-  LuMail,
-  LuPhone,
-  LuPlus,
-  LuRefreshCw,
-  LuStar,
-  LuTrendingUp,
-  LuUserCheck,
-  LuUsers,
-} from "react-icons/lu";
+  ArrowRight,
+  Award,
+  CalendarDays,
+  Dumbbell,
+  Filter,
+  Mail,
+  Phone,
+  Plus,
+  RefreshCw,
+  Star,
+  TrendingUp,
+  UserCheck,
+  Users,
+} from "lucide-react";
 import { useEffect } from "react";
 import { PageHeader } from "@/core/components/PageHeader";
 import { useNavActionStore } from "@/core/store/useNavActionStore";
@@ -164,15 +164,15 @@ const StaffCard = memo(({ trainer, onClick }: { trainer: TrainerDocument; onClic
         {/* Contact */}
         <SimpleGrid columns={1} gap={2}>
           <HStack gap={2.5} color={muted} minW={0}>
-            <Icon as={LuMail} boxSize={3.5} />
+            <Icon as={Mail} boxSize={3.5} />
             <Text fontSize="sm" fontWeight="700" truncate>{data.email}</Text>
           </HStack>
           <HStack gap={2.5} color={muted}>
-            <Icon as={LuPhone} boxSize={3.5} />
+            <Icon as={Phone} boxSize={3.5} />
             <Text fontSize="sm" fontWeight="700">{data.phone}</Text>
           </HStack>
           <HStack gap={2.5} color={muted}>
-            <Icon as={LuCalendarDays} boxSize={3.5} />
+            <Icon as={CalendarDays} boxSize={3.5} />
             <Text fontSize="sm" fontWeight="700">Joined {formatDate(data.joiningDate)}</Text>
           </HStack>
         </SimpleGrid>
@@ -193,14 +193,14 @@ const StaffCard = memo(({ trainer, onClick }: { trainer: TrainerDocument; onClic
             <VStack align="start" gap={0}>
               <Text fontSize="10px" color={muted} fontWeight="900" textTransform="uppercase">Rating</Text>
               <HStack gap={1}>
-                <LuStar size={12} color="var(--chakra-colors-yellow-400)" fill="var(--chakra-colors-yellow-400)" />
+                <Star size={12} color="var(--chakra-colors-yellow-400)" fill="var(--chakra-colors-yellow-400)" />
                 <Text fontSize="sm" fontWeight="900" color="app.text.primary">4.9</Text>
               </HStack>
             </VStack>
           </HStack>
           <Circle size="9" bg={`${accent}.500/10`} color={`${accent}.500`}
             transition="all 0.2s" _groupHover={{ transform: "translateX(2px)" }}>
-            <LuArrowRight size={16} />
+            <ArrowRight size={16} />
           </Circle>
         </HStack>
       </VStack>
@@ -278,7 +278,7 @@ const TrainersStaff = memo(() => {
           aria-label="Refresh list"
           loading={loading}
         >
-          <LuRefreshCw size={14} />
+          <RefreshCw size={14} />
         </IconButton>
         <Button
           colorPalette="blue"
@@ -288,7 +288,7 @@ const TrainersStaff = memo(() => {
           fontWeight="800"
           onClick={() => navigateTo("AddTrainer")}
         >
-          <LuPlus size={16} /> New Trainer
+          <Plus size={16} /> New Trainer
         </Button>
       </HStack>
     );
@@ -317,16 +317,16 @@ const TrainersStaff = memo(() => {
             <HStack gap={3} flexWrap="wrap">
               <Button variant="outline" borderRadius="xl" fontWeight="800"
                 onClick={() => navigateTo("trainerSchedules")}>
-                <LuCalendarDays size={16} style={{ marginRight: "6px" }} /> View Schedules
+                <CalendarDays size={16} style={{ marginRight: "6px" }} /> View Schedules
               </Button>
             </HStack>
           </VStack>
 
           <SimpleGrid columns={{ base: 1, md: 2, xl: 4 }} gap={4}>
-            <StatTile label="Total Staff" value={metrics.total} caption="Across all roles" icon={LuUsers} accent="blue.500" />
-            <StatTile label="Trainers" value={metrics.trainers} caption={`${metrics.online} online now`} icon={LuDumbbell} accent="purple.500" />
-            <StatTile label="Avg Rating" value={metrics.avgRating} caption="Trainer average" icon={LuStar} accent="yellow.500" />
-            <StatTile label="Sessions" value={metrics.totalSessions} caption="This week total" icon={LuTrendingUp} accent="green.500" />
+            <StatTile label="Total Staff" value={metrics.total} caption="Across all roles" icon={Users} accent="blue.500" />
+            <StatTile label="Trainers" value={metrics.trainers} caption={`${metrics.online} online now`} icon={Dumbbell} accent="purple.500" />
+            <StatTile label="Avg Rating" value={metrics.avgRating} caption="Trainer average" icon={Star} accent="yellow.500" />
+            <StatTile label="Sessions" value={metrics.totalSessions} caption="This week total" icon={TrendingUp} accent="green.500" />
           </SimpleGrid>
         </Grid>
       </Box>
@@ -336,7 +336,7 @@ const TrainersStaff = memo(() => {
         actions={
           <Button colorPalette="blue" borderRadius="xl" px={5} fontWeight="900"
             onClick={() => navigateTo("trainerSchedules")}>
-            <LuCalendarDays size={16} style={{ marginRight: "6px" }} /> Schedules
+            <CalendarDays size={16} style={{ marginRight: "6px" }} /> Schedules
           </Button>
         }
         onSearchChange={setSearchQuery}
@@ -357,7 +357,7 @@ const TrainersStaff = memo(() => {
                 bg={panelBg} border="1px solid" borderColor={borderColor}>
                 <HStack gap={2}>
                   <Circle size="9" bg="purple.500/10" color="purple.500">
-                    <LuFilter size={16} />
+                    <Filter size={16} />
                   </Circle>
                   <VStack align="start" gap={0}>
                     <Text fontWeight="900" color="app.text.primary">Directory</Text>
@@ -393,7 +393,7 @@ const TrainersStaff = memo(() => {
                 <Flex direction="column" align="center" justify="center" py={20} gap={4}
                   borderRadius="2xl" bg={panelBg} border="1px solid" borderColor={borderColor}>
                   <Circle size="16" bg="purple.500/10" color="purple.500">
-                    <LuUsers size={30} />
+                    <Users size={30} />
                   </Circle>
                   <VStack gap={1}>
                     <Heading size="sm" fontWeight="900">No staff found</Heading>
@@ -418,7 +418,7 @@ const TrainersStaff = memo(() => {
                       <Text fontSize="xs" color={muted} fontWeight="700">Highest rated trainers</Text>
                     </VStack>
                     <Badge colorPalette="yellow" borderRadius="full" variant="solid">
-                      <LuAward size={12} />
+                      <Award size={12} />
                     </Badge>
                   </HStack>
 
@@ -439,7 +439,7 @@ const TrainersStaff = memo(() => {
                               {name.full}
                             </Text>
                             <HStack gap={1}>
-                              <LuStar size={10} color="var(--chakra-colors-yellow-400)" fill="var(--chakra-colors-yellow-400)" />
+                              <Star size={10} color="var(--chakra-colors-yellow-400)" fill="var(--chakra-colors-yellow-400)" />
                               <Text fontSize="xs" color={muted} fontWeight="800">4.9 · {t.data.experienceYears}y exp</Text>
                             </HStack>
                           </VStack>

@@ -4,16 +4,16 @@ import { useNavActionStore } from "@/core/store/useNavActionStore";
 import { Box, Breadcrumb, Flex, HStack, Text } from "@chakra-ui/react";
 import React, { forwardRef, useEffect, useState, useMemo } from "react";
 import {
-  LuArrowLeft,
-  LuHouse,
-  LuBox,
-  LuLayers,
-  LuLayoutDashboard,
-  LuChevronRight,
-  LuUser,
-  LuSettings
-} from "react-icons/lu";
-import { FiHelpCircle } from "react-icons/fi";
+  ArrowLeft,
+  Home,
+  Box as BoxIcon,
+  Layers,
+  LayoutDashboard,
+  ChevronRight,
+  User,
+  Settings,
+  HelpCircle
+} from "lucide-react";
 import {
   useLocation,
   useNavigate,
@@ -39,36 +39,36 @@ const AppBreadcrumb = forwardRef((props, ref) => {
     {
       path: "/myApps",
       label: "Home",
-      icon: <LuHouse size="14" />
+      icon: <Home size="14" />
     },
   ]);
 
   useEffect(() => {
     const newConfig: ConfigItem[] = [
-      { path: "/myApps", label: "Home", icon: <LuHouse size="14" /> }
+      { path: "/myApps", label: "Home", icon: <Home size="14" /> }
     ];
 
     if (pathname.toLowerCase().includes("/profile")) {
-      newConfig.push({ path: pathname, label: "Profile", icon: <LuUser size="14" /> });
+      newConfig.push({ path: pathname, label: "Profile", icon: <User size="14" /> });
     } else if (pathname.toLowerCase().includes("/settings")) {
-      newConfig.push({ path: pathname, label: "Settings", icon: <LuSettings size="14" /> });
+      newConfig.push({ path: pathname, label: "Settings", icon: <Settings size="14" /> });
     } else if (pathname.toLowerCase().includes("/helpcenter")) {
-      newConfig.push({ path: pathname, label: "Help Center", icon: <FiHelpCircle size="14" /> });
+      newConfig.push({ path: pathname, label: "Help Center", icon: <HelpCircle size="14" /> });
     } else if (!view && !appCode) {
-      newConfig.push({ path: "#", label: "MyApps", icon: <LuLayers size="14" /> });
+      newConfig.push({ path: "#", label: "MyApps", icon: <Layers size="14" /> });
     } else {
       // App root path — delegated to shared buildPath utility
       newConfig.push({
         path: buildPath("home"),
         label: appName,
-        icon: <LuBox size="14" />
+        icon: <BoxIcon size="14" />
       });
 
       if (view && view !== "home") {
         newConfig.push({
           path: buildPath(view),
           label: view,
-          icon: <LuLayoutDashboard size="14" />
+          icon: <LayoutDashboard size="14" />
         });
       }
 
@@ -76,7 +76,7 @@ const AppBreadcrumb = forwardRef((props, ref) => {
         newConfig.push({
           path: buildPath(view || "", secondaryView),
           label: secondaryView,
-          icon: <LuLayers size="14" />
+          icon: <Layers size="14" />
         });
       }
     }
@@ -131,7 +131,7 @@ const AppBreadcrumb = forwardRef((props, ref) => {
                 color={inactiveColor}
                 minW="fit-content"
               >
-                <LuArrowLeft size="14" />
+                <ArrowLeft size="14" />
                 <Text
                   fontWeight="600"
                   fontSize={{ base: "11px", md: "xs" }}
@@ -140,7 +140,7 @@ const AppBreadcrumb = forwardRef((props, ref) => {
                   Back
                 </Text>
               </HStack>
-              <LuChevronRight size="12" color={inactiveColor} />
+              <ChevronRight size="12" color={inactiveColor} />
             </HStack>
           )}
 
@@ -190,7 +190,7 @@ const AppBreadcrumb = forwardRef((props, ref) => {
                       </Breadcrumb.Item>
                       {!isLast && (
                         <Breadcrumb.Separator>
-                          <LuChevronRight size="12" color={inactiveColor} />
+                                      <ChevronRight size="12" color={inactiveColor} />
                         </Breadcrumb.Separator>
                       )}
                     </React.Fragment>

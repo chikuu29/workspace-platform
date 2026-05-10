@@ -25,7 +25,7 @@ import {
     PopoverTrigger,
 } from "../../components/ui/popover";
 import { ruleEngine } from "../engine/logicEngine";
-import { LuCalendar, LuChevronLeft, LuChevronRight, LuClock } from "react-icons/lu";
+import { Calendar, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 
 interface DATETIMEFIELD {
     name: string;
@@ -216,8 +216,8 @@ const DateTimeField = ({
                                         <Box w="full">
                                             <InputGroup
                                                 w="full"
-                                                startElement={<LuCalendar color="gray.400" />}
-                                                endElement={<LuClock color="gray.400" />}
+                                                startElement={<Calendar color="gray.400" />}
+                                                endElement={<Clock color="gray.400" />}
                                             >
                                                 <Input
                                                     readOnly
@@ -250,7 +250,7 @@ const DateTimeField = ({
                                             <VStack gap="4" align="stretch">
                                                 <Flex w="full" justify="space-between" align="center">
                                                     <IconButton size="xs" variant="ghost" onClick={() => changeMonth(-1)} visibility={viewMode === "year" ? "hidden" : "visible"}>
-                                                        <LuChevronLeft />
+                                                        <ChevronLeft />
                                                     </IconButton>
                                                     <Button
                                                         variant="ghost"
@@ -265,7 +265,7 @@ const DateTimeField = ({
                                                         }
                                                     </Button>
                                                     <IconButton size="xs" variant="ghost" onClick={() => changeMonth(1)} visibility={viewMode === "year" ? "hidden" : "visible"}>
-                                                        <LuChevronRight />
+                                                        <ChevronRight />
                                                     </IconButton>
                                                 </Flex>
 

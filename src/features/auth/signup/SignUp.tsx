@@ -19,12 +19,9 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { POSTAPI } from "@/app/api";
 import { AlertProps } from "@/app/types/appConfigInterface";
-import { SiAuthelia } from "react-icons/si";
+import { Building2, Mail, Phone, Fingerprint } from "lucide-react";
 import { useForm } from "react-hook-form";
 import AuthFormInput from "../components/AuthFormInput";
-import { MdEmail } from "react-icons/md";
-import { FiPhone } from "react-icons/fi";
-import { FaBuilding } from "react-icons/fa6";
 
 const MotionBox = motion.create(Box);
 const MotionStack = motion.create(Stack);
@@ -341,7 +338,7 @@ const SignUp = () => {
                   <AuthFormInput
                     label="Organization Name"
                     required
-                    icon={<FaBuilding size={16} />}
+                    icon={<Building2 size={16} />}
                     error={errors.organization_name?.message?.toString()}
                     hint="No spaces — use letters, numbers or hyphens (e.g. acme-corp)"
                     inputProps={
@@ -371,7 +368,7 @@ const SignUp = () => {
                   <AuthFormInput
                     label="Admin Email"
                     required
-                    icon={<MdEmail size={18} />}
+                    icon={<Mail size={18} />}
                     error={errors.organization_email?.message?.toString()}
                     inputProps={
                       {
@@ -396,7 +393,7 @@ const SignUp = () => {
                   <AuthFormInput
                     label="Phone Number"
                     required
-                    icon={<FiPhone size={17} />}
+                    icon={<Phone size={17} />}
                     error={errors.phone_number?.message?.toString()}
                     hint="Include country code (e.g. +91 98765 43210)"
                     inputProps={

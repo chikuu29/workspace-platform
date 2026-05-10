@@ -34,22 +34,22 @@ import {
 import { NativeSelectField, NativeSelectRoot } from "@/components/ui/native-select";
 import { toaster } from "@/components/ui/toaster";
 import {
-    LuZap,
-    LuPlus,
-    LuPencil,
-    LuTrash2,
-    LuRefreshCw,
-    LuShield,
-    LuCheck,
-    LuEye,
-    LuSave,
-    LuStar,
-    LuCode,
-    LuSearch,
-    LuChevronDown,
-    LuLayoutGrid,
-    LuLock,
-} from "react-icons/lu";
+    Zap,
+    Plus,
+    Pencil,
+    Trash2,
+    RefreshCw,
+    Shield,
+    Check,
+    Eye,
+    Save,
+    Star,
+    Code,
+    Search,
+    ChevronDown,
+    LayoutGrid,
+    Lock
+} from "lucide-react";
 import { GETAPI, POSTAPI, PUTAPI, DELETEAPI } from "@/app/api";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field } from "@/components/ui/field";
@@ -233,7 +233,7 @@ const PermissionsView = memo(() => {
                                     border="1px solid"
                                     borderColor="rgba(139,92,246,0.2)"
                                 >
-                                    <Icon as={LuShield} boxSize={4} color="purple.400" />
+                                    <Icon as={Shield} boxSize={4} color="purple.400" />
                                 </Center>
                                 <Text fontWeight="700" color="app.text.primary" fontSize="lg">
                                     {perm.name}
@@ -259,7 +259,7 @@ const PermissionsView = memo(() => {
                                     borderRadius="full"
                                     px={2}
                                 >
-                                    <Icon as={LuLock} boxSize={3} mr={1} />
+                                    <Icon as={Lock} boxSize={3} mr={1} />
                                     Platform Only
                                 </Badge>
                             )}
@@ -276,7 +276,7 @@ const PermissionsView = memo(() => {
                     {/* Bottom Section */}
                     <HStack justify="space-between" align="center" pt={4} borderTop="1px solid" borderColor="app.card.border" mt="auto">
                         <Badge variant="subtle" colorPalette="cyan" borderRadius="md" size="sm">
-                            <Icon as={LuLayoutGrid} mr={1} />
+                            <Icon as={LayoutGrid} mr={1} />
                             {apps.find(a => a.id === perm.app_id)?.code || "System"}
                         </Badge>
 
@@ -289,7 +289,7 @@ const PermissionsView = memo(() => {
                                 _hover={{ color: "purple.400", bg: "purple.500/10" }}
                                 onClick={() => handleEditClick(perm)}
                             >
-                                <LuPencil />
+                                <Pencil />
                             </IconButton>
                             <IconButton
                                 aria-label="Delete"
@@ -299,7 +299,7 @@ const PermissionsView = memo(() => {
                                 _hover={{ color: "red.400", bg: "red.500/10" }}
                                 onClick={() => handleDelete(perm.id)}
                             >
-                                <LuTrash2 />
+                                <Trash2 />
                             </IconButton>
                         </HStack>
                     </HStack>
@@ -324,7 +324,7 @@ const PermissionsView = memo(() => {
                             onClick={handleAddClick}
                             boxShadow="0 4px 12px rgba(139,92,246,0.3)"
                         >
-                            <LuPlus style={{ marginRight: '8px' }} /> Create Permission
+                            <Plus style={{ marginRight: '8px' }} /> Create Permission
                         </Button>
                     </HStack>
                 }
@@ -339,7 +339,7 @@ const PermissionsView = memo(() => {
                 ) : filteredPermissions.length === 0 ? (
                     <Center py={20}>
                         <VStack gap={3}>
-                            <Icon as={LuSearch} boxSize={8} color="app.text.muted" />
+                            <Icon as={Search} boxSize={8} color="app.text.muted" />
                             <Text color="app.text.muted">No permissions found matching your search.</Text>
                         </VStack>
                     </Center>
@@ -368,7 +368,7 @@ const PermissionsView = memo(() => {
                     >
                         <HStack gap={3}>
                             <Center w={10} h={10} borderRadius="xl" bg="purple.500" color="white">
-                                <Icon as={selectedPermission ? LuPencil : LuPlus} boxSize={5} />
+                                <Icon as={selectedPermission ? Pencil : Plus} boxSize={5} />
                             </Center>
                             <VStack align="start" gap={0}>
                                 <Heading size="md" color="app.text.primary">
@@ -401,12 +401,12 @@ const PermissionsView = memo(() => {
                                                 disabled={!!selectedPermission}
                                             >
                                                 <HStack>
-                                                    <Icon as={LuLayoutGrid} color="purple.400" />
+                                                    <Icon as={LayoutGrid} color="purple.400" />
                                                     <Text color={selectedAppId ? "app.text.primary" : "app.text.muted"}>
                                                         {apps.find(a => a.id === selectedAppId)?.name || "Select Application"}
                                                     </Text>
                                                 </HStack>
-                                                <LuChevronDown />
+                                                <ChevronDown />
                                             </Button>
                                         </PopoverTrigger>
                                         <PopoverContent
@@ -493,12 +493,7 @@ const PermissionsView = memo(() => {
                                                 </Text>
                                                 <SimpleGrid columns={2} gap={4}>
                                                     {[
-                                                        { val: "read", lab: "Read", icon: LuEye, colorScheme: "blue" },
-                                                        { val: "write", lab: "Write", icon: LuPencil, colorScheme: "green" },
-                                                        { val: "add", lab: "Add / Create", icon: LuPlus, colorScheme: "purple" },
-                                                        { val: "update", lab: "Update", icon: LuRefreshCw, colorScheme: "orange" },
-                                                        { val: "delete", lab: "Delete", icon: LuTrash2, colorScheme: "red" },
-                                                        { val: "*", lab: "All Access (*)", icon: LuStar, colorScheme: "yellow" }
+                                                        { val: "*", lab: "All Access (*)", icon: Star, colorScheme: "yellow" }
                                                     ].map((item) => (
                                                         <Checkbox
                                                             key={item.val}
@@ -590,7 +585,7 @@ const PermissionsView = memo(() => {
                                         <HStack justify="space-between">
                                             <VStack align="start" gap={0}>
                                                 <HStack gap={2}>
-                                                    <Icon as={LuLock} color="orange.400" boxSize={4} />
+                                                    <Icon as={Lock} color="orange.400" boxSize={4} />
                                                     <Text color="app.text.primary" fontSize="sm" fontWeight="600">Platform Only</Text>
                                                 </HStack>
                                                 <Text color="app.text.muted" fontSize="xs">
@@ -622,7 +617,7 @@ const PermissionsView = memo(() => {
                             boxShadow="0 8px 16px rgba(139,92,246,0.2)"
                             _active={{ transform: "scale(0.98)" }}
                         >
-                            <LuSave style={{ marginRight: '8px' }} />
+                            <Save style={{ marginRight: '8px' }} />
                             {selectedPermission ? "Update Permission" : "Generate Permissions"}
                         </Button>
                     </DrawerFooter>

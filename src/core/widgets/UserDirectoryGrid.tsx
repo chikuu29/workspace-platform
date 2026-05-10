@@ -14,7 +14,7 @@ import {
     Spinner,
 } from "@chakra-ui/react";
 import { memo, useCallback, useMemo, useState } from "react";
-import { LuSearch, LuUsersRound, LuRefreshCw } from "react-icons/lu";
+import { Search, Users, RotateCcw } from "lucide-react";
 import { UserCard, UserCardAction, UserCardData } from "./UserCard";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -121,7 +121,7 @@ export const UserDirectoryGrid = memo(
                     <HStack gap={3} flex={1} flexWrap="wrap">
                         {/* Search */}
                         <InputGroup
-                            startElement={<LuSearch size={15} />}
+                            startElement={<Search size={15} />}
                             maxW={{ base: "100%", sm: "320px" }}
                             flex={1}
                         >
@@ -210,7 +210,7 @@ export const UserDirectoryGrid = memo(
                                 alignItems="center"
                                 justifyContent="center"
                             >
-                                <Icon as={LuUsersRound} boxSize={7} color="app.text.muted" />
+                                <Icon as={Users} boxSize={7} color="app.text.muted" />
                             </Box>
                             <VStack gap={1}>
                                 <Text fontWeight="600" color="app.text.primary">
@@ -235,7 +235,7 @@ export const UserDirectoryGrid = memo(
                                         setStatusFilter("all");
                                     }}
                                 >
-                                    <LuRefreshCw size={13} />
+                                    <RotateCcw size={13} />
                                     Clear filters
                                 </Button>
                             )}

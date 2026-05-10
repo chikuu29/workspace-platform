@@ -1,6 +1,6 @@
 import React, { memo } from "react";
 import { VStack, Flex, HStack, Box, Text, Separator, SimpleGrid, Badge } from "@chakra-ui/react";
-import { LuUser, LuEllipsis } from "react-icons/lu";
+import { User, MoreHorizontal } from "lucide-react";
 import { DataTableColumn } from "./types";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { motion } from "framer-motion";
@@ -79,7 +79,7 @@ function MobileDataCardComponent<T extends Record<string, any>>({ row, columns }
                 <Flex justify="space-between" align="center">
                     <HStack gap={3}>
                         <Box p={2} bg="blue.100/10" borderRadius="lg" color="blue.500">
-                            <LuUser size="16px" />
+                            <User size={16} />
                         </Box>
                         <VStack align="start" gap={0}>
                             <Text fontWeight="800" fontSize="md">{row.name || row.label || row[columns[1]?.key] || "Record"}</Text>
@@ -101,7 +101,7 @@ function MobileDataCardComponent<T extends Record<string, any>>({ row, columns }
                 </SimpleGrid>
                 <HStack justify="end" pt={1}>
                     <Box p={1.5} color={secondaryColor} _hover={{ color: "blue.500" }} cursor="pointer">
-                        <LuEllipsis size="18px" />
+                        <MoreHorizontal size={18} />
                     </Box>
                 </HStack>
             </VStack>

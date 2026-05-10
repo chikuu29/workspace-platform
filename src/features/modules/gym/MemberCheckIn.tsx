@@ -13,9 +13,9 @@ import {
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import {
-  LuCheck, LuX, LuScan, LuUser, LuCreditCard, LuHistory,
-  LuArrowRight, LuInfo,
-} from "react-icons/lu";
+  Check, X, Scan, User, CreditCard, History,
+  ArrowRight, Info,
+} from "lucide-react";
 import { toaster } from "@/components/ui/toaster";
 import { GymApiService } from "./services/gymApi.service";
 
@@ -23,9 +23,9 @@ import { GymApiService } from "./services/gymApi.service";
 
 const StatusIndicator = memo(({ status }: { status: "idle" | "success" | "error" | "loading" }) => {
   const colors = {
-    idle: { bg: "gray.500/10", icon: LuScan, color: "gray.500" },
-    success: { bg: "green.500", icon: LuCheck, color: "white" },
-    error: { bg: "red.500", icon: LuX, color: "white" },
+    idle: { bg: "gray.500/10", icon: Scan, color: "gray.500" },
+    success: { bg: "green.500", icon: Check, color: "white" },
+    error: { bg: "red.500", icon: X, color: "white" },
     loading: { bg: "blue.500", icon: Spinner, color: "white" },
   };
 
@@ -136,7 +136,7 @@ const MemberCheckIn = memo(() => {
               borderRadius="2xl" fontWeight="900" onClick={() => handleCheckIn()}
               disabled={!memberId || status === "loading"}
             >
-              RECORD CHECK-IN <LuArrowRight style={{ marginLeft: "8px" }} />
+              RECORD CHECK-IN <ArrowRight style={{ marginLeft: "8px" }} />
             </Button>
           </VStack>
         </Box>
@@ -150,7 +150,7 @@ const MemberCheckIn = memo(() => {
           >
             <HStack gap={5}>
               <Circle size="60px" bg="blue.500/10" color="blue.500">
-                <LuUser size={30} />
+                <User size={30} />
               </Circle>
               <VStack align="start" gap={0} flex="1">
                 <Text fontSize="xs" fontWeight="900" color="green.500" textTransform="uppercase">Recent Access</Text>
@@ -182,11 +182,11 @@ const MemberCheckIn = memo(() => {
         {/* Shortcuts / Quick Tips */}
         <HStack gap={8} opacity={0.6}>
            <HStack gap={2}>
-              <Circle size="6" bg="gray.500/20"><LuHistory size={12} /></Circle>
+              <Circle size="6" bg="gray.500/20"><History size={12} /></Circle>
               <Text fontSize="xs" fontWeight="700">View Recent Logs</Text>
            </HStack>
            <HStack gap={2}>
-              <Circle size="6" bg="gray.500/20"><LuInfo size={12} /></Circle>
+              <Circle size="6" bg="gray.500/20"><Info size={12} /></Circle>
               <Text fontSize="xs" fontWeight="700">Report Issue</Text>
            </HStack>
         </HStack>

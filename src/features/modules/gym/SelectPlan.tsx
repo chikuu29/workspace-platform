@@ -31,15 +31,15 @@ import {
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { useParams } from "react-router";
 import {
-    LuArrowLeft,
-    LuArrowRight,
-    LuCalendarDays,
-    LuCheck,
-    LuCrown,
-    LuShieldCheck,
-    LuZap,
-    LuSparkles,
-} from "react-icons/lu";
+    ArrowLeft,
+    ArrowRight,
+    CalendarDays,
+    Check,
+    Crown,
+    ShieldCheck,
+    Zap,
+    Sparkles,
+} from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Field } from "@/components/ui/field";
 import { toaster } from "@/components/ui/toaster";
@@ -124,7 +124,7 @@ const PlanCard = memo(({ plan, isSelected, onSelect }: PlanCardProps) => {
                                 </Text>
                                 {planData.code.toLowerCase().includes("pro") && (
                                     <Icon color={`${accent}.500`}>
-                                        <LuSparkles />
+                                        <Sparkles />
                                     </Icon>
                                 )}
                             </HStack>
@@ -140,7 +140,7 @@ const PlanCard = memo(({ plan, isSelected, onSelect }: PlanCardProps) => {
                                 color="white"
                                 boxShadow={`0 0 15px var(--chakra-colors-${accent}-500)`}
                             >
-                                <LuCheck size={16} />
+                                <Check size={16} />
                             </Circle>
                         ) : (
                             <Circle size={8} border="2px solid" borderColor={borderColor} />
@@ -169,7 +169,7 @@ const PlanCard = memo(({ plan, isSelected, onSelect }: PlanCardProps) => {
                         {planData.features.map((f) => (
                             <HStack key={f} gap={3}>
                                 <Circle size={5} bg={`${accent}.500/10`} color={`${accent}.500`}>
-                                    <LuCheck size={12} strokeWidth={3} />
+                                    <Check size={12} strokeWidth={3} />
                                 </Circle>
                                 <Text fontSize="sm" fontWeight="600" color="app.text.primary">
                                     {f}
@@ -206,7 +206,7 @@ const PlanCard = memo(({ plan, isSelected, onSelect }: PlanCardProps) => {
                         >
                             <HStack gap={2}>
                                 <Text>{isSelected ? "Plan Selected" : "Get Started"}</Text>
-                                {isSelected ? <LuCheck size={16} /> : <LuArrowRight size={16} />}
+                                {isSelected ? <Check size={16} /> : <ArrowRight size={16} />}
                             </HStack>
                         </Button>
                     </Box>
@@ -231,7 +231,7 @@ const EmptyPlansState = memo(() => {
         <Card p={12} borderRadius="3xl" bg={useColorModeValue("white", "rgba(15, 23, 42, 0.65)")} backdropFilter="blur(20px)" border="1px solid" borderColor={useColorModeValue("gray.100", "whiteAlpha.100")}>
             <VStack gap={6} textAlign="center">
                 <Circle size={20} bg="brand.500/10" color="brand.500">
-                    <LuCrown size={32} />
+                    <Crown size={32} />
                 </Circle>
                 <VStack gap={1}>
                     <Heading size="lg" fontWeight="900">No active plans</Heading>
@@ -396,7 +396,7 @@ const SelectPlan = memo(() => {
                 >
                     {isSubmitting ? <Spinner size="xs" borderWidth="2px" /> : (
                         <HStack gap={2}>
-                            <LuZap size={14} />
+                            <Zap size={14} />
                             <Text>Activate</Text>
                         </HStack>
                     )}
@@ -416,7 +416,7 @@ const SelectPlan = memo(() => {
                 <Card p={12} borderRadius="3xl" bg={useColorModeValue("white", "rgba(15, 23, 42, 0.65)")} backdropFilter="blur(20px)" border="1px solid" borderColor={useColorModeValue("gray.100", "whiteAlpha.100")}>
                     <VStack gap={6} textAlign="center">
                         <Circle size={20} bg="red.500/10" color="red.500">
-                            <LuShieldCheck size={32} />
+                            <ShieldCheck size={32} />
                         </Circle>
                         <VStack gap={1}>
                             <Heading size="xl" fontWeight="900">Profile Unavailable</Heading>
@@ -436,7 +436,7 @@ const SelectPlan = memo(() => {
                             bg="brand.500"
                             _hover={{ transform: "translateY(-2px)" }}
                         >
-                            <LuArrowLeft size={18} /> Back to Directory
+                            <ArrowLeft size={18} /> Back to Directory
                         </Button>
                     </VStack>
                 </Card>
@@ -534,7 +534,7 @@ const SelectPlan = memo(() => {
                         >
                             <HStack gap={3}>
                                 <Circle size={8} bg="brand.500/10" color="brand.500">
-                                    <LuCalendarDays size={16} />
+                                    <CalendarDays size={16} />
                                 </Circle>
                                 <Text fontSize="lg" fontWeight="900" color="app.text.primary">
                                     Subscription Settings
@@ -602,7 +602,7 @@ const SelectPlan = memo(() => {
                         <VStack align="stretch" gap={6}>
                             <HStack justify="space-between">
                                 <Text fontSize="md" fontWeight="900" color="app.text.primary">Summary</Text>
-                                <LuCrown color="var(--chakra-colors-brand-500)" size={18} />
+                                <Crown color="var(--chakra-colors-brand-500)" size={18} />
                             </HStack>
 
                             {selectedPlan ? (
@@ -670,7 +670,7 @@ const SelectPlan = memo(() => {
                                 {isSubmitting ? <Spinner size="sm" borderWidth="3px" /> : (
                                     <HStack gap={2}>
                                         <Text>Complete Checkout</Text>
-                                        <LuArrowRight size={18} />
+                                        <ArrowRight size={18} />
                                     </HStack>
                                 )}
                             </Button>
@@ -678,12 +678,12 @@ const SelectPlan = memo(() => {
                             <VStack gap={2}>
                                 {selectedPlan && renewalDate && (
                                     <HStack gap={2} color="green.500">
-                                        <LuCalendarDays size={14} />
+                                        <CalendarDays size={14} />
                                         <Text fontSize="xs" fontWeight="800">Renews on {renewalDate}</Text>
                                     </HStack>
                                 )}
                                 <HStack gap={2} color={muted} opacity={0.8}>
-                                    <LuShieldCheck size={14} />
+                                    <ShieldCheck size={14} />
                                     <Text fontSize="10px" fontWeight="700" textTransform="uppercase">
                                         Bank-grade Security · Encrypted
                                     </Text>

@@ -27,20 +27,20 @@ import {
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 import {
-  LuActivity,
-  LuArrowRight,
-  LuCalendarDays,
-  LuCircleAlert,
-  LuCircleCheck,
-  LuClock3,
-  LuCreditCard,
-  LuDumbbell,
-  LuReceipt,
-  LuTrendingUp,
-  LuUserPlus,
-  LuUsers,
-  LuZap,
-} from "react-icons/lu";
+  Activity,
+  ArrowRight,
+  CalendarDays,
+  CircleAlert,
+  CircleCheck,
+  Clock3,
+  CreditCard,
+  Dumbbell,
+  Receipt,
+  TrendingUp,
+  UserPlus,
+  Users,
+  Zap,
+} from "lucide-react";
 
 import { PageHeader } from "@/core/components/PageHeader";
 import { useGymDashboard } from "./hooks/useGymDashboard";
@@ -234,10 +234,10 @@ const GymManagementDashboard = memo(() => {
         actions={
           <HStack gap={3}>
             <Button variant="outline" borderRadius="xl" onClick={() => navigateTo("members")} fontWeight="900">
-              <LuUsers size={16} /> Directory
+              <Users size={16} /> Directory
             </Button>
             <Button colorPalette="blue" borderRadius="xl" onClick={() => navigateTo("AddMember")} fontWeight="900">
-              <LuUserPlus size={16} /> Enroll Member
+              <UserPlus size={16} /> Enroll Member
             </Button>
           </HStack>
         }
@@ -260,19 +260,19 @@ const GymManagementDashboard = memo(() => {
               </VStack>
               <HStack gap={3} flexWrap="wrap">
                 <Button colorPalette="blue" borderRadius="xl" fontWeight="900" onClick={() => navigateTo("AddMember")}>
-                  <LuUserPlus size={18} /> New Enrollment
+                  <UserPlus size={18} /> New Enrollment
                 </Button>
                 <Button variant="outline" borderRadius="xl" fontWeight="900" onClick={() => navigateTo("Subscription")}>
-                  <LuCreditCard size={17} /> Billing
+                  <CreditCard size={17} /> Billing
                 </Button>
               </HStack>
             </VStack>
 
             <SimpleGrid columns={{ base: 1, md: 2, xl: 4 }} gap={4}>
-              <KpiTile label="Active members" value={activeMembers.toLocaleString()} caption={`${retention}% active ratio`} icon={LuUsers} accent="blue.500" loading={loading} />
-              <KpiTile label="Check-ins today" value={(kpis?.checkins_today || 0).toLocaleString()} caption="Front desk traffic" icon={LuActivity} accent="green.500" loading={loading} />
-              <KpiTile label="MRR" value={formatCurrency(kpis?.revenue_mrr)} caption="Monthly recurring revenue" icon={LuReceipt} accent="purple.500" loading={loading} />
-              <KpiTile label="Trainer utilization" value={`${utilization}%`} caption="Floor capacity signal" icon={LuDumbbell} accent="orange.500" loading={loading} />
+              <KpiTile label="Active members" value={activeMembers.toLocaleString()} caption={`${retention}% active ratio`} icon={Users} accent="blue.500" loading={loading} />
+              <KpiTile label="Check-ins today" value={(kpis?.checkins_today || 0).toLocaleString()} caption="Front desk traffic" icon={Activity} accent="green.500" loading={loading} />
+              <KpiTile label="MRR" value={formatCurrency(kpis?.revenue_mrr)} caption="Monthly recurring revenue" icon={Receipt} accent="purple.500" loading={loading} />
+              <KpiTile label="Trainer utilization" value={`${utilization}%`} caption="Floor capacity signal" icon={Dumbbell} accent="orange.500" loading={loading} />
             </SimpleGrid>
           </Grid>
         </SurfaceCard>
@@ -297,9 +297,9 @@ const GymManagementDashboard = memo(() => {
                   </Flex>
 
                   <SimpleGrid columns={{ base: 1, md: 3 }} gap={3}>
-                    <WorkflowButton label="New Enrollment" caption="Create member profile" icon={LuUserPlus} accent="blue.500" onClick={() => navigateTo("AddMember")} />
-                    <WorkflowButton label="Member Check-in" caption="Log front desk arrival" icon={LuClock3} accent="green.500" onClick={() => navigateTo("MemberCheckIn")} />
-                    <WorkflowButton label="Process Payment" caption="Open billing workflow" icon={LuReceipt} accent="purple.500" onClick={() => navigateTo("Subscription")} />
+                    <WorkflowButton label="New Enrollment" caption="Create member profile" icon={UserPlus} accent="blue.500" onClick={() => navigateTo("AddMember")} />
+                    <WorkflowButton label="Member Check-in" caption="Log front desk arrival" icon={Clock3} accent="green.500" onClick={() => navigateTo("MemberCheckIn")} />
+                    <WorkflowButton label="Process Payment" caption="Open billing workflow" icon={Receipt} accent="purple.500" onClick={() => navigateTo("Subscription")} />
                   </SimpleGrid>
                 </VStack>
               </SurfaceCard>
@@ -316,7 +316,7 @@ const GymManagementDashboard = memo(() => {
                       </Text>
                     </VStack>
                     <Button variant="ghost" size="sm" borderRadius="xl" colorPalette="blue" fontWeight="900" onClick={() => navigateTo("revenueReport")}>
-                      Detailed Report <LuArrowRight size={15} />
+                      Detailed Report <ArrowRight size={15} />
                     </Button>
                   </Flex>
                   <RevenuAnalytics />
@@ -338,9 +338,9 @@ const GymManagementDashboard = memo(() => {
                     </Badge>
                   </HStack>
                   <VStack align="stretch" gap={3}>
-                    <AlertRow title="Renewal attention" description={`${attentionMembers} members need follow-up`} icon={LuCircleAlert} accent="orange.500" />
-                    <AlertRow title="Frozen accounts" description={`${frozenMembers} paused memberships`} icon={LuZap} accent="blue.500" />
-                    <AlertRow title="Daily check-ins" description={`${kpis?.checkins_today || 0} visits recorded today`} icon={LuCircleCheck} accent="green.500" />
+                    <AlertRow title="Renewal attention" description={`${attentionMembers} members need follow-up`} icon={CircleAlert} accent="orange.500" />
+                    <AlertRow title="Frozen accounts" description={`${frozenMembers} paused memberships`} icon={Zap} accent="blue.500" />
+                    <AlertRow title="Daily check-ins" description={`${kpis?.checkins_today || 0} visits recorded today`} icon={CircleCheck} accent="green.500" />
                   </VStack>
                 </VStack>
               </SurfaceCard>
@@ -389,7 +389,7 @@ const GymManagementDashboard = memo(() => {
                       ))}
                       {!loading && (stats?.recent_members || []).length === 0 && (
                         <VStack py={8} gap={2}>
-                          <Icon as={LuCircleCheck} boxSize={8} color="gray.300" />
+                          <Icon as={CircleCheck} boxSize={8} color="gray.300" />
                           <Text fontSize="sm" color={muted} fontWeight="700">
                             No recent enrollments yet.
                           </Text>
@@ -411,7 +411,7 @@ const GymManagementDashboard = memo(() => {
                         Trainer utilization
                       </Text>
                     </VStack>
-                    <LuCalendarDays size={20} />
+                    <CalendarDays size={20} />
                   </HStack>
                   <Progress.Root value={utilization} colorPalette="orange" size="sm">
                     <Progress.Track bg="whiteAlpha.200">

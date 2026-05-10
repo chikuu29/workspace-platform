@@ -5,7 +5,7 @@ import MenuLink from "@/core/components/MenuLink";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/store";
 import { APP_CONFIG_STATE } from "@/app/types/appConfigInterface";
-import { LuChevronDown } from "react-icons/lu";
+import { ChevronDown } from "lucide-react";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -90,7 +90,7 @@ const CollapsibleGroup = memo(
             transform={isOpen ? "rotate(0deg)" : "rotate(-90deg)"}
             color={textColor}
           >
-            <LuChevronDown size={14} />
+            <ChevronDown size={14} />
           </Box>
         </Flex>
 

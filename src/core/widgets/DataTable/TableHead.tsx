@@ -1,6 +1,6 @@
 import React, { memo } from "react";
 import { Table, Icon, HStack, Text, Box } from "@chakra-ui/react";
-import { LuArrowUp, LuArrowDown, LuArrowUpDown } from "react-icons/lu";
+import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 import { DataTableColumn, SortOrder } from "./types";
 import { useColorModeValue } from "@/components/ui/color-mode";
 
@@ -67,7 +67,7 @@ function TableHead<T>({
                                 <Text>{col.label}</Text>
                                 {col.isSortable && (
                                     <Icon
-                                        as={isSorted ? (sortOrder === "asc" ? LuArrowUp : LuArrowDown) : LuArrowUpDown}
+                                        as={isSorted ? (sortOrder === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown}
                                         color={isSorted ? "blue.500" : "gray.400"}
                                         fontSize="11px"
                                         transition="transform 0.2s"

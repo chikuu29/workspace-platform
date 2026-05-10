@@ -11,7 +11,7 @@ import {
   Portal,
   Menu,
 } from "@chakra-ui/react";
-import { MdNotificationsNone } from "react-icons/md";
+import { Bell } from "lucide-react";
 import { HSeparator } from "../separator/Separator";
 import Notifications from "../Notifications/Notifications";
 
@@ -81,7 +81,7 @@ const NotificationMenu: React.FC = () => {
       <Menu.Trigger asChild>
         <IconButton aria-label="Notifications" variant="ghost" size="md" {...navActionButton}>
           <Box position="relative">
-            <Icon boxSize={{ base: 5, md: 6 }} as={MdNotificationsNone} />
+            <Icon boxSize={{ base: 5, md: 6 }} as={Bell} />
             {notificationsCount > 0 && (
               <Badge
                 position="absolute"

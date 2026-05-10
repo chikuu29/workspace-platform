@@ -12,12 +12,7 @@ import {
     Button,
     Avatar,
 } from "@chakra-ui/react";
-import {
-    LuShield,
-    LuRefreshCw,
-    LuMail,
-    LuShieldAlert,
-} from "react-icons/lu";
+import { Shield, RefreshCw, Mail, ShieldAlert } from "lucide-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/store";
 import { GETAPI, PUTAPI } from "@/app/api";
@@ -41,7 +36,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 const ACCESS_ACTIONS: UserCardAction[] = [
     {
         label: "Manage Access",
-        icon: <LuShieldAlert />,
+        icon: <ShieldAlert />,
         colorPalette: "purple",
         actionType: "MANAGE_ACCESS",
     },
@@ -160,7 +155,7 @@ const OrganizationAccessView = memo(() => {
                             onClick={fetchData}
                             loading={isLoading}
                         >
-                            <LuRefreshCw />
+                            <RefreshCw />
                         </IconButton>
                     }
                 />
@@ -213,7 +208,7 @@ const OrganizationAccessView = memo(() => {
                                             {selectedUser.first_name} {selectedUser.last_name}
                                         </Text>
                                         <HStack fontSize="xs" color="app.text.muted" fontWeight="600">
-                                            <LuMail size={12} />
+                                            <Mail size={12} />
                                             <Text>{selectedUser.email}</Text>
                                         </HStack>
                                     </VStack>

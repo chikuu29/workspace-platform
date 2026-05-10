@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { FiMail, FiShield, FiLock, FiChevronLeft, FiArrowRight, FiCheckCircle } from "react-icons/fi";
+import { Mail, Shield, Lock, ChevronLeft, ArrowRight, CheckCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router";
 import { AuthCard } from "../components/AuthCard";
@@ -155,7 +155,7 @@ const ForgotPassword = () => {
             <VStack gap={4} align="stretch">
               <AuthFormInput
                 label="Email Address"
-                icon={<FiMail size={17} />}
+                icon={<Mail size={17} />}
                 error={errors.email?.message}
                 required
                 inputProps={{
@@ -182,7 +182,7 @@ const ForgotPassword = () => {
                 color="white"
                 _hover={{ transform: "translateY(-1px)", boxShadow: "lg" }}
               >
-                Send Reset Code <FiArrowRight style={{ marginLeft: "8px" }} />
+                Send Reset Code <ArrowRight style={{ marginLeft: "8px" }} />
               </Button>
             </VStack>
           </MotionBox>
@@ -203,7 +203,7 @@ const ForgotPassword = () => {
               </Text>
               <AuthFormInput
                 label="Verification Code"
-                icon={<FiShield size={17} />}
+                icon={<Shield size={17} />}
                 error={errors.otp?.message}
                 required
                 inputProps={{
@@ -231,7 +231,7 @@ const ForgotPassword = () => {
                 color="white"
                 _hover={{ transform: "translateY(-1px)", boxShadow: "lg" }}
               >
-                Verify Code <FiArrowRight style={{ marginLeft: "8px" }} />
+                Verify Code <ArrowRight style={{ marginLeft: "8px" }} />
               </Button>
               <Button
                 variant="ghost"
@@ -258,7 +258,7 @@ const ForgotPassword = () => {
             <VStack gap={4} align="stretch">
               <AuthFormInput
                 label="New Password"
-                icon={<FiLock size={17} />}
+                icon={<Lock size={17} />}
                 isPassword
                 error={errors.new_password?.message}
                 required
@@ -272,7 +272,7 @@ const ForgotPassword = () => {
               />
               <AuthFormInput
                 label="Confirm Password"
-                icon={<FiLock size={17} />}
+                icon={<Lock size={17} />}
                 isPassword
                 error={errors.confirm_password?.message}
                 required
@@ -317,7 +317,7 @@ const ForgotPassword = () => {
           >
             <VStack gap={6}>
               <Box color="green.400">
-                <FiCheckCircle size={60} />
+                <CheckCircle size={60} />
               </Box>
               <VStack gap={2}>
                 <Text fontSize="xl" fontWeight="bold" color="auth.text.primary">
@@ -354,7 +354,7 @@ const ForgotPassword = () => {
         step === "RESET" ? "Secure your account" :
         "Operation completed"
       }
-      icon={<FiShield size={30} color="#6366f1" />}
+      icon={<Shield size={30} color="#6366f1" />}
     >
       <VStack gap={6} width="100%">
         {step !== "SUCCESS" && step !== "EMAIL" && (
@@ -369,7 +369,7 @@ const ForgotPassword = () => {
               _hover={{ color: "auth.text.accent" }}
               onClick={handleBack}
             >
-              <FiChevronLeft /> Back
+              <ChevronLeft /> Back
             </chakra.button>
           </Flex>
         )}

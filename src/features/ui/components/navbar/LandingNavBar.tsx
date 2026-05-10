@@ -13,9 +13,8 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { GrDocumentStore } from "react-icons/gr";
+import { Store, ChevronDown, ChevronRight, Menu, X } from "lucide-react";
 import { Link } from "react-router";
-import { LuChevronDown, LuChevronRight, LuMenu, LuX } from 'react-icons/lu';
 export default function WithSubnavigation() {
   const { open, onToggle } = useDisclosure();
   const navColor = useColorModeValue("gray.600", "white");
@@ -40,11 +39,11 @@ export default function WithSubnavigation() {
           ml={{ base: -2 }}
           display={{ base: "flex", md: "none" }}
         >
-          <IconButton onClick={onToggle} variant={"ghost"} aria-label={"Toggle Navigation"}>{open ? <Icon as={LuX} w={3} h={3} /> : <Icon as={LuMenu} w={5} h={5} />}</IconButton>
+          <IconButton onClick={onToggle} variant={"ghost"} aria-label={"Toggle Navigation"}>{open ? <Icon as={X} w={3} h={3} /> : <Icon as={Menu} w={5} h={5} />}</IconButton>
         </Flex>
         <Flex flex={{ base: 1 }} justify={{ base: "center", md: "start" }}>
           <Icon h="24px" w="24px" color="white" mr={2}>
-            <GrDocumentStore />
+            <Store />
           </Icon>
           <Text
             textAlign={useBreakpointValue({ base: "center", md: "left" })}
@@ -172,7 +171,7 @@ const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
             flex={1}
           >
             <Icon color={"pink.400"} w={5} h={5}>
-              <LuChevronRight />
+              <ChevronRight />
             </Icon>
           </Flex>
         </Stack>
@@ -223,7 +222,7 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
               w={6}
               h={6}
             >
-              <LuChevronDown />
+              <ChevronDown />
             </Icon>
           )}
         </a></Box>

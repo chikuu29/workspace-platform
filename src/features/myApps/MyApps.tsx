@@ -15,8 +15,7 @@ import { memo, useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
-import { FiSearch } from "react-icons/fi";
-import { LuChevronRight, LuLayoutGrid, LuSearch } from "react-icons/lu";
+import { Search, ChevronRight, LayoutGrid } from "lucide-react";
 import * as dynamicFunctions from "../../script/myAppsScript";
 import { InputGroup } from "@/components/ui/input-group";
 import { useColorModeValue } from "@/components/ui/color-mode";
@@ -117,7 +116,7 @@ const AppCard: React.FC<AppCardProps> = memo(
                 />
               )}
             </Box>
-            <Icon as={LuChevronRight} color="app.text.muted" opacity={0.4} />
+            <Icon as={ChevronRight} color="app.text.muted" opacity={0.4} />
           </Flex>
 
           <VStack align="start" gap={1}>
@@ -224,7 +223,7 @@ function MyApps() {
           <Flex justify="space-between" align="center" gap={4} wrap="wrap">
             <Flex align="center" gap={3}>
               <Center p={2} bg="brand.500" borderRadius="lg" color="white">
-                <Icon as={LuLayoutGrid} boxSize={5} />
+                <Icon as={LayoutGrid} boxSize={5} />
               </Center>
               <VStack align="start" gap={0}>
                 <Text fontSize="lg" fontWeight="bold" lineHeight="1.2">
@@ -239,7 +238,7 @@ function MyApps() {
             <Box>
               <InputGroup
                 flex="1"
-                startElement={<Icon as={LuSearch} color="gray.400" />}
+                startElement={<Icon as={Search} color="gray.400" />}
               >
                 <Input
                   placeholder="Search apps..."
@@ -317,7 +316,7 @@ function MyApps() {
             py={20}
             opacity={0.6}
           >
-            <Icon as={FiSearch} boxSize={10} mb={4} color="app.text.muted" />
+            <Icon as={Search} boxSize={10} mb={4} color="app.text.muted" />
             <Text fontWeight="600" color="app.text.primary">
               No apps found
             </Text>

@@ -64,6 +64,7 @@ const AuthUsers: React.FC = () => {
         path: "/account/organization/users",
         params: { page, limit: pagination.limit },
         isPrivateApi: true,
+        serverName: 'identity'
       }).subscribe({
         next: (res: any) => {
           if (res.success) {

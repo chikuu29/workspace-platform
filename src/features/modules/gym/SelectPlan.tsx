@@ -29,7 +29,7 @@ import {
     Icon,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { useNavigate, useLocation, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import {
     LuArrowLeft,
     LuArrowRight,
@@ -49,7 +49,7 @@ import { useSubscriptionPlans } from "./hooks/useSubscriptionPlans";
 import { GymApiService } from "./services/gymApi.service";
 import { useNavActionStore } from "@/core/store/useNavActionStore";
 import { PageLayout } from "@/core/components/PageLayout";
-import { useGymNavigation } from "./utils/useGymNavigation";
+import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 import type { SubscriptionPlanDocument, ActivateSubscriptionPayload } from "./types/Gym.types";
 
 // ─── Constants ──────────────────────────────────────────────────────────────
@@ -221,20 +221,11 @@ PlanCard.displayName = "PlanCard";
 
 const EmptyPlansState = memo(() => {
     const muted = useColorModeValue("gray.500", "gray.400");
-    const navigate = useNavigate();
-    const { pathname } = useLocation();
-    const { appCode } = useParams();
-    const appName = appCode || "myGym";
-    const workspacePrefix = pathname.includes("/workspace")
-        ? `${pathname.split("/workspace")[0]}/workspace`
-        : "";
+    const { navigateTo } = useWorkspaceRouter();
 
     const handleCreatePlan = useCallback(() => {
-        const path = appCode
-            ? `${workspacePrefix}/app/${appCode}/AddSubscriptionPlan`
-            : `${workspacePrefix}/AddSubscriptionPlan?app=${appName}`;
-        navigate(path);
-    }, [appCode, appName, workspacePrefix, navigate]);
+        navigateTo("AddSubscriptionPlan");
+    }, [navigateTo]);
 
     return (
         <Card p={12} borderRadius="3xl" bg={useColorModeValue("white", "rgba(15, 23, 42, 0.65)")} backdropFilter="blur(20px)" border="1px solid" borderColor={useColorModeValue("gray.100", "whiteAlpha.100")}>
@@ -284,14 +275,7 @@ const SelectPlan = memo(() => {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // ── Navigation ──
-    const {
-        workspacePrefix,
-        appCode,
-        goToMembers,
-        goBack
-    } = useGymNavigation();
-
-    const appName = appCode || "myGym";
+    const { navigateTo, goBack } = useWorkspaceRouter();
 
     const memberName = useMemo(() => {
         const d = member?.data;
@@ -316,8 +300,8 @@ const SelectPlan = memo(() => {
 
     // ── Handlers ──
     const handleBack = useCallback(() => {
-        goToMembers();
-    }, [goToMembers]);
+        navigateTo("members");
+    }, [navigateTo]);
 
     const handleSelectPlan = useCallback((plan: SubscriptionPlanDocument) => {
         setSelectedPlan(plan);
@@ -332,19 +316,21 @@ const SelectPlan = memo(() => {
     }, []);
 
     const handleConfirm = useCallback(() => {
+        const effectiveMemberId = member?.data?.member_id || memberId;
+
         if (!selectedPlan) {
             toaster.create({ title: "Select a Plan", description: "Pick a subscription plan first.", type: "warning" });
             return;
         }
-        if (!memberId) {
-            toaster.create({ title: "No Member", description: "Member ID is missing from the URL.", type: "error" });
+        if (!effectiveMemberId) {
+            toaster.create({ title: "No Member", description: "Member ID is missing.", type: "error" });
             return;
         }
 
         setIsSubmitting(true);
 
         const payload: ActivateSubscriptionPayload = {
-            member_id: memberId,
+            member_id: effectiveMemberId,
             plan_code: selectedPlan.data.code,
             start_date: startDate,
             is_paid: isPaid,
@@ -380,7 +366,7 @@ const SelectPlan = memo(() => {
         });
 
         return () => sub.unsubscribe();
-    }, [selectedPlan, memberId, startDate, isPaid, total, memberName, handleBack]);
+    }, [selectedPlan, memberId, member?.data?.member_id, startDate, isPaid, total, memberName, handleBack]);
 
     // ── Theme & Styles ──
     const muted = useColorModeValue("gray.500", "gray.400");
@@ -393,17 +379,6 @@ const SelectPlan = memo(() => {
     useEffect(() => {
         setNavActions(
             <HStack gap={3}>
-                {/* <Button
-                    variant="outline"
-                    borderRadius="xl"
-                    size="md"
-                    onClick={handleBack}
-                    fontWeight="800"
-                    h="40px"
-                    _hover={{ bg: "whiteAlpha.100" }}
-                >
-                    <LuArrowLeft size={16} /> Cancel
-                </Button> */}
                 <Button
                     // colorPalette="brand"
                     size="md"
@@ -412,7 +387,7 @@ const SelectPlan = memo(() => {
                     // borderRadius="xl"
                     fontWeight="900"
                     onClick={handleConfirm}
-                    disabled={!selectedPlan || isSubmitting}
+                    disabled={!selectedPlan || isSubmitting || !member}
                     // bg="brand.500"
                     // boxShadow="0 8px 16px -4px var(--chakra-colors-brand-500)"
                     _hover={{
@@ -430,7 +405,43 @@ const SelectPlan = memo(() => {
             </HStack>
         );
         return () => clearNavActions();
-    }, [setNavActions, clearNavActions, handleBack, handleConfirm, selectedPlan, isSubmitting]);
+    }, [setNavActions, clearNavActions, handleBack, handleConfirm, selectedPlan, isSubmitting, member]);
+
+    // ── Not found ──
+    if (!memberLoading && !member) {
+        return (
+            <PageLayout
+                title="Member Not Found"
+                subtitle={`No profile found for ID: ${memberId || "Unknown"}.`}
+            >
+                <Card p={12} borderRadius="3xl" bg={useColorModeValue("white", "rgba(15, 23, 42, 0.65)")} backdropFilter="blur(20px)" border="1px solid" borderColor={useColorModeValue("gray.100", "whiteAlpha.100")}>
+                    <VStack gap={6} textAlign="center">
+                        <Circle size={20} bg="red.500/10" color="red.500">
+                            <LuShieldCheck size={32} />
+                        </Circle>
+                        <VStack gap={1}>
+                            <Heading size="xl" fontWeight="900">Profile Unavailable</Heading>
+                            <Text color={muted} fontWeight="600" fontSize="lg">
+                                We couldn't find a member profile matching the ID: <Text as="span" color="app.text.primary" fontWeight="900">"{memberId}"</Text>.
+                            </Text>
+                        </VStack>
+                        <Button 
+                            colorPalette="brand" 
+                            size="lg" 
+                            px={10} 
+                            borderRadius="2xl" 
+                            fontWeight="900" 
+                            onClick={handleBack}
+                            bg="brand.500"
+                            _hover={{ transform: "translateY(-2px)" }}
+                        >
+                            <LuArrowLeft size={18} /> Back to Directory
+                        </Button>
+                    </VStack>
+                </Card>
+            </PageLayout>
+        );
+    }
 
     return (
         <PageLayout

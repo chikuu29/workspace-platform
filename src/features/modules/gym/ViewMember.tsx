@@ -25,7 +25,7 @@ import {
 } from "@chakra-ui/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { useLocation, useNavigate, useParams, useSearchParams } from "react-router";
+import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 import {
   LuActivity,
   LuArrowRight,
@@ -337,27 +337,12 @@ const MemberTile = memo(({
 MemberTile.displayName = "MemberTile";
 
 const ViewMember = memo(() => {
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const { appCode } = useParams();
-  const [searchParams] = useSearchParams();
+  const { navigateTo } = useWorkspaceRouter();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<MemberFilter>("all");
 
   const { members, total, loading, refresh } = useGymMembers();
-
-  const appParam = searchParams.get("app");
-  const appName = useMemo(() => appCode || appParam || "myGym", [appCode, appParam]);
-  const prefix = useMemo(
-    () => (pathname.includes("/workspace") ? `${pathname.split("/workspace")[0]}/workspace` : ""),
-    [pathname]
-  );
-
-  const navigateTo = useCallback((view: string) => {
-    const path = appCode ? `${prefix}/app/${appCode}/${view}` : `${prefix}/${view}?app=${appName}`;
-    navigate(path);
-  }, [appCode, appName, navigate, prefix]);
 
   const mountNavActions = useNavActionStore((state) => state.setActions);
   const unmountNavActions = useNavActionStore((state) => state.clearActions);

@@ -25,7 +25,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { useLocation, useNavigate, useParams, useSearchParams } from "react-router";
+import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 import {
   LuActivity,
   LuArrowRight,
@@ -207,24 +207,9 @@ const AlertRow = memo(({
 AlertRow.displayName = "AlertRow";
 
 const GymManagementDashboard = memo(() => {
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const { appCode } = useParams();
-  const [searchParams] = useSearchParams();
+  const { navigateTo } = useWorkspaceRouter();
 
   const { stats, loading } = useGymDashboard();
-
-  const appParam = searchParams.get("app");
-  const appName = useMemo(() => appCode || appParam || "myGym", [appCode, appParam]);
-  const prefix = useMemo(
-    () => (pathname.includes("/workspace") ? `${pathname.split("/workspace")[0]}/workspace` : ""),
-    [pathname]
-  );
-
-  const navigateTo = useCallback((view: string) => {
-    const path = appCode ? `${prefix}/app/${appCode}/${view}` : `${prefix}/${view}?app=${appName}`;
-    navigate(path);
-  }, [appCode, appName, navigate, prefix]);
 
   const kpis = stats?.kpis;
   const totalMembers = kpis?.total_members || 0;

@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 import {
   LuActivity, LuArrowLeft, LuCalendarDays, LuCheck, LuCreditCard,
   LuDumbbell, LuFileText, LuFingerprint, LuMail, LuMapPin,
@@ -25,7 +25,7 @@ import { useGymMember } from "./hooks/useGymMember";
 import type { MemberDocument } from "./types/Gym.types";
 import { useNavActionStore } from "@/core/store/useNavActionStore";
 import { useEffect } from "react";
-import { useGymNavigation } from "./utils/useGymNavigation";
+import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 
 // ─── Status Config ──────────────────────────────────────────────────
 
@@ -97,14 +97,10 @@ ActionRow.displayName = "ActionRow";
 // ─── Main Component ─────────────────────────────────────────────────
 
 const MemberDetail = memo(() => {
-  const navigate = useNavigate();
   const { params: memberId } = useParams();
   const { member, loading, refresh } = useGymMember(memberId);
 
-  const {
-    goToSelectPlan,
-    goBack
-  } = useGymNavigation();
+  const { navigateTo, goBack } = useWorkspaceRouter();
 
   const name = useMemo(() => getName(member?.data), [member]);
   const status = (member?.data.status || "frozen") as StatusKey;
@@ -117,8 +113,8 @@ const MemberDetail = memo(() => {
 
   const handleAssignPlan = useCallback(() => {
     if (!memberId) return;
-    goToSelectPlan(memberId);
-  }, [goToSelectPlan, memberId]);
+    navigateTo("selectPlan", memberId);
+  }, [navigateTo, memberId]);
 
   // ── Days remaining calc ──
   const daysRemaining = useMemo(() => {

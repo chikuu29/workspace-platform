@@ -12,7 +12,7 @@ import {
   Grid, GridItem,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { useNavigate, useLocation, useParams, useSearchParams } from "react-router";
+import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 import {
   DrawerRoot, DrawerContent, DrawerHeader, DrawerBody, DrawerFooter,
   DrawerBackdrop, DrawerCloseTrigger,
@@ -152,15 +152,7 @@ const GymSubscriptionPlans = memo(() => {
   const [isSaving, setIsSaving] = useState(false);
   const [activeFilter, setActiveFilter] = useState<PlanFilter>("all");
 
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const { appCode } = useParams();
-  const [searchParams] = useSearchParams();
-
-  const appParam = searchParams.get("app");
-  const appName = appCode || appParam || "myGym";
-  const workspacePrefix = pathname.includes("/workspace")
-    ? `${pathname.split("/workspace")[0]}/workspace` : "";
+  const { navigateTo } = useWorkspaceRouter();
 
   const muted = useColorModeValue("gray.500", "gray.400");
   const borderColor = useColorModeValue("rgba(226,232,240,0.84)", "rgba(255,255,255,0.12)");
@@ -185,11 +177,8 @@ const GymSubscriptionPlans = memo(() => {
 
   // ── Handlers ──
   const handleAddClick = useCallback(() => {
-    const path = appCode
-      ? `${workspacePrefix}/app/${appCode}/AddSubscriptionPlan`
-      : `${workspacePrefix}/AddSubscriptionPlan?app=${appName}`;
-    navigate(path);
-  }, [appCode, appName, workspacePrefix, navigate]);
+    navigateTo("AddSubscriptionPlan");
+  }, [navigateTo]);
 
   const handleEditClick = useCallback((plan: SubscriptionPlanDocument) => {
     setSelectedPlan(plan);

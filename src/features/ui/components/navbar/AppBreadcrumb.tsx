@@ -1,7 +1,7 @@
-import { ColorModeButton, useColorModeValue } from "@/components/ui/color-mode";
+import { useColorModeValue } from "@/components/ui/color-mode";
 import { useNavActionStore } from "@/core/store/useNavActionStore";
-import { FullscreenButton } from "@/components/ui/fullscreen-button";
-import { Box, Breadcrumb, Flex, HStack, IconButton, Text } from "@chakra-ui/react";
+
+import { Box, Breadcrumb, Flex, HStack, Text } from "@chakra-ui/react";
 import React, { forwardRef, useEffect, useState, useMemo } from "react";
 import {
   LuArrowLeft,
@@ -20,6 +20,7 @@ import {
   useParams,
   useSearchParams,
 } from "react-router";
+import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 
 interface ConfigItem {
   path: string;
@@ -28,12 +29,10 @@ interface ConfigItem {
 }
 
 const AppBreadcrumb = forwardRef((props, ref) => {
-  const { appCode, view, secondaryView } = useParams();
+  const { view, secondaryView } = useParams();
   const [searchParams] = useSearchParams();
-  const appParam = searchParams.get("app");
-  const appName = useMemo(() => appCode || appParam || "Default", [appCode, appParam]);
   const { pathname } = useLocation();
-  const navigate = useNavigate();
+  const { appName, appCode, workspacePrefix, buildPath, goBack } = useWorkspaceRouter();
   const breadcrumbActions = useNavActionStore((state) => state.actions);
 
   const [config, setConfig] = useState<ConfigItem[]>([
@@ -58,26 +57,24 @@ const AppBreadcrumb = forwardRef((props, ref) => {
     } else if (!view && !appCode) {
       newConfig.push({ path: "#", label: "MyApps", icon: <LuLayers size="14" /> });
     } else {
-      const appBasePath = appCode ? `/app/${appCode}/home` : `/?app=${appName}`;
+      // App root path — delegated to shared buildPath utility
       newConfig.push({
-        path: `${pathname.split("/workspace")[0]}/workspace${appBasePath}`,
+        path: buildPath("home"),
         label: appName,
         icon: <LuBox size="14" />
       });
 
       if (view && view !== "home") {
-        const viewPath = appCode ? `/app/${appCode}/${view}` : `/${view}?app=${appName}`;
         newConfig.push({
-          path: `${pathname.split("/workspace")[0]}/workspace${viewPath}`,
+          path: buildPath(view),
           label: view,
           icon: <LuLayoutDashboard size="14" />
         });
       }
 
       if (secondaryView) {
-        const secondaryPath = appCode ? `/app/${appCode}/${view}/${secondaryView}` : `/${view}/${secondaryView}?app=${appName}`;
         newConfig.push({
-          path: `${pathname.split("/workspace")[0]}/workspace${secondaryPath}`,
+          path: buildPath(view || "", secondaryView),
           label: secondaryView,
           icon: <LuLayers size="14" />
         });
@@ -85,7 +82,9 @@ const AppBreadcrumb = forwardRef((props, ref) => {
     }
 
     setConfig(newConfig);
-  }, [pathname, view, secondaryView, appName, appCode]);
+  }, [pathname, view, secondaryView, appName, appCode, buildPath]);
+
+  const navigate = useNavigate();
 
   const handleNavigate = (c: ConfigItem, isLast: boolean) => {
     if (!isLast) navigate(c.path);
@@ -95,9 +94,7 @@ const AppBreadcrumb = forwardRef((props, ref) => {
   const inactiveColor = useColorModeValue("gray.500", "whiteAlpha.500");
   const hoverBg = useColorModeValue("blue.50", "whiteAlpha.100");
   const borderColorValue = useColorModeValue("gray.100", "whiteAlpha.100");
-  const bgValue = useColorModeValue("white/90", "rgba(15, 23, 42, 0.9)");
-  const controlsBg = useColorModeValue("gray.50", "whiteAlpha.50");
-  const controlsBorder = useColorModeValue("gray.100", "whiteAlpha.100");
+
 
   return (
     <Box
@@ -129,7 +126,7 @@ const AppBreadcrumb = forwardRef((props, ref) => {
                 rounded="lg"
                 transition="all 0.2s"
                 cursor="pointer"
-                onClick={() => navigate(-1)}
+                onClick={goBack}
                 _hover={{ bg: hoverBg, transform: "translateY(-1px)" }}
                 color={inactiveColor}
                 minW="fit-content"

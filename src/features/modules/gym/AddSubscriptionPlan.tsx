@@ -27,7 +27,7 @@ import {
     VStack,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { useNavigate, useLocation, useParams, useSearchParams } from "react-router";
+import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 import {
     LuArrowLeft,
     LuCheck,
@@ -120,7 +120,7 @@ const PreviewCard = memo(({
 
                 {/* Description */}
                 {description && (
-                    <Text fontSize="sm" color={muted} lineHeight="tall" noOfLines={2}>
+                    <Text fontSize="sm" color={muted} lineHeight="tall" lineClamp={2}>
                         {description}
                     </Text>
                 )}
@@ -197,10 +197,7 @@ SectionHeader.displayName = "SectionHeader";
 // ─── Main Component ─────────────────────────────────────────────────────────
 
 const AddSubscriptionPlan = memo(() => {
-    const navigate = useNavigate();
-    const { pathname } = useLocation();
-    const { appCode } = useParams();
-    const [searchParams] = useSearchParams();
+    const { navigateTo } = useWorkspaceRouter();
 
     // ── Form state ──
     const [name, setName] = useState("");
@@ -214,13 +211,6 @@ const AddSubscriptionPlan = memo(() => {
     const [isActive, setIsActive] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // ── Derived ──
-    const appName = appCode || searchParams.get("app") || "myGym";
-    const workspacePrefix = useMemo(() => {
-        if (!pathname.includes("/workspace")) return "";
-        return `${pathname.split("/workspace")[0]}/workspace`;
-    }, [pathname]);
-
     const validationErrors = useMemo(() => {
         const errors: string[] = [];
         if (!name.trim()) errors.push("Plan name is required");
@@ -233,11 +223,8 @@ const AddSubscriptionPlan = memo(() => {
 
     // ── Navigation ──
     const handleBack = useCallback(() => {
-        const back = appCode
-            ? `${workspacePrefix}/app/${appCode}/GymSubscriptionPlans`
-            : `${workspacePrefix}/GymSubscriptionPlans?app=${appName}`;
-        navigate(back);
-    }, [appCode, appName, workspacePrefix, navigate]);
+        navigateTo("GymSubscriptionPlans");
+    }, [navigateTo]);
 
     // ── Feature management ──
     const handleAddFeature = useCallback(() => setFeatures((p) => [...p, ""]), []);

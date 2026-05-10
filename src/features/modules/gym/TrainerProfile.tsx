@@ -12,7 +12,8 @@ import {
 } from "@chakra-ui/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { useNavigate, useSearchParams } from "react-router";
+import { useSearchParams } from "react-router";
+import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 import {
   LuActivity, LuArrowLeft, LuCalendarDays, LuCheck, LuCreditCard,
   LuDumbbell, LuFileText, LuFingerprint, LuMail, LuMapPin,
@@ -94,7 +95,7 @@ ActionRow.displayName = "ActionRow";
 // ─── Main Component ─────────────────────────────────────────────────
 
 const TrainerProfile = memo(() => {
-  const navigate = useNavigate();
+  const { goBack } = useWorkspaceRouter();
   const [searchParams] = useSearchParams();
   const trainerId = searchParams.get("trainer_id");
   const { trainer, loading, refresh } = useGymTrainer(trainerId || undefined);
@@ -103,7 +104,7 @@ const TrainerProfile = memo(() => {
   const status = (trainer?.data.status || "active") as StatusKey;
   const sm = STATUS_META[status] || STATUS_META.active;
 
-  const handleBack = useCallback(() => navigate(-1), [navigate]);
+  const handleBack = useCallback(() => goBack(), [goBack]);
 
   const heroBg = useColorModeValue(
     "linear-gradient(135deg, rgba(239,246,255,0.98), rgba(255,255,255,0.94) 50%, rgba(236,253,245,0.9))",

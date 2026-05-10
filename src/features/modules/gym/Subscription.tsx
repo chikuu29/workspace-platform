@@ -22,7 +22,7 @@ import {
     IconButton,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { useLocation, useNavigate, useParams, useSearchParams } from "react-router";
+import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 import {
     LuArrowRight,
     LuBadgeDollarSign,
@@ -229,22 +229,7 @@ PlanSummaryCard.displayName = "PlanSummaryCard";
 // ─── Main ───────────────────────────────────────────────────────────────────
 
 const Subscription = () => {
-    const navigate = useNavigate();
-    const { pathname } = useLocation();
-    const { appCode } = useParams();
-    const [searchParams] = useSearchParams();
-
-    const appParam = searchParams.get("app");
-    const appName = useMemo(() => appCode || appParam || "myGym", [appCode, appParam]);
-    const workspacePrefix = useMemo(() => {
-        if (!pathname.includes("/workspace")) return "";
-        return `${pathname.split("/workspace")[0]}/workspace`;
-    }, [pathname]);
-
-    const buildViewPath = useCallback((viewName: string) => {
-        if (appCode) return `${workspacePrefix}/app/${appCode}/${viewName}`;
-        return `${workspacePrefix}/${viewName}?app=${appName}`;
-    }, [appCode, appName, workspacePrefix]);
+    const { navigateTo, buildPath } = useWorkspaceRouter();
 
     // ── Data ──
     const { plans, loading: plansLoading, refetch: refetchPlans } = useSubscriptionPlans();
@@ -257,12 +242,12 @@ const Subscription = () => {
 
     // ── Navigation handlers ──
     const handleCreatePlan = useCallback(() => {
-        navigate(buildViewPath("AddSubscriptionPlan"));
-    }, [navigate, buildViewPath]);
+        navigateTo("AddSubscriptionPlan");
+    }, [navigateTo]);
 
     const handleManagePlans = useCallback(() => {
-        navigate(buildViewPath("GymSubscriptionPlans"));
-    }, [navigate, buildViewPath]);
+        navigateTo("GymSubscriptionPlans");
+    }, [navigateTo]);
 
     const mountNavActions = useNavActionStore((state) => state.setActions);
     const unmountNavActions = useNavActionStore((state) => state.clearActions);
@@ -309,8 +294,8 @@ const Subscription = () => {
     }, [mountNavActions, unmountNavActions, handleRefresh, handleManagePlans, handleCreatePlan, plansLoading, statsLoading]);
 
     const handleViewMembers = useCallback(() => {
-        navigate(buildViewPath("members"));
-    }, [navigate, buildViewPath]);
+        navigateTo("members");
+    }, [navigateTo]);
 
     // ── Plan ↔ stats map for member counts ──
     const planStatsMap = useMemo(() => {

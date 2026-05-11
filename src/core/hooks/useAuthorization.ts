@@ -43,7 +43,6 @@ export function useAuthorization(
                 return false;
             });
         };
-
         if (requireAll) {
             return reqPermsArray.every(checkPermission);
         } else {

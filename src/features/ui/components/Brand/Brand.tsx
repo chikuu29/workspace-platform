@@ -32,7 +32,8 @@ export default function Brand() {
         <Image
           src="/assets/icons/workspace-logo.svg"
           alt="Workspace Logo"
-
+          loading="eager"
+          fetchPriority="high"
           h={{ base: "38px", sm: "44px", md: "52px" }}
           maxW={{ base: "128px", sm: "172px", md: "260px" }}
           w="auto"

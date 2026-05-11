@@ -15,6 +15,7 @@
   "dependencies": {
     "@chakra-ui/cli": "^3.33.0",
     "@chakra-ui/react": "^3.33.0",
+    "@internationalized/date": "^3.12.1",
     "@reduxjs/toolkit": "^2.5.1",
     "@tanstack/react-virtual": "^3.13.24",
     "@types/canvas-confetti": "^1.9.0",

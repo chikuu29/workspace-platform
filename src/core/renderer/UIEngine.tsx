@@ -41,10 +41,13 @@ const UIEngineComponent: React.FC<UIEngineProps> = ({ config, initialData = EMPT
     // );
     // const hasMountedRef = useRef(false);
 
-   console.log("Initial Data:", initialData);
+    console.log("Initial Data:", initialData);
     const methods = useForm({
         defaultValues: initialData,
-        mode: "onSubmit" // Change to onSubmit
+        mode: "onSubmit",
+        // Keep field registrations alive even when tabs haven't been visited yet (lazy mount)
+        // Without this, unvisited tabs would silently pass validation since their fields never register.
+        shouldUnregister: false,
     });
 
     const { watch } = methods;
@@ -226,8 +229,8 @@ const UIEngineComponent: React.FC<UIEngineProps> = ({ config, initialData = EMPT
                                     _active={{ transform: "translateY(0px)" }}
                                     transition="all 0.2s"
                                     onClick={() => setAlertOpen(false)}
-                                    rounded="xl"
-                                    shadow="lg"
+                                    rounded="sm"
+                                    // shadow="lg"
                                     fontWeight="800"
                                     fontSize="md"
                                 >

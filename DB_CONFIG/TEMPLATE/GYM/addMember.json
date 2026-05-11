@@ -120,7 +120,7 @@
                                 "text": "Gender",
                                 "description": "Select the member's gender for facilities allocation",
                                 "widget": "radioField",
-                                "mandatory":true,
+                                "mandatory": true,
                                 "oneLiner": true,
                                 "enableClear": true,
                                 "options": [
@@ -204,7 +204,6 @@
                                     "uploadURL": "app/upload"
                                 }
                             }
-                            
                         ]
                     }
                 ]

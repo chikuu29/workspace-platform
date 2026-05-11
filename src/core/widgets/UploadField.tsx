@@ -167,6 +167,9 @@ const UploadField = ({
           isPrivateApi: true,
           data: {
             process_name: name,
+            accept,
+            max_size_bytes: defaultApiConfig?.maxSizeBytes ?? defaultApiConfig?.max_size_bytes,
+            max_files: defaultApiConfig?.maxFiles ?? defaultApiConfig?.max_files ?? (multiple ? 10 : 1),
             proxyUrl: proxyUrl,
           },
           files: selectedFiles,

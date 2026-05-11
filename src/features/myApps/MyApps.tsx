@@ -19,6 +19,7 @@ import { Search, ChevronRight, LayoutGrid } from "lucide-react";
 import * as dynamicFunctions from "../../script/myAppsScript";
 import { InputGroup } from "@/components/ui/input-group";
 import { useColorModeValue } from "@/components/ui/color-mode";
+import { useAuthorization } from "@/core/hooks/useAuthorization";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -165,13 +166,20 @@ function MyApps() {
   const [searchTerm, setSearchTerm] = useState("");
   const appList = useMemo(() => appConfig?.config?.appList ?? [], [appConfig]);
   const subscribed_apps = organizations?.organization?.subscribed_apps || [];
-
+ 
   const filteredApps = useMemo(() => {
     return appList.filter((app: any) => {
       const app_slug = app.app_slug || app.id;
+      let hasAccess = useAuthorization(app.required_permissions || [], true, true);
       // If the app is a specific APP_ module, check if the organization has an active subscription for it
       if (!subscribed_apps.includes(app_slug)) {
         if (user_type !== "SYSTEM") {
+          return false;
+        }
+      }
+       else {
+        console.log("hasAccess", hasAccess);
+        if (!hasAccess) {
           return false;
         }
       }

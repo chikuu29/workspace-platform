@@ -6,6 +6,7 @@
             {
                 "id": "SYSTEM",
                 "app_slug": "system",
+                "required_permissions": ["SYSTEM.VIEW.READ"],
                 "hidden": false,
                 "name": "Admin Module",
                 "target": "/workspace/app/system/home",
@@ -26,6 +27,7 @@
             {
                 "id": "MY_GYM",
                 "app_slug": "myGym",
+                "required_permissions": ["MYGYM.VIEW.READ"],
                 "hidden": false,
                 "name": "Gym Management",
                 "target": "/workspace/app/myGym/home",

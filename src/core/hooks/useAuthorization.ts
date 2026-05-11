@@ -8,6 +8,7 @@ import { RootState } from '@/app/store';
  * 
  * @param requiredPermissions - A single permission string or an array of permission strings to check.
  * @param requireAll - If true, the user must have ALL the required permissions. If false, ANY required permission is sufficient. default: false.
+ * allowedRootUser - If true, users with root or superuser status will automatically be authorized regardless of specific permissions. default: false.
  * @returns boolean indicating if the user is authorized.
  */
 export function useAuthorization(

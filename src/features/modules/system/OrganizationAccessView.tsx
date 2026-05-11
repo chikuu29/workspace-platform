@@ -68,6 +68,7 @@ const OrganizationAccessView = memo(() => {
         GETAPI({
             path: "/account/organization/users",
             isPrivateApi: true,
+serverName:'identity'
         }).subscribe({
             next: (res: any) => {
                 if (res.success) {
@@ -86,6 +87,7 @@ const OrganizationAccessView = memo(() => {
         GETAPI({
             path: "/account/roles",
             isPrivateApi: true,
+serverName:'identity'
         }).subscribe((res: any) => {
             if (res.success) setAvailableRoles(res.data || []);
         });
@@ -111,6 +113,7 @@ const OrganizationAccessView = memo(() => {
             path: `/account/users/${selectedUser.id}/roles`,
             data: { role_ids: selectedRoleIds },
             isPrivateApi: true,
+serverName:'identity'
         }).subscribe({
             next: (res: any) => {
                 if (res.success) {

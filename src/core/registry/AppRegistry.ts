@@ -60,36 +60,36 @@ const registry: RegistryConfig = {
         home: () => import("@/features/modules/system/PlatformView"),
         DatabaseStatistics: {
             component: () => import("@/features/modules/system/DatabaseStatisticsView"),
-            permissions: "SYSTEM_ADMINISTRATOR.SYSTEM.*",
+            permissions: "SYSTEM.ADMINISTRATOR.*",
         },
         ApplicationClients: {
             component: () => import("@/features/modules/system/OAuthView"),
-            permissions: "SYSTEM_ADMINISTRATOR.SYSTEM.*",
+            permissions: "SYSTEM.ADMINISTRATOR.*",
         },
         AuthUsers: () => import("@/features/modules/system/AuthUser"),
         Organizations: {
             component: () => import("@/features/modules/system/OrganizationView"),
-            permissions: "SYSTEM_ADMINISTRATOR.SYSTEM.*",
+            permissions: "SYSTEM.ADMINISTRATOR.*",
         },
         accesscontrol: {
             component: () => import("@/features/modules/system/AccessControlView"),
-            permissions: "SYSTEM_ADMINISTRATOR.SYSTEM.*",
+            permissions: "SYSTEM.ADMINISTRATOR.*",
         },
         SaasApps: {
             component: () => import("@/features/modules/system/SaasAppsView"),
-            permissions: "SYSTEM_ADMINISTRATOR.SYSTEM.*",
+            permissions: "SYSTEM.ADMINISTRATOR.*",
         },
         Features: {
             component: () => import("@/features/modules/system/FeaturesView"),
-            permissions: "SYSTEM_ADMINISTRATOR.SYSTEM.*",
+            permissions: "SYSTEM.ADMINISTRATOR.*",
         },
         Permissions: {
             component: () => import("@/features/modules/system/PermissionsView"),
-            permissions: "SYSTEM_ADMINISTRATOR.SYSTEM.*",
+            permissions: "SYSTEM.ADMINISTRATOR.*",
         },
         SubscriptionPlans: {
             component: () => import("@/features/modules/system/SubscriptionPlansView"),
-            permissions: "SYSTEM_ADMINISTRATOR.SYSTEM.*",
+            permissions: "SYSTEM.ADMINISTRATOR.*",
         },
         OrganizationRoles: {
             component: () => import("@/features/modules/system/OrganizationRolesView")

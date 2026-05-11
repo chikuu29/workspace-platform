@@ -57,7 +57,7 @@ const ADMIN_MODULES: AdminModule[] = [
     gradient: "linear-gradient(135deg,#6366f1,#8b5cf6)",
     accentColor: "purple",
     category: "Access & Security",
-    permissions: ["SYSTEM_ADMINISTRATOR.SYSTEM.*"],
+    permissions: ["SYSTEM.ADMINISTRATOR.*"],
   },
   {
     id: 2,
@@ -68,7 +68,7 @@ const ADMIN_MODULES: AdminModule[] = [
     gradient: "linear-gradient(135deg,#3b82f6,#6366f1)",
     accentColor: "blue",
     category: "Platform Settings",
-    permissions: ["SYSTEM_ADMINISTRATOR.SYSTEM.*"],
+    permissions: ["SYSTEM.ADMINISTRATOR.*"],
   },
   {
     id: 3,
@@ -99,7 +99,7 @@ const ADMIN_MODULES: AdminModule[] = [
     gradient: "linear-gradient(135deg,#06b6d4,#3b82f6)",
     accentColor: "cyan",
     category: "Products & Billing",
-    permissions: ["SYSTEM_ADMINISTRATOR.SYSTEM.*"],
+    permissions: ["SYSTEM.ADMINISTRATOR.*"],
   },
   {
     id: 6,
@@ -110,7 +110,7 @@ const ADMIN_MODULES: AdminModule[] = [
     gradient: "linear-gradient(135deg,#a855f7,#ec4899)",
     accentColor: "pink",
     category: "Products & Billing",
-    permissions: ["SYSTEM_ADMINISTRATOR.SYSTEM.*"],
+    permissions: ["SYSTEM.ADMINISTRATOR.*"],
   },
   {
     id: 7,
@@ -121,7 +121,7 @@ const ADMIN_MODULES: AdminModule[] = [
     gradient: "linear-gradient(135deg,#14b8a6,#22c55e)",
     accentColor: "teal",
     category: "Products & Billing",
-    permissions: ["SYSTEM_ADMINISTRATOR.SYSTEM.*"],
+    permissions: ["SYSTEM.ADMINISTRATOR.*"],
   },
   {
     id: 8,
@@ -132,7 +132,7 @@ const ADMIN_MODULES: AdminModule[] = [
     gradient: "linear-gradient(135deg,#64748b,#475569)",
     accentColor: "gray",
     category: "Platform Settings",
-    permissions: ["SYSTEM_ADMINISTRATOR.SYSTEM.*"],
+    permissions: ["SYSTEM.ADMINISTRATOR.*"],
   },
   {
     id: 9,
@@ -143,7 +143,7 @@ const ADMIN_MODULES: AdminModule[] = [
     gradient: "linear-gradient(135deg,#8b5cf6,#6366f1)",
     accentColor: "purple",
     category: "Access & Security",
-    permissions: ["SYSTEM_ADMINISTRATOR.SYSTEM.*"],
+    permissions: ["SYSTEM.ADMINISTRATOR.*"],
   },
   {
     id: 10,

@@ -379,12 +379,14 @@ const OrganizationRolesView = memo(() => {
     GETAPI({
       path: "/account/roles",
       isPrivateApi: true,
+      serverName:'identity'
     }).subscribe((res) => {
       if (res.success) setRoles(res.data || []);
 
       GETAPI({
         path: "/account/policies",
         isPrivateApi: true,
+        serverName:'identity'
       }).subscribe((policyRes: any) => {
         if (policyRes.success) setAvailablePolicies(policyRes.data || []);
         setIsLoading(false);
@@ -430,6 +432,7 @@ const OrganizationRolesView = memo(() => {
         PUTAPI({
           path: `/account/roles/${roleId}/policies`,
           data: { policy_ids: selectedPolicyIds },
+          serverName:'identity',
           isPrivateApi: true,
         }).subscribe((res) => {
           if (res.success) {
@@ -447,6 +450,7 @@ const OrganizationRolesView = memo(() => {
         PUTAPI({
           path: `/account/roles/${selectedRole.id}`,
           data: { role_name: role_name.trim(), description: description?.trim() || undefined },
+          serverName:'identity',
           isPrivateApi: true,
         }).subscribe((res) => {
           if (res.success) {
@@ -461,6 +465,7 @@ const OrganizationRolesView = memo(() => {
           path: "/account/roles",
           data: { role_name: role_name.trim(), description: description?.trim() || undefined },
           isPrivateApi: true,
+          serverName:'identity',
         }).subscribe((res) => {
           if (res.success && res.data?.id) {
             attachPolicies(res.data.id);
@@ -479,6 +484,7 @@ const OrganizationRolesView = memo(() => {
       DELETEAPI({
         path: `/account/roles/${id}`,
         isPrivateApi: true,
+        serverName:'identity',
       }).subscribe((res) => {
         if (res.success) {
           toaster.create({ title: "Role Deleted", type: "success" });

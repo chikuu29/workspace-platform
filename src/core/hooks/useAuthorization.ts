@@ -12,12 +12,16 @@ import { RootState } from '@/app/store';
  */
 export function useAuthorization(
     requiredPermissions: string | string[],
+    allowedRootUser:boolean=false,
     requireAll: boolean = false
 ): boolean {
     const permissions = useSelector((state: RootState) => state.rbac.permissions);
-
+    const {is_root_user,is_superuser}=useSelector((state: RootState) => state.rbac);
     return useMemo(() => {
+
         if (!requiredPermissions || requiredPermissions.length === 0) return true;
+        // if(is_root_user || is_superuser) return true;
+        if(allowedRootUser && (is_root_user || is_superuser)) return true;
 
         const reqPermsArray = Array.isArray(requiredPermissions)
             ? requiredPermissions

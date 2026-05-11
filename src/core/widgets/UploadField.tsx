@@ -189,6 +189,7 @@ const UploadField = ({
 
   const { open, onOpen, onClose } = useDisclosure();
   const methods = useFormContext();
+  const { getValues, register, setValue, trigger, unregister } = methods;
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -199,9 +200,40 @@ const UploadField = ({
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  const [uploadedFiles, setUploadedFiles] = useState<any[]>(
-    methods.watch(name) || []
-  );
+  const [uploadedFiles, setUploadedFiles] = useState<any[]>(() => getValues(name) || []);
+  const uploadedFileCount = uploadedFiles.length;
+  const selectedFileCount = selectedFiles.length;
+  const hasFiles = uploadedFileCount > 0 || selectedFileCount > 0;
+  const selectedFileCountRef = useRef(selectedFileCount);
+  const mandatoryRef = useRef(mandatory);
+  const disabledRef = useRef(disabled);
+  const textRef = useRef(text);
+  selectedFileCountRef.current = selectedFileCount;
+  mandatoryRef.current = mandatory;
+  disabledRef.current = disabled;
+  textRef.current = text;
+  const previousSelectedFileCountRef = useRef(selectedFileCount);
+
+  useEffect(() => {
+    register(name, {
+      validate: (value) => {
+        if (!mandatoryRef.current || disabledRef.current) return true;
+        const hasStoredFiles = Array.isArray(value) ? value.length > 0 : !!value;
+        return hasStoredFiles || selectedFileCountRef.current > 0 || `${textRef.current} is required`;
+      },
+    });
+
+    return () => {
+      unregister(name);
+    };
+  }, [name, register, unregister]);
+
+  useEffect(() => {
+    if (previousSelectedFileCountRef.current !== selectedFileCount) {
+      previousSelectedFileCountRef.current = selectedFileCount;
+      trigger(name);
+    }
+  }, [name, selectedFileCount, trigger]);
 
   const handleFileChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files ? Array.from(event.target.files) : [];
@@ -230,7 +262,7 @@ const UploadField = ({
           if (response.success && response.uploadFiles.length > 0) {
             const updatedFiles = [...uploadedFiles, ...response.uploadFiles];
             setUploadedFiles(updatedFiles);
-            methods.setValue(name, updatedFiles, { shouldValidate: true });
+            setValue(name, updatedFiles, { shouldValidate: true });
             if (events) ruleEngine.processEvents(events, updatedFiles, 'change', methods);
             setSelectedFiles([]);
             setPreviews([]);
@@ -239,16 +271,16 @@ const UploadField = ({
         });
       }
     }
-  }, [selectedFiles, defaultApiConfig, name, uploadedFiles, methods, onClose, events]);
+  }, [selectedFiles, defaultApiConfig, name, uploadedFiles, methods, onClose, events, setValue]);
 
   const handleClear = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedFiles([]);
     setPreviews([]);
     setUploadedFiles([]);
-    methods.setValue(name, null, { shouldValidate: true });
+    setValue(name, [], { shouldValidate: true });
     if (events) ruleEngine.processEvents(events, null, 'change', methods);
-  }, [methods, name, events]);
+  }, [methods, name, events, setValue]);
 
   const handleRemoveFile = useCallback((index: number) => {
     setSelectedFiles((prev) => {
@@ -265,9 +297,9 @@ const UploadField = ({
   const handleUploadedRemoveFile = useCallback((index: number) => {
     const updatedFiles = uploadedFiles.filter((_, i) => i !== index);
     setUploadedFiles(updatedFiles);
-    methods.setValue(name, updatedFiles, { shouldValidate: true });
+    setValue(name, updatedFiles, { shouldValidate: true });
     if (events) ruleEngine.processEvents(events, updatedFiles, 'change', methods);
-  }, [uploadedFiles, methods, name, events]);
+  }, [uploadedFiles, methods, name, events, setValue]);
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -358,8 +390,8 @@ const UploadField = ({
         >
           {text && (
             <Box w={labelWidth}>
-              <Field.Label fontSize="sm" fontWeight="semibold" color="fg.muted">
-                {text}
+              <Field.Label fontSize="md" fontWeight="semibold" >
+                {text}  <Field.RequiredIndicator />
               </Field.Label>
               {description && !oneLiner && (
                 <Text fontSize="xs" color="fg.subtle">
@@ -375,7 +407,7 @@ const UploadField = ({
                 <Box w="full" onClick={onOpen} cursor="pointer">
                   <Input
                     readOnly
-                    value={uploadedFiles.length > 0 ? `${uploadedFiles.length} file(s) uploaded` : ""}
+                    value={uploadedFileCount > 0 ? `${uploadedFileCount} file(s) uploaded` : ""}
                     placeholder="Click to upload files..."
                     size="md"
                     borderRadius="xl"
@@ -389,7 +421,7 @@ const UploadField = ({
                 </Box>
               </Box>
 
-              {enableClear && uploadedFiles.length > 0 && !disabled && (
+              {enableClear && uploadedFileCount > 0 && !disabled && (
                 <IconButton
                   size="sm"
                   variant="ghost"
@@ -401,8 +433,8 @@ const UploadField = ({
                 </IconButton>
               )}
             </HStack>
-            <Field.ErrorText fontSize="xs" color="red.500" mt={1}>
-              {errors?.message?.toString()}
+            <Field.ErrorText fontSize="md" color="red.500" mt={1}>
+              <Field.ErrorIcon /> {errors?.message?.toString()}
             </Field.ErrorText>
           </Box>
         </Flex>
@@ -490,11 +522,11 @@ const UploadField = ({
                       </Button>
                     )}
 
-                    {(selectedFiles.length > 0 || uploadedFiles.length > 0) && (
+                    {hasFiles && (
                       <VStack w="full" align="stretch" gap={3}>
                         <Flex justify="space-between" align="center">
                           <Text fontSize="2xs" fontWeight="bold" color="fg.muted" textTransform="uppercase" letterSpacing="widest">
-                            FILES ({selectedFiles.length + uploadedFiles.length})
+                            FILES ({selectedFileCount + uploadedFileCount})
                           </Text>
                           {selectedFiles.length > 0 && <Badge size="sm" variant="subtle" colorPalette="orange">PENDING</Badge>}
                         </Flex>

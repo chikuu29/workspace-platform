@@ -88,6 +88,7 @@ const FormBreadcrumbActions = React.memo(
 );
 
 const FormView = ({ config, publishActionsToBreadcrumb = true }: any) => {
+ 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const openModal = useModalStore((s) => s.openModal);

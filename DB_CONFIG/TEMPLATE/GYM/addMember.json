@@ -120,6 +120,7 @@
                                 "text": "Gender",
                                 "description": "Select the member's gender for facilities allocation",
                                 "widget": "radioField",
+                                "mandatory":true,
                                 "oneLiner": true,
                                 "enableClear": true,
                                 "options": [
@@ -180,7 +181,7 @@
                                 "description": "Upload a valid passport, driver's license, or national ID",
                                 "widget": "uploadField",
                                 "oneLiner": true,
-                                "mandatory": true,
+                                "mandatory": false,
                                 "liveCameraAllow": false,
                                 "defaultApiConfig": {
                                     "max_size_bytes": 5242880,
@@ -195,6 +196,7 @@
                                 "widget": "uploadField",
                                 "oneLiner": true,
                                 "liveCameraAllow": true,
+                                "mandatory": true,
                                 "accept": "image/*",
                                 "defaultApiConfig": {
                                     "max_size_bytes": 5242880,

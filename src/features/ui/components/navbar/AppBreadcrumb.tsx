@@ -10,9 +10,10 @@ import {
   Layers,
   LayoutDashboard,
   ChevronRight,
+  Slash,
   User,
   Settings,
-  HelpCircle
+  HelpCircle,
 } from "lucide-react";
 import {
   useLocation,
@@ -165,8 +166,8 @@ const AppBreadcrumb = forwardRef((props, ref) => {
                       <Breadcrumb.Item>
                         <HStack
                           gap={{ base: "1.5", md: "2" }}
-                          px={{ base: "2.5", md: "3" }}
-                          py="1.5"
+                          // px={{ base: "1.5", md: "3" }}
+                          p="1.5"
                           rounded="lg"
                           transition="all 0.2s"
                           cursor={isLast ? "default" : "pointer"}
@@ -190,7 +191,9 @@ const AppBreadcrumb = forwardRef((props, ref) => {
                       </Breadcrumb.Item>
                       {!isLast && (
                         <Breadcrumb.Separator>
-                                      <ChevronRight size="12" color={inactiveColor} />
+                          <Box color={inactiveColor} display="flex" alignItems="center">
+                            <Slash size={12} color="currentColor" strokeWidth={2} />
+                          </Box>
                         </Breadcrumb.Separator>
                       )}
                     </React.Fragment>

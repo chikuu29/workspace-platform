@@ -19,7 +19,9 @@ import { Search, ChevronRight, LayoutGrid } from "lucide-react";
 import * as dynamicFunctions from "../../script/myAppsScript";
 import { InputGroup } from "@/components/ui/input-group";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { useAuthorization } from "@/core/hooks/useAuthorization";
+// useAuthorization is a React hook — never call hooks inside useMemo/filter callbacks.
+// Instead we read raw RBAC slices at the top level and use a pure helper below.
+// (RootState is already imported on line 17)
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -161,33 +163,47 @@ function MyApps() {
   const auth = useSelector((state: RootState) => state.auth);
   const organizations = useSelector((state: RootState) => state.organizations);
   const user_type = useSelector((state: RootState) => state.rbac.user_type);
+  // Read raw RBAC state at hook-level so it can be safely closed-over inside useMemo.
+  const rbacPermissions = useSelector((state: RootState) => state.rbac.permissions);
+  const is_root_user = useSelector((state: RootState) => state.rbac.is_root_user);
+  const is_superuser = useSelector((state: RootState) => state.rbac.is_superuser);
   const navigate = useNavigate();
 
   const [searchTerm, setSearchTerm] = useState("");
   const appList = useMemo(() => appConfig?.config?.appList ?? [], [appConfig]);
-  const subscribed_apps = organizations?.organization?.subscribed_apps || [];
- 
+  const subscribed_apps = useMemo(
+    () => organizations?.organization?.subscribed_apps || [],
+    [organizations?.organization?.subscribed_apps],
+  );
+
   const filteredApps = useMemo(() => {
+    // Inline permission check — rbacPermissions/is_root_user/is_superuser are closed-over
+    // from the top-level selectors above, so no hook is called inside this callback.
+    const userPerms: string[] = rbacPermissions || [];
+    const isPrivileged = is_root_user || is_superuser;
+
     return appList.filter((app: any) => {
       const app_slug = app.app_slug || app.id;
-      let hasAccess = useAuthorization(app.required_permissions || [], true, true);
-      // If the app is a specific APP_ module, check if the organization has an active subscription for it
+
+      // Subscription gate — SYSTEM users bypass it.
       if (!subscribed_apps.includes(app_slug)) {
-        if (user_type !== "SYSTEM") {
-          return false;
-        }
-      }
-       else {
-        console.log("hasAccess", hasAccess);
-        if (!hasAccess) {
-          return false;
+        if (user_type !== "SYSTEM") return false;
+      } else {
+        // Permission gate — inline logic, mirrors useAuthorization without calling a hook.
+        const required: string[] = app.required_permissions || [];
+        if (required.length > 0 && !isPrivileged) {
+          const hasAll = required.every((reqPerm) =>
+            userPerms.some((p) =>
+              p === reqPerm || (p.endsWith(".*") && reqPerm.startsWith(p.slice(0, -2))) || p === "*"
+            )
+          );
+          if (!hasAll) return false;
         }
       }
 
-      // Convert snake_case to Title Case (e.g., organization_email -> Organization Email).toLowerCase())
       return app.name.toLowerCase().includes(searchTerm.toLowerCase());
     });
-  }, [searchTerm, appList, subscribed_apps]);
+  }, [searchTerm, appList, subscribed_apps, user_type, rbacPermissions, is_root_user, is_superuser]);
 
   const handleDefaultNavigate = useCallback(
     (e: React.MouseEvent, cfg: any) => {

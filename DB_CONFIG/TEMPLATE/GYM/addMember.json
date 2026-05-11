@@ -56,7 +56,7 @@
                 },
                 "hidden": false,
                 "oneLiner": true,
-                "required": true,
+                "mandatory": true,
                 "event": "draft"
             }
         ]
@@ -85,7 +85,7 @@
                                 "description": "Enter member's first name",
                                 "widget": "textField",
                                 "oneLiner": true,
-                                "required": true,
+                                "mandatory": true,
                                 "maxLength": 50
                             },
                             {
@@ -94,7 +94,7 @@
                                 "description": "Enter member's last name",
                                 "widget": "textField",
                                 "oneLiner": true,
-                                "required": true,
+                                "mandatory": true,
                                 "maxLength": 50
                             },
                             {
@@ -104,7 +104,7 @@
                                 "type": "email",
                                 "widget": "textField",
                                 "oneLiner": true,
-                                "required": true
+                                "mandatory": true
                             },
                             {
                                 "name": "phone",
@@ -113,7 +113,7 @@
                                 "type": "tel",
                                 "widget": "textField",
                                 "oneLiner": true,
-                                "required": true
+                                "mandatory": true
                             },
                             {
                                 "name": "gender",
@@ -143,7 +143,7 @@
                                 "description": "Current permanent residence details",
                                 "widget": "textAreaField",
                                 "oneLiner": true,
-                                "required": false
+                                "mandatory": false
                             }
                         ]
                     },
@@ -157,7 +157,7 @@
                                 "description": "Schedule your first orientation session",
                                 "widget": "dateAndTimeField",
                                 "oneLiner": true,
-                                "required": true,
+                                "mandatory": true,
                                 "enableClear": true
                             },
                             {
@@ -180,11 +180,11 @@
                                 "description": "Upload a valid passport, driver's license, or national ID",
                                 "widget": "uploadField",
                                 "oneLiner": true,
-                                "required": true,
-                                "liveCameraAllow": true,
+                                "mandatory": true,
+                                "liveCameraAllow": false,
                                 "defaultApiConfig": {
                                     "max_size_bytes": 5242880,
-                                    "accept": "image/*",
+                                    "accept": "image/* application/pdf",
                                     "uploadURL": "app/upload"
                                 }
                             },
@@ -197,31 +197,12 @@
                                 "liveCameraAllow": true,
                                 "accept": "image/*",
                                 "defaultApiConfig": {
+                                    "max_size_bytes": 5242880,
+                                    "accept": "image/*",
                                     "uploadURL": "app/upload"
                                 }
-                            },
-                            {
-                                "name": "paymentMode",
-                                "text": "Payment Mode",
-                                "description": "Preferred method for subscription renewal",
-                                "widget": "radioField",
-                                "oneLiner": true,
-                                "enableClear": true,
-                                "options": [
-                                    {
-                                        "label": "Cash",
-                                        "value": "cash"
-                                    },
-                                    {
-                                        "label": "Credit Card",
-                                        "value": "card"
-                                    },
-                                    {
-                                        "label": "UPI / Digital",
-                                        "value": "upi"
-                                    }
-                                ]
                             }
+                            
                         ]
                     }
                 ]

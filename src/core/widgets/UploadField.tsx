@@ -24,14 +24,15 @@ import {
   Upload,
   Camera,
   X,
-  Eye,
-  Download,
   Trash2,
   RotateCcw,
   Check,
   File as FileIcon,
-  Image as ImageIcon,
-  Video,
+  FileText,
+  FileSpreadsheet,
+  FileArchive,
+  FileCode,
+  Presentation,
 } from "lucide-react";
 import { POSTAPI } from "../../app/api";
 import { ruleEngine } from "../engine/logicEngine";
@@ -59,42 +60,89 @@ const FileItem = memo(({
   file,
   onRemove,
   onView,
-  status = "pending",
+  previewUrl,
   isUploaded = false
 }: {
   file: any,
   onRemove: () => void,
   onView?: () => void,
-  status?: string,
+  previewUrl?: string,
   isUploaded?: boolean
 }) => {
-  const bg = useColorModeValue("whiteAlpha.500", "whiteAlpha.100");
+  const bg = useColorModeValue("white", "whiteAlpha.100");
+  const hoverBg = useColorModeValue("gray.50", "whiteAlpha.200");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.200");
+  const uploadedBorderColor = useColorModeValue("green.300", "green.500");
 
   const fileName = isUploaded ? file.originalName : file.name;
-  const fileSize = (file.size / 1024).toFixed(1);
-  const isImg = file.type?.startsWith("image/") || ["jpg", "jpeg", "png", "gif"].some(ext => fileName.toLowerCase().endsWith(ext));
+  const fileSize = file.size ? `${(file.size / 1024).toFixed(1)} KB` : "";
+  const lowerName = fileName?.toLowerCase() ?? "";
+  const extension = lowerName.split(".").pop() ?? "";
+  const isImg = file.type?.startsWith("image/") || ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg"].includes(extension);
+  const imageUrl = isImg
+    ? previewUrl || (isUploaded && file.accessObjectPath ? `${location.origin}/api/${file.accessObjectPath}` : undefined)
+    : undefined;
+
+  const fileAccent = useMemo(() => {
+    if (extension === "pdf") return { bg: "red.50", color: "red.600", icon: FileText };
+    if (["doc", "docx", "odt", "rtf"].includes(extension)) return { bg: "blue.50", color: "blue.600", icon: FileText };
+    if (["xls", "xlsx", "csv"].includes(extension)) return { bg: "green.50", color: "green.600", icon: FileSpreadsheet };
+    if (["ppt", "pptx"].includes(extension)) return { bg: "orange.50", color: "orange.600", icon: Presentation };
+    if (["zip", "rar", "7z"].includes(extension)) return { bg: "yellow.50", color: "yellow.700", icon: FileArchive };
+    if (["json", "xml", "html", "css", "js", "ts", "tsx"].includes(extension)) return { bg: "purple.50", color: "purple.600", icon: FileCode };
+    return { bg: isUploaded ? "green.100" : "indigo.50", color: isUploaded ? "green.600" : "indigo.500", icon: FileIcon };
+  }, [extension, isUploaded]);
+
+  const FileTypeIcon = fileAccent.icon;
 
   return (
     <Flex
-      p={3}
-      borderRadius="xl"
+      p={2.5}
+      borderRadius="lg"
       bg={bg}
       align="center"
       gap={3}
-      borderWidth="1.5px"
-      borderColor={isUploaded ? "green.200" : borderColor}
-      transition="all 0.2s"
-      _hover={{ transform: "translateY(-2px)", boxShadow: "sm" }}
+      borderWidth="1px"
+      borderColor={isUploaded ? uploadedBorderColor : borderColor}
+      boxShadow="0 1px 2px rgba(15, 23, 42, 0.06)"
+      transition="background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease"
+      cursor={onView ? "pointer" : "default"}
+      role={onView ? "button" : undefined}
+      tabIndex={onView ? 0 : undefined}
+      onClick={onView}
+      onKeyDown={(event) => {
+        if (onView && (event.key === "Enter" || event.key === " ")) {
+          event.preventDefault();
+          onView();
+        }
+      }}
+      _hover={{
+        bg: hoverBg,
+        borderColor: isUploaded ? uploadedBorderColor : "indigo.300",
+        boxShadow: "0 10px 24px rgba(15, 23, 42, 0.10)",
+        transform: "translateY(-1px)"
+      }}
+      _focusVisible={{ outline: "2px solid", outlineColor: "indigo.400", outlineOffset: "2px" }}
     >
-      <Center boxSize="40px" borderRadius="lg" bg={isUploaded ? "green.100" : "indigo.50"} color={isUploaded ? "green.600" : "indigo.500"}>
-        {isImg ? <ImageIcon size={20} /> : <FileIcon size={20} />}
+      <Center boxSize="56px" borderRadius="md" bg={fileAccent.bg} color={fileAccent.color} overflow="hidden" flexShrink={0}>
+        {imageUrl ? (
+          <Image src={imageUrl} alt={fileName} boxSize="full" objectFit="cover" />
+        ) : (
+          <FileTypeIcon size={22} />
+        )}
       </Center>
 
-      <VStack align="stretch" gap={0} flex="1">
-        <Text fontSize="xs" fontWeight="bold" truncate maxW="220px">{fileName}</Text>
+      <VStack align="stretch" gap={1} flex="1" minW={0}>
+        <Text fontSize="sm" fontWeight="semibold" truncate color="fg">
+          {fileName}
+        </Text>
         <HStack gap={2}>
-          <Text fontSize="2xs" color="fg.subtle">{fileSize} KB</Text>
+          {fileSize && <Text fontSize="2xs" color="fg.subtle">{fileSize}</Text>}
+          {extension && (
+            <Badge size="xs" colorPalette="gray" variant="surface" borderRadius="sm" fontSize="8px">
+              {extension.toUpperCase()}
+            </Badge>
+          )}
           <Badge size="xs" colorPalette={isUploaded ? "green" : "indigo"} variant="subtle" borderRadius="full" fontSize="8px">
             {isUploaded ? "UPLOADED" : "PENDING"}
           </Badge>
@@ -102,12 +150,17 @@ const FileItem = memo(({
       </VStack>
 
       <HStack gap={1}>
-        {onView && (
-          <IconButton size="xs" variant="ghost" onClick={onView} _hover={{ bg: "whiteAlpha.300" }}>
-            <Eye />
-          </IconButton>
-        )}
-        <IconButton size="xs" variant="ghost" colorPalette="red" onClick={onRemove} _hover={{ bg: "red.50", color: "red.600" }}>
+        <IconButton
+          aria-label={`Remove ${fileName}`}
+          size="xs"
+          variant="ghost"
+          colorPalette="red"
+          onClick={(event) => {
+            event.stopPropagation();
+            onRemove();
+          }}
+          _hover={{ bg: "red.50", color: "red.600" }}
+        >
           <Trash2 />
         </IconButton>
       </HStack>
@@ -451,7 +504,9 @@ const UploadField = ({
                             <FileItem
                               key={`sel-${i}`}
                               file={file}
+                              previewUrl={previews[i]}
                               onRemove={() => handleRemoveFile(i)}
+                              onView={() => window.open(previews[i], "_blank")}
                             />
                           ))}
                           {uploadedFiles.map((file, i) => (
@@ -486,18 +541,18 @@ const UploadField = ({
                     </Box>
                     <HStack w="full" gap={3}>
                       {!capturedImage ? (
-                        <Button flex="1" size="lg" colorPalette="blue" borderRadius="xl" onClick={capturePhoto} boxShadow="0 4px 12px rgba(66, 153, 225, 0.4)">
+                        <Button flex="1" size="md" colorPalette="blue" borderRadius="md" onClick={capturePhoto} boxShadow="0 4px 12px rgba(66, 153, 225, 0.4)">
                           <Camera /> Capture
                         </Button>
                       ) : (
                           <>
-                          <Button flex="1" size="lg" variant="outline" borderRadius="xl" onClick={startCamere}><RotateCcw /> Retake</Button>
-                          <Button flex="1" size="lg" colorPalette="green" borderRadius="xl" onClick={confirmPhoto} boxShadow="0 4px 12px rgba(72, 187, 120, 0.4)">
+                          <Button flex="1" size="md" variant="solid" borderRadius="md" onClick={startCamere}><RotateCcw /> Retake</Button>
+                          <Button flex="1" size="md" colorPalette="green" borderRadius="md" onClick={confirmPhoto} >
                             <Check /> Use Photo
                           </Button>
                         </>
                       )}
-                      <Button variant="outline" onClick={() => { stopCamera(); setLiveCameraActive(false); setCapturedImage(null); }} size="lg">Cancel</Button>
+                      <Button variant="solid" size="md" colorPalette="red" onClick={() => { stopCamera(); setLiveCameraActive(false); setCapturedImage(null); }} >Cancel</Button>
                     </HStack>
                   </VStack>
                 )}

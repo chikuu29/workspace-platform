@@ -10,20 +10,20 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Install dependencies using cache optimization
-COPY package.json package-lock.json ./
+COPY package.json pnpm-lock.yaml ./
 
 # Install deps without lifecycle scripts so Chakra typegen doesn't run
 # before the source tree exists in the image.
-RUN npm ci --legacy-peer-deps --ignore-scripts
+RUN pnpm install --legacy-peer-deps --ignore-scripts
 
 # Copy rest of the source code
 COPY . .
 
 # Generate Chakra types after the source files are available
-RUN npm run typegen
+RUN pnpm run typegen
 
 # Build the React app
-RUN npm run build
+RUN pnpm run build
 
 
 # -----------------------

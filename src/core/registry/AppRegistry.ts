@@ -60,36 +60,36 @@ const registry: RegistryConfig = {
         home: () => import("@/features/modules/system/PlatformView"),
         DatabaseStatistics: {
             component: () => import("@/features/modules/system/DatabaseStatisticsView"),
-            permissions: "SYSTEM_ADMINISTRATOR.SYSTEM.*",
+            permissions: "SYSTEM.ADMINISTRATOR.*",
         },
         ApplicationClients: {
             component: () => import("@/features/modules/system/OAuthView"),
-            permissions: "SYSTEM_ADMINISTRATOR.SYSTEM.*",
+            permissions: "SYSTEM.ADMINISTRATOR.*",
         },
         AuthUsers: () => import("@/features/modules/system/AuthUser"),
         Organizations: {
             component: () => import("@/features/modules/system/OrganizationView"),
-            permissions: "SYSTEM_ADMINISTRATOR.SYSTEM.*",
+            permissions: "SYSTEM.ADMINISTRATOR.*",
         },
         accesscontrol: {
             component: () => import("@/features/modules/system/AccessControlView"),
-            permissions: "SYSTEM_ADMINISTRATOR.SYSTEM.*",
+            permissions: "SYSTEM.ADMINISTRATOR.*",
         },
         SaasApps: {
             component: () => import("@/features/modules/system/SaasAppsView"),
-            permissions: "SYSTEM_ADMINISTRATOR.SYSTEM.*",
+            permissions: "SYSTEM.ADMINISTRATOR.*",
         },
         Features: {
             component: () => import("@/features/modules/system/FeaturesView"),
-            permissions: "SYSTEM_ADMINISTRATOR.SYSTEM.*",
+            permissions: "SYSTEM.ADMINISTRATOR.*",
         },
         Permissions: {
             component: () => import("@/features/modules/system/PermissionsView"),
-            permissions: "SYSTEM_ADMINISTRATOR.SYSTEM.*",
+            permissions: "SYSTEM.ADMINISTRATOR.*",
         },
         SubscriptionPlans: {
             component: () => import("@/features/modules/system/SubscriptionPlansView"),
-            permissions: "SYSTEM_ADMINISTRATOR.SYSTEM.*",
+            permissions: "SYSTEM.ADMINISTRATOR.*",
         },
         OrganizationRoles: {
             component: () => import("@/features/modules/system/OrganizationRolesView")
@@ -105,12 +105,28 @@ const registry: RegistryConfig = {
     myGym: {
         layout: () => import("@/theme/layouts/workspace"),
         home: () => import("@/features/modules/gym/GymView"),
-        // AddMember: () => import("@/features/modules/gym/AddMember"),
+        // Member management
+        members: () => import("@/features/modules/gym/ViewMember"),
+        memberDetails: () => import("@/features/modules/gym/MemberDetail"),
+        MemberCheckIn: () => import("@/features/modules/gym/MemberCheckIn"),
+        // Billing & Subscriptions
         Subscription: () => import("@/features/modules/gym/Subscription"),
-        ListMember: () => import("@/features/modules/gym/ViewMember"),
         GymSubscriptionPlans: () => import("@/features/modules/gym/GymSubscriptionPlans"),
         AddSubscriptionPlan: () => import("@/features/modules/gym/AddSubscriptionPlan"),
-        CreateSubscription: () => import("@/features/modules/gym/CreateSubscription"),
+        selectPlan: () => import("@/features/modules/gym/SelectPlan"),
+        PaymentsHistory: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.PaymentsHistory })),
+        // Trainers
+        trainers: () => import("@/features/modules/gym/TrainersStaff"),
+        TrainerProfile: () => import("@/features/modules/gym/TrainerProfile"),
+        trainerSchedules: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.TrainerSchedules })),
+        // Classes
+        listClasses: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.ListClasses })),
+        addClass: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.AddClass })),
+        classBookings: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.ClassBookings })),
+        // Reports
+        revenueReport: () => import("@/features/modules/gym/RevenueReport"),
+        attendanceReport: () => import("@/features/modules/gym/AttendanceReport"),
+        performanceReport: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.PerformanceReport })),
     },
     Default: {
         workspacePage: () => import("@/core/WorkspacePage"),

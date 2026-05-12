@@ -4,6 +4,17 @@ import { useFormState, useFormContext } from "react-hook-form";
 import { WidgetRegistry } from "../registry/WidgetRegistry";
 import { useFormStore } from "../store/useFormStore";
 
+const isSameFormValue = (left: any, right: any) => {
+  if (Object.is(left, right)) return true;
+  if (!left || !right || typeof left !== "object" || typeof right !== "object") return false;
+
+  try {
+    return JSON.stringify(left) === JSON.stringify(right);
+  } catch {
+    return false;
+  }
+};
+
 const RunTimeWidgetRender: React.FC<any> = React.memo(({ configs, tabs, ...rest }) => {
   const { control, setValue, getValues } = useFormContext();
   const { errors } = useFormState({ control });
@@ -18,18 +29,21 @@ const RunTimeWidgetRender: React.FC<any> = React.memo(({ configs, tabs, ...rest 
       const nextValues = state.values;
       if (nextValues === previousValues) return;
 
-      Object.keys(nextValues).forEach(key => {
-        if (previousValues[key] === nextValues[key]) return;
-        if (getValues(key) === nextValues[key]) return;
+      const changedKeys = Object.keys(nextValues).filter(key => {
+        if (isSameFormValue(previousValues[key], nextValues[key])) return false;
+        if (isSameFormValue(getValues(key), nextValues[key])) return false;
+        return true;
+      });
 
+      previousValues = nextValues;
+
+      changedKeys.forEach(key => {
         setValue(key, nextValues[key], {
           shouldDirty: false,
           shouldTouch: false,
           shouldValidate: false,
         });
       });
-
-      previousValues = nextValues;
     });
 
     return unsubscribe;

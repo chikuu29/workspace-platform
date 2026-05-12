@@ -13,10 +13,10 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams, useSearchParams } from "react-router";
 import MessageInput from "./MessageInput";
-import { FaUser, FaRobot, FaAngleDoubleDown } from "react-icons/fa";
+import { User, Bot, ChevronsDown, MessageSquare } from "lucide-react";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { Avatar } from "@/components/ui/avatar";
-import { BiMessageDetail } from "react-icons/bi";
+
 import { POSTAPI } from "@/app/api";
 import { motion, AnimatePresence } from "framer-motion";
 import { API_SERVICES } from "@/config/api.config";
@@ -400,7 +400,7 @@ export default function AIView(params: any) {
                           borderRadius="xl"
                           p={1}
                           size="md"
-                          icon={<FaRobot size={20} />}
+                          icon={<Bot size={20} />}
                           bg="blue.500"
                           color="white"
                           boxShadow="0 0 20px rgba(59, 130, 246, 0.3)"
@@ -468,7 +468,7 @@ export default function AIView(params: any) {
                         size="md"
                         borderRadius="xl"
                         bg="purple.500"
-                        icon={<FaUser size={18} />}
+                        icon={<User size={18} />}
                         boxShadow="0 0 20px rgba(168, 85, 247, 0.2)"
                       />
                     )}
@@ -491,7 +491,7 @@ export default function AIView(params: any) {
                     py={2}
                     onClick={clearChat}
                   >
-                    <BiMessageDetail />
+                    <MessageSquare />
                     New Chat
                   </IconButton>
                 </Box>

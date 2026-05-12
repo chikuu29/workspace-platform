@@ -24,13 +24,17 @@ import {
     Badge,
 } from "@chakra-ui/react";
 import { forwardRef, memo, useCallback, useEffect, useState } from "react";
-import { FaAngleDown, FaBoxOpen } from "react-icons/fa";
-import { FaArrowDownShortWide, FaArrowUpShortWide } from "react-icons/fa6";
-import { LuSearch } from "react-icons/lu";
-import { MdOpenInNew } from "react-icons/md";
-import { RiDeleteBin5Line } from "react-icons/ri";
-import { TiEdit } from "react-icons/ti";
-import { VscListFilter } from "react-icons/vsc";
+import { 
+    ChevronDown, 
+    PackageOpen, 
+    ArrowDownNarrowWide, 
+    ArrowUpNarrowWide, 
+    Search, 
+    ExternalLink, 
+    Trash2, 
+    Pencil, 
+    ListFilter 
+} from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { formatKey } from "@/utils/formatKey";
 import { formatValue } from "@/utils/formatters";
@@ -68,9 +72,9 @@ interface TABLE_WIDGET {
 // `headerConfig = []` create a new array reference on every render, which
 // makes them always look "changed" in a useEffect dep array → infinite loop.
 const DEFAULT_ACTIONS: ACTIONTYPES[] = [
-    { types: "VIEW", title: "Open", icon: <MdOpenInNew />, colorPalette: "blue", action: "openAction" },
-    { types: "EDIT", title: "Edit", icon: <TiEdit />, colorPalette: "yellow", action: "editAction" },
-    { types: "DELETE", title: "Delete", icon: <RiDeleteBin5Line />, colorPalette: "red", action: "deleteAction" },
+    { types: "VIEW", title: "Open", icon: <ExternalLink />, colorPalette: "blue", action: "openAction" },
+    { types: "EDIT", title: "Edit", icon: <Pencil />, colorPalette: "yellow", action: "editAction" },
+    { types: "DELETE", title: "Delete", icon: <Trash2 />, colorPalette: "red", action: "deleteAction" },
 ];
 
 const DEFAULT_HEADER_CONFIG: string[] = [];
@@ -167,7 +171,7 @@ export const TableWidget = memo(
                                         _hover={{ borderColor: "app.text.accent", bg: "app.card.bg" }}
                                         transition="all 0.2s"
                                     >
-                                        Status <FaAngleDown />
+                                        Status <ChevronDown />
                                     </Button>
                                 </MenuTrigger>
                                 <MenuContent p={3} borderRadius="xl" boxShadow="xl" minW="200px">
@@ -209,14 +213,14 @@ export const TableWidget = memo(
                                 _hover={{ borderColor: "app.text.accent" }}
                                 transition="all 0.2s"
                             >
-                                <VscListFilter /> More Filters
+                                <ListFilter /> More Filters
                             </Button>
                         </HStack>
                     )}
 
                     {/* Search input */}
                     <InputGroup
-                        startElement={<LuSearch />}
+                        startElement={<Search />}
                         flex={1}
                         maxW={{ base: "100%", md: "380px" }}
                     >
@@ -297,8 +301,8 @@ export const TableWidget = memo(
                                                                 transition="opacity 0.15s"
                                                             >
                                                                 {sortKey === key && !sortAsc
-                                                                    ? <FaArrowUpShortWide size={11} />
-                                                                    : <FaArrowDownShortWide size={11} />
+                                                                    ? <ArrowUpNarrowWide size={11} />
+                                                                    : <ArrowDownNarrowWide size={11} />
                                                                 }
                                                             </Box>
                                                         </HStack>
@@ -462,7 +466,7 @@ export const TableWidget = memo(
                                     border="1px dashed"
                                     borderColor="app.card.border"
                                 >
-                                    <Icon as={FaBoxOpen} boxSize={7} color="app.text.muted" />
+                                    <Icon as={PackageOpen} boxSize={7} color="app.text.muted" />
                                 </Box>
                                 <VStack gap={1}>
                                     <Text fontSize="md" fontWeight="600" color="app.text.primary">

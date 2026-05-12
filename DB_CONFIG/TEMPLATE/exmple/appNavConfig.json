@@ -1,0 +1,264 @@
+{
+    "id": 1,
+    "type": "menu",
+    "config": {
+        "appList": [
+            {
+                "id": "SYSTEM",
+                "app_slug": "system",
+                "hidden": false,
+                "name": "Admin Module",
+                "target": "/workspace/app/system/home",
+                "actions": {
+                    "onClick": ""
+                },
+                "logo": {
+                    "url": "../assets/icons/3d-casual-life-secure-document.png",
+                    "style": {
+                        "mb": "4px",
+                        "boxSize": "59px",
+                        "objectFit": "contain"
+                    }
+                }
+            },
+            {
+                "id": "MY_GYM",
+                "app_slug": "MY_GYM",
+                "hidden": false,
+                "name": "Gym Management",
+                "target": "/workspace/app/myGym/home",
+                "actions": {
+                    "onClick": ""
+                },
+                "logo": {
+                    "url": "../assets/icons/smart-gym-water-bottle-and-dumbbells-for-a-healthy-lifestyle.png",
+                    "style": {
+                        "mb": "4px",
+                        "boxSize": "59px",
+                        "objectFit": "contain"
+                    }
+                }
+            },
+            {
+                "id": "MY_HOSTEL",
+                "app_slug": "MY_HOSTEL",
+                "hidden": false,
+                "name": "Hostel Management",
+                "target": "/workspace/app/myHostel/home",
+                "actions": {
+                    "onClick": ""
+                },
+                "logo": {
+                    "url": "../assets/icons/3d-casual-life-secure-document.png",
+                    "style": {
+                        "mb": "4px",
+                        "boxSize": "59px",
+                        "objectFit": "contain"
+                    }
+                }
+            },
+            {
+                "id": "MY_RESTAURANT",
+                "app_slug": "MY_RESTAURANT",
+                "hidden": false,
+                "name": "Restaurant Management",
+                "target": "/workspace/app/myRestaurant/home",
+                "actions": {
+                    "onClick": ""
+                },
+                "logo": {
+                    "url": "../assets/icons/3d-casual-life-secure-document.png",
+                    "style": {
+                        "mb": "4px",
+                        "boxSize": "59px",
+                        "objectFit": "contain"
+                    }
+                }
+            }
+        ],
+        "featueListBaseOnURL": {
+            "AdminModules": {
+                "SHOW_SIDE_NAV_MENU": true,
+                "SHOW_TOP_NAV_MENU": false,
+                "MENU": [
+                    {
+                        "label": "Home",
+                        "icon": "FcHome",
+                        "path": "/app/AdminModules/AdminModule",
+                        "isMaster": true
+                    },
+                    {
+                        "label": "DB INFO",
+                        "icon": "FaDatabase",
+                        "path": "/app/AdminModules/DatabaseStatistics",
+                        "isMaster": true
+                    },
+                    {
+                        "label": "DB INFO",
+                        "isMaster": false,
+                        "icon": "FcBusinessman",
+                        "menu": [
+                            {
+                                "label": "List Members",
+                                "icon": "FcTodoList",
+                                "path": "/app/AdminModules/DatabaseStatistics"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "myApps": {},
+            "myGym": {
+                "SHOW_SIDE_NAV_MENU": false,
+                "SHOW_TOP_NAV_MENU": true,
+                "MENU": [
+                    {
+                        "label": "Home",
+                        "icon": "FcHome",
+                        "path": "/app/myGym/home",
+                        "isMaster": true
+                    },
+                    {
+                        "label": "Members",
+                        "isMaster": false,
+                        "icon": "FcBusinessman",
+                        "menu": [
+                            {
+                                "label": "List Members",
+                                "icon": "FcTodoList",
+                                "path": "/app/myGym/members"
+                            },
+                            {
+                                "label": "Add Member",
+                                "icon": "FcPlus",
+                                "path": "/app/myGym/AddMember"
+                            },
+                            {
+                                "label": "Member Check-In",
+                                "icon": "FcCheckmark",
+                                "path": "/app/myGym/MemberCheckIn"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Trainers & Staff",
+                        "isMaster": false,
+                        "icon": "FcManager",
+                        "menu": [
+                            {
+                                "label": "List Trainers",
+                                "icon": "FcReading",
+                                "path": "/app/myGym/trainers"
+                            },
+                            {
+                                "label": "Add Trainer",
+                                "icon": "FcPlus",
+                                "path": "/app/myGym/AddMember",
+                                "action": {
+                                    "type": "modal",
+                                    "templateName": "AddTrainer",
+                                    "config": {
+                                        "size": "full",
+                                        "closeOnOverlayClick": true,
+                                        "closeOnEsc": true,
+                                        "scrollBehavior": "inside"
+                                    }
+                                }
+                            },
+                            {
+                                "label": "Manage Schedules",
+                                "icon": "FcCalendar",
+                                "path": "/app/myGym/trainerSchedules"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Classes & Scheduling",
+                        "isMaster": false,
+                        "icon": "FcCalendar",
+                        "menu": [
+                            {
+                                "label": "List Classes",
+                                "icon": "FcTodoList",
+                                "path": "/app/myGym/listClasses"
+                            },
+                            {
+                                "label": "Add Class",
+                                "icon": "FcPlus",
+                                "path": "/app/myGym/addClass"
+                            },
+                            {
+                                "label": "Class Bookings",
+                                "icon": "FcBookmark",
+                                "path": "/app/myGym/classBookings"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Reports",
+                        "isMaster": false,
+                        "icon": "FcBarChart",
+                        "menu": [
+                            {
+                                "label": "Revenue Report",
+                                "icon": "FcMoneyTransfer",
+                                "path": "/app/myGym/revenueReport"
+                            },
+                            {
+                                "label": "Attendance Report",
+                                "icon": "FcClock",
+                                "path": "/app/myGym/attendanceReport"
+                            },
+                            {
+                                "label": "Performance Report",
+                                "icon": "FcStatistics",
+                                "path": "/app/myGym/performanceReport"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Billing & Payments",
+                        "isMaster": false,
+                        "icon": "FcMoneyTransfer",
+                        "menu": [
+                            {
+                                "label": "Subscription Plans",
+                                "icon": "FcPlanner",
+                                "path": "/app/myGym/Subscription"
+                            },
+                            {
+                                "label": "Payment History",
+                                "icon": "FcList",
+                                "path": "/app/myGym/PaymentsHistory"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "myHostel": {
+                "SHOW_SIDE_NAV_MENU": true,
+                "SHOW_TOP_NAV_MENU": true,
+                "MENU": [
+                    {
+                        "label": "Home",
+                        "icon": "FcHome",
+                        "path": "/app/myHostel/home",
+                        "isMaster": true
+                    }
+                ]
+            },
+            "myRestaurant": {
+                "SHOW_SIDE_NAV_MENU": true,
+                "SHOW_TOP_NAV_MENU": true,
+                "MENU": [
+                    {
+                        "label": "Home",
+                        "icon": "FcHome",
+                        "path": "/app/myRestaurant/home",
+                        "isMaster": true
+                    }
+                ]
+            }
+        }
+    }
+}

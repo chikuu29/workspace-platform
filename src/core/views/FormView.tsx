@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo, useCallback, useEffect } from "react";
 import {
   Box,
   Flex,
@@ -20,11 +20,80 @@ import { startLoading, stopLoading } from "@/app/slices/loader/appLoaderSlice";
 import { useNavigate } from "react-router";
 import { useModalStore } from "@/core/store/useModalStore";
 import { RootState } from "@/app/store";
+import { useNavActionStore } from "@/core/store/useNavActionStore";
 
-const FormView = ({ config }: any) => {
+interface FormBreadcrumbActionsProps {
+  buttons: any[];
+  formId: string;
+  isEventInProgress: boolean;
+  pendingEventName: string | null;
+  onActionButtonClick: (button: any) => void;
+}
+
+const FormBreadcrumbActions = React.memo(
+  ({
+    buttons,
+    formId,
+    isEventInProgress,
+    pendingEventName,
+    onActionButtonClick,
+  }: FormBreadcrumbActionsProps) => (
+    <Flex
+      gap="2"
+      wrap="wrap"
+      align="center"
+      justify={{ base: "stretch", md: "flex-end" }}
+      w="full"
+    >
+      {buttons.map((btn: any, idx: number) => {
+        const isSubmit = btn.event === "submit";
+        const customStyles = btn?.styles || {};
+        const defaultShadow = isSubmit
+          ? "0 12px 24px -18px rgba(59, 130, 246, 0.8)"
+          : "0 12px 22px -20px rgba(15, 23, 42, 0.35)";
+
+        return (
+          <Button
+            key={btn.name || idx}
+            onClick={isSubmit ? undefined : () => onActionButtonClick(btn)}
+            type={isSubmit ? "submit" : "button"}
+            form={isSubmit ? formId : undefined}
+            size="md"
+            h="40px"
+            px={6}
+            loading={isEventInProgress && pendingEventName === btn.event}
+            disabled={isEventInProgress}
+            borderRadius={customStyles.borderRadius || "sm"}
+            minW={{ base: "full", sm: "120px", md: "auto" }}
+            justifyContent="center"
+            gap="2"
+            variant={customStyles.variant || (isSubmit ? "solid" : "subtle")}
+            colorPalette={customStyles.colorPalette || (isSubmit ? "blue" : "gray")}
+            _hover={{
+              transform: "translateY(-1px)",
+              boxShadow: customStyles.boxShadow || defaultShadow,
+              ...customStyles._hover,
+            }}
+            {...customStyles}
+          >
+            {btn.iconName && <AsyncLoadIcon iconName={btn.iconName} />}
+            <Text fontWeight="inherit" whiteSpace="nowrap">
+              {btn.text}
+            </Text>
+          </Button>
+        );
+      })}
+    </Flex>
+  ),
+);
+
+const FormView = ({ config, publishActionsToBreadcrumb = true }: any) => {
+ 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const openModal = useModalStore((s) => s.openModal);
+  const setBreadcrumbActions = useNavActionStore((s) => s.setActions);
+  const clearBreadcrumbActions = useNavActionStore((s) => s.clearActions);
   const organizationName = useSelector(
     (state: RootState) => state.organizations?.organization?.name ?? "GHOST_ORG"
   );
@@ -38,12 +107,6 @@ const FormView = ({ config }: any) => {
     "app.text.primary",
     "app.text.primary",
   );
-
-  const headerPanelBg = useColorModeValue(
-    "rgba(255,255,255,0.76)",
-    "rgba(255,255,255,0.04)",
-  );
-
 
   const metaBg = useColorModeValue(
     "rgba(255,255,255,0.7)",
@@ -172,6 +235,43 @@ const FormView = ({ config }: any) => {
     [executeFormEvent, isEventInProgress],
   );
 
+  const breadcrumbActions = useMemo(
+    () => (
+      <FormBreadcrumbActions
+        buttons={visibleActionButtons}
+        formId={formId}
+        isEventInProgress={isEventInProgress}
+        pendingEventName={pendingEventName}
+        onActionButtonClick={handleActionButtonClick}
+      />
+    ),
+    [
+      formId,
+      handleActionButtonClick,
+      isEventInProgress,
+      pendingEventName,
+      visibleActionButtons,
+    ],
+  );
+
+  useEffect(() => {
+    if (!publishActionsToBreadcrumb) return;
+
+    if (visibleActionButtons.length === 0) {
+      clearBreadcrumbActions();
+      return;
+    }
+
+    setBreadcrumbActions(breadcrumbActions);
+    return () => clearBreadcrumbActions();
+  }, [
+    breadcrumbActions,
+    clearBreadcrumbActions,
+    publishActionsToBreadcrumb,
+    setBreadcrumbActions,
+    visibleActionButtons.length,
+  ]);
+
   if (!tabs.length) return null;
   return (
     <Box position="relative">
@@ -266,14 +366,13 @@ const FormView = ({ config }: any) => {
                 </Text>
               </VStack>
             </VStack>
-
-            {visibleActionButtons.length > 0 && (
+            {visibleActionButtons.length > 0 && !publishActionsToBreadcrumb && (
               <Box
                 w={{ base: "full", xl: "auto" }}
                 minW={{ xl: "320px" }}
                 p="3"
                 borderRadius="2xl"
-                bg={headerPanelBg}
+                // bg={headerPanelBg}
                 border="1px solid"
                 borderColor={borderColor}
                 backdropFilter="blur(14px)"
@@ -337,7 +436,7 @@ const FormView = ({ config }: any) => {
                           minW={{ xl: "160px" }}
                           justifyContent="center"
                           gap="2.5"
-                          
+
                           variant={
                             customStyles.variant ||
                             (isSubmit ? "solid" : "subtle")
@@ -361,7 +460,8 @@ const FormView = ({ config }: any) => {
                             //   justifyContent="center"
                             //   boxSize="4"
                             // >
-                              <AsyncLoadIcon iconName={btn.iconName} />
+                            <AsyncLoadIcon iconName={btn.iconName} />
+
                             // </Box>
                           )}
                           <Text fontWeight="inherit">{btn.text}</Text>
@@ -372,6 +472,7 @@ const FormView = ({ config }: any) => {
                 </VStack>
               </Box>
             )}
+
           </Flex>
         </Box>
 

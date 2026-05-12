@@ -12,9 +12,7 @@ import {
     DialogTitle,
     DialogBody,
 } from "@chakra-ui/react";
-import { IoShieldCheckmarkOutline } from "react-icons/io5";
-import { AiTwotoneCloseCircle } from "react-icons/ai";
-import { TbLockAccess } from "react-icons/tb";
+import { ShieldCheck, CircleX, LockKeyhole } from "lucide-react";
 
 import { List } from "@chakra-ui/react";
 
@@ -53,7 +51,7 @@ const APIErrorScreen = (props: any) => {
             <DialogBackdrop />
             <DialogContent className="dialog-container">
                 <DialogHeader className="dialog-header">
-                    <Icon as={TbLockAccess} boxSize={6} color="red" />
+                    <Icon as={LockKeyhole} boxSize={6} color="red" />
                     <DialogTitle>OAuth Authentication Failed</DialogTitle>
                 </DialogHeader>
 
@@ -80,7 +78,7 @@ const APIErrorScreen = (props: any) => {
                                 {errorList.map((error, index) => (
                                     <List.Item key={index}>
                                         <List.Indicator asChild colorPalette="green.500">
-                                            <AiTwotoneCloseCircle color="red" />
+                                            <CircleX color="red" />
                                         </List.Indicator>
                                         {`${error.field} - ${error.message}`}
                                     </List.Item>
@@ -101,7 +99,7 @@ const APIErrorScreen = (props: any) => {
                         colorScheme="red"
                         onClick={handleRetry}
                     >
-                        <IoShieldCheckmarkOutline />
+                        <ShieldCheck />
                         Retry Authentication
                     </IconButton>
                 </DialogFooter>

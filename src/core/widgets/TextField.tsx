@@ -58,7 +58,7 @@ const TextField = ({
     name,
   });
 
-   // 🔥 Debounced rule engine (IMPORTANT)
+  // 🔥 Debounced rule engine (IMPORTANT)
   const debouncedRule = useMemo(() => {
     let timer: any;
     return (val: string) => {
@@ -77,7 +77,7 @@ const TextField = ({
       rhfOnChange(e); // RHF update
       debouncedRule(val); // Rule engine
     },
-    [debouncedRule]
+    [debouncedRule],
   );
 
   const handleClear = useCallback(() => {
@@ -121,28 +121,28 @@ const TextField = ({
             <Box w={labelWidth}>
               <Field.Label
                 htmlFor={name}
-                // fontSize="sm"
-                // fontWeight="semibold"
+                fontSize="md"
+                fontWeight="semibold"
                 // color="fg.muted"
                 transition="color 0.2s"
-                _invalid={{ color: "red.500" }}
-                mb={oneLiner ? 0 : 1}
-                 css={{
-                    "& [data-part='label']": {
-                        color: "app.text.muted",
-                        fontSize: "0.8125rem",
-                        fontWeight: 500,
-                        letterSpacing: "0.02em",
-                        marginBottom: "6px",
-                    },
-                    "& [data-part='helper-text']": {
-                        color: "app.text.muted",
-                        fontSize: "0.75rem",
-                        marginTop: "4px",
-                    },
-                }}
+                // _invalid={{ color: "red.500" }}
+                // mb={oneLiner ? 0 : 1}
+                //  css={{
+                //     "& [data-part='label']": {
+                //         color: "app.text.muted",
+                //         fontSize: "0.8125rem",
+                //         fontWeight: 500,
+                //         letterSpacing: "0.02em",
+                //         marginBottom: "6px",
+                //     },
+                //     "& [data-part='helper-text']": {
+                //         color: "app.text.muted",
+                //         fontSize: "0.75rem",
+                //         marginTop: "4px",
+                //     },
+                // }}
               >
-                {text}
+                {text}  <Field.RequiredIndicator />
               </Field.Label>
               {description && !oneLiner && (
                 <Text fontSize="xs" color="fg.subtle" mb={1}>
@@ -209,7 +209,7 @@ const TextField = ({
                     }}
                     transition="all 0.22s cubic-bezier(0.4,0,0.2,1)"
                     backdropFilter="blur(4px)"
-                     onChange={(e) => handleChange(e, onChange)}
+                    onChange={(e) => handleChange(e, onChange)}
                   />
                 );
               })()}
@@ -222,23 +222,24 @@ const TextField = ({
               )}
             </HStack>
 
-            <Flex justify="flex-end" mt={1} gap={4}>
+            <Flex mt={2} gap={4}  align="center" justify={oneLiner ? "space-between" : "flex-start"}>
+              <Field.ErrorText
+                fontSize="md"
+                color="red.500"
+                fontWeight="medium"
+              >
+                <Field.ErrorIcon />
+                {errors?.message?.toString()}
+              </Field.ErrorText>
               {maxLength && (
                 <Text
-                  fontSize="2xs"
+                  fontSize="xs"
                   fontWeight="medium"
                   color={value?.length > maxLength ? "red.500" : "fg.subtle"}
                 >
                   {value?.length || 0} / {maxLength}
                 </Text>
               )}
-              <Field.ErrorText
-                fontSize="xs"
-                color="red.500"
-                fontWeight="medium"
-              >
-                {errors?.message?.toString()}
-              </Field.ErrorText>
             </Flex>
           </Box>
         </Flex>

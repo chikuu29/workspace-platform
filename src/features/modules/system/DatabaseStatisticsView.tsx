@@ -13,18 +13,18 @@ import {
   IconButton,
 } from "@chakra-ui/react";
 import {
-  LuDatabase,
-  LuLayers,
-  LuEye,
-  LuBox,
-  LuScale,
-  LuHardDrive,
-  LuDatabaseBackup,
-  LuFiles,
-  LuCheck,
-  LuActivity,
-  LuRefreshCw
-} from "react-icons/lu";
+  Database,
+  Layers,
+  Eye,
+  Box as BoxIcon,
+  Scale,
+  HardDrive,
+  DatabaseBackup,
+  Files,
+  Check,
+  Activity,
+  RefreshCw
+} from "lucide-react";
 import { GETAPI } from "../../../app/api";
 import { PageLayout } from "@/core/components/PageLayout";
 import { Card } from "@/core/components/Card";
@@ -132,16 +132,16 @@ const DatabaseStatistics = () => {
   }
 
   const stats = [
-    { icon: LuDatabase, label: "Database", value: report?.db },
-    { icon: LuLayers, label: "Collections", value: report?.collections },
-    { icon: LuEye, label: "Views", value: report?.views },
-    { icon: LuBox, label: "Objects", value: report?.objects },
-    { icon: LuScale, label: "Avg Object Size", value: `${(report?.avgObjSize || 0).toFixed(2)} bytes` },
-    { icon: LuHardDrive, label: "Data Size", value: `${report?.dataSize || 0} bytes` },
-    { icon: LuDatabaseBackup, label: "Storage Size", value: `${report?.storageSize || 0} bytes` },
-    { icon: LuFiles, label: "Indexes", value: report?.indexes },
-    { icon: LuActivity, label: "Index Size", value: `${report?.indexSize || 0} bytes` },
-    { icon: LuCheck, label: "Status", value: report?.ok === 1 ? "Healthy" : "Attention" },
+    { icon: Database, label: "Database", value: report?.db },
+    { icon: Layers, label: "Collections", value: report?.collections },
+    { icon: Eye, label: "Views", value: report?.views },
+    { icon: BoxIcon, label: "Objects", value: report?.objects },
+    { icon: Scale, label: "Avg Object Size", value: `${(report?.avgObjSize || 0).toFixed(2)} bytes` },
+    { icon: HardDrive, label: "Data Size", value: `${report?.dataSize || 0} bytes` },
+    { icon: DatabaseBackup, label: "Storage Size", value: `${report?.storageSize || 0} bytes` },
+    { icon: Files, label: "Indexes", value: report?.indexes },
+    { icon: Activity, label: "Index Size", value: `${report?.indexSize || 0} bytes` },
+    { icon: Check, label: "Status", value: report?.ok === 1 ? "Healthy" : "Attention" },
   ];
 
   return (
@@ -150,7 +150,7 @@ const DatabaseStatistics = () => {
       isRefreshing={loading}
       title={
         <HStack gap={3}>
-          <Icon as={LuActivity} boxSize={6} color="app.text.accent" />
+          <Icon as={Activity} boxSize={6} color="app.text.accent" />
           <Text>System Health</Text>
         </HStack>
       }

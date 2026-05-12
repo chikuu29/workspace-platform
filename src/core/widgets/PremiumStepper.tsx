@@ -8,7 +8,7 @@ import {
     Circle,
     IconButton,
 } from "@chakra-ui/react";
-import { LuCheck, LuChevronLeft, LuChevronRight } from "react-icons/lu";
+import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { useColorModeValue } from "@/components/ui/color-mode";
 
 interface Step {
@@ -107,7 +107,7 @@ const PremiumStepper: React.FC<PremiumStepperProps> = ({
                     _hover={{ color: useColorModeValue("blue.600", "white"), bg: navBtnHoverBg }}
                     transition="all 0.2s"
                 >
-                    <LuChevronLeft />
+                    <ChevronLeft />
                 </IconButton>
             </Box>
 
@@ -149,7 +149,7 @@ const PremiumStepper: React.FC<PremiumStepperProps> = ({
                                     _hover={{ transform: "scale(1.1)", bg: isActive ? "blue.600" : isCompleted ? "green.600" : useColorModeValue("gray.200", "whiteAlpha.200") }}
                                 >
                                     {isCompleted ? (
-                                        <LuCheck size="18" />
+                                        <Check size="18" />
                                     ) : (
                                         <Text fontWeight="bold" fontSize="sm">
                                             {String(index + 1).padStart(2, "0")}
@@ -209,7 +209,7 @@ const PremiumStepper: React.FC<PremiumStepperProps> = ({
                     _hover={{ color: useColorModeValue("blue.600", "white"), bg: navBtnHoverBg }}
                     transition="all 0.2s"
                 >
-                    <LuChevronRight />
+                    <ChevronRight />
                 </IconButton>
             </Box>
         </Flex>

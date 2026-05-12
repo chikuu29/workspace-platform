@@ -13,7 +13,7 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { FaPlus, FaFilter, FaEdit, FaEye, FaTrash } from "react-icons/fa";
+import { Plus, Filter, Pencil, Eye, Trash2 } from "lucide-react";
 import { HSeparator } from "../separator/Separator";
 
 function MyTable() {
@@ -43,7 +43,7 @@ function MyTable() {
             // width="300px"
             me={2}
           />
-          <IconButton aria-label="Filter" colorPalette="gray"><FaFilter /></IconButton>
+          <IconButton aria-label="Filter" colorPalette="gray"><Filter /></IconButton>
         </Flex>
       </Flex>
       {!isMobile ? (
@@ -157,15 +157,15 @@ function MyTable() {
               {/* Action Buttons Section */}
               <Stack direction="row" gap={4} mt={4}>
                 {/* View Button */}
-                <Button colorPalette="teal"><FaEye />View
+                <Button colorPalette="teal"><Eye />View
                 </Button>
 
                 {/* Edit Button */}
-                <Button colorPalette="blue"><FaEdit />Edit
+                <Button colorPalette="blue"><Pencil />Edit
                 </Button>
 
                 {/* Delete Button */}
-                <Button colorPalette="red"><FaTrash />Delete
+                <Button colorPalette="red"><Trash2 />Delete
                 </Button>
               </Stack>
             </Box>

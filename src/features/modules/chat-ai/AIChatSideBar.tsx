@@ -15,32 +15,25 @@ import {
   InputGroup,
 } from "@chakra-ui/react";
 import { memo, useState } from "react";
-import { 
-  CiEdit, 
-  CiSearch, 
-  CiTrash,
-  CiCalendar,
-  CiClock2,
-  CiStar
-} from "react-icons/ci";
-import { 
-  FaRobot,
-  FaChevronDown,
-  FaChevronRight,
-  FaFilter
-} from "react-icons/fa";
-import { 
-  MdOutlineHistoryToggleOff,
-  MdClose,
-  MdMoreVert,
-  MdPushPin
-} from "react-icons/md";
-import { 
-  PiSidebar,
-  PiChatCircle,
-  PiSparkle
-} from "react-icons/pi";
-import { RiRobot2Fill } from "react-icons/ri";
+import {
+  Edit3,
+  Search,
+  Trash2,
+  Calendar,
+  Clock,
+  Star,
+  Bot,
+  ChevronDown,
+  ChevronRight,
+  Filter,
+  History,
+  X,
+  MoreVertical,
+  Pin,
+  PanelLeft,
+  MessageCircle,
+  Sparkles
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const MotionBox = motion.create(Box);
@@ -217,7 +210,7 @@ const AIChatSideBar = ({
               color="blue.500"
               boxShadow="inner"
             >
-              <RiRobot2Fill size={22} />
+              <Bot size={22} />
             </Box>
             <VStack align="start" gap={0}>
               <Text fontSize="md" fontWeight="800" color={textColor} letterSpacing="tight">
@@ -237,7 +230,7 @@ const AIChatSideBar = ({
             color={subtextColor}
             _hover={{ bg: hoverBg, color: textColor }}
           >
-            <MdClose size={16} />
+            <X size={16} />
           </IconButton>
         </Flex>
 
@@ -254,7 +247,7 @@ const AIChatSideBar = ({
           transition="all 0.2s"
           color="white"
         >
-          <CiEdit size={18} />
+          <Edit3 size={18} />
           New Conversation
         </Button>
       </Box>
@@ -298,8 +291,8 @@ const AIChatSideBar = ({
                   </Badge>
                 </HStack>
                 {expandedGroups.has(groupName) ? 
-                  <FaChevronDown size={12} /> : 
-                  <FaChevronRight size={12} />
+                  <ChevronDown size={12} /> : 
+                  <ChevronRight size={12} />
                 }
               </Button>
 
@@ -345,10 +338,10 @@ const AIChatSideBar = ({
                         <Flex justify="space-between" align="start" mb={2}>
                           <HStack gap={2} flex={1} minW={0}>
                             {chat.isPinned && (
-                              <MdPushPin size={12} color="orange" />
+                              <Pin size={12} color="orange" />
                             )}
                             {chat.isStarred && (
-                              <CiStar size={12} color="gold" />
+                              <Star size={12} color="gold" />
                             )}
                             <Text 
                               fontSize="sm" 
@@ -369,7 +362,7 @@ const AIChatSideBar = ({
                             _groupHover={{ opacity: 1 }}
                             color={subtextColor}
                           >
-                            <MdMoreVert size={14} />
+                            <MoreVertical size={14} />
                           </IconButton>
                         </Flex>
                         
@@ -393,7 +386,7 @@ const AIChatSideBar = ({
                               bg="whiteAlpha.100"
                               color={subtextColor}
                             >
-                              <CiClock2 size={10} />
+                              <Clock size={10} />
                             </Box>
                             <Text fontSize="10px" fontWeight="bold" color={subtextColor} textTransform="uppercase">
                               {chat.timestamp}
@@ -428,7 +421,7 @@ const AIChatSideBar = ({
               variant="ghost"
               color={subtextColor}
             >
-              <FaFilter />
+              <Filter size={14} />
             </IconButton>
             <IconButton
               aria-label="Clear history"
@@ -436,7 +429,7 @@ const AIChatSideBar = ({
               variant="ghost"
               color={subtextColor}
             >
-              <CiTrash />
+              <Trash2 size={14} />
             </IconButton>
           </HStack>
         </HStack>

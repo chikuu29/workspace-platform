@@ -3,7 +3,7 @@ import { Box, Input, chakra, type InputProps } from "@chakra-ui/react";
 import { Field } from "@/components/ui/field";
 import { InputGroup } from "@/components/ui/input-group";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiEye, FiEyeOff } from "react-icons/fi";
+import { Eye, EyeOff } from "lucide-react";
 
 const ChakraButton = chakra("button");
 
@@ -60,7 +60,7 @@ const AuthFormInput = React.forwardRef<HTMLInputElement, AuthFormInputProps>(
                 cursor="pointer"
                 px={1}
             >
-                {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </ChakraButton>
         ) : null;
 

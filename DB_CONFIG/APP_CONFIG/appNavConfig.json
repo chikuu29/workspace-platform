@@ -6,6 +6,7 @@
             {
                 "id": "SYSTEM",
                 "app_slug": "system",
+                "required_permissions": ["SYSTEM.VIEW.READ"],
                 "hidden": false,
                 "name": "Admin Module",
                 "target": "/workspace/app/system/home",
@@ -13,6 +14,8 @@
                     "onClick": ""
                 },
                 "logo": {
+                    "ShowSvg": true,
+                    "svgIcon": "<svg viewBox=\"0 0 24 24\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z\"/></svg>",
                     "url": "../assets/icons/3d-casual-life-secure-document.png",
                     "style": {
                         "mb": "4px",
@@ -23,7 +26,8 @@
             },
             {
                 "id": "MY_GYM",
-                "app_slug": "MY_GYM",
+                "app_slug": "myGym",
+                "required_permissions": ["MYGYM.VIEW.READ"],
                 "hidden": false,
                 "name": "Gym Management",
                 "target": "/workspace/app/myGym/home",
@@ -31,6 +35,8 @@
                     "onClick": ""
                 },
                 "logo": {
+                    "ShowSvg": true,
+                    "svgIcon": "<svg viewBox=\"0 0 24 24\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m6.5 6.5 11 11\"/><path d=\"m11.5 4-7.5 7.5\"/><path d=\"m20 12.5-7.5 7.5\"/><path d=\"m11.5 6.5-5 5\"/><path d=\"m17.5 12.5-5 5\"/><path d=\"m6.5 11.5 5-5\"/><path d=\"m12.5 17.5 5-5\"/></svg>",
                     "url": "../assets/icons/smart-gym-water-bottle-and-dumbbells-for-a-healthy-lifestyle.png",
                     "style": {
                         "mb": "4px",
@@ -49,6 +55,8 @@
                     "onClick": ""
                 },
                 "logo": {
+                    "ShowSvg": true,
+                    "svgIcon": "<svg viewBox=\"0 0 24 24\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 21h18\"/><path d=\"M9 8h1\"/><path d=\"M9 12h1\"/><path d=\"M9 16h1\"/><path d=\"M14 8h1\"/><path d=\"M14 12h1\"/><path d=\"M14 16h1\"/><path d=\"M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16\"/></svg>",
                     "url": "../assets/icons/3d-casual-life-secure-document.png",
                     "style": {
                         "mb": "4px",
@@ -67,6 +75,8 @@
                     "onClick": ""
                 },
                 "logo": {
+                    "ShowSvg": true,
+                    "svgIcon": "<svg viewBox=\"0 0 24 24\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2\"/><path d=\"M7 2v20\"/><path d=\"M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7\"/></svg>",
                     "url": "../assets/icons/3d-casual-life-secure-document.png",
                     "style": {
                         "mb": "4px",
@@ -109,33 +119,33 @@
             },
             "myApps": {},
             "myGym": {
-                "SHOW_SIDE_NAV_MENU": false,
+                "SHOW_SIDE_NAV_MENU": true,
                 "SHOW_TOP_NAV_MENU": true,
                 "MENU": [
                     {
                         "label": "Home",
-                        "icon": "FcHome",
+                        "icon": "Home",
                         "path": "/app/myGym/home",
                         "isMaster": true
                     },
                     {
                         "label": "Members",
                         "isMaster": false,
-                        "icon": "FcBusinessman",
+                        "icon": "Users",
                         "menu": [
                             {
                                 "label": "List Members",
-                                "icon": "FcTodoList",
-                                "path": "/app/myGym/ListMember"
+                                "icon": "List",
+                                "path": "/app/myGym/members"
                             },
                             {
                                 "label": "Add Member",
-                                "icon": "FcPlus",
+                                "icon": "UserPlus",
                                 "path": "/app/myGym/AddMember"
                             },
                             {
                                 "label": "Member Check-In",
-                                "icon": "FcCheckmark",
+                                "icon": "UserCheck",
                                 "path": "/app/myGym/MemberCheckIn"
                             }
                         ]
@@ -143,30 +153,21 @@
                     {
                         "label": "Trainers & Staff",
                         "isMaster": false,
-                        "icon": "FcManager",
+                        "icon": "Dumbbell",
                         "menu": [
                             {
                                 "label": "List Trainers",
-                                "icon": "FcReading",
-                                "path": "/app/myGym/listTrainers"
+                                "icon": "ClipboardList",
+                                "path": "/app/myGym/trainers"
                             },
                             {
                                 "label": "Add Trainer",
-                                "icon": "FcPlus",
-                                "action": {
-                                    "type": "modal",
-                                    "templateName": "AddTrainer",
-                                    "config": {
-                                        "size": "full",
-                                        "closeOnOverlayClick": true,
-                                        "closeOnEsc": true,
-                                        "scrollBehavior": "inside"
-                                    }
-                                }
+                                "icon": "UserPlus",
+                                "path": "/app/myGym/AddTrainer"
                             },
                             {
                                 "label": "Manage Schedules",
-                                "icon": "FcCalendar",
+                                "icon": "CalendarDays",
                                 "path": "/app/myGym/trainerSchedules"
                             }
                         ]
@@ -174,21 +175,21 @@
                     {
                         "label": "Classes & Scheduling",
                         "isMaster": false,
-                        "icon": "FcCalendar",
+                        "icon": "Calendar",
                         "menu": [
                             {
                                 "label": "List Classes",
-                                "icon": "FcTodoList",
+                                "icon": "LayoutList",
                                 "path": "/app/myGym/listClasses"
                             },
                             {
                                 "label": "Add Class",
-                                "icon": "FcPlus",
+                                "icon": "CalendarPlus",
                                 "path": "/app/myGym/addClass"
                             },
                             {
                                 "label": "Class Bookings",
-                                "icon": "FcBookmark",
+                                "icon": "Bookmark",
                                 "path": "/app/myGym/classBookings"
                             }
                         ]
@@ -196,21 +197,21 @@
                     {
                         "label": "Reports",
                         "isMaster": false,
-                        "icon": "FcBarChart",
+                        "icon": "BarChart3",
                         "menu": [
                             {
                                 "label": "Revenue Report",
-                                "icon": "FcMoneyTransfer",
+                                "icon": "DollarSign",
                                 "path": "/app/myGym/revenueReport"
                             },
                             {
                                 "label": "Attendance Report",
-                                "icon": "FcClock",
+                                "icon": "Clock",
                                 "path": "/app/myGym/attendanceReport"
                             },
                             {
                                 "label": "Performance Report",
-                                "icon": "FcStatistics",
+                                "icon": "TrendingUp",
                                 "path": "/app/myGym/performanceReport"
                             }
                         ]
@@ -218,16 +219,16 @@
                     {
                         "label": "Billing & Payments",
                         "isMaster": false,
-                        "icon": "FcMoneyTransfer",
+                        "icon": "CreditCard",
                         "menu": [
                             {
                                 "label": "Subscription Plans",
-                                "icon": "FcPlanner",
+                                "icon": "Layers",
                                 "path": "/app/myGym/Subscription"
                             },
                             {
                                 "label": "Payment History",
-                                "icon": "FcList",
+                                "icon": "Receipt",
                                 "path": "/app/myGym/PaymentsHistory"
                             }
                         ]

@@ -8,7 +8,7 @@ import {
   Circle,
 } from "@chakra-ui/react";
 import { Link, useNavigate } from "react-router";
-import { FiShieldOff, FiArrowLeft, FiHome } from "react-icons/fi";
+import { ShieldOff, ArrowLeft, Home } from "lucide-react";
 import { motion } from "framer-motion";
 import { useColorModeValue } from "@/components/ui/color-mode";
 
@@ -87,7 +87,7 @@ const UnauthorizedAccess = () => {
             _dark={{ bg: "rgba(239, 68, 68, 0.1)" }}
             color="red.500"
           >
-            <Icon as={FiShieldOff} boxSize={8} />
+            <Icon as={ShieldOff} boxSize={8} />
           </Circle>
 
           <VStack gap={2}>
@@ -113,7 +113,7 @@ const UnauthorizedAccess = () => {
               borderRadius="xl"
               fontWeight="600"
             >
-              <FiArrowLeft /> Go Back
+              <ArrowLeft /> Go Back
             </Button>
             
             <Link to="/myApps" style={{ width: "100%" }}>
@@ -127,7 +127,7 @@ const UnauthorizedAccess = () => {
                 borderRadius="xl"
                 fontWeight="500"
               >
-                <FiHome /> Return Home
+                <Home /> Return Home
               </Button>
             </Link>
           </VStack>

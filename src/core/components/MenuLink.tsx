@@ -1,6 +1,7 @@
 import { Box, HStack, VStack, Text, Popover, Stack } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { NavLink, useNavigate, useLocation } from "react-router";
+import { buildWorkspacePath } from "@/core/utils/pathBuilder";
 import AsyncLoadIcon from "@/utils/hooks/AsyncLoadIcon";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/store";
@@ -42,6 +43,8 @@ interface MenuConfig {
     key: string;
     label: string;
     icon: string;
+    /** Raw SVG markup string — rendered instantly by AsyncLoadIcon when present */
+    svgIcon?: string;
     path?: string;
     target?: string;
     /** Legacy onClick/onHover handlers */
@@ -132,28 +135,16 @@ const MenuLink = memo(({ menuConfig, showFullSideBarMenu }: MenuLinkProps) => {
     const expandedActive = useMemo(() => ({ transform: "scale(0.98)" }), []);
     const collapsedActive = useMemo(() => ({ transform: "scale(0.95)" }), []);
 
-    const navigationPath = useMemo(() => {
-        if (!menuConfig.path) return "";
-        const clean = menuConfig.path.startsWith("/") ? menuConfig.path.substring(1) : menuConfig.path;
+    // Path resolution delegated to shared pathBuilder utility
+    const navigationPath = useMemo(
+        () => (menuConfig.path ? buildWorkspacePath(menuConfig.path, organizationName) : ""),
+        [organizationName, menuConfig.path],
+    );
 
-        // Platform level views (Portal)
-        if (clean === "myApps" || clean === "profile" || clean === "settings") {
-            return `/${clean}`;
-        }
-
-        return `/${organizationName}/workspace/${clean}`;
-    }, [organizationName, menuConfig.path]);
-
-    const targetUrl = useMemo(() => {
-        if (!menuConfig.target) return "";
-        const clean = menuConfig.target.startsWith("/") ? menuConfig.target.substring(1) : menuConfig.target;
-
-        if (clean === "myApps" || clean === "profile" || clean === "settings") {
-            return `/${clean}`;
-        }
-        console.log("MenuLink targetUrl", clean, organizationName);
-        return `/${organizationName}/workspace/${clean}`;
-    }, [organizationName, menuConfig.target]);
+    const targetUrl = useMemo(
+        () => (menuConfig.target ? buildWorkspacePath(menuConfig.target, organizationName) : ""),
+        [organizationName, menuConfig.target],
+    );
 
     /**
      * Recursive check to see if this item or any of its children are currently active.
@@ -245,12 +236,12 @@ const MenuLink = memo(({ menuConfig, showFullSideBarMenu }: MenuLinkProps) => {
                 onMouseEnter={checkTruncation}
             >
                 <Box flexShrink={0} display="flex" alignItems="center" justifyContent="center">
-                    <AsyncLoadIcon iconName={menuConfig.icon} />
+                    <AsyncLoadIcon iconName={menuConfig.icon} svgIcon={menuConfig.svgIcon} />
                 </Box>
                 <Text
                     ref={textRef}
-                    fontSize="sm"
-                    fontWeight="500"
+                    // fontSize="sm"
+                    // fontWeight="500"
                     color="text.default"
                     whiteSpace="nowrap"
                     overflow="hidden"
@@ -278,7 +269,7 @@ const MenuLink = memo(({ menuConfig, showFullSideBarMenu }: MenuLinkProps) => {
                 _active={collapsedActive}
             >
                 <Box display="flex" alignItems="center" justifyContent="center" h="24px">
-                    <AsyncLoadIcon iconName={menuConfig.icon} />
+                    <AsyncLoadIcon iconName={menuConfig.icon} svgIcon={menuConfig.svgIcon} />
                 </Box>
                 <Text
                     fontSize="0.6rem"
@@ -331,7 +322,7 @@ const MenuLink = memo(({ menuConfig, showFullSideBarMenu }: MenuLinkProps) => {
                         p={4}
                         rounded="xl"
                         minW="sm"
-                        bg="bg.default"
+                        bg="app.card.bg"
                         zIndex="popover"
                     >
                         <Stack>

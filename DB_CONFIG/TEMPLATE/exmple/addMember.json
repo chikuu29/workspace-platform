@@ -1,0 +1,230 @@
+{
+    "id": "1",
+    "pageName": "AddMember",
+    "route": "AddMember",
+    "appName": "myGym",
+    "appMeta": {
+        "appName": "Gym",
+        "viewName": "AddMember",
+        "viewId": "1",
+        "version": "1.0.0",
+        "owner": "Suryanarayan Biswal",
+        "createdAt": "2024-11-19"
+    },
+    "settings": {
+        "theme": "default",
+        "language": "en",
+        "securityEnabled": true,
+        "sanitizeHtml": false
+    },
+    "scripts": {
+        "files": [
+            "Gym/addMemberScript"
+        ],
+        "postScript": "documentPostScript"
+    },
+    "ACTIONS": {
+        "showSaveButton": true,
+        "events": {
+            "draft": {
+                "type": "API_CALL",
+                "url": "app/draft",
+                "method": "POST",
+                "successMessage": "Membership details saved as draft!",
+                "errorMessage": "Failed to save draft. Please try again."
+            },
+            "submit": {
+                "type": "API_CALL",
+                "url": "gym/addMember",
+                "method": "POST",
+                "successMessage": "Membership registration successful!",
+                "errorMessage": "Registration failed. Please check the details and try again.",
+                "laterActions": {
+                    "type": "NAVIGATION",
+                    "path": "/app/myGym/SelectPlan?member_id={{member_id}}"
+                }
+            }
+        },
+        "ACTION_BUTTONS": [
+            {
+                "name": "Draft",
+                "text": "Draft",
+                "iconName": "LuSave",
+                "widget": "button",
+                "styles": {
+                    "variant": "action"
+                },
+                "hidden": false,
+                "oneLiner": true,
+                "required": true,
+                "event": "draft"
+            }
+        ]
+    },
+    "UI_TYPE": {
+        "type": "FORM_VIEW",
+        "title": "Member Onboarding",
+        "description": "Register new members with a premium, guided experience.",
+        "target": "forms",
+        "layoutStyles": {
+            "p":"0"
+        }
+    },
+    "UI_VIEW": {
+        "schema": {
+            "forms": {
+                "tabs": [
+                    {
+                        "title": "Personal Details",
+                        "description": "Basic identification and contact information.",
+                        "iconName": "UserPen",
+                        "widgets": [
+                            {
+                                "name": "firstName",
+                                "text": "First Name",
+                                "description": "Enter member's first name",
+                                "widget": "textField",
+                                "oneLiner": true,
+                                "required": true,
+                                "maxLength": 50
+                            },
+                            {
+                                "name": "lastName",
+                                "text": "Last Name",
+                                "description": "Enter member's last name",
+                                "widget": "textField",
+                                "oneLiner": true,
+                                "required": true,
+                                "maxLength": 50
+                            },
+                            {
+                                "name": "email",
+                                "text": "Email Address",
+                                "description": "Used for membership alerts and newsletters",
+                                "type": "email",
+                                "widget": "textField",
+                                "oneLiner": true,
+                                "required": true
+                            },
+                            {
+                                "name": "phone",
+                                "text": "Phone Number",
+                                "description": "Primary contact number for SMS updates",
+                                "type": "tel",
+                                "widget": "textField",
+                                "oneLiner": true,
+                                "required": true
+                            },
+                            {
+                                "name": "gender",
+                                "text": "Gender",
+                                "description": "Select the member's gender for facilities allocation",
+                                "widget": "radioField",
+                                "oneLiner": true,
+                                "enableClear": true,
+                                "options": [
+                                    {
+                                        "label": "Male",
+                                        "value": "male"
+                                    },
+                                    {
+                                        "label": "Female",
+                                        "value": "female"
+                                    },
+                                    {
+                                        "label": "Other",
+                                        "value": "other"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "address",
+                                "text": "Residential Address",
+                                "description": "Current permanent residence details",
+                                "widget": "textAreaField",
+                                "oneLiner": true,
+                                "required": false
+                            }
+                        ]
+                    },
+                    {
+                        "title": "Fitness Goals",
+                        "iconName": "Activity",
+                        "widgets": [
+                            {
+                                "name": "appointmentTime",
+                                "text": "Appointment Slot",
+                                "description": "Schedule your first orientation session",
+                                "widget": "dateAndTimeField",
+                                "oneLiner": true,
+                                "required": true,
+                                "enableClear": true
+                            },
+                            {
+                                "name": "fitnessGoals",
+                                "text": "Fitness Objectives",
+                                "description": "What is the member aiming to achieve? (e.g., Weight loss, Muscle gain)",
+                                "widget": "textAreaField",
+                                "oneLiner": true
+                            }
+                        ]
+                    },
+                    {
+                        "title": "Verification",
+                        "description": "Security documents and profile setup.",
+                        "iconName": "ShieldCheck",
+                        "widgets": [
+                            {
+                                "name": "idProof",
+                                "text": "Government ID Proof",
+                                "description": "Upload a valid passport, driver's license, or national ID",
+                                "widget": "uploadField",
+                                "oneLiner": true,
+                                "required": true,
+                                "liveCameraAllow": true,
+                                "defaultApiConfig": {
+                                    "uploadURL": "app/upload"
+                                }
+                            },
+                            {
+                                "name": "profilePic",
+                                "text": "Profile Photo",
+                                "description": "A clear facial photo for the membership card",
+                                "widget": "uploadField",
+                                "oneLiner": true,
+                                "liveCameraAllow": true,
+                                "accept": "image/*",
+                                "defaultApiConfig": {
+                                    "uploadURL": "app/upload"
+                                }
+                            },
+                            {
+                                "name": "paymentMode",
+                                "text": "Payment Mode",
+                                "description": "Preferred method for subscription renewal",
+                                "widget": "radioField",
+                                "oneLiner": true,
+                                "enableClear": true,
+                                "options": [
+                                    {
+                                        "label": "Cash",
+                                        "value": "cash"
+                                    },
+                                    {
+                                        "label": "Credit Card",
+                                        "value": "card"
+                                    },
+                                    {
+                                        "label": "UPI / Digital",
+                                        "value": "upi"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    "active": true
+}

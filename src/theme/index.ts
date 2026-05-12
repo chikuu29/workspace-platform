@@ -30,7 +30,7 @@ export const system = createSystem(defaultConfig, {
             color: "text.default",
             bg: "bg.default",
 
-            fontWeight: "500",
+            fontWeight: "700",
             fontFamily: "body",
             "&::-webkit-scrollbar": {
                 display: "none",

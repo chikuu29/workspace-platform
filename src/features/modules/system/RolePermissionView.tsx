@@ -16,12 +16,12 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import {
-  LuPlus,
-  LuRefreshCw,
-  LuShield,
-  LuShieldCheck,
-  LuChevronRight,
-} from "react-icons/lu";
+  Plus,
+  RefreshCw,
+  Shield,
+  ShieldCheck,
+  ChevronRight,
+} from "lucide-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/store";
 import { GETAPI, POSTAPI } from "@/app/api";
@@ -107,7 +107,7 @@ const RoleCard = memo(({ role, description, is_active = true }: RoleCardProps) =
               bg="rgba(255,255,255,0.22)"
             />
             <Icon
-              as={is_active ? LuShieldCheck : LuShield}
+              as={is_active ? ShieldCheck : Shield}
               boxSize={5}
               color="white"
               zIndex={1}
@@ -170,7 +170,7 @@ const RoleCard = memo(({ role, description, is_active = true }: RoleCardProps) =
             >
               Manage Permissions
             </Text>
-            <LuChevronRight size={14} color="var(--chakra-colors-app-text-accent)" />
+            <ChevronRight size={14} color="var(--chakra-colors-app-text-accent)" />
           </Flex>
         </Box>
       </VStack>
@@ -249,7 +249,7 @@ const RolePermissionView = memo(() => {
             onClick={fetchRoles}
             loading={isLoading}
           >
-            <LuRefreshCw />
+            <RefreshCw />
           </IconButton>
           <Button
             size="sm"
@@ -263,7 +263,7 @@ const RolePermissionView = memo(() => {
             transition="all 0.2s"
             onClick={() => setModalOpen(true)}
           >
-            <LuPlus style={{ marginRight: "6px" }} />
+            <Plus style={{ marginRight: "6px" }} />
             Create Role
           </Button>
         </HStack>
@@ -286,7 +286,7 @@ const RolePermissionView = memo(() => {
               bg="rgba(99,102,241,0.08)" border="1px dashed" borderColor="app.card.border"
               display="flex" alignItems="center" justifyContent="center"
             >
-              <Icon as={LuShield} boxSize={7} color="app.text.muted" />
+              <Icon as={Shield} boxSize={7} color="app.text.muted" />
             </Box>
             <Text fontWeight="600" color="app.text.primary">No roles yet</Text>
             <Text fontSize="sm" color="app.text.muted">Create your first role to manage permissions.</Text>

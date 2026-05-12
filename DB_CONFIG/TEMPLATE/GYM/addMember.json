@@ -41,7 +41,7 @@
                 "errorMessage": "Registration failed. Please check the details and try again.",
                 "laterActions": {
                     "type": "NAVIGATION",
-                    "path": "/app/myGym/CreateSubscription?member_id={{member_id}}"
+                    "path": "/app/myGym/selectPlan/{{member_id}}"
                 }
             }
         },
@@ -56,7 +56,7 @@
                 },
                 "hidden": false,
                 "oneLiner": true,
-                "required": true,
+                "mandatory": true,
                 "event": "draft"
             }
         ]
@@ -67,7 +67,7 @@
         "description": "Register new members with a premium, guided experience.",
         "target": "forms",
         "layoutStyles": {
-            "p":"0"
+            "p": "0"
         }
     },
     "UI_VIEW": {
@@ -77,49 +77,50 @@
                     {
                         "title": "Personal Details",
                         "description": "Basic identification and contact information.",
-                        "iconName": "LuUser",
+                        "iconName": "UserPen",
                         "widgets": [
                             {
-                                "name": "memberFirstName",
+                                "name": "firstName",
                                 "text": "First Name",
                                 "description": "Enter member's first name",
                                 "widget": "textField",
                                 "oneLiner": true,
-                                "required": true,
+                                "mandatory": true,
                                 "maxLength": 50
                             },
                             {
-                                "name": "memberLastName",
+                                "name": "lastName",
                                 "text": "Last Name",
                                 "description": "Enter member's last name",
                                 "widget": "textField",
                                 "oneLiner": true,
-                                "required": true,
+                                "mandatory": true,
                                 "maxLength": 50
                             },
                             {
-                                "name": "memberEmail",
+                                "name": "email",
                                 "text": "Email Address",
                                 "description": "Used for membership alerts and newsletters",
                                 "type": "email",
                                 "widget": "textField",
                                 "oneLiner": true,
-                                "required": true
+                                "mandatory": true
                             },
                             {
-                                "name": "memberPhone",
+                                "name": "phone",
                                 "text": "Phone Number",
                                 "description": "Primary contact number for SMS updates",
                                 "type": "tel",
                                 "widget": "textField",
                                 "oneLiner": true,
-                                "required": true
+                                "mandatory": true
                             },
                             {
-                                "name": "memberGender",
+                                "name": "gender",
                                 "text": "Gender",
                                 "description": "Select the member's gender for facilities allocation",
                                 "widget": "radioField",
+                                "mandatory": true,
                                 "oneLiner": true,
                                 "enableClear": true,
                                 "options": [
@@ -138,18 +139,18 @@
                                 ]
                             },
                             {
-                                "name": "memberAddress",
+                                "name": "address",
                                 "text": "Residential Address",
                                 "description": "Current permanent residence details",
                                 "widget": "textAreaField",
                                 "oneLiner": true,
-                                "required": false
+                                "mandatory": false
                             }
                         ]
                     },
                     {
                         "title": "Fitness Goals",
-                        "iconName": "LuActivity",
+                        "iconName": "Activity",
                         "widgets": [
                             {
                                 "name": "appointmentTime",
@@ -157,7 +158,7 @@
                                 "description": "Schedule your first orientation session",
                                 "widget": "dateAndTimeField",
                                 "oneLiner": true,
-                                "required": true,
+                                "mandatory": true,
                                 "enableClear": true
                             },
                             {
@@ -172,7 +173,7 @@
                     {
                         "title": "Verification",
                         "description": "Security documents and profile setup.",
-                        "iconName": "LuShieldCheck",
+                        "iconName": "ShieldCheck",
                         "widgets": [
                             {
                                 "name": "idProof",
@@ -180,9 +181,11 @@
                                 "description": "Upload a valid passport, driver's license, or national ID",
                                 "widget": "uploadField",
                                 "oneLiner": true,
-                                "required": true,
-                                "liveCameraAllow": true,
+                                "mandatory": false,
+                                "liveCameraAllow": false,
                                 "defaultApiConfig": {
+                                    "max_size_bytes": 5242880,
+                                    "accept": "image/* application/pdf",
                                     "uploadURL": "app/upload"
                                 }
                             },
@@ -193,32 +196,13 @@
                                 "widget": "uploadField",
                                 "oneLiner": true,
                                 "liveCameraAllow": true,
+                                "mandatory": true,
                                 "accept": "image/*",
                                 "defaultApiConfig": {
+                                    "max_size_bytes": 5242880,
+                                    "accept": "image/*",
                                     "uploadURL": "app/upload"
                                 }
-                            },
-                            {
-                                "name": "paymentMode",
-                                "text": "Payment Mode",
-                                "description": "Preferred method for subscription renewal",
-                                "widget": "radioField",
-                                "oneLiner": true,
-                                "enableClear": true,
-                                "options": [
-                                    {
-                                        "label": "Cash",
-                                        "value": "cash"
-                                    },
-                                    {
-                                        "label": "Credit Card",
-                                        "value": "card"
-                                    },
-                                    {
-                                        "label": "UPI / Digital",
-                                        "value": "upi"
-                                    }
-                                ]
                             }
                         ]
                     }

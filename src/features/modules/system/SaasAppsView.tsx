@@ -36,20 +36,20 @@ import { toaster } from "@/components/ui/toaster";
 import { GETAPI, POSTAPI, PUTAPI, DELETEAPI } from "@/app/api";
 import { APIResponse } from "@/app/interfaces/app.interface";
 import {
-    LuLayoutGrid,
-    LuPlus,
-    LuPencil,
-    LuTrash2,
-    LuRefreshCw,
-    LuChevronRight,
-    LuShieldCheck,
-    LuZap,
-    LuSave,
-    LuGlobe,
-    LuCoins,
-    LuActivity,
-    LuChevronDown
-} from "react-icons/lu";
+    LayoutGrid,
+    Plus,
+    Pencil,
+    Trash2,
+    RefreshCw,
+    ChevronRight,
+    ShieldCheck,
+    Zap,
+    Save,
+    Globe,
+    Coins,
+    Activity,
+    ChevronDown
+} from "lucide-react";
 import { Field } from "@/components/ui/field";
 import { PageLayout } from "@/core/components/PageLayout";
 import { Card } from "@/core/components/Card";
@@ -146,7 +146,7 @@ const SaasAppsView = memo(() => {
             name: formData.get("name"),
             code: formData.get("code"),
             description: formData.get("description"),
-            icon: formData.get("icon") || "LuLayoutGrid",
+            icon: formData.get("icon") || "LayoutGrid",
             is_active: formData.get("is_active") === "on",
             pricing: [
                 {
@@ -244,7 +244,7 @@ const SaasAppsView = memo(() => {
                                 borderColor="rgba(6,182,212,0.2)"
                                 boxShadow="inner"
                             >
-                                <Icon as={LuLayoutGrid} boxSize={5} color="cyan.400" />
+                                <Icon as={LayoutGrid} boxSize={5} color="cyan.400" />
                             </Center>
                             <VStack align="start" gap={0} flex={1}>
                                 <Text fontWeight="800" color="app.text.primary" fontSize="md" letterSpacing="tight">
@@ -291,7 +291,7 @@ const SaasAppsView = memo(() => {
                                     _hover={{ bg: "cyan.500/10", color: "cyan.400" }}
                                     title="Manage Features"
                                 >
-                                    <LuZap size={16} />
+                                    <Zap size={16} />
                                 </IconButton>
                                 <IconButton
                                     aria-label="Permissions"
@@ -302,7 +302,7 @@ const SaasAppsView = memo(() => {
                                     _hover={{ bg: "purple.500/10", color: "purple.400" }}
                                     title="Manage Permissions"
                                 >
-                                    <LuShieldCheck size={16} />
+                                    <ShieldCheck size={16} />
                                 </IconButton>
                             </HStack>
 
@@ -315,7 +315,7 @@ const SaasAppsView = memo(() => {
                                     onClick={() => handleEditClick(app)}
                                     _hover={{ bg: "white/10", color: "white" }}
                                 >
-                                    <LuPencil size={14} />
+                                    <Pencil size={14} />
                                 </IconButton>
                                 <IconButton
                                     aria-label="Delete"
@@ -326,7 +326,7 @@ const SaasAppsView = memo(() => {
                                     onClick={() => handleDelete(app.id)}
                                     _hover={{ bg: "red.500/10", color: "red.400" }}
                                 >
-                                    <LuTrash2 size={14} />
+                                    <Trash2 size={14} />
                                 </IconButton>
                             </HStack>
                         </HStack>
@@ -342,7 +342,7 @@ const SaasAppsView = memo(() => {
                 title={
                     <HStack gap={3}>
                         <Center boxSize="40px" borderRadius="xl" bg="rgba(6,182,212,0.15)" color="cyan.400" border="1px solid" borderColor="cyan.400/20">
-                            <LuLayoutGrid size={20} />
+                            <LayoutGrid size={20} />
                         </Center>
                         <Text>Applications</Text>
                     </HStack>
@@ -365,7 +365,7 @@ const SaasAppsView = memo(() => {
                             fontWeight="700"
                             _hover={{ transform: "translateY(-1px)", boxShadow: "0 12px 24px rgba(6,182,212,0.35)" }}
                         >
-                            <LuPlus style={{ strokeWidth: '3px', marginRight: '8px' }} size={18} /> Register Application
+                            <Plus style={{ strokeWidth: '3px', marginRight: '8px' }} size={18} /> Register Application
                         </Button>
                     </HStack>
                 }
@@ -383,7 +383,7 @@ const SaasAppsView = memo(() => {
                     <Center py={32}>
                         <VStack gap={8} maxW="400px" textAlign="center">
                             <Center boxSize="100px" borderRadius="3xl" bg="rgba(255,255,255,0.02)" border="2px dashed" borderColor="app.card.border">
-                                <LuLayoutGrid size={48} color="rgba(255,255,255,0.2)" />
+                                <LayoutGrid size={48} color="rgba(255,255,255,0.2)" />
                             </Center>
                             <VStack gap={2}>
                                 <Heading size="xl" fontWeight="900">Project Zero</Heading>
@@ -392,7 +392,7 @@ const SaasAppsView = memo(() => {
                                 </Text>
                             </VStack>
                             <Button colorPalette="cyan" size="lg" borderRadius="2xl" onClick={handleAddClick} px={8} h="54px" fontWeight="800">
-                                Register Service <LuChevronRight />
+                                Register Service <ChevronRight />
                             </Button>
                         </VStack>
                     </Center>
@@ -418,7 +418,7 @@ const SaasAppsView = memo(() => {
                     <DrawerHeader borderBottom="1px solid" borderColor="app.card.border" py={10} px={12}>
                         <HStack gap={6}>
                             <Center w={16} h={16} borderRadius="2xl" bg="cyan.500" color="white" boxShadow="0 12px 24px rgba(6,182,212,0.3)">
-                                <Icon as={selectedApp ? LuPencil : LuPlus} boxSize={8} />
+                                <Icon as={selectedApp ? Pencil : Plus} boxSize={8} />
                             </Center>
                             <VStack align="start" gap={0}>
                                 <Heading size="2xl" fontWeight="900" letterSpacing="tight" color="app.text.primary">
@@ -437,7 +437,7 @@ const SaasAppsView = memo(() => {
                                 {/* Identification Section */}
                                 <Stack gap={6}>
                                     <HStack gap={2} mb={-2}>
-                                        <LuActivity color="cyan.400" size={14} />
+                                        <Activity color="cyan.400" size={14} />
                                         <Text fontSize="xs" fontWeight="800" textTransform="uppercase" letterSpacing="widest" color="cyan.400">Identification</Text>
                                     </HStack>
 
@@ -490,7 +490,7 @@ const SaasAppsView = memo(() => {
                                 {/* Pricing Section */}
                                 <Stack gap={6}>
                                     <HStack gap={2} mb={-2}>
-                                        <LuCoins color="cyan.400" size={14} />
+                                        <Coins color="cyan.400" size={14} />
                                         <Text fontSize="xs" fontWeight="800" textTransform="uppercase" letterSpacing="widest" color="cyan.400">Commercial Configuration</Text>
                                     </HStack>
 
@@ -550,10 +550,10 @@ const SaasAppsView = memo(() => {
 
                                 {/* Visuals & Status */}
                                 <SimpleGrid columns={2} gap={6}>
-                                    <Field label="Visual Icon" color="app.text.secondary" helperText="React Icon key (e.g. LuGlobe)">
+                                    <Field label="Visual Icon" color="app.text.secondary" helperText="React Icon key (e.g. Globe)">
                                         <Input
                                             name="icon"
-                                            defaultValue={selectedApp?.icon || "LuLayoutGrid"}
+                                            defaultValue={selectedApp?.icon || "LayoutGrid"}
                                             bg="rgba(255,255,255,0.02)"
                                             borderColor="app.card.border"
                                             borderRadius="xl"
@@ -601,7 +601,7 @@ const SaasAppsView = memo(() => {
                             boxShadow="0 12px 24px rgba(6,182,212,0.25)"
                             _active={{ transform: "scale(0.98)" }}
                         >
-                            <LuSave style={{ marginRight: '8px' }} />
+                            <Save style={{ marginRight: '8px' }} />
                             {selectedApp ? "Update Configuration" : "Initialize Application"}
                         </Button>
                     </DrawerFooter>

@@ -24,8 +24,7 @@ import {
   DialogActionTrigger,
 } from "@/components/ui/dialog";
 import { Toaster, toaster } from "@/components/ui/toaster";
-import { IoCreateOutline } from "react-icons/io5";
-import { LuTriangleAlert, LuCopy, LuCheck, LuRefreshCw, LuShieldAlert, LuX } from "react-icons/lu";
+import { SquarePen, TriangleAlert, Copy, Check, RefreshCw, ShieldAlert, X } from "lucide-react";
 
 import { GETAPI, PUTAPI, POSTAPI, DELETEAPI } from "@/app/api";
 import { TableWidget } from "@/core/widgets/TableWidget";
@@ -215,7 +214,7 @@ const OAuthView = () => {
             }}
             _active={{ transform: "translateY(0) scale(1)", boxShadow: "none" }}
           >
-            <IoCreateOutline size={18} />
+            <SquarePen size={18} />
             Create Client
           </Button>
         }
@@ -243,7 +242,7 @@ const OAuthView = () => {
           <DialogHeader px={6} pt={6} pb={2}>
             <HStack gap={3}>
               <Flex align="center" justify="center" w={10} h={10} borderRadius="xl" bg="rgba(239, 68, 68, 0.12)">
-                <LuTriangleAlert size={20} color="var(--chakra-colors-red-400)" />
+                <TriangleAlert size={20} color="var(--chakra-colors-red-400)" />
               </Flex>
               <DialogTitle fontSize="lg" fontWeight="700" color="app.text.primary">Delete Client</DialogTitle>
             </HStack>
@@ -324,7 +323,7 @@ const OAuthView = () => {
                   border="1px solid"
                   borderColor="rgba(139,92,246,0.25)"
                 >
-                  <IoCreateOutline size={20} color="var(--chakra-colors-purple-400)" />
+                  <SquarePen size={20} color="var(--chakra-colors-purple-400)" />
                 </Flex>
 
                 <Stack gap={0}>
@@ -360,7 +359,7 @@ const OAuthView = () => {
                 }}
                 transition="all 0.25s cubic-bezier(0.4,0,0.2,1)"
               >
-                <LuX size={18} />
+                <X size={18} />
               </IconButton>
             </HStack>
           </DialogHeader>
@@ -420,7 +419,7 @@ const OAuthView = () => {
                 loading={isRegenerating}
                 loadingText="Regenerating…"
               >
-                <LuRefreshCw size={14} />
+                <RefreshCw size={14} />
                 Regenerate Secret
               </Button>
             )}
@@ -460,7 +459,7 @@ const OAuthView = () => {
           <DialogHeader px={6} pt={6} pb={3}>
             <HStack gap={3}>
               <Flex align="center" justify="center" w={10} h={10} borderRadius="xl" bg="rgba(251,146,60,0.12)">
-                <LuShieldAlert size={20} color="var(--chakra-colors-orange-400)" />
+                <ShieldAlert size={20} color="var(--chakra-colors-orange-400)" />
               </Flex>
               <DialogTitle fontSize="lg" fontWeight="800" color="orange.300">
                 Save Your Client Secret
@@ -515,7 +514,7 @@ const OAuthView = () => {
                 cursor="pointer"
 
               >
-                {secretCopied ? <><LuCheck size={14} />&nbsp;Copied!</> : <><LuCopy size={14} />&nbsp;Copy</>}
+                {secretCopied ? <><Check size={14} />&nbsp;Copied!</> : <><Copy size={14} />&nbsp;Copy</>}
               </Button>
             </HStack>
 

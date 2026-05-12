@@ -15,11 +15,13 @@ import { memo, useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
-import { FiSearch } from "react-icons/fi";
-import { LuChevronRight, LuLayoutGrid, LuSearch } from "react-icons/lu";
+import { Search, ChevronRight, LayoutGrid } from "lucide-react";
 import * as dynamicFunctions from "../../script/myAppsScript";
 import { InputGroup } from "@/components/ui/input-group";
 import { useColorModeValue } from "@/components/ui/color-mode";
+// useAuthorization is a React hook — never call hooks inside useMemo/filter callbacks.
+// Instead we read raw RBAC slices at the top level and use a pure helper below.
+// (RootState is already imported on line 17)
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -81,7 +83,7 @@ const AppCard: React.FC<AppCardProps> = memo(
               w="48px"
               h="48px"
               borderRadius="xl"
-              bg="white"
+              bg={useColorModeValue("white", "whiteAlpha.100")}
               p={2}
               display="flex"
               alignItems="center"
@@ -89,15 +91,35 @@ const AppCard: React.FC<AppCardProps> = memo(
               boxShadow="0 4px 12px rgba(0,0,0,0.08)"
               overflow="hidden"
             >
-              <Image
-                src={logo?.url}
-                alt={`${name} logo`}
-                objectFit="contain"
-                maxH="100%"
-                maxW="100%"
-              />
+              {logo?.ShowSvg ? (
+                <Box
+                  w="full"
+                  h="full"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  color="brand.500"
+                  dangerouslySetInnerHTML={{ __html: logo.svgIcon }}
+                  css={{
+                    "& svg": {
+                      width: "26px",
+                      height: "26px",
+                      stroke: "currentColor",
+                      fill: "none",
+                    },
+                  }}
+                />
+              ) : (
+                <Image
+                  src={logo?.url}
+                  alt={`${name} logo`}
+                  objectFit="contain"
+                  maxH="100%"
+                  maxW="100%"
+                />
+              )}
             </Box>
-            <Icon as={LuChevronRight} color="app.text.muted" opacity={0.4} />
+            <Icon as={ChevronRight} color="app.text.muted" opacity={0.4} />
           </Flex>
 
           <VStack align="start" gap={1}>
@@ -141,26 +163,47 @@ function MyApps() {
   const auth = useSelector((state: RootState) => state.auth);
   const organizations = useSelector((state: RootState) => state.organizations);
   const user_type = useSelector((state: RootState) => state.rbac.user_type);
+  // Read raw RBAC state at hook-level so it can be safely closed-over inside useMemo.
+  const rbacPermissions = useSelector((state: RootState) => state.rbac.permissions);
+  const is_root_user = useSelector((state: RootState) => state.rbac.is_root_user);
+  const is_superuser = useSelector((state: RootState) => state.rbac.is_superuser);
   const navigate = useNavigate();
 
   const [searchTerm, setSearchTerm] = useState("");
   const appList = useMemo(() => appConfig?.config?.appList ?? [], [appConfig]);
-  const subscribed_apps = organizations?.organization?.subscribed_apps || [];
+  const subscribed_apps = useMemo(
+    () => organizations?.organization?.subscribed_apps || [],
+    [organizations?.organization?.subscribed_apps],
+  );
 
   const filteredApps = useMemo(() => {
+    // Inline permission check — rbacPermissions/is_root_user/is_superuser are closed-over
+    // from the top-level selectors above, so no hook is called inside this callback.
+    const userPerms: string[] = rbacPermissions || [];
+    const isPrivileged = is_root_user || is_superuser;
+
     return appList.filter((app: any) => {
       const app_slug = app.app_slug || app.id;
-      // If the app is a specific APP_ module, check if the organization has an active subscription for it
+
+      // Subscription gate — SYSTEM users bypass it.
       if (!subscribed_apps.includes(app_slug)) {
-        if (user_type !== "SYSTEM") {
-          return false;
+        if (user_type !== "SYSTEM") return false;
+      } else {
+        // Permission gate — inline logic, mirrors useAuthorization without calling a hook.
+        const required: string[] = app.required_permissions || [];
+        if (required.length > 0 && !isPrivileged) {
+          const hasAll = required.every((reqPerm) =>
+            userPerms.some((p) =>
+              p === reqPerm || (p.endsWith(".*") && reqPerm.startsWith(p.slice(0, -2))) || p === "*"
+            )
+          );
+          if (!hasAll) return false;
         }
       }
 
-      // Convert snake_case to Title Case (e.g., organization_email -> Organization Email).toLowerCase())
       return app.name.toLowerCase().includes(searchTerm.toLowerCase());
     });
-  }, [searchTerm, appList, subscribed_apps]);
+  }, [searchTerm, appList, subscribed_apps, user_type, rbacPermissions, is_root_user, is_superuser]);
 
   const handleDefaultNavigate = useCallback(
     (e: React.MouseEvent, cfg: any) => {
@@ -204,7 +247,7 @@ function MyApps() {
           <Flex justify="space-between" align="center" gap={4} wrap="wrap">
             <Flex align="center" gap={3}>
               <Center p={2} bg="brand.500" borderRadius="lg" color="white">
-                <Icon as={LuLayoutGrid} boxSize={5} />
+                <Icon as={LayoutGrid} boxSize={5} />
               </Center>
               <VStack align="start" gap={0}>
                 <Text fontSize="lg" fontWeight="bold" lineHeight="1.2">
@@ -219,7 +262,7 @@ function MyApps() {
             <Box>
               <InputGroup
                 flex="1"
-                startElement={<Icon as={LuSearch} color="gray.400" />}
+                startElement={<Icon as={Search} color="gray.400" />}
               >
                 <Input
                   placeholder="Search apps..."
@@ -297,7 +340,7 @@ function MyApps() {
             py={20}
             opacity={0.6}
           >
-            <Icon as={FiSearch} boxSize={10} mb={4} color="app.text.muted" />
+            <Icon as={Search} boxSize={10} mb={4} color="app.text.muted" />
             <Text fontWeight="600" color="app.text.primary">
               No apps found
             </Text>

@@ -13,6 +13,7 @@ import { firstValueFrom } from "rxjs";
 import { APIRequest } from "@/app/api";
 import { useApiResponseModalStore } from "@/core/store/useApiResponseModalStore";
 import { buildApiResponseAlert } from "@/core/utils/apiResponseAlert";
+import { buildWorkspacePath } from "@/core/utils/pathBuilder";
 
 /**
  * ActionEngine
@@ -78,23 +79,9 @@ const deepInterpolate = (obj: any, data: any): any => {
 };
 
 // ─── Path Builder ────────────────────────────────────────────────────
+// buildWorkspacePath is now imported from @/core/utils/pathBuilder
+// (shared across ActionEngine, useWorkspaceRouter, MenuLink)
 
-/** Builds an organization-scoped workspace path */
-const buildWorkspacePath = (path: string, organizationName: string): string => {
-    let cleanPath = path.startsWith("/") ? path.substring(1) : path;
-
-    // Prevent duplicate "/workspace/workspace/" by stripping leading workspace segment
-    if (cleanPath.startsWith("workspace/")) {
-        cleanPath = cleanPath.substring("workspace/".length);
-    }
-
-    // Platform level views
-    if (cleanPath.startsWith("myApps") || cleanPath.startsWith("profile") || cleanPath.startsWith("settings")) {
-        return `/${cleanPath}`;
-    }
-
-    return `/${organizationName}/workspace/${cleanPath}`;
-};
 
 // ─── Individual Handlers ─────────────────────────────────────────────
 
@@ -161,13 +148,13 @@ const handleApiCall: ActionHandler = async (action, ctx) => {
         useApiResponseModalStore.getState().openModal(modalConfig);
 
         if (isSuccess && laterActions) {
-            // response.data typically holds the actual object
-            const interpolationData = { ...ctx.payload, ...(response?.result || response) };
+            // response.data holds the created resource payload
+            const interpolationData = { ...ctx.payload, ...(response?.data || response?.result || response) };
             console.log("interpolationData", interpolationData);
             const nextAction = deepInterpolate(laterActions, interpolationData);
             console.log("nextAction", nextAction);
             // Execute the next action(s) sequentially
-            await ActionEngine.execute(nextAction, { ...ctx, response: response?.result });
+            await ActionEngine.execute(nextAction, { ...ctx, response: response?.data || response?.result });
         }
 
     } catch (error) {

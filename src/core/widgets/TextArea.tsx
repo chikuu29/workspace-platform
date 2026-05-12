@@ -80,14 +80,14 @@ const TextArea = ({
             <Box w={labelWidth} pt={oneLiner ? 2 : 0}>
               <Field.Label
                 htmlFor={name}
-                fontSize="sm"
+                fontSize="md"
                 fontWeight="semibold"
-                color="fg.muted"
+                // color="fg.muted"
                 transition="color 0.2s"
                 _invalid={{ color: "red.500" }}
                 mb={oneLiner ? 0 : 1}
               >
-                {text}
+                {text}  <Field.RequiredIndicator />
               </Field.Label>
               {description && !oneLiner && (
                 <Text fontSize="xs" color="fg.subtle" mb={1}>

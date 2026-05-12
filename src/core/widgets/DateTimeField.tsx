@@ -1,36 +1,32 @@
 import {
     Box,
+    Button,
+    DatePicker,
+    Field,
     Flex,
     Input,
-    Field,
+    Portal,
     Text,
-    HStack,
-    VStack,
-    IconButton,
-    Button,
-    SimpleGrid,
-    Center,
 } from "@chakra-ui/react";
-import { useColorModeValue } from "../../components/ui/color-mode";
-import { useEffect, useState, memo, useCallback, useMemo } from "react";
-import React from "react";
-import { FieldError, useFormContext, useWatch } from "react-hook-form";
-import { InputGroup } from "../../components/ui/input-group";
-import { CloseButton } from "../../components/ui/close-button";
-import { SegmentedControl } from "../../components/ui/segmented-control";
 import {
-    PopoverBody,
-    PopoverContent,
-    PopoverRoot,
-    PopoverTrigger,
-} from "../../components/ui/popover";
+    CalendarDateTime,
+    DateFormatter,
+    type DateValue,
+    getLocalTimeZone,
+} from "@internationalized/date";
+import { useColorModeValue } from "../../components/ui/color-mode";
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type FieldError, useFormContext, useWatch } from "react-hook-form";
+import { CloseButton } from "../../components/ui/close-button";
 import { ruleEngine } from "../engine/logicEngine";
-import { LuCalendar, LuChevronLeft, LuChevronRight, LuClock } from "react-icons/lu";
+import { Calendar } from "lucide-react";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface DATETIMEFIELD {
     name: string;
-    text: string;
-    mandatory: boolean;
+    text?: string;
+    mandatory?: boolean;
     description?: string;
     disabled?: boolean;
     hidden?: boolean;
@@ -40,6 +36,34 @@ interface DATETIMEFIELD {
     errors: FieldError;
     events?: any;
 }
+
+// ─── Formatter (module-level singleton — created once, never recreated) ────────
+
+const dateTimeFormatter = new DateFormatter("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+});
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+/**
+ * Convert a JS Date to a CalendarDateTime so it integrates with
+ * Chakra's DatePicker value system (Zag.js / @internationalized/date).
+ */
+function dateToCalendar(date: Date): CalendarDateTime {
+    return new CalendarDateTime(
+        date.getFullYear(),
+        date.getMonth() + 1,
+        date.getDate(),
+        date.getHours(),
+        date.getMinutes(),
+    );
+}
+
+// ─── DateTimeField ────────────────────────────────────────────────────────────
 
 const DateTimeField = ({
     name,
@@ -56,365 +80,267 @@ const DateTimeField = ({
     if (hidden) return null;
 
     const methods = useFormContext();
-    const value = useWatch({
-        control: methods.control,
-        name,
+    const { control, register, setValue, unregister } = methods;
+    const rhfValue = useWatch({ control, name });
+
+    // CalendarDateTime[] — the format Chakra DatePicker expects
+    const [calValue, setCalValue] = useState<CalendarDateTime[]>(() => {
+        if (!rhfValue) return [];
+        try {
+            return [dateToCalendar(new Date(rhfValue))];
+        } catch {
+            return [];
+        }
     });
 
-    // Integrated State
-    const [open, setOpen] = useState(false);
-    const [viewMode, setViewMode] = useState<"calendar" | "year">("calendar");
-    const [viewDate, setViewDate] = useState(new Date());
-    const [selectedDate, setSelectedDate] = useState<Date | null>(value ? new Date(value) : null);
-
-    // Time State
-    const [hour, setHour] = useState("12");
-    const [minute, setMinute] = useState("00");
-    const [ampm, setAmpm] = useState<string>("AM");
-
-    // UI Colors
-    const borderColor = useColorModeValue("gray.200", "whiteAlpha.200");
-    const bg = useColorModeValue("white", "rgba(15, 23, 42, 0.9)");
-    const mutedColor = useColorModeValue("gray.500", "whiteAlpha.600");
-
-    // Sync from outer value
+    // ── Register with RHF so mandatory validation fires on submit ─────────────
     useEffect(() => {
-        if (value) {
-            const dt = new Date(value);
-            if (!isNaN(dt.getTime())) {
-                setSelectedDate(dt);
-                setViewDate(dt);
-                let h = dt.getHours();
-                const m = String(dt.getMinutes()).padStart(2, "0");
-                const p = h >= 12 ? "PM" : "AM";
-                h = h % 12 || 12;
-                setHour(String(h).padStart(2, "0"));
-                setMinute(m);
-                setAmpm(p);
-            }
-        } else {
-            setSelectedDate(null);
-        }
-    }, [value]);
-
-    const formattedValue = useMemo(() => {
-        if (!selectedDate) return "";
-        return selectedDate.toLocaleString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
+        register(name, {
+            required: mandatory ? `${text || "This field"} is required` : false,
         });
-    }, [selectedDate]);
+        return () => { unregister(name); };
+    }, [mandatory, name, register, text, unregister]);
 
-    const years = useMemo(() => {
-        const currentYear = new Date().getFullYear();
-        const startYear = currentYear - 50;
-        const endYear = currentYear + 50;
-        const yearsArray = [];
-        for (let i = startYear; i <= endYear; i++) {
-            yearsArray.push(i);
-        }
-        return yearsArray;
-    }, []);
-
-    const daysInMonth = useMemo(() => {
-        const year = viewDate.getFullYear();
-        const month = viewDate.getMonth();
-        const firstDay = new Date(year, month, 1).getDay();
-        const lastDate = new Date(year, month + 1, 0).getDate();
-
-        const days = [];
-        for (let i = 0; i < firstDay; i++) days.push(null);
-        for (let i = 1; i <= lastDate; i++) days.push(new Date(year, month, i));
-        return days;
-    }, [viewDate]);
-
-    const handleDateSelect = (date: Date) => {
-        const newDate = new Date(date);
-        let h = parseInt(hour);
-        if (ampm === "PM" && h < 12) h += 12;
-        if (ampm === "AM" && h === 12) h = 0;
-        newDate.setHours(h, parseInt(minute), 0, 0);
-
-        const iso = newDate.toISOString();
-        methods.setValue(name, iso, { shouldValidate: true });
-        if (events) ruleEngine.processEvents(events, iso, 'change', methods);
-    };
-
-    const handleYearSelect = (year: number) => {
-        setViewDate(new Date(year, viewDate.getMonth(), 1));
-        setViewMode("calendar");
-    };
-
-    const handleTimeSync = (newHour: string, newMin: string, newAmpm: string) => {
-        if (!selectedDate) {
-            // If no date selected yet, use viewDate or today
-            const baseDate = viewDate || new Date();
-            let h = parseInt(newHour) || 12;
-            if (newAmpm === "PM" && h < 12) h += 12;
-            if (newAmpm === "AM" && h === 12) h = 0;
-            baseDate.setHours(h, parseInt(newMin) || 0, 0, 0);
+    // ── Sync incoming RHF value → CalendarDateTime (edit mode / form reset) ───
+    useEffect(() => {
+        if (!rhfValue) {
+            setCalValue([]);
             return;
         }
-        const newDate = new Date(selectedDate);
-        let h = parseInt(newHour) || 12;
-        if (newAmpm === "PM" && h < 12) h += 12;
-        if (newAmpm === "AM" && h === 12) h = 0;
-        newDate.setHours(h, parseInt(newMin) || 0, 0, 0);
+        try {
+            const d = new Date(rhfValue);
+            if (!isNaN(d.getTime())) {
+                setCalValue([dateToCalendar(d)]);
+            }
+        } catch {
+            setCalValue([]);
+        }
+    }, [rhfValue]);
 
-        const iso = newDate.toISOString();
-        methods.setValue(name, iso, { shouldValidate: true });
-        if (events) ruleEngine.processEvents(events, iso, 'change', methods);
-    };
+    // ── Colors ────────────────────────────────────────────────────────────────
+    const accent = "#6366f1";
+    const borderColor = useColorModeValue("gray.200", "whiteAlpha.200");
+    const inputBg = useColorModeValue("white", "whiteAlpha.50");
+    const mutedColor = useColorModeValue("gray.400", "whiteAlpha.500");
+    const panelBg = useColorModeValue("white", "gray.900");
+    const hasError = !!errors;
+
+    // ── Derived display values ────────────────────────────────────────────────
+
+    /** Native time input value — "HH:MM" */
+    const timeValue = calValue[0]
+        ? `${String(calValue[0].hour).padStart(2, "0")}:${String(calValue[0].minute).padStart(2, "0")}`
+        : "";
+
+    /** Formatted label shown on the trigger button */
+    const displayLabel = useMemo(() => {
+        if (!calValue[0]) return "";
+        return dateTimeFormatter.format(calValue[0].toDate(getLocalTimeZone()));
+    }, [calValue]);
+
+    // ── Commit to RHF ─────────────────────────────────────────────────────────
+
+    const commitCalendar = useCallback((next: CalendarDateTime) => {
+        const iso = next.toDate(getLocalTimeZone()).toISOString();
+        setValue(name, iso, { shouldValidate: true, shouldDirty: true });
+        if (events) ruleEngine.processEvents(events, iso, "change", methods);
+    }, [events, methods, name, setValue]);
+
+    // ── DatePicker change (user selects a day) ────────────────────────────────
+
+    const handleDateChange = useCallback((details: any) => {
+        const newDate = details.value[0];
+        if (!newDate) {
+            setCalValue([]);
+            setValue(name, "", { shouldValidate: true, shouldDirty: true });
+            if (events) ruleEngine.processEvents(events, "", "change", methods);
+            return;
+        }
+        // Preserve existing time when changing the date
+        const prevTime = calValue[0] ?? { hour: 0, minute: 0 };
+        const next = new CalendarDateTime(
+            newDate.year,
+            newDate.month,
+            newDate.day,
+            prevTime.hour,
+            prevTime.minute,
+        );
+        setCalValue([next]);
+        commitCalendar(next);
+    }, [calValue, commitCalendar, events, methods, name, setValue]);
+
+    // ── Time input change (native <input type="time">) ────────────────────────
+
+    const handleTimeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        const [hours, minutes] = e.currentTarget.value.split(":").map(Number);
+        setCalValue((prev) => {
+            const base = prev[0] ?? new CalendarDateTime(
+                new Date().getFullYear(),
+                new Date().getMonth() + 1,
+                new Date().getDate(),
+                0, 0,
+            );
+            const next = base.set({ hour: hours, minute: minutes });
+            commitCalendar(next);
+            return [next];
+        });
+    }, [commitCalendar]);
+
+    // ── Clear ────────────────────────────────────────────────────────────────
 
     const handleClear = useCallback((e: React.MouseEvent) => {
         e.stopPropagation();
-        methods.setValue(name, "", { shouldValidate: true });
-        if (events) ruleEngine.processEvents(events, "", 'change', methods);
-    }, [methods, name, events]);
-
-    const changeMonth = (offset: number) => {
-        setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + offset, 1));
-    };
+        setCalValue([]);
+        setValue(name, "", { shouldValidate: true, shouldDirty: true });
+        if (events) ruleEngine.processEvents(events, "", "change", methods);
+    }, [events, methods, name, setValue]);
 
     const labelWidth = oneLiner ? { base: "full", md: "35%" } : "full";
     const inputWidth = oneLiner ? { base: "full", md: "65%" } : "full";
 
     return (
         <Box w="full" py={2} px={1}>
-            <Field.Root invalid={!!errors} required={mandatory} disabled={disabled}>
+            <Field.Root invalid={hasError} required={mandatory} disabled={disabled}>
                 <Flex
                     direction={oneLiner ? { base: "column", md: "row" } : "column"}
                     align={oneLiner ? { base: "stretch", md: "center" } : "stretch"}
                     gap={oneLiner ? 4 : 2}
                     w="full"
                 >
+                    {/* Label */}
                     {text && (
                         <Box w={labelWidth}>
-                            <Field.Label fontSize="sm" fontWeight="semibold" color="fg.muted">
-                                {text}
+                            <Field.Label fontSize="sm" fontWeight="600" color="fg.default">
+                                {text} <Field.RequiredIndicator />
                             </Field.Label>
                             {description && !oneLiner && (
-                                <Text fontSize="xs" color="fg.subtle">
-                                    {description}
-                                </Text>
+                                <Text fontSize="xs" color="fg.muted" mt={0.5}>{description}</Text>
                             )}
                         </Box>
                     )}
 
+                    {/* Input area */}
                     <Box w={inputWidth}>
-                        <HStack gap={2} w="full" align="center">
-                            <Box flex="1">
-                                <PopoverRoot open={open} onOpenChange={(e) => {
-                                    setOpen(e.open);
-                                    if (!e.open) setViewMode("calendar");
-                                }}>
-                                    <PopoverTrigger asChild>
-                                        <Box w="full">
-                                            <InputGroup
-                                                w="full"
-                                                startElement={<LuCalendar color="gray.400" />}
-                                                endElement={<LuClock color="gray.400" />}
-                                            >
-                                                <Input
-                                                    readOnly
-                                                    value={formattedValue}
-                                                    placeholder="Select date and time..."
-                                                    cursor="pointer"
-                                                    onClick={() => !disabled && setOpen(true)}
-                                                    size="md"
-                                                    borderRadius="xl"
-                                                    borderWidth="1.5px"
-                                                    _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px rgba(66, 153, 225, 0.6)" }}
-                                                    bg={useColorModeValue("white", "whiteAlpha.100")}
-                                                />
-                                            </InputGroup>
+                        <DatePicker.Root
+                            value={calValue as any}
+                            onValueChange={handleDateChange as any}
+                            closeOnSelect={false}
+                            disabled={disabled}
+                            w="full"
+                        >
+                            {/* Trigger button — exact pattern from Chakra reference demo */}
+                            <DatePicker.Control>
+                                <Box position="relative" w="full">
+                                    <DatePicker.Trigger asChild unstyled>
+                                        <Button
+                                            variant="outline"
+                                            w="full"
+                                            h="40px"
+                                            justifyContent="space-between"
+                                            borderRadius="xl"
+                                            borderWidth="1.5px"
+                                            borderColor={hasError ? "red.400" : borderColor}
+                                            bg={inputBg}
+                                            fontSize="sm"
+                                            fontWeight={displayLabel ? "600" : "400"}
+                                            color={displayLabel ? "fg.default" : mutedColor}
+                                            disabled={disabled}
+                                            px={3}
+                                            _focus={{
+                                                outline: "none",
+                                                borderColor: hasError ? "red.400" : accent,
+                                                boxShadow: hasError
+                                                    ? "0 0 0 3px rgba(239,68,68,0.18)"
+                                                    : "0 0 0 3px rgba(99,102,241,0.18)",
+                                            }}
+                                            transition="all 0.2s"
+                                        >
+                                            <Box style={{ color: hasError ? "#f87171" : accent }} mr={2} flexShrink={0}>
+                                                <Calendar size={15} />
+                                            </Box>
+                                            <Text flex={1} textAlign="left" truncate>
+                                                {displayLabel || "Select date & time..."}
+                                            </Text>
+                                        </Button>
+                                    </DatePicker.Trigger>
+
+                                    {/* Clear button — sits inside the control, right edge */}
+                                    {enableClear && rhfValue && !disabled && (
+                                        <Box position="absolute" right={1} top="50%" transform="translateY(-50%)" zIndex={1}>
+                                            <CloseButton
+                                                size="xs"
+                                                variant="ghost"
+                                                color="fg.muted"
+                                                onClick={handleClear}
+                                                _hover={{ bg: "transparent", color: "red.500" }}
+                                            />
                                         </Box>
-                                    </PopoverTrigger>
+                                    )}
+                                </Box>
+                            </DatePicker.Control>
 
-                                    <PopoverContent
-                                        width="320px"
-                                        p="0"
+                            {/* Calendar panel — Portal so it escapes overflow:hidden containers */}
+                            <Portal>
+                                <DatePicker.Positioner>
+                                    <DatePicker.Content
+                                        p={3}
                                         borderRadius="2xl"
-                                        overflow="hidden"
-                                        border="1px solid"
+                                        border="1.5px solid"
                                         borderColor={borderColor}
-                                        bg={bg}
-                                        backdropFilter="blur(16px)"
-                                        boxShadow="2xl"
+                                        // bg={panelBg}
+                                        boxShadow="0 20px 60px -12px rgba(0,0,0,0.3)"
+                                        minW="280px"
                                     >
-                                        <PopoverBody p="4">
-                                            <VStack gap="4" align="stretch">
-                                                <Flex w="full" justify="space-between" align="center">
-                                                    <IconButton size="xs" variant="ghost" onClick={() => changeMonth(-1)} visibility={viewMode === "year" ? "hidden" : "visible"}>
-                                                        <LuChevronLeft />
-                                                    </IconButton>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        fontWeight="bold"
-                                                        onClick={() => setViewMode(viewMode === "calendar" ? "year" : "calendar")}
-                                                        _hover={{ bg: useColorModeValue("gray.100", "whiteAlpha.100") }}
-                                                    >
-                                                        {viewMode === "calendar"
-                                                            ? viewDate.toLocaleString('default', { month: 'long', year: 'numeric' })
-                                                            : "Select Year"
-                                                        }
-                                                    </Button>
-                                                    <IconButton size="xs" variant="ghost" onClick={() => changeMonth(1)} visibility={viewMode === "year" ? "hidden" : "visible"}>
-                                                        <LuChevronRight />
-                                                    </IconButton>
-                                                </Flex>
+                                        {/* Day view: header + calendar + time input */}
+                                        <DatePicker.View view="day">
+                                            <DatePicker.Header />
+                                            <DatePicker.DayTable />
+                                            {/* Native time input — elegant, no custom spinners needed */}
+                                            <Box pt={2} pb={1} borderTop="1px solid" borderColor={borderColor} mt={2}>
+                                                <Text fontSize="10px" fontWeight="700" letterSpacing="widest" color={mutedColor} textTransform="uppercase" mb={1.5}>
+                                                    Time
+                                                </Text>
+                                                <Input
+                                                    type="time"
+                                                    value={timeValue}
+                                                    onChange={handleTimeChange}
+                                                    size="sm"
+                                                    borderRadius="lg"
+                                                    borderColor={borderColor}
+                                                    bg={inputBg}
+                                                    fontFamily="mono"
+                                                    fontWeight="600"
+                                                    fontSize="sm"
+                                                    _focus={{
+                                                        borderColor: accent,
+                                                        boxShadow: `0 0 0 3px rgba(99,102,241,0.18)`,
+                                                    }}
+                                                />
+                                            </Box>
+                                        </DatePicker.View>
 
-                                                {/* Scrollable Area */}
-                                                <Box maxH="320px" overflowY="auto" px={1}>
-                                                    {viewMode === "calendar" ? (
-                                                        <SimpleGrid columns={7} gap="1" w="full">
-                                                            {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, idx) => (
-                                                                <Center key={`${d}-${idx}`} fontSize="2xs" fontWeight="bold" color={mutedColor}>
-                                                                    {d}
-                                                                </Center>
-                                                            ))}
-                                                            {daysInMonth.map((date, i) => (
-                                                                <Center key={i}>
-                                                                    {date && (
-                                                                        <Button
-                                                                            size="xs"
-                                                                            variant={selectedDate?.toDateString() === date.toDateString() ? "solid" : "ghost"}
-                                                                            colorPalette={selectedDate?.toDateString() === date.toDateString() ? "blue" : "gray"}
-                                                                            onClick={() => handleDateSelect(date)}
-                                                                            fontSize="xs"
-                                                                            w="8"
-                                                                            h="8"
-                                                                            borderRadius="md"
-                                                                        >
-                                                                            {date.getDate()}
-                                                                        </Button>
-                                                                    )}
-                                                                </Center>
-                                                            ))}
-                                                        </SimpleGrid>
-                                                    ) : (
-                                                        <Box w="full">
-                                                            <SimpleGrid columns={3} gap="2">
-                                                                {years.map(year => (
-                                                                    <Button
-                                                                        key={year}
-                                                                        size="sm"
-                                                                        variant={viewDate.getFullYear() === year ? "solid" : "ghost"}
-                                                                        colorPalette={viewDate.getFullYear() === year ? "blue" : "gray"}
-                                                                        onClick={() => handleYearSelect(year)}
-                                                                        borderRadius="md"
-                                                                    >
-                                                                        {year}
-                                                                    </Button>
-                                                                ))}
-                                                            </SimpleGrid>
-                                                        </Box>
-                                                    )}
+                                        {/* Month view */}
+                                        <DatePicker.View view="month">
+                                            <DatePicker.Header />
+                                            <DatePicker.MonthTable />
+                                        </DatePicker.View>
 
-                                                    {selectedDate && viewMode === "calendar" && (
-                                                        <Box w="full" pt="4" mt="2" borderTop="1px solid" borderColor={borderColor}>
-                                                            <VStack gap="4">
-                                                                <HStack justify="center" gap="6">
-                                                                    <VStack gap="0" align="center">
-                                                                        <Text fontSize="2xs" color={mutedColor} fontWeight="bold">HOUR</Text>
-                                                                        <Input
-                                                                            type="number"
-                                                                            min={1}
-                                                                            max={12}
-                                                                            value={hour}
-                                                                            onChange={(e) => {
-                                                                                let v = e.target.value.slice(-2);
-                                                                                if (parseInt(v) > 12) v = "12";
-                                                                                if (parseInt(v) < 1) v = "01";
-                                                                                setHour(v);
-                                                                                handleTimeSync(v, minute, ampm);
-                                                                            }}
-                                                                            w="14"
-                                                                            textAlign="center"
-                                                                            variant="flushed"
-                                                                            fontWeight="bold"
-                                                                        />
-                                                                    </VStack>
-                                                                    <Text pt="4" fontWeight="bold" fontSize="xl">:</Text>
-                                                                    <VStack gap="0" align="center">
-                                                                        <Text fontSize="2xs" color={mutedColor} fontWeight="bold">MIN</Text>
-                                                                        <Input
-                                                                            type="number"
-                                                                            min={0}
-                                                                            max={59}
-                                                                            value={minute}
-                                                                            onChange={(e) => {
-                                                                                let v = e.target.value.slice(-2);
-                                                                                if (parseInt(v) > 59) v = "59";
-                                                                                if (parseInt(v) < 0) v = "00";
-                                                                                setMinute(v);
-                                                                                handleTimeSync(hour, v, ampm);
-                                                                            }}
-                                                                            w="14"
-                                                                            textAlign="center"
-                                                                            variant="flushed"
-                                                                            fontWeight="bold"
-                                                                        />
-                                                                    </VStack>
-                                                                </HStack>
+                                        {/* Year view */}
+                                        <DatePicker.View view="year">
+                                            <DatePicker.Header />
+                                            <DatePicker.YearTable />
+                                        </DatePicker.View>
+                                    </DatePicker.Content>
+                                </DatePicker.Positioner>
+                            </Portal>
+                        </DatePicker.Root>
 
-                                                                <Center w="full">
-                                                                    <SegmentedControl
-                                                                        value={ampm}
-                                                                        onValueChange={(e) => {
-                                                                            if (e.value) {
-                                                                                setAmpm(e.value);
-                                                                                handleTimeSync(hour, minute, e.value);
-                                                                            }
-                                                                        }}
-                                                                        items={["AM", "PM"]}
-                                                                        size="sm"
-                                                                        w="140px"
-                                                                    />
-                                                                </Center>
-                                                            </VStack>
-                                                        </Box>
-                                                    )}
-                                                </Box>
-
-                                                {/* Pinned Footer */}
-                                                <Button
-                                                    w="full"
-                                                    size="md"
-                                                    colorPalette="blue"
-                                                    onClick={() => setOpen(false)}
-                                                    borderRadius="xl"
-                                                    fontWeight="bold"
-                                                    mt="2"
-                                                >
-                                                    Done
-                                                </Button>
-                                            </VStack>
-                                        </PopoverBody>
-                                    </PopoverContent>
-                                </PopoverRoot>
-                            </Box>
-                            {enableClear && value && !disabled && (
-                                <CloseButton
-                                    size="sm"
-                                    variant="ghost"
-                                    color="fg.muted"
-                                    onClick={handleClear}
-                                    _hover={{ bg: "transparent", color: "red.500" }}
-                                />
-                            )}
-                        </HStack>
-
-                        <Flex justify="flex-end" mt={1}>
-                            <Field.ErrorText fontSize="xs" color="red.500" fontWeight="medium">
-                                {errors?.message?.toString()}
+                        {/* Validation error */}
+                        {hasError && (
+                            <Field.ErrorText fontSize="xs" color="red.500" fontWeight="600" mt={1}>
+                                <Field.ErrorIcon /> {errors?.message?.toString()}
                             </Field.ErrorText>
-                        </Flex>
+                        )}
                     </Box>
                 </Flex>
             </Field.Root>

@@ -13,15 +13,7 @@ import { useForm, Controller } from "react-hook-form";
 import { Field } from "@/components/ui/field";
 import { InputGroup } from "@/components/ui/input-group";
 import { toaster } from "@/components/ui/toaster";
-import { GrSystem } from "react-icons/gr";
-import {
-    LuCheck,
-    LuKeyRound,
-    LuGlobe,
-    LuSettings2,
-    LuShieldCheck,
-    LuLock,
-} from "react-icons/lu";
+import { Cpu, Check, KeyRound, Globe, Settings2, ShieldCheck, Lock } from "lucide-react";
 
 interface OAuthClientFormProps {
     initialData: any;
@@ -175,7 +167,7 @@ const RadioPill = ({
                         flexShrink: 0,
                     }}
                 >
-                    <LuCheck size={14} />
+                    <Check size={14} />
                 </span>
                 {label}
             </Box>
@@ -261,7 +253,7 @@ const ToggleChip = ({
                     flexShrink: 0,
                 }}
             >
-                <LuCheck size={14} />
+                <Check size={14} />
             </span>
             {label}
         </Box>
@@ -432,10 +424,10 @@ export const OAuthClientForm = ({ initialData, onSubmit, actionMode, serverError
             <VStack gap={8} py={2} align="stretch">
 
                 {/* ── Identity ── */}
-                <FormSection title="Identity" icon={<LuKeyRound size={16} />} accentColor="purple.400">
+                <FormSection title="Identity" icon={<KeyRound size={16} />} accentColor="purple.400">
                     <SimpleGrid columns={{ base: 1, md: 2 }} gap={4} w="100%">
                         <Field label="Client ID *" disabled={actionMode === "EDIT"} invalid={!!errors.client_id} errorText={errors.client_id?.message as string} w="100%">
-                            <InputGroup flex="1" w="100%" startElement={<GrSystem />}>
+                            <InputGroup flex="1" w="100%" startElement={<Cpu size={16} />}>
                                 <Input
                                     {...register("client_id", { required: "Client ID is required", minLength: { value: 6, message: "Min 6 chars" }, maxLength: { value: 50, message: "Max 50 chars" } })}
                                     placeholder="e.g. my_app_client"
@@ -456,7 +448,7 @@ export const OAuthClientForm = ({ initialData, onSubmit, actionMode, serverError
                 </FormSection>
 
                 {/* ── URLs & Origins ── */}
-                <FormSection title="Endpoints & Origins" icon={<LuGlobe size={16} />} accentColor="blue.400">
+                <FormSection title="Endpoints & Origins" icon={<Globe size={16} />} accentColor="blue.400">
                     <VStack gap={4} w="100%">
                         <Controller
                             name="redirect_urls"
@@ -481,7 +473,7 @@ export const OAuthClientForm = ({ initialData, onSubmit, actionMode, serverError
                 </FormSection>
 
                 {/* ── Client Settings ── */}
-                <FormSection title="Configuration" icon={<LuSettings2 size={16} />} accentColor="orange.400">
+                <FormSection title="Configuration" icon={<Settings2 size={16} />} accentColor="orange.400">
                     <VStack gap={3} w="100%" align="stretch">
                         <Controller name="client_type" control={control} rules={{ required: "Required" }} render={({ field }) => (
                             <InlineRow label="Client Type">
@@ -541,7 +533,7 @@ export const OAuthClientForm = ({ initialData, onSubmit, actionMode, serverError
                 </FormSection>
 
                 {/* ── Capabilities ── */}
-                <FormSection title="Capabilities" icon={<LuShieldCheck size={16} />} accentColor="green.400">
+                <FormSection title="Capabilities" icon={<ShieldCheck size={16} />} accentColor="green.400">
                     <VStack gap={3} w="100%" align="stretch">
                         <Controller
                             name="authorization_grant_types"
@@ -621,7 +613,7 @@ export const OAuthClientForm = ({ initialData, onSubmit, actionMode, serverError
                 </FormSection>
 
                 {/* ── Scopes ── */}
-                <FormSection title="Scopes" icon={<LuLock size={16} />} accentColor="cyan.400">
+                <FormSection title="Scopes" icon={<Lock size={16} />} accentColor="cyan.400">
                     <Controller
                         name="scope"
                         control={control}

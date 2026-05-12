@@ -125,8 +125,8 @@ const DialogRenderer = memo(() => {
         <Dialog.Root
             open={isOpen}
             onOpenChange={handleOpenChange}
-            // size={dialogConfig.size ?? "xl"}
-            size={"full"}
+            size={dialogConfig.size ?? "full"}
+            // size={"lg"}
             placement="center"
             motionPreset="slide-in-bottom"
             scrollBehavior={dialogConfig.scrollBehavior ?? "inside"}
@@ -188,7 +188,7 @@ const DialogRenderer = memo(() => {
                             )}
                             {config && !loading && !error && (
                                 <Box p={4}>
-                                    <ViewRenderer config={config} />
+                                    <ViewRenderer config={config} publishActionsToBreadcrumb={false} />
                                 </Box>
                             )}
                         </Dialog.Body>

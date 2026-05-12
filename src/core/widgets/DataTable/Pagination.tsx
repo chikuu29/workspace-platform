@@ -1,6 +1,6 @@
 import React, { memo } from "react";
 import { HStack, Text, Button, Box, Flex } from "@chakra-ui/react";
-import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DataTablePagination } from "./types";
 import { useColorModeValue } from "@/components/ui/color-mode";
 
@@ -63,7 +63,7 @@ function PaginationComponent({ pagination, onPageChange, onPageSizeChange: _onPa
                     _hover={{ bg: "blue.50", borderColor: "blue.300", color: "blue.600", transform: "translateY(-1px)" }}
                     transition="all 0.2s"
                 >
-                    <LuChevronLeft size="16px" />
+                    <ChevronLeft size={16} />
                 </Button>
 
                 <Box
@@ -95,7 +95,7 @@ function PaginationComponent({ pagination, onPageChange, onPageSizeChange: _onPa
                     _hover={{ bg: "blue.50", borderColor: "blue.300", color: "blue.600", transform: "translateY(-1px)" }}
                     transition="all 0.2s"
                 >
-                    <LuChevronRight size="16px" />
+                    <ChevronRight size={16} />
                 </Button>
             </HStack>
         </Flex>

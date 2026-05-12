@@ -15,7 +15,7 @@ import {
   Separator,
   Button
 } from "@chakra-ui/react";
-import { FiBell, FiLock, FiGlobe, FiSmartphone, FiShield, FiKey } from "react-icons/fi";
+import { Bell, Lock, Globe, Smartphone, ShieldCheck, Key } from "lucide-react";
 import { useColorModeValue } from "@/components/ui/color-mode";
 
 const SettingsPage = () => {
@@ -29,21 +29,21 @@ const SettingsPage = () => {
     {
       title: "Two-Factor Authentication",
       description: "Require a secure code in addition to your password.",
-      icon: FiShield,
+      icon: ShieldCheck,
       toggled: true,
       color: "teal"
     },
     {
       title: "Active Sessions",
       description: "Manage devices where you are currently signed in.",
-      icon: FiSmartphone,
+      icon: Smartphone,
       toggled: false,
       color: "blue"
     },
     {
       title: "Password Rotation",
       description: "Require password changes every 90 days.",
-      icon: FiKey,
+      icon: Key,
       toggled: false,
       color: "purple"
     }
@@ -53,14 +53,14 @@ const SettingsPage = () => {
     {
       title: "Push Notifications",
       description: "Receive alerts for incoming messages and updates.",
-      icon: FiBell,
+      icon: Bell,
       toggled: true,
       color: "orange"
     },
     {
       title: "Language & Region",
       description: "Change language, timezone, and regional formatting.",
-      icon: FiGlobe,
+      icon: Globe,
       toggled: true,
       color: "green"
     }

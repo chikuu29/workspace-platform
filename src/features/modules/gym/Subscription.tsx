@@ -1,595 +1,456 @@
-import { useCallback, useMemo, useState } from "react";
+/**
+ * Subscription.tsx
+ *
+ * Subscription dashboard with High-Fidelity Glassmorphism and Gradient Borders.
+ * API-driven overview of subscription plans, subscriber stats, and quick actions.
+ */
+
+import { memo, useCallback, useMemo } from "react";
 import {
-  Badge,
-  Box,
-  Button,
-  Circle,
-  Flex,
-  Heading,
-  HStack,
-  Icon,
-  Progress,
-  Separator,
-  SimpleGrid,
-  Text,
-  VStack,
+    Badge,
+    Box,
+    Button,
+    Circle,
+    Flex,
+    Heading,
+    HStack,
+    Separator,
+    SimpleGrid,
+    Skeleton,
+    Text,
+    VStack,
+    IconButton,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { useLocation, useNavigate, useParams, useSearchParams } from "react-router";
+import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 import {
-  LuArrowRight,
-  LuArrowUpRight,
-  LuBadgeDollarSign,
-  LuCalendarClock,
-  LuChartColumn,
-  LuCircleDollarSign,
-  LuCreditCard,
-  LuFileClock,
-  LuReceipt,
-  LuShieldAlert,
-  LuSparkles,
-  LuUsers,
-  LuWallet,
-} from "react-icons/lu";
+    ArrowRight,
+    BadgeDollarSign,
+    ChartColumn,
+    CircleDollarSign,
+    CreditCard,
+    Layers,
+    Plus,
+    Settings,
+    ShieldCheck,
+    Users,
+    Wallet,
+} from "lucide-react";
+import { PageLayout } from "@/core/components/PageLayout";
+import { useSubscriptionPlans } from "./hooks/useSubscriptionPlans";
+import { useSubscriptionStats } from "./hooks/useSubscriptionStats";
+import { useNavActionStore } from "@/core/store/useNavActionStore";
+import { useEffect } from "react";
+import { RefreshCw } from "lucide-react";
+import type { SubscriptionPlanDocument, PlanWithMembers } from "./types/Gym.types";
 
-type PlanStatus = "Top plan" | "Growing" | "Needs push";
-type RenewalStatus = "Due Today" | "This Week" | "Overdue";
+// ─── Glassmorphic Card Wrapper ──────────────────────────────────────────────
 
-interface PlanRecord {
-  name: string;
-  price: string;
-  billingCycle: string;
-  members: number;
-  utilization: number;
-  retention: string;
-  revenue: string;
-  status: PlanStatus;
-  features: string[];
-  accent: string;
+interface GlassCardProps {
+    children: React.ReactNode;
+    p?: number | string;
+    h?: string;
+    accentColor?: string;
+    onClick?: () => void;
+    cursor?: string;
 }
 
-interface RenewalRecord {
-  member: string;
-  plan: string;
-  due: string;
-  amount: string;
-  status: RenewalStatus;
-}
+const GlassCard = memo(({ children, p = 6, h, accentColor = "blue", onClick, cursor }: GlassCardProps) => {
+    const bg = useColorModeValue("rgba(255, 255, 255, 0.74)", "rgba(15, 23, 42, 0.58)");
+    const borderColor = useColorModeValue("rgba(226, 232, 240, 0.84)", "rgba(255, 255, 255, 0.12)");
+    const shadow = useColorModeValue("0 4px 12px rgba(0, 0, 0, 0.05)", "0 1px 3px rgba(0,0,0,0.04)");
 
-const planRecords: PlanRecord[] = [
-  {
-    name: "Annual Platinum",
-    price: "$899",
-    billingCycle: "per year",
-    members: 412,
-    utilization: 88,
-    retention: "95.4%",
-    revenue: "$370K",
-    status: "Top plan",
-    accent: "blue",
-    features: ["Priority PT slots", "Nutrition review", "2 freeze credits"],
-  },
-  {
-    name: "Quarterly Flex",
-    price: "$289",
-    billingCycle: "per quarter",
-    members: 268,
-    utilization: 74,
-    retention: "87.2%",
-    revenue: "$77K",
-    status: "Growing",
-    accent: "green",
-    features: ["Flexible renewal", "Class access", "1 trainer consultation"],
-  },
-  {
-    name: "Monthly Starter",
-    price: "$79",
-    billingCycle: "per month",
-    members: 176,
-    utilization: 58,
-    retention: "71.8%",
-    revenue: "$13.9K",
-    status: "Needs push",
-    accent: "orange",
-    features: ["Open gym access", "Basic onboarding", "Upgrade anytime"],
-  },
-];
-
-const renewalQueue: RenewalRecord[] = [
-  { member: "Sara Khan", plan: "Quarterly Flex", due: "Today, 5:00 PM", amount: "$120", status: "Due Today" },
-  { member: "Rohan Iyer", plan: "Family Flex", due: "18 Mar 2026", amount: "$80", status: "This Week" },
-  { member: "Nidhi Jain", plan: "Monthly Starter", due: "18 Mar 2026", amount: "$79", status: "This Week" },
-  { member: "Kabir Das", plan: "Monthly Starter", due: "Overdue by 3 days", amount: "$79", status: "Overdue" },
-];
-
-const collectionChannels = [
-  { label: "Auto debit", share: 52, amount: "$23.5K", color: "blue.500" },
-  { label: "UPI / Card", share: 33, amount: "$14.8K", color: "green.500" },
-  { label: "Front desk", share: 15, amount: "$6.9K", color: "orange.500" },
-];
-
-const actionCards = [
-  {
-    title: "Review renewals",
-    description: "Handle due-today plans, partial payments and member outreach.",
-    icon: LuCalendarClock,
-    accent: "blue",
-  },
-  {
-    title: "Launch upgrade push",
-    description: "Move active monthly members into quarterly or annual plans.",
-    icon: LuSparkles,
-    accent: "green",
-  },
-  {
-    title: "Collections check",
-    description: "Audit unpaid invoices and desk-level settlements before close.",
-    icon: LuReceipt,
-    accent: "orange",
-  },
-];
-
-const animations = `
-  @keyframes slideUpFade {
-    0% { opacity: 0; transform: translateY(24px); }
-    100% { opacity: 1; transform: translateY(0); }
-  }
-  .animate-entrance {
-    animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    opacity: 0;
-  }
-  .delay-1 { animation-delay: 0.1s; }
-  .delay-2 { animation-delay: 0.2s; }
-  .delay-3 { animation-delay: 0.3s; }
-  .delay-4 { animation-delay: 0.4s; }
-  
-  .hover-lift {
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .hover-lift:hover {
-    transform: translateY(-6px) scale(1.01);
-    box-shadow: 0 30px 60px -15px rgba(0,0,0,0.15);
-  }
-  
-  .glow-icon {
-    box-shadow: 0 0 24px currentColor;
-  }
-`;
-
-const SurfaceCard = ({ children, className = "", ...props }: any) => {
-  const bg = useColorModeValue("rgba(255, 255, 255, 0.75)", "rgba(15, 23, 42, 0.6)");
-  const borderColor = useColorModeValue("rgba(255, 255, 255, 0.8)", "rgba(255, 255, 255, 0.08)");
-  const shadow = useColorModeValue(
-    "0 12px 40px -12px rgba(0,0,0,0.06), inset 0 1px 0 0 rgba(255,255,255,0.6)",
-    "0 12px 40px -12px rgba(0,0,0,0.8), inset 0 1px 0 0 rgba(255,255,255,0.05)"
-  );
-
-  return (
-    <Box
-      bg={bg}
-      border="1px solid"
-      borderColor={borderColor}
-      borderRadius="3xl"
-      boxShadow={shadow}
-      backdropFilter="blur(20px)"
-      className={className}
-      transition="all 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
-      {...props}
-    >
-      {children}
-    </Box>
-  );
-};
-
-const KPI = ({
-  label,
-  value,
-  helper,
-  icon,
-  accent,
-}: {
-  label: string;
-  value: string;
-  helper: string;
-  icon: React.ElementType;
-  accent: string;
-}) => {
-  const iconBg = useColorModeValue(`${accent}.50`, "whiteAlpha.100");
-  const iconColor = useColorModeValue(`${accent}.600`, `${accent}.300`);
-  const muted = useColorModeValue("gray.600", "gray.300");
-
-  return (
-    <SurfaceCard p={5} className="hover-lift">
-      <VStack align="stretch" gap={4}>
-        <Circle size="12" bg={iconBg} color={iconColor} className="glow-icon">
-          <Icon as={icon} boxSize={5} />
-        </Circle>
-        <VStack align="start" gap="1">
-          <Text fontSize="sm" fontWeight="600" color={muted} letterSpacing="wide">
-            {label}
-          </Text>
-          <Heading size="xl" letterSpacing="tighter">{value}</Heading>
-          <Text fontSize="sm" color={muted}>
-            {helper}
-          </Text>
-        </VStack>
-      </VStack>
-    </SurfaceCard>
-  );
-};
-
-const PlanCard = ({ plan }: { plan: PlanRecord }) => {
-  const quiet = useColorModeValue("gray.500", "gray.400");
-  const muted = useColorModeValue("gray.600", "gray.300");
-  const softSurface = useColorModeValue("rgba(0,0,0,0.02)", "whiteAlpha.50");
-  const accentBg = useColorModeValue(`${plan.accent}.50`, "whiteAlpha.100");
-  const accentColor = useColorModeValue(`${plan.accent}.600`, `${plan.accent}.300`);
-  const isTopPlan = plan.status === "Top plan";
-
-  return (
-    <SurfaceCard p={6} h="full" className="hover-lift" borderColor={isTopPlan ? useColorModeValue("blue.300", "blue.600") : undefined} boxShadow={isTopPlan ? useColorModeValue("0 12px 40px -12px rgba(59,130,246,0.3)", "0 12px 40px -12px rgba(59,130,246,0.2)") : undefined}>
-      <VStack align="stretch" gap={6} h="full">
-        <Flex justify="space-between" align="start" gap={4}>
-          <VStack align="start" gap="2">
-            <Badge colorPalette={plan.accent} variant="subtle" borderRadius="full" px="3" py="1" fontWeight="bold">
-              {plan.status}
-            </Badge>
-            <Box>
-              <Heading size="lg" letterSpacing="tight">{plan.name}</Heading>
-              <Text color={muted} mt={1} fontSize="lg" fontWeight="600">
-                {plan.price} <Text as="span" color={quiet} fontSize="sm" fontWeight="normal">/ {plan.billingCycle}</Text>
-              </Text>
+    // Gradient border logic using a wrapper and an inner box
+    return (
+        <Box
+            position="relative"
+            borderRadius="2xl"
+            p="1px" // The thickness of the gradient border
+            bgGradient={`linear(to-br, ${accentColor}.400/20, transparent, ${accentColor}.400/20)`}
+            transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+            _hover={{
+                transform: "translateY(-2px)",
+                bgGradient: `linear(to-br, ${accentColor}.400/40, transparent, ${accentColor}.400/40)`,
+                boxShadow: `0 8px 24px -12px var(--chakra-colors-${accentColor}-500)`,
+            }}
+            boxShadow={shadow}
+            h={h}
+            onClick={onClick}
+            cursor={cursor}
+        >
+            <Box
+                bg={bg}
+                backdropFilter="blur(20px)"
+                borderRadius="calc(var(--chakra-radii-2xl) - 1px)"
+                p={p}
+                h="full"
+                border="1px solid"
+                borderColor={borderColor}
+            >
+                {children}
             </Box>
-          </VStack>
-          <Circle size="12" bg={accentBg} color={accentColor}>
-            <Icon as={LuCreditCard} boxSize={5} />
-          </Circle>
-        </Flex>
+        </Box>
+    );
+});
+GlassCard.displayName = "GlassCard";
 
-        <SimpleGrid columns={2} gap={4}>
-          <Box p={4} borderRadius="2xl" bg={softSurface}>
-            <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" color={quiet}>
-              Members
-            </Text>
-            <Heading size="md" mt={1}>{plan.members}</Heading>
-          </Box>
-          <Box p={4} borderRadius="2xl" bg={softSurface}>
-            <Text fontSize="xs" textTransform="uppercase" letterSpacing="widest" color={quiet}>
-              Revenue
-            </Text>
-            <Heading size="md" mt={1}>{plan.revenue}</Heading>
-          </Box>
-        </SimpleGrid>
+// ─── KPI Tile ───────────────────────────────────────────────────────────────
 
-        <VStack align="stretch" gap={3} flex="1">
-          <HStack justify="space-between">
-            <Text fontSize="sm" fontWeight="600" color={muted}>
-              Utilization
-            </Text>
-            <Text fontSize="sm" fontWeight="bold" color={quiet}>
-              {plan.utilization}%
-            </Text>
-          </HStack>
-          <Progress.Root value={plan.utilization} size="md" colorPalette={plan.accent} borderRadius="full">
-            <Progress.Track borderRadius="full" bg={softSurface}>
-              <Progress.Range borderRadius="full" />
-            </Progress.Track>
-          </Progress.Root>
-          <Text fontSize="sm" color={muted}>
-            Retention: <Text as="span" fontWeight="800" color={useColorModeValue("gray.800", "white")}>{plan.retention}</Text>
-          </Text>
-        </VStack>
+interface KpiTileProps {
+    label: string;
+    value: string;
+    helper: string;
+    icon: React.ElementType;
+    accent: string;
+}
 
-        <Separator opacity={0.5} />
+const KpiTile = memo(({ label, value, helper, icon: IconComponent, accent }: KpiTileProps) => {
+    const iconBg = useColorModeValue(`${accent}.50`, "rgba(255, 255, 255, 0.05)");
+    const iconColor = useColorModeValue(`${accent}.600`, `${accent}.300`);
+    const muted = useColorModeValue("gray.600", "gray.400");
 
-        <VStack align="stretch" gap={3}>
-          {plan.features.map((feature) => (
-            <HStack key={feature} gap={3} color={muted}>
-              <Circle size="5" bg={accentBg} color={accentColor}>
-                <LuArrowRight size="12px" />
-              </Circle>
-              <Text fontSize="sm" fontWeight="500">{feature}</Text>
-            </HStack>
-          ))}
-        </VStack>
-      </VStack>
-    </SurfaceCard>
-  );
-};
-
-const ActionCard = ({
-  item,
-  muted,
-  softSurface,
-}: {
-  item: (typeof actionCards)[number];
-  muted: string;
-  softSurface: string;
-}) => {
-  const iconBg = useColorModeValue(`${item.accent}.50`, "whiteAlpha.100");
-  const iconColor = useColorModeValue(`${item.accent}.600`, `${item.accent}.300`);
-
-  return (
-    <Box p={5} borderRadius="2xl" bg={softSurface} className="hover-lift" cursor="pointer" border="1px solid" borderColor="transparent" _hover={{ borderColor: useColorModeValue(`${item.accent}.200`, `${item.accent}.700`) }}>
-      <VStack align="start" gap={4}>
-        <Circle size="12" bg={iconBg} color={iconColor}>
-          <Icon as={item.icon} boxSize={5} />
-        </Circle>
-        <VStack align="start" gap="1">
-          <Heading size="sm" letterSpacing="tight">{item.title}</Heading>
-          <Text fontSize="sm" color={muted}>{item.description}</Text>
-        </VStack>
-      </VStack>
-    </Box>
-  );
-};
-
-const Subscription = () => {
-  const [isAnalyticsOpen, setAnalyticsOpen] = useState(false);
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const { appCode } = useParams();
-  const [searchParams] = useSearchParams();
-
-  const appParam = searchParams.get("app");
-  const appName = useMemo(() => appCode || appParam || "myGym", [appCode, appParam]);
-  const workspacePrefix = useMemo(() => {
-    if (!pathname.includes("/workspace")) return "";
-    return `${pathname.split("/workspace")[0]}/workspace`;
-  }, [pathname]);
-
-  const buildViewPath = useCallback((viewName: string) => {
-    if (appCode) return `${workspacePrefix}/app/${appCode}/${viewName}`;
-    return `${workspacePrefix}/${viewName}?app=${appName}`;
-  }, [appCode, appName, workspacePrefix]);
-
-  const heroBg = useColorModeValue(
-    "linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(14,165,233,0.10) 42%, rgba(249,115,22,0.15) 100%)",
-    "linear-gradient(135deg, rgba(37,99,235,0.25) 0%, rgba(8,145,178,0.20) 42%, rgba(249,115,22,0.15) 100%)"
-  );
-  const muted = useColorModeValue("gray.600", "gray.300");
-  const quiet = useColorModeValue("gray.500", "gray.400");
-  const softSurface = useColorModeValue("rgba(0,0,0,0.03)", "whiteAlpha.50");
-  const toneBlue = useColorModeValue("blue.600", "blue.300");
-  const channelTrackBg = useColorModeValue("gray.100", "whiteAlpha.100");
-
-  const decorativeBlob1 = useColorModeValue("rgba(59,130,246,0.3)", "rgba(59,130,246,0.15)");
-  const decorativeBlob2 = useColorModeValue("rgba(249,115,22,0.2)", "rgba(249,115,22,0.1)");
-
-  return (
-    <Box position="relative" w="full" minH="100%">
-      <style>{animations}</style>
-
-      {/* Decorative Orbs */}
-      <Box position="absolute" top="-5%" left="-5%" w="350px" h="350px" bg={decorativeBlob1} filter="blur(100px)" borderRadius="full" pointerEvents="none" zIndex={0} />
-      <Box position="absolute" top="40%" right="-5%" w="300px" h="300px" bg={decorativeBlob2} filter="blur(90px)" borderRadius="full" pointerEvents="none" zIndex={0} />
-
-      <VStack align="stretch" gap={8} pb={12} position="relative" zIndex={1}>
-        <SurfaceCard p={{ base: 6, md: 8 }} bg={heroBg} overflow="hidden" position="relative" className="animate-entrance">
-          <Box
-            position="absolute"
-            top="-40px"
-            right="-20px"
-            w={{ base: "180px", md: "280px" }}
-            h={{ base: "180px", md: "280px" }}
-            borderRadius="full"
-            bg="rgba(255,255,255,0.1)"
-            filter="blur(30px)"
-            pointerEvents="none"
-          />
-          <SimpleGrid columns={{ base: 1, xl: 2 }} gap={10} position="relative">
-            <VStack align="start" gap={6}>
-              <HStack flexWrap="wrap" gap="3">
-                <Badge colorPalette="blue" variant="solid" px="4" py="1.5" borderRadius="full" fontWeight="bold">
-                  Subscription Desk
-                </Badge>
-                <Badge variant="surface" px="4" py="1.5" borderRadius="full" bg={useColorModeValue("white", "whiteAlpha.200")}>
-                  <Box as="span" w="2" h="2" borderRadius="full" bg="red.500" display="inline-block" mr={2} />
-                  4 renewals need action
-                </Badge>
-                <Badge variant="surface" px="4" py="1.5" borderRadius="full" bg={useColorModeValue("white", "whiteAlpha.200")}>
-                  <Box as="span" w="2" h="2" borderRadius="full" bg="green.500" display="inline-block" mr={2} />
-                  Auto-debit success 96.2%
-                </Badge>
-              </HStack>
-
-              <VStack align="start" gap="3" maxW="2xl">
-                <Heading size={{ base: "2xl", md: "3xl" }} letterSpacing="tight" fontWeight="800">
-                  Modern subscription management for renewals, collections and upgrades.
-                </Heading>
-                <Text fontSize={{ base: "md", md: "lg" }} color={muted} lineHeight="tall">
-                  Manage billing health across all gym plans, review due members, watch channel
-                  performance and launch plan upgrades from one CRM billing page.
-                </Text>
-              </VStack>
-
-              <HStack flexWrap="wrap" gap="4" pt={2}>
-                <Button colorPalette="blue" size="xl" borderRadius="2xl" px={8} className="hover-lift" onClick={() => navigate(buildViewPath("AddSubscriptionPlan"))}>
-                  <LuBadgeDollarSign />
-                  New subscription
-                </Button>
-                <Button variant="surface" size="xl" borderRadius="2xl" px={8} className="hover-lift" bg={useColorModeValue("white", "whiteAlpha.200")} onClick={() => navigate(buildViewPath("ListMember"))}>
-                  <LuUsers />
-                  Open members
-                </Button>
-                <Button variant="ghost" size="xl" borderRadius="2xl" px={6} className="hover-lift" onClick={() => setAnalyticsOpen(true)}>
-                  <LuChartColumn />
-                  Analytics
-                </Button>
-              </HStack>
-            </VStack>
-
-            <SimpleGrid columns={{ base: 2, md: 4 }} gap={5}>
-              <KPI label="MRR" value="$45.2K" helper="12.1% higher than last month" icon={LuWallet} accent="blue" />
-              <KPI label="Renewals" value="128" helper="Due in the next 30 days" icon={LuCalendarClock} accent="green" />
-              <KPI label="Collection Rate" value="96.2%" helper="Across all payment channels" icon={LuCircleDollarSign} accent="orange" />
-              <KPI label="At Risk" value="18" helper="Need outreach or reactivation" icon={LuShieldAlert} accent="red" />
-            </SimpleGrid>
-          </SimpleGrid>
-        </SurfaceCard>
-
-        <SurfaceCard p={{ base: 6, md: 8 }} className="animate-entrance delay-1">
-          <VStack align="stretch" gap={6}>
-            <Flex justify="space-between" align={{ base: "start", md: "center" }} gap={4} direction={{ base: "column", md: "row" }}>
-              <Box>
-                <Text fontSize="sm" textTransform="uppercase" letterSpacing="widest" color={quiet} mb={2} fontWeight="700">
-                  Plan Catalog
-                </Text>
-                <Heading size="xl" letterSpacing="tight">Subscription portfolio performance</Heading>
-              </Box>
-              <Badge variant="subtle" colorPalette="blue" px="4" py="2" borderRadius="full" fontWeight="bold">
-                Product + Collections
-              </Badge>
-            </Flex>
-
-            <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} gap={6}>
-              {planRecords.map((plan) => (
-                <PlanCard key={plan.name} plan={plan} />
-              ))}
-            </SimpleGrid>
-          </VStack>
-        </SurfaceCard>
-
-        <SimpleGrid columns={{ base: 1, xl: 3 }} gap={8}>
-          <VStack align="stretch" gap={8} gridColumn={{ xl: "span 2" }}>
-            <SurfaceCard p={{ base: 6, md: 8 }} className="animate-entrance delay-2">
-              <VStack align="stretch" gap={6}>
-                <Flex justify="space-between" align={{ base: "start", md: "center" }} direction={{ base: "column", md: "row" }} gap={4}>
-                  <Box>
-                    <Text fontSize="sm" textTransform="uppercase" letterSpacing="widest" color={quiet} mb={2} fontWeight="700">
-                      Collections
+    return (
+        <GlassCard p={5} accentColor={accent}>
+            <VStack align="stretch" gap={4}>
+                <Flex justify="space-between" align="center">
+                    <Circle size="12" bg={iconBg} color={iconColor} shadow="inner">
+                        <IconComponent size={20} />
+                    </Circle>
+                    <Badge colorPalette={accent} variant="surface" borderRadius="full">
+                        Live
+                    </Badge>
+                </Flex>
+                <VStack align="start" gap="0.5">
+                    <Text fontSize="xs" fontWeight="800" color={muted} letterSpacing="wider" textTransform="uppercase">
+                        {label}
                     </Text>
-                    <Heading size="xl" letterSpacing="tight">Revenue channel mix</Heading>
-                  </Box>
-                  <Badge variant="surface" bg={softSurface} borderRadius="full" px="4" py="2" fontWeight="600">
-                    Updated today
-                  </Badge>
+                    <Heading size="2xl" letterSpacing="tight" fontWeight="900">
+                        {value}
+                    </Heading>
+                    <Text fontSize="xs" color={muted} fontWeight="500">
+                        {helper}
+                    </Text>
+                </VStack>
+            </VStack>
+        </GlassCard>
+    );
+});
+KpiTile.displayName = "KpiTile";
+
+// ─── Plan Summary Card ──────────────────────────────────────────────────────
+
+interface PlanSummaryCardProps {
+    plan: SubscriptionPlanDocument;
+    memberInfo?: PlanWithMembers;
+}
+
+const PlanSummaryCard = memo(({ plan, memberInfo }: PlanSummaryCardProps) => {
+    const accent = plan.data.accent_color || "blue";
+    const muted = useColorModeValue("gray.500", "gray.400");
+    const softSurface = useColorModeValue("rgba(0,0,0,0.03)", "whiteAlpha.100");
+    const accentBg = useColorModeValue(`${accent}.100`, "whiteAlpha.200");
+    const accentColor = useColorModeValue(`${accent}.600`, `${accent}.300`);
+
+    const memberCount = memberInfo?.member_count ?? 0;
+    const planRevenue = memberInfo?.revenue ?? 0;
+
+    return (
+        <GlassCard p={6} h="full" accentColor={accent}>
+            <VStack align="stretch" gap={6} h="full">
+                {/* Header */}
+                <Flex justify="space-between" align="start" gap={3}>
+                    <VStack align="start" gap={2}>
+                        <Badge
+                            colorPalette={accent}
+                            variant="solid"
+                            borderRadius="full"
+                            px="3"
+                            fontSize="2xs"
+                            fontWeight="900"
+                        >
+                            {plan.data.is_active ? "ACTIVE PLAN" : "INACTIVE"}
+                        </Badge>
+                        <Heading size="xl" fontWeight="900" letterSpacing="tight">
+                            {plan.data.name}
+                        </Heading>
+                        <HStack align="baseline" gap={1}>
+                            <Text fontSize="2xl" fontWeight="900">
+                                ₹{plan.data.price.toLocaleString("en-IN")}
+                            </Text>
+                            <Text color={muted} fontSize="xs" fontWeight="700" textTransform="uppercase">
+                                / {plan.data.billing_cycle}
+                            </Text>
+                        </HStack>
+                    </VStack>
+                    <Circle size="12" bg={accentBg} color={accentColor} shadow="md">
+                        <CreditCard size={22} />
+                    </Circle>
                 </Flex>
 
-                <VStack align="stretch" gap={4}>
-                  {collectionChannels.map((channel) => (
-                    <Box key={channel.label} p={5} borderRadius="2xl" bg={softSurface} className="hover-lift">
-                      <Flex justify="space-between" mb={4}>
-                        <VStack align="start" gap="1">
-                          <Text fontWeight="800" fontSize="lg">{channel.label}</Text>
-                          <Text fontSize="md" color={muted}>{channel.amount}</Text>
-                        </VStack>
-                        <Text fontSize="md" fontWeight="bold" color={quiet}>{channel.share}% share</Text>
-                      </Flex>
-                      <Box h="3" borderRadius="full" bg={channelTrackBg} overflow="hidden">
-                        <Box h="full" w={`${channel.share}%`} bg={channel.color} borderRadius="full" transition="width 1s ease-in-out" />
-                      </Box>
+                {/* Stats row with glass containers */}
+                <SimpleGrid columns={2} gap={3}>
+                    <Box p={4} borderRadius="2xl" bg={softSurface} border="1px solid" borderColor="whiteAlpha.200">
+                        <Text fontSize="2xs" textTransform="uppercase" letterSpacing="widest" color={muted} fontWeight="800">
+                            Members
+                        </Text>
+                        <Heading size="md" mt={1} fontWeight="900">{memberCount}</Heading>
                     </Box>
-                  ))}
-                </VStack>
-              </VStack>
-            </SurfaceCard>
-
-            <SurfaceCard p={{ base: 6, md: 8 }} className="animate-entrance delay-3">
-              <VStack align="stretch" gap={6}>
-                <Box>
-                  <Text fontSize="sm" textTransform="uppercase" letterSpacing="widest" color={quiet} mb={2} fontWeight="700">
-                    Action Queue
-                  </Text>
-                  <Heading size="xl" letterSpacing="tight">Billing workflows for today</Heading>
-                </Box>
-
-                <SimpleGrid columns={{ base: 1, md: 3 }} gap={6}>
-                  {actionCards.map((item) => (
-                    <ActionCard key={item.title} item={item} muted={muted} softSurface={softSurface} />
-                  ))}
+                    <Box p={4} borderRadius="2xl" bg={softSurface} border="1px solid" borderColor="whiteAlpha.200">
+                        <Text fontSize="2xs" textTransform="uppercase" letterSpacing="widest" color={muted} fontWeight="800">
+                            MRR
+                        </Text>
+                        <Heading size="md" mt={1} fontWeight="900">₹{planRevenue.toLocaleString("en-IN")}</Heading>
+                    </Box>
                 </SimpleGrid>
-              </VStack>
-            </SurfaceCard>
-          </VStack>
 
-          <VStack align="stretch" gap={8}>
-            <SurfaceCard p={{ base: 6, md: 8 }} className="animate-entrance delay-2">
-              <VStack align="stretch" gap={5}>
-                <Box>
-                  <Text fontSize="sm" textTransform="uppercase" letterSpacing="widest" color={quiet} mb={2} fontWeight="700">
-                    Renewal Queue
-                  </Text>
-                  <Heading size="lg" letterSpacing="tight">Members due for follow-up</Heading>
-                </Box>
-
-                {renewalQueue.map((item) => {
-                  const tone =
-                    item.status === "Due Today" ? "red" : item.status === "Overdue" ? "orange" : "blue";
-
-                  return (
-                    <Box key={`${item.member}-${item.plan}`} p={5} borderRadius="2xl" bg={softSurface} className="hover-lift">
-                      <VStack align="stretch" gap={4}>
-                        <HStack justify="space-between" align="start">
-                          <VStack align="start" gap="1">
-                            <Text fontWeight="800" fontSize="md">{item.member}</Text>
-                            <Text fontSize="sm" color={muted} fontWeight="500">{item.plan}</Text>
-                          </VStack>
-                          <Badge colorPalette={tone} variant="subtle" fontWeight="bold" px="3" py="1" borderRadius="full">
-                            {item.status}
-                          </Badge>
+                {/* Features */}
+                <Separator opacity={0.1} />
+                <VStack align="stretch" gap={3} flex="1">
+                    {plan.data.features.slice(0, 3).map((feature) => (
+                        <HStack key={feature} gap={3}>
+                            <Circle size="6" bg={accentBg} color={accentColor}>
+                                <ShieldCheck size={14} />
+                            </Circle>
+                            <Text fontSize="sm" fontWeight="600" color="app.text.primary">{feature}</Text>
                         </HStack>
-                        <HStack justify="space-between" color={quiet}>
-                          <HStack gap={2}>
-                            <LuFileClock />
-                            <Text fontSize="sm" fontWeight="500">{item.due}</Text>
-                          </HStack>
-                          <Text fontSize="md" fontWeight="800" color="inherit">
-                            {item.amount}
-                          </Text>
-                        </HStack>
-                      </VStack>
-                    </Box>
-                  );
-                })}
-
-                <Button variant="outline" size="lg" borderRadius="2xl" className="hover-lift" mt={2} onClick={() => navigate(buildViewPath("ListMember"))}>
-                  Open member records
-                  <LuArrowRight />
-                </Button>
-              </VStack>
-            </SurfaceCard>
-
-            <SurfaceCard p={{ base: 6, md: 8 }} className="animate-entrance delay-3" bg={useColorModeValue("blue.50", "blue.900")} borderColor={useColorModeValue("blue.100", "blue.800")}>
-              <VStack align="stretch" gap={5}>
-                <Box>
-                  <Text fontSize="sm" textTransform="uppercase" letterSpacing="widest" color={useColorModeValue("blue.600", "blue.300")} mb={2} fontWeight="800">
-                    Strategy Note
-                  </Text>
-                  <Heading size="md" letterSpacing="tight">Recommended move</Heading>
-                </Box>
-                <Text fontSize="md" color={useColorModeValue("gray.700", "gray.300")} lineHeight="tall" fontWeight="500">
-                  Push monthly members with strong visit history toward quarterly plans. That group
-                  has the best upgrade probability and the lowest collection friction.
-                </Text>
-                <HStack gap={3} color={toneBlue} mt={2} p={3} bg={useColorModeValue("white", "whiteAlpha.200")} borderRadius="xl">
-                  <LuSparkles size={20} />
-                  <Text fontSize="sm" fontWeight="800">
-                    Use trainers to anchor the upgrade conversation
-                  </Text>
-                </HStack>
-              </VStack>
-            </SurfaceCard>
-          </VStack>
-        </SimpleGrid>
-
-        <SurfaceCard p={{ base: 6, md: 8 }} className="animate-entrance delay-4" bg={useColorModeValue("gray.900", "whiteAlpha.100")} color="white" borderColor="transparent">
-          <Flex justify="space-between" align={{ base: "start", md: "center" }} direction={{ base: "column", md: "row" }} gap={6}>
-            <VStack align="start" gap={2}>
-              <Heading size="lg" letterSpacing="tight" color="white">Need deeper numbers?</Heading>
-              <Text fontSize="md" color="gray.300" maxW="xl">
-                Open the analytics panel to review retention, revenue streams and growth signals with high-resolution charts.
-              </Text>
+                    ))}
+                    {plan.data.features.length > 3 && (
+                        <Text fontSize="xs" color={muted} fontWeight="700" pl={9}>
+                            + {plan.data.features.length - 3} MORE PRIVILEGES
+                        </Text>
+                    )}
+                </VStack>
             </VStack>
-            <Button size="xl" colorPalette="blue" borderRadius="2xl" className="hover-lift" px={8} onClick={() => setAnalyticsOpen(true)}>
-              Open highly-detailed analytics
-              <LuArrowUpRight />
-            </Button>
-          </Flex>
-        </SurfaceCard>
-      </VStack>
-    </Box>
-  );
+        </GlassCard>
+    );
+});
+PlanSummaryCard.displayName = "PlanSummaryCard";
+
+// ─── Main ───────────────────────────────────────────────────────────────────
+
+const Subscription = () => {
+    const { navigateTo, buildPath } = useWorkspaceRouter();
+
+    // ── Data ──
+    const { plans, loading: plansLoading, refetch: refetchPlans } = useSubscriptionPlans();
+    const { stats, loading: statsLoading, refetch: refetchStats } = useSubscriptionStats();
+
+    const handleRefresh = useCallback(() => {
+        refetchPlans();
+        refetchStats();
+    }, [refetchPlans, refetchStats]);
+
+    // ── Navigation handlers ──
+    const handleCreatePlan = useCallback(() => {
+        navigateTo("AddSubscriptionPlan");
+    }, [navigateTo]);
+
+    const handleManagePlans = useCallback(() => {
+        navigateTo("GymSubscriptionPlans");
+    }, [navigateTo]);
+
+    const mountNavActions = useNavActionStore((state) => state.setActions);
+    const unmountNavActions = useNavActionStore((state) => state.clearActions);
+
+    useEffect(() => {
+        mountNavActions(
+            <HStack gap={2}>
+                <IconButton
+                    variant="subtle"
+                    colorPalette="yellow"
+                    borderRadius="sm"
+                    size="sm"
+                    onClick={handleRefresh}
+                    aria-label="Refresh hub"
+                    loading={plansLoading || statsLoading}
+                    h="32px"
+                    w="32px"
+                >
+                    <RefreshCw size={14} />
+                </IconButton>
+                <Button
+                    variant="outline"
+                    borderRadius="sm"
+                    size="sm"
+                    onClick={handleManagePlans}
+                    h="32px"
+                    fontWeight="800"
+                >
+                    <Settings /> Management
+                </Button>
+                <Button
+                    colorPalette="blue"
+                    borderRadius="sm"
+                    size="sm"
+                    onClick={handleCreatePlan}
+                    h="32px"
+                    fontWeight="800"
+                >
+                    <Plus /> New Plan
+                </Button>
+            </HStack>
+        );
+        return () => unmountNavActions();
+    }, [mountNavActions, unmountNavActions, handleRefresh, handleManagePlans, handleCreatePlan, plansLoading, statsLoading]);
+
+    const handleViewMembers = useCallback(() => {
+        navigateTo("members");
+    }, [navigateTo]);
+
+    // ── Plan ↔ stats map for member counts ──
+    const planStatsMap = useMemo(() => {
+        const map = new Map<string, PlanWithMembers>();
+        if (stats?.plans_with_members) {
+            for (const p of stats.plans_with_members) {
+                map.set(p.plan_code, p);
+            }
+        }
+        return map;
+    }, [stats]);
+
+    // ── Theme ──
+    const muted = useColorModeValue("gray.500", "gray.400");
+
+    return (
+        <PageLayout
+            title="Subscription Hub"
+            subtitle="Real-time membership health, revenue forecasting, and plan management."
+        >
+            <VStack align="stretch" gap={10} pb={8}>
+
+                {/* ── KPI Row ─────────────────────────────────────────── */}
+                <SimpleGrid columns={{ base: 1, sm: 2, lg: 4 }} gap={6}>
+                    {statsLoading ? (
+                        [1, 2, 3, 4].map((i) => (
+                            <Skeleton key={i} height="160px" borderRadius="3xl" />
+                        ))
+                    ) : (
+                        <>
+                            <KpiTile
+                                label="Live Portfolios"
+                                value={String(stats?.active_plans ?? 0)}
+                                helper={`${stats?.total_plans ?? 0} Global Tiers`}
+                                icon={Layers}
+                                accent="blue"
+                            />
+                            <KpiTile
+                                label="Subscribers"
+                                value={String(stats?.total_subscribers ?? 0)}
+                                helper="Active Memberships"
+                                icon={Users}
+                                accent="green"
+                            />
+                            <KpiTile
+                                label="Projected MRR"
+                                value={`₹${(stats?.total_mrr ?? 0).toLocaleString("en-IN")}`}
+                                helper="Recurring Revenue"
+                                icon={CircleDollarSign}
+                                accent="orange"
+                            />
+                            <KpiTile
+                                label="Unit Economy"
+                                value={
+                                    stats && stats.total_subscribers > 0
+                                        ? `₹${Math.round(stats.total_mrr / stats.total_subscribers).toLocaleString("en-IN")}`
+                                        : "₹0"
+                                }
+                                helper="Average Revenue / User"
+                                icon={ChartColumn}
+                                accent="purple"
+                            />
+                        </>
+                    )}
+                </SimpleGrid>
+
+                {/* ── Plans Grid ──────────────────────────────────────── */}
+                <VStack align="stretch" gap={6}>
+                    <Flex justify="space-between" align="end">
+                        <VStack align="start" gap={1}>
+                            <HStack gap={2}>
+                                <Box w="4px" h="20px" bg="blue.500" borderRadius="full" />
+                                <Heading size="lg" fontWeight="950" letterSpacing="tight">Active Tiers</Heading>
+                            </HStack>
+                            <Text fontSize="sm" color={muted} fontWeight="600">
+                                Monitor performance and distribution across all subscription levels
+                            </Text>
+                        </VStack>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            borderRadius="xl"
+                            onClick={handleManagePlans}
+                            fontWeight="800"
+                        >
+                            Catalog Overview <ArrowRight size={14} style={{ marginLeft: "4px" }} />
+                        </Button>
+                    </Flex>
+
+                    {plansLoading ? (
+                        <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} gap={6}>
+                            {[1, 2, 3].map((i) => (
+                                <Skeleton key={i} height="320px" borderRadius="3xl" />
+                            ))}
+                        </SimpleGrid>
+                    ) : (
+                        <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} gap={8}>
+                            {plans.map((plan) => (
+                                <PlanSummaryCard
+                                    key={plan._id}
+                                    plan={plan}
+                                    memberInfo={planStatsMap.get(plan.data.code)}
+                                />
+                            ))}
+                        </SimpleGrid>
+                    )}
+                </VStack>
+
+                {/* ── Quick Access ───────────────────────────────────── */}
+                <SimpleGrid columns={{ base: 1, md: 3 }} gap={6}>
+                    <GlassCard p={6} cursor="pointer" onClick={handleCreatePlan} accentColor="blue">
+                        <VStack align="start" gap={4}>
+                            <Circle size="12" bg="blue.500/10" color="blue.500">
+                                <BadgeDollarSign size={24} />
+                            </Circle>
+                            <VStack align="start" gap="1">
+                                <Heading size="md" fontWeight="900" letterSpacing="tight">Plan Architect</Heading>
+                                <Text fontSize="xs" color={muted} fontWeight="600">
+                                    Configure new membership tiers with dynamic pricing.
+                                </Text>
+                            </VStack>
+                        </VStack>
+                    </GlassCard>
+
+                    <GlassCard p={6} cursor="pointer" onClick={handleManagePlans} accentColor="green">
+                        <VStack align="start" gap={4}>
+                            <Circle size="12" bg="green.500/10" color="green.500">
+                                <Settings size={24} />
+                            </Circle>
+                            <VStack align="start" gap="1">
+                                <Heading size="md" fontWeight="900" letterSpacing="tight">System Config</Heading>
+                                <Text fontSize="xs" color={muted} fontWeight="600">
+                                    Audit pricing models, features, and active statuses.
+                                </Text>
+                            </VStack>
+                        </VStack>
+                    </GlassCard>
+
+                    <GlassCard p={6} cursor="pointer" onClick={handleViewMembers} accentColor="orange">
+                        <VStack align="start" gap={4}>
+                            <Circle size="12" bg="orange.500/10" color="orange.500">
+                                <Users size={24} />
+                            </Circle>
+                            <VStack align="start" gap="1">
+                                <Heading size="md" fontWeight="900" letterSpacing="tight">Member Ledger</Heading>
+                                <Text fontSize="xs" color={muted} fontWeight="600">
+                                    Analyze enrollment data and subscription lifecycles.
+                                </Text>
+                            </VStack>
+                        </VStack>
+                    </GlassCard>
+                </SimpleGrid>
+            </VStack>
+        </PageLayout>
+    );
 };
 
 export default Subscription;

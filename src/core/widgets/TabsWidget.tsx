@@ -45,8 +45,7 @@ const TabsWidget: React.FC<TabsWidgetProps> = ({ tabs, defaultValue, ...rest }) 
         <TabsRoot
             key={tabsKey}
             defaultValue={defaultTabValue}
-            lazyMount
-            unmountOnExit
+            // lazyMount
             variant="plain"
             w="full"
         >
@@ -139,16 +138,16 @@ const TabsWidget: React.FC<TabsWidgetProps> = ({ tabs, defaultValue, ...rest }) 
                                 ease: [0.19, 1, 0.22, 1]
                             }}
                         >
-                            <VStack align="start" gap="2" mb="12">
+                            <VStack align="start" gap="2" mb="6" >
                                 <Heading
-                                    size="2xl"
+                                    size="xl"
                                     fontWeight="extrabold"
                                     color={textColor}
                                     letterSpacing="tight"
                                 >
                                     {tab.headerTitle || tab.title}
                                 </Heading>
-                                <Text color={mutedTextColor} fontSize="lg" maxW="2xl" lineHeight="tall">
+                                <Text color={"text.muted"} fontSize="lg" lineHeight="tall">
                                     {tab.description || "Refine and manage your workspace settings and configurations."}
                                 </Text>
                             </VStack>

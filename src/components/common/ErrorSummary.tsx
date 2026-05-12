@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Box, Heading, Text, VStack, HStack, Icon, List, Separator } from "@chakra-ui/react";
-import { FaExclamationTriangle, FaCircle } from "react-icons/fa";
+import { AlertTriangle, Circle } from "lucide-react";
 import { ParsedError } from "@/utils/apiErrorParser";
 
 interface ErrorSummaryProps {
@@ -24,7 +24,7 @@ export const ErrorSummary: React.FC<ErrorSummaryProps> = ({ error }) => {
         >
             <VStack align="start" gap={3}>
                 <HStack gap={3} align="start">
-                    <Icon as={FaExclamationTriangle} color="red.500" mt={1} />
+                    <Icon as={AlertTriangle} color="red.500" mt={1} />
                     <VStack align="start" gap={1}>
                         <Heading size="sm" color="red.700" _dark={{ color: "red.300" }}>
                             {error.summary}
@@ -44,7 +44,7 @@ export const ErrorSummary: React.FC<ErrorSummaryProps> = ({ error }) => {
                             {error.issues.map((issue, index) => (
                                 <List.Item key={index} alignItems="start">
                                     <HStack align="start" gap={2}>
-                                        <Icon as={FaCircle} color="red.400" mt={1.5} boxSize={2} />
+                                        <Icon as={Circle} color="red.400" mt={1.5} boxSize={2} fill="currentColor" />
                                         <Text fontSize="sm" color="red.700" _dark={{ color: "red.300" }}>
                                             <Text as="span" fontWeight="bold">{issue.field}: </Text>
                                             {issue.message}

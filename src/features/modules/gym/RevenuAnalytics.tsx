@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { motion } from "framer-motion";
-import { LuArrowUpRight, LuUsers, LuTrendingUp, LuActivity } from "react-icons/lu";
+import { ArrowUpRight, Users, TrendingUp, Activity } from "lucide-react";
 import LoadIcon from "../../../utils/hooks/LoadIcon";
 
 const MotionBox = motion.create(Box as any);
@@ -97,7 +97,7 @@ const MembershipHealthMatrix = () => {
     <VStack align="stretch" gap={4} w="full" p={5} borderRadius="2xl" bg="blue.600" color="white" boxShadow="xl">
       <HStack justify="space-between">
         <Heading size="xs" fontWeight="700" opacity={0.8} textTransform="uppercase">Membership Health</Heading>
-        <LuActivity size="16px" />
+        <Activity size="16px" />
       </HStack>
       <VStack align="center" py={4} gap={1}>
         <Text fontSize="4xl" fontWeight="900">92.4%</Text>
@@ -207,14 +207,14 @@ export default function RevenuAnalytics() {
             {/* Micro analytics footer */}
             <HStack gap={8} pt={4} borderTop="1px solid" borderColor={borderColor}>
               <HStack gap={2}>
-                <LuUsers color="#3182ce" />
+                <Users color="#3182ce" />
                 <VStack align="start" gap={0}>
                   <Text fontSize="xs" fontWeight="700" color="gray.500">Peak Hours Density</Text>
                   <Text fontSize="sm" fontWeight="800">Extremely High</Text>
                 </VStack>
               </HStack>
               <HStack gap={2}>
-                <LuTrendingUp color="#38A169" />
+                <TrendingUp color="#38A169" />
                 <VStack align="start" gap={0}>
                   <Text fontSize="xs" fontWeight="700" color="gray.500">Quarterly Target</Text>
                   <Text fontSize="sm" fontWeight="800">82% Achieved</Text>

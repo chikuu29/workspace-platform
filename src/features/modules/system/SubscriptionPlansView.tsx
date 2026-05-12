@@ -35,20 +35,20 @@ import { toaster } from "@/components/ui/toaster";
 import { GETAPI, POSTAPI, PUTAPI, DELETEAPI } from "@/app/api";
 import { APIResponse } from "@/app/interfaces/app.interface";
 import {
-    LuPlus,
-    LuPencil,
-    LuTrash2,
-    LuRefreshCw,
-    LuUsers,
-    LuDatabase,
-    LuGlobe,
-    LuCoins,
-    LuTimer,
-    LuTicket,
-    LuShieldCheck,
-    LuArrowRight,
-    LuLayers,
-} from "react-icons/lu";
+    Plus,
+    Pencil,
+    Trash2,
+    RefreshCw,
+    Users,
+    Database,
+    Globe,
+    Coins,
+    Timer,
+    Ticket,
+    ShieldCheck,
+    ArrowRight,
+    Layers,
+} from "lucide-react";
 import { Field } from "@/components/ui/field";
 import { PageLayout } from "@/core/components/PageLayout";
 import { Card } from "@/core/components/Card";
@@ -231,7 +231,7 @@ const SubscriptionPlansView = memo(() => {
                                     onClick={() => handleEditClick(plan)}
                                     _hover={{ bg: "cyan.500/10", color: "cyan.400" }}
                                 >
-                                    <LuPencil size={14} />
+                                    <Pencil size={14} />
                                 </IconButton>
                                 <IconButton
                                     aria-label="Delete"
@@ -242,7 +242,7 @@ const SubscriptionPlansView = memo(() => {
                                     onClick={() => handleDelete(plan.id)}
                                     _hover={{ bg: "red.500/10", color: "red.400" }}
                                 >
-                                    <LuTrash2 size={14} />
+                                    <Trash2 size={14} />
                                 </IconButton>
                             </HStack>
                         </HStack>
@@ -278,7 +278,7 @@ const SubscriptionPlansView = memo(() => {
                             <HStack justify="space-between">
                                 <HStack gap={3}>
                                     <Circle size={8} bg="cyan.500/10" border="1px solid" borderColor="cyan.500/20">
-                                        <Icon as={LuUsers} boxSize="14px" color="cyan.400" />
+                                        <Icon as={Users} boxSize="14px" color="cyan.400" />
                                     </Circle>
                                     <Text fontSize="sm" color="app.text.secondary">Users Limit</Text>
                                 </HStack>
@@ -290,7 +290,7 @@ const SubscriptionPlansView = memo(() => {
                             <HStack justify="space-between">
                                 <HStack gap={3}>
                                     <Circle size={8} bg="cyan.500/10" border="1px solid" borderColor="cyan.500/20">
-                                        <Icon as={LuLayers} boxSize="14px" color="cyan.400" />
+                                        <Icon as={Layers} boxSize="14px" color="cyan.400" />
                                     </Circle>
                                     <Text fontSize="sm" color="app.text.secondary">Branches</Text>
                                 </HStack>
@@ -302,7 +302,7 @@ const SubscriptionPlansView = memo(() => {
                             <HStack justify="space-between">
                                 <HStack gap={3}>
                                     <Circle size={8} bg="cyan.500/10" border="1px solid" borderColor="cyan.500/20">
-                                        <Icon as={LuDatabase} boxSize="14px" color="cyan.400" />
+                                        <Icon as={Database} boxSize="14px" color="cyan.400" />
                                     </Circle>
                                     <Text fontSize="sm" color="app.text.secondary">Storage</Text>
                                 </HStack>
@@ -315,13 +315,13 @@ const SubscriptionPlansView = memo(() => {
                         {/* Footer Info */}
                         <HStack mt={8} pt={6} borderTop="1px dashed" borderColor="app.card.border" justify="space-between">
                             <HStack gap={1.5}>
-                                <Icon as={LuGlobe} boxSize="12px" color="app.text.muted" />
+                                <Icon as={Globe} boxSize="12px" color="app.text.muted" />
                                 <Text fontSize="xs" color="app.text.muted" fontWeight="600">
                                     {version?.country}
                                 </Text>
                             </HStack>
                             <HStack gap={1.5}>
-                                <Icon as={LuShieldCheck} boxSize="12px" color="emerald.400" />
+                                <Icon as={ShieldCheck} boxSize="12px" color="emerald.400" />
                                 <Text fontSize="xs" color="app.text.muted">
                                     v{version?.version || 1}
                                 </Text>
@@ -338,7 +338,7 @@ const SubscriptionPlansView = memo(() => {
             <PageLayout
                 title={
                     <HStack gap={3}>
-                        <Icon as={LuTicket} boxSize={6} color="cyan.500" />
+                        <Icon as={Ticket} boxSize={6} color="cyan.500" />
                         <Text>Plans & Pricing</Text>
                     </HStack>
                 }
@@ -359,7 +359,7 @@ const SubscriptionPlansView = memo(() => {
                             onClick={handleAddClick}
                             boxShadow="0 8px 16px -4px rgba(0, 255, 255, 0.2)"
                         >
-                            <LuPlus style={{ marginRight: "8px" }} /> Create Plan
+                            <Plus style={{ marginRight: "8px" }} /> Create Plan
                         </Button>
                     </HStack>
                 }
@@ -378,7 +378,7 @@ const SubscriptionPlansView = memo(() => {
                 ) : plans.length === 0 ? (
                     <Center h="400px" bg="app.card.bg" borderRadius="3xl" border="1px dashed" borderColor="app.card.border">
                         <VStack gap={6}>
-                            <Icon as={LuTicket} boxSize={12} color="white/10" />
+                            <Icon as={Ticket} boxSize={12} color="white/10" />
                             <VStack gap={1}>
                                 <Text color="white" fontWeight="bold" fontSize="lg">No Subscription Plans Found</Text>
                                 <Text color="app.text.muted" maxW="300px" textAlign="center">
@@ -425,7 +425,7 @@ const SubscriptionPlansView = memo(() => {
                                 {/* Basic Info */}
                                 <VStack align="stretch" gap={4}>
                                     <HStack gap={2} mb={2}>
-                                        <Icon as={LuTimer} color="cyan.400" boxSize="16px" />
+                                        <Icon as={Timer} color="cyan.400" boxSize="16px" />
                                         <Text fontSize="sm" fontWeight="bold" color="white">Logical Identity</Text>
                                     </HStack>
                                     <SimpleGrid columns={2} gap={4}>
@@ -476,7 +476,7 @@ const SubscriptionPlansView = memo(() => {
                                 {/* Pricing Configuration */}
                                 <VStack align="stretch" gap={4}>
                                     <HStack gap={2} mb={2}>
-                                        <Icon as={LuCoins} color="cyan.400" boxSize="16px" />
+                                        <Icon as={Coins} color="cyan.400" boxSize="16px" />
                                         <Text fontSize="sm" fontWeight="bold" color="white">Commercial Tiers</Text>
                                     </HStack>
                                     <SimpleGrid columns={3} gap={4}>
@@ -547,7 +547,7 @@ const SubscriptionPlansView = memo(() => {
                                 {/* Resource Limits */}
                                 <VStack align="stretch" gap={4}>
                                     <HStack gap={2} mb={2}>
-                                        <Icon as={LuLayers} color="cyan.400" boxSize="16px" />
+                                        <Icon as={Layers} color="cyan.400" boxSize="16px" />
                                         <Text fontSize="sm" fontWeight="bold" color="white">Resource Constraints</Text>
                                     </HStack>
                                     <SimpleGrid columns={3} gap={4}>
@@ -615,7 +615,7 @@ const SubscriptionPlansView = memo(() => {
                             boxShadow="0 10px 20px -5px rgba(0, 255, 255, 0.2)"
                         >
                             {selectedPlan ? "Apply Upgrade" : "Launch Subscription Plan"}
-                            <Icon as={LuArrowRight} ml={2} />
+                            <Icon as={ArrowRight} ml={2} />
                         </Button>
                     </DrawerFooter>
                 </DrawerContent>

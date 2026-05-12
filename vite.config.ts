@@ -20,10 +20,10 @@ export default defineConfig(({ mode }) => {
       react(),
       createVersionPlugin(),
       mode === 'production' &&
-        visualizer({
-          filename: './dist/stats.html',
-          open: true,
-        }),
+      visualizer({
+        filename: './dist/stats.html',
+        open: true,
+      }),
     ],
 
     build: {
@@ -65,6 +65,8 @@ export default defineConfig(({ mode }) => {
         '/identity': {
           target: env.VITE_IDENTITY_PROVIDER_API_URL,
           changeOrigin: true,
+          // Strips /identity so the identity server receives the bare path:
+          //   /identity/account/organization/users → /account/organization/users
           rewrite: (path) => path.replace(/^\/identity/, ''),
         },
       },

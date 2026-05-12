@@ -21,18 +21,19 @@ import { useColorModeValue } from "@/components/ui/color-mode";
 import React, { useRef, useState, useCallback, memo, useMemo, useEffect } from "react";
 import { FieldError, useFormContext } from "react-hook-form";
 import {
-  LuUpload,
-  LuCamera,
-  LuX,
-  LuEye,
-  LuDownload,
-  LuTrash2,
-  LuRotateCcw,
-  LuCheck,
-  LuFile,
-  LuImage,
-  LuVideo,
-} from "react-icons/lu";
+  Upload,
+  Camera,
+  X,
+  Trash2,
+  RotateCcw,
+  Check,
+  File as FileIcon,
+  FileText,
+  FileSpreadsheet,
+  FileArchive,
+  FileCode,
+  Presentation,
+} from "lucide-react";
 import { POSTAPI } from "../../app/api";
 import { ruleEngine } from "../engine/logicEngine";
 
@@ -54,47 +55,144 @@ interface UPLOAD {
   enableClear?: boolean;
 }
 
+const UPLOAD_FILE_KEYS = [
+  "id",
+  "key",
+  "bucket",
+  "name",
+  "filename",
+  "fileName",
+  "originalName",
+  "size",
+  "type",
+  "mimeType",
+  "mime_type",
+  "path",
+  "url",
+  "accessObjectPath",
+  "accessUrl",
+  "objectPath",
+  "createdAt",
+  "updatedAt",
+] as const;
+
+const toPlainUploadedFile = (file: any) => {
+  if (!file || typeof file !== "object") return file;
+
+  const plainFile: Record<string, string | number | boolean | null> = {};
+
+  UPLOAD_FILE_KEYS.forEach((key) => {
+    const value = file[key];
+    if (["string", "number", "boolean"].includes(typeof value) || value === null) {
+      plainFile[key] = value;
+    }
+  });
+
+  if (!plainFile.originalName && typeof file.name === "string") {
+    plainFile.originalName = file.name;
+  }
+
+  return plainFile;
+};
+
+const toPlainUploadedFiles = (files: any): any[] => (
+  Array.isArray(files) ? files.map(toPlainUploadedFile) : []
+);
+
+const isUploadedMatchForPendingFile = (uploadedFile: any, pendingFile: File) => {
+  const uploadedName = uploadedFile?.originalName ?? uploadedFile?.name ?? uploadedFile?.filename;
+  const uploadedSize = uploadedFile?.size;
+  return uploadedName === pendingFile.name && (uploadedSize === undefined || uploadedSize === pendingFile.size);
+};
+
 // Optimized Sub-component for individual file display
 const FileItem = memo(({
   file,
   onRemove,
   onView,
-  status = "pending",
+  previewUrl,
   isUploaded = false
 }: {
   file: any,
   onRemove: () => void,
   onView?: () => void,
-  status?: string,
+  previewUrl?: string,
   isUploaded?: boolean
 }) => {
-  const bg = useColorModeValue("whiteAlpha.500", "whiteAlpha.100");
+  const bg = useColorModeValue("white", "whiteAlpha.100");
+  const hoverBg = useColorModeValue("gray.50", "whiteAlpha.200");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.200");
+  const uploadedBorderColor = useColorModeValue("green.300", "green.500");
 
   const fileName = isUploaded ? file.originalName : file.name;
-  const fileSize = (file.size / 1024).toFixed(1);
-  const isImg = file.type?.startsWith("image/") || ["jpg", "jpeg", "png", "gif"].some(ext => fileName.toLowerCase().endsWith(ext));
+  const fileSize = file.size ? `${(file.size / 1024).toFixed(1)} KB` : "";
+  const lowerName = fileName?.toLowerCase() ?? "";
+  const extension = lowerName.split(".").pop() ?? "";
+  const isImg = file.type?.startsWith("image/") || ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg"].includes(extension);
+  const imageUrl = isImg
+    ? previewUrl || (isUploaded && file.accessObjectPath ? `${location.origin}/backend/${file.accessObjectPath}` : undefined)
+    : undefined;
+
+  const fileAccent = useMemo(() => {
+    if (extension === "pdf") return { bg: "red.50", color: "red.600", icon: FileText };
+    if (["doc", "docx", "odt", "rtf"].includes(extension)) return { bg: "blue.50", color: "blue.600", icon: FileText };
+    if (["xls", "xlsx", "csv"].includes(extension)) return { bg: "green.50", color: "green.600", icon: FileSpreadsheet };
+    if (["ppt", "pptx"].includes(extension)) return { bg: "orange.50", color: "orange.600", icon: Presentation };
+    if (["zip", "rar", "7z"].includes(extension)) return { bg: "yellow.50", color: "yellow.700", icon: FileArchive };
+    if (["json", "xml", "html", "css", "js", "ts", "tsx"].includes(extension)) return { bg: "purple.50", color: "purple.600", icon: FileCode };
+    return { bg: isUploaded ? "green.100" : "indigo.50", color: isUploaded ? "green.600" : "indigo.500", icon: FileIcon };
+  }, [extension, isUploaded]);
+
+  const FileTypeIcon = fileAccent.icon;
 
   return (
     <Flex
-      p={3}
-      borderRadius="xl"
+      p={2.5}
+      borderRadius="lg"
       bg={bg}
       align="center"
       gap={3}
-      borderWidth="1.5px"
-      borderColor={isUploaded ? "green.200" : borderColor}
-      transition="all 0.2s"
-      _hover={{ transform: "translateY(-2px)", boxShadow: "sm" }}
+      borderWidth="1px"
+      borderColor={isUploaded ? uploadedBorderColor : borderColor}
+      boxShadow="0 1px 2px rgba(15, 23, 42, 0.06)"
+      transition="background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease"
+      cursor={onView ? "pointer" : "default"}
+      role={onView ? "button" : undefined}
+      tabIndex={onView ? 0 : undefined}
+      onClick={onView}
+      onKeyDown={(event) => {
+        if (onView && (event.key === "Enter" || event.key === " ")) {
+          event.preventDefault();
+          onView();
+        }
+      }}
+      _hover={{
+        bg: hoverBg,
+        borderColor: isUploaded ? uploadedBorderColor : "indigo.300",
+        boxShadow: "0 10px 24px rgba(15, 23, 42, 0.10)",
+        transform: "translateY(-1px)"
+      }}
+      _focusVisible={{ outline: "2px solid", outlineColor: "indigo.400", outlineOffset: "2px" }}
     >
-      <Center boxSize="40px" borderRadius="lg" bg={isUploaded ? "green.100" : "indigo.50"} color={isUploaded ? "green.600" : "indigo.500"}>
-        {isImg ? <LuImage size={20} /> : <LuFile size={20} />}
+      <Center boxSize="56px" borderRadius="md" bg={fileAccent.bg} color={fileAccent.color} overflow="hidden" flexShrink={0}>
+        {imageUrl ? (
+          <Image src={imageUrl} alt={fileName} boxSize="full" objectFit="cover" />
+        ) : (
+          <FileTypeIcon size={22} />
+        )}
       </Center>
 
-      <VStack align="stretch" gap={0} flex="1">
-        <Text fontSize="xs" fontWeight="bold" truncate maxW="220px">{fileName}</Text>
+      <VStack align="stretch" gap={1} flex="1" minW={0}>
+        <Text fontSize="sm" fontWeight="semibold" truncate color="fg">
+          {fileName}
+        </Text>
         <HStack gap={2}>
-          <Text fontSize="2xs" color="fg.subtle">{fileSize} KB</Text>
+          {fileSize && <Text fontSize="2xs" color="fg.subtle">{fileSize}</Text>}
+          {extension && (
+            <Badge size="xs" colorPalette="gray" variant="surface" borderRadius="sm" fontSize="8px">
+              {extension.toUpperCase()}
+            </Badge>
+          )}
           <Badge size="xs" colorPalette={isUploaded ? "green" : "indigo"} variant="subtle" borderRadius="full" fontSize="8px">
             {isUploaded ? "UPLOADED" : "PENDING"}
           </Badge>
@@ -102,13 +200,18 @@ const FileItem = memo(({
       </VStack>
 
       <HStack gap={1}>
-        {onView && (
-          <IconButton size="xs" variant="ghost" onClick={onView} _hover={{ bg: "whiteAlpha.300" }}>
-            <LuEye />
-          </IconButton>
-        )}
-        <IconButton size="xs" variant="ghost" colorPalette="red" onClick={onRemove} _hover={{ bg: "red.50", color: "red.600" }}>
-          <LuTrash2 />
+        <IconButton
+          aria-label={`Remove ${fileName}`}
+          size="xs"
+          variant="ghost"
+          colorPalette="red"
+          onClick={(event) => {
+            event.stopPropagation();
+            onRemove();
+          }}
+          _hover={{ bg: "red.50", color: "red.600" }}
+        >
+          <Trash2 />
         </IconButton>
       </HStack>
     </Flex>
@@ -132,12 +235,12 @@ const UploadField = ({
   events,
   enableClear = true,
 }: UPLOAD) => {
-  if (hidden) return null;
-
   const { open, onOpen, onClose } = useDisclosure();
   const methods = useFormContext();
+  const { getValues, register, setValue, trigger, unregister } = methods;
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+  const previewsRef = useRef<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [liveCameraActive, setLiveCameraActive] = useState<boolean>(false);
@@ -145,54 +248,157 @@ const UploadField = ({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const [uploadedFiles, setUploadedFiles] = useState<any[]>(
-    methods.watch(name) || []
-  );
+  const [uploadedFiles, setUploadedFiles] = useState<any[]>(() => toPlainUploadedFiles(getValues(name)));
+  const uploadedFileCount = uploadedFiles.length;
+  const selectedFileCount = selectedFiles.length;
+  const hasPendingFiles = selectedFileCount > 0;
+  const hasUploadedFiles = uploadedFileCount > 0;
+  const selectedFileCountRef = useRef(selectedFileCount);
+  const mandatoryRef = useRef(mandatory);
+  const disabledRef = useRef(disabled);
+  const textRef = useRef(text);
+  selectedFileCountRef.current = selectedFileCount;
+  mandatoryRef.current = mandatory;
+  disabledRef.current = disabled;
+  textRef.current = text;
+  const previousSelectedFileCountRef = useRef(selectedFileCount);
+  const fieldBg = useColorModeValue("white", "whiteAlpha.100");
+  const dialogBorderColor = useColorModeValue("indigo.500", "indigo.400");
+  const dialogBg = useColorModeValue("white", "rgba(15, 23, 42, 0.98)");
+  const dialogHeaderBg = useColorModeValue("gray.50", "whiteAlpha.50");
+  const dialogHeaderColor = useColorModeValue("indigo.700", "indigo.300");
+  const dropzoneBorderColor = useColorModeValue("indigo.200", "whiteAlpha.300");
+  const dropzoneDraggingBg = useColorModeValue("indigo.50", "whiteAlpha.200");
+  const dropzoneBg = useColorModeValue("indigo.50/30", "whiteAlpha.50");
+  const dropzoneHoverBg = useColorModeValue("indigo.50", "whiteAlpha.100");
+  const dialogFooterBg = useColorModeValue("indigo.50/30", "whiteAlpha.50");
+
+  const clearPendingSelection = useCallback(() => {
+    setSelectedFiles([]);
+    setPreviews((currentPreviews) => {
+      currentPreviews.forEach((url) => URL.revokeObjectURL(url));
+      return [];
+    });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  }, []);
+
+  const removeUploadedFromPending = useCallback((uploadedFilesToRemove: any[]) => {
+    setSelectedFiles((currentFiles) => {
+      const uploadMatches = [...uploadedFilesToRemove];
+      const removeIndexes = new Set<number>();
+
+      currentFiles.forEach((file, index) => {
+        const matchIndex = uploadMatches.findIndex((uploadedFile) => isUploadedMatchForPendingFile(uploadedFile, file));
+        if (matchIndex >= 0) {
+          removeIndexes.add(index);
+          uploadMatches.splice(matchIndex, 1);
+        }
+      });
+
+      if (removeIndexes.size === 0) return currentFiles;
+
+      setPreviews((currentPreviews) => (
+        currentPreviews.filter((url, index) => {
+          if (removeIndexes.has(index)) {
+            URL.revokeObjectURL(url);
+            return false;
+          }
+          return true;
+        })
+      ));
+
+      if (fileInputRef.current && removeIndexes.size === currentFiles.length) {
+        fileInputRef.current.value = "";
+      }
+
+      return currentFiles.filter((_, index) => !removeIndexes.has(index));
+    });
+  }, []);
+
+  useEffect(() => {
+    register(name, {
+      validate: (value) => {
+        if (!mandatoryRef.current || disabledRef.current) return true;
+        const hasStoredFiles = Array.isArray(value) ? value.length > 0 : !!value;
+        return hasStoredFiles || selectedFileCountRef.current > 0 || `${textRef.current} is required`;
+      },
+    });
+
+    return () => {
+      unregister(name);
+    };
+  }, [name, register, unregister]);
+
+  useEffect(() => {
+    if (previousSelectedFileCountRef.current !== selectedFileCount) {
+      previousSelectedFileCountRef.current = selectedFileCount;
+      trigger(name);
+    }
+  }, [name, selectedFileCount, trigger]);
 
   const handleFileChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files ? Array.from(event.target.files) : [];
-    setSelectedFiles((pre) => [...pre, ...files]);
-    const previewURLs = files.map((file) => URL.createObjectURL(file));
-    setPreviews((pre) => [...pre, ...previewURLs]);
-  }, []);
+    const nextFiles = multiple ? files : files.slice(0, 1);
+    const previewURLs = nextFiles.map((file) => URL.createObjectURL(file));
 
-  const handleModalConfirm = useCallback(() => {
-    if (selectedFiles.length > 0) {
+    setSelectedFiles((previousFiles) => (multiple ? [...previousFiles, ...nextFiles] : nextFiles));
+    setPreviews((previousPreviews) => {
+      if (multiple) return [...previousPreviews, ...previewURLs];
+
+      previousPreviews.forEach((url) => URL.revokeObjectURL(url));
+      return previewURLs;
+    });
+
+    event.target.value = "";
+  }, [multiple]);
+
+  const handleUpload = useCallback(() => {
+    if (selectedFiles.length > 0 && !isUploading) {
       const uploadURL = defaultApiConfig?.uploadURL;
       if (uploadURL) {
-        const proxyUrl = location.origin + "/api";
+        const proxyUrl = location.origin + "/backend";
+        setIsUploading(true);
         POSTAPI({
           path: uploadURL,
           isPrivateApi: true,
           data: {
             process_name: name,
+            accept,
+            max_size_bytes: defaultApiConfig?.maxSizeBytes ?? defaultApiConfig?.max_size_bytes,
+            max_files: defaultApiConfig?.maxFiles ?? defaultApiConfig?.max_files ?? (multiple ? 10 : 1),
             proxyUrl: proxyUrl,
           },
           files: selectedFiles,
         }).subscribe((response) => {
-          if (response.success && response.uploadFiles.length > 0) {
-            const updatedFiles = [...uploadedFiles, ...response.uploadFiles];
+          setIsUploading(false);
+          const uploadFiles = toPlainUploadedFiles(
+            response?.uploadFiles ?? response?.payload?.uploadFiles ?? response?.data?.uploadFiles
+          );
+          if (response.success && uploadFiles.length > 0) {
+            const updatedFiles = multiple ? [...uploadedFiles, ...uploadFiles] : uploadFiles;
             setUploadedFiles(updatedFiles);
-            methods.setValue(name, updatedFiles, { shouldValidate: true });
+            setValue(name, updatedFiles, { shouldValidate: true });
             if (events) ruleEngine.processEvents(events, updatedFiles, 'change', methods);
-            setSelectedFiles([]);
-            setPreviews([]);
-            onClose();
+            removeUploadedFromPending(uploadFiles);
           }
+        }, () => {
+          setIsUploading(false);
         });
       }
     }
-  }, [selectedFiles, defaultApiConfig, name, uploadedFiles, methods, onClose, events]);
+  }, [selectedFiles, isUploading, defaultApiConfig, name, multiple, uploadedFiles, setValue, events, methods, accept, removeUploadedFromPending]);
 
   const handleClear = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    setSelectedFiles([]);
-    setPreviews([]);
+    clearPendingSelection();
     setUploadedFiles([]);
-    methods.setValue(name, null, { shouldValidate: true });
-    if (events) ruleEngine.processEvents(events, null, 'change', methods);
-  }, [methods, name, events]);
+    setValue(name, [], { shouldValidate: true });
+    if (events) ruleEngine.processEvents(events, [], 'change', methods);
+  }, [methods, name, events, setValue, clearPendingSelection]);
 
   const handleRemoveFile = useCallback((index: number) => {
     setSelectedFiles((prev) => {
@@ -207,18 +413,18 @@ const UploadField = ({
   }, []);
 
   const handleUploadedRemoveFile = useCallback((index: number) => {
-    const updatedFiles = uploadedFiles.filter((_, i) => i !== index);
+    const updatedFiles = toPlainUploadedFiles(uploadedFiles.filter((_, i) => i !== index));
     setUploadedFiles(updatedFiles);
-    methods.setValue(name, updatedFiles, { shouldValidate: true });
+    setValue(name, updatedFiles, { shouldValidate: true });
     if (events) ruleEngine.processEvents(events, updatedFiles, 'change', methods);
-  }, [uploadedFiles, methods, name, events]);
+  }, [uploadedFiles, methods, name, events, setValue]);
 
-  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+  const handleDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
-    setIsDragging(true);
-  };
+    setIsDragging((current) => current || true);
+  }, []);
 
-  const handleDragLeave = () => setIsDragging(false);
+  const handleDragLeave = useCallback(() => setIsDragging(false), []);
 
   const handleDrop = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -230,7 +436,7 @@ const UploadField = ({
     }
   }, [handleFileChange]);
 
-  const handleButtonClick = () => fileInputRef.current?.click();
+  const handleButtonClick = useCallback(() => fileInputRef.current?.click(), []);
 
   const startCamere = async () => {
     try {
@@ -281,15 +487,21 @@ const UploadField = ({
     }
   };
 
-  // Cleanup effect for preview URLs
+  useEffect(() => {
+    previewsRef.current = previews;
+  }, [previews]);
+
+  // Cleanup preview URLs on unmount. Individual clear/remove actions revoke immediately.
   useEffect(() => {
     return () => {
-      previews.forEach(url => URL.revokeObjectURL(url));
+      previewsRef.current.forEach(url => URL.revokeObjectURL(url));
     };
-  }, [previews]);
+  }, []);
 
   const labelWidth = oneLiner ? { base: "full", md: "35%" } : "full";
   const contentWidth = oneLiner ? { base: "full", md: "65%" } : "full";
+
+  if (hidden) return null;
 
   return (
     <Box w="full" py={2} px={1}>
@@ -302,8 +514,8 @@ const UploadField = ({
         >
           {text && (
             <Box w={labelWidth}>
-              <Field.Label fontSize="sm" fontWeight="semibold" color="fg.muted">
-                {text}
+              <Field.Label fontSize="md" fontWeight="semibold" >
+                {text}  <Field.RequiredIndicator />
               </Field.Label>
               {description && !oneLiner && (
                 <Text fontSize="xs" color="fg.subtle">
@@ -319,21 +531,21 @@ const UploadField = ({
                 <Box w="full" onClick={onOpen} cursor="pointer">
                   <Input
                     readOnly
-                    value={uploadedFiles.length > 0 ? `${uploadedFiles.length} file(s) uploaded` : ""}
+                    value={uploadedFileCount > 0 ? `${uploadedFileCount} file(s) uploaded` : ""}
                     placeholder="Click to upload files..."
                     size="md"
                     borderRadius="xl"
                     borderWidth="1.5px"
-                    bg={useColorModeValue("white", "whiteAlpha.100")}
+                    bg={fieldBg}
                     _focus={{ borderColor: "indigo.500", boxShadow: "0 0 0 1px var(--chakra-colors-indigo-500)" }}
                   />
                   <Center position="absolute" right="3" top="50%" transform="translateY(-50%)" color="gray.400">
-                    <LuCamera size={18} />
+                    <Camera size={18} />
                   </Center>
                 </Box>
               </Box>
 
-              {enableClear && uploadedFiles.length > 0 && !disabled && (
+              {enableClear && uploadedFileCount > 0 && !disabled && (
                 <IconButton
                   size="sm"
                   variant="ghost"
@@ -341,12 +553,12 @@ const UploadField = ({
                   onClick={handleClear}
                   _hover={{ bg: "transparent", color: "red.500" }}
                 >
-                  <LuX />
+                  <X />
                 </IconButton>
               )}
             </HStack>
-            <Field.ErrorText fontSize="xs" color="red.500" mt={1}>
-              {errors?.message?.toString()}
+            <Field.ErrorText fontSize="md" color="red.500" mt={1}>
+              <Field.ErrorIcon /> {errors?.message?.toString()}
             </Field.ErrorText>
           </Box>
         </Flex>
@@ -361,8 +573,8 @@ const UploadField = ({
               boxShadow="2xl"
               overflow="hidden"
               border="2px solid"
-              borderColor={useColorModeValue("indigo.500", "indigo.400")}
-              bg={useColorModeValue("white", "rgba(15, 23, 42, 0.98)")}
+              borderColor={dialogBorderColor}
+              bg={dialogBg}
               backdropFilter="blur(24px)"
               position="relative"
             >
@@ -377,12 +589,12 @@ const UploadField = ({
                 zIndex="docked"
                 colorPalette="indigo"
               >
-                <LuX />
+                <X />
               </IconButton>
 
-              <Dialog.Header borderBottomWidth="1px" p={5} bg={useColorModeValue("gray.50", "whiteAlpha.50")}>
+              <Dialog.Header borderBottomWidth="1px" p={5} bg={dialogHeaderBg}>
                 <Flex justify="space-between" align="center">
-                  <Text fontWeight="bold" fontSize="lg" color={useColorModeValue("indigo.700", "indigo.300")}>Upload Documents</Text>
+                  <Text fontWeight="bold" fontSize="lg" color={dialogHeaderColor}>Upload Documents</Text>
                 </Flex>
               </Dialog.Header>
 
@@ -394,15 +606,15 @@ const UploadField = ({
                       w="full"
                       h="160px"
                       border="2px dashed"
-                      borderColor={isDragging ? "indigo.500" : useColorModeValue("indigo.200", "whiteAlpha.300")}
+                      borderColor={isDragging ? "indigo.500" : dropzoneBorderColor}
                       borderRadius="2xl"
                       display="flex"
                       flexDirection="column"
                       alignItems="center"
                       justifyContent="center"
-                      bg={isDragging ? useColorModeValue("indigo.50", "whiteAlpha.200") : useColorModeValue("indigo.50/30", "whiteAlpha.50")}
-                      transition="all 0.2s"
-                      _hover={{ borderColor: "indigo.500", bg: useColorModeValue("indigo.50", "whiteAlpha.100"), transform: "scale(1.01)" }}
+                      bg={isDragging ? dropzoneDraggingBg : dropzoneBg}
+                      transition="background 0.2s ease, border-color 0.2s ease"
+                      _hover={{ borderColor: "indigo.500", bg: dropzoneHoverBg }}
                       cursor="pointer"
                       onClick={handleButtonClick}
                       onDragOver={handleDragOver}
@@ -412,7 +624,7 @@ const UploadField = ({
                     >
                       <VStack gap={2}>
                         <Center boxSize="50px" borderRadius="full" bg="indigo.100" color="indigo.600" _dark={{ bg: "indigo.900/40" }}>
-                          <LuUpload size={24} />
+                          <Upload size={24} />
                         </Center>
                         <VStack gap={0}>
                           <Text fontWeight="bold" fontSize="sm">Click or Drag to Upload</Text>
@@ -430,34 +642,50 @@ const UploadField = ({
                         onClick={startCamere}
                         colorPalette="indigo"
                       >
-                        <LuCamera /> Take a Photo
+                        <Camera /> Take a Photo
                       </Button>
                     )}
 
-                    {(selectedFiles.length > 0 || uploadedFiles.length > 0) && (
+                    {hasPendingFiles && (
                       <VStack w="full" align="stretch" gap={3}>
                         <Flex justify="space-between" align="center">
                           <Text fontSize="2xs" fontWeight="bold" color="fg.muted" textTransform="uppercase" letterSpacing="widest">
-                            FILES ({selectedFiles.length + uploadedFiles.length})
+                            Pending files ({selectedFileCount})
                           </Text>
-                          {selectedFiles.length > 0 && <Badge size="sm" variant="subtle" colorPalette="orange">PENDING</Badge>}
+                          <Badge size="sm" variant="subtle" colorPalette="orange">PENDING</Badge>
                         </Flex>
 
                         <VStack gap={2} align="stretch" maxH="220px" overflowY="auto" pr={1} className="custom-scroll">
                           {selectedFiles.map((file, i) => (
                             <FileItem
-                              key={`sel-${i}`}
+                              key={`${file.name}-${file.size}-${file.lastModified}`}
                               file={file}
+                              previewUrl={previews[i]}
                               onRemove={() => handleRemoveFile(i)}
+                              onView={() => window.open(previews[i], "_blank")}
                             />
                           ))}
+                        </VStack>
+                      </VStack>
+                    )}
+
+                    {hasUploadedFiles && (
+                      <VStack w="full" align="stretch" gap={3}>
+                        <Flex justify="space-between" align="center">
+                          <Text fontSize="2xs" fontWeight="bold" color="fg.muted" textTransform="uppercase" letterSpacing="widest">
+                            Uploaded files ({uploadedFileCount})
+                          </Text>
+                          <Badge size="sm" variant="subtle" colorPalette="green">UPLOADED</Badge>
+                        </Flex>
+
+                        <VStack gap={2} align="stretch" maxH="220px" overflowY="auto" pr={1} className="custom-scroll">
                           {uploadedFiles.map((file, i) => (
                             <FileItem
-                              key={`up-${i}`}
+                              key={file.accessObjectPath ?? file.objectPath ?? file.originalName ?? `up-${i}`}
                               file={file}
                               isUploaded
                               onRemove={() => handleUploadedRemoveFile(i)}
-                              onView={() => window.open(location.origin + "/api/" + file.accessObjectPath, "_blank")}
+                              onView={() => window.open(location.origin + "/backend/" + file.accessObjectPath, "_blank")}
                             />
                           ))}
                         </VStack>
@@ -483,31 +711,34 @@ const UploadField = ({
                     </Box>
                     <HStack w="full" gap={3}>
                       {!capturedImage ? (
-                        <Button flex="1" size="lg" colorPalette="blue" borderRadius="xl" onClick={capturePhoto} boxShadow="0 4px 12px rgba(66, 153, 225, 0.4)">
-                          <LuCamera /> Capture
+                        <Button flex="1" size="md" colorPalette="blue" borderRadius="md" onClick={capturePhoto} boxShadow="0 4px 12px rgba(66, 153, 225, 0.4)">
+                          <Camera /> Capture
                         </Button>
                       ) : (
-                        <>
-                          <Button flex="1" size="lg" variant="outline" borderRadius="xl" onClick={startCamere}><LuRotateCcw /> Retake</Button>
-                          <Button flex="1" size="lg" colorPalette="green" borderRadius="xl" onClick={confirmPhoto} boxShadow="0 4px 12px rgba(72, 187, 120, 0.4)">
-                            <LuCheck /> Use Photo
+                          <>
+                          <Button flex="1" size="md" variant="solid" borderRadius="md" onClick={startCamere}><RotateCcw /> Retake</Button>
+                          <Button flex="1" size="md" colorPalette="green" borderRadius="md" onClick={confirmPhoto} >
+                            <Check /> Use Photo
                           </Button>
                         </>
                       )}
-                      <Button variant="outline" onClick={() => { stopCamera(); setLiveCameraActive(false); setCapturedImage(null); }} size="lg">Cancel</Button>
+                      <Button variant="solid" size="md" colorPalette="red" onClick={() => { stopCamera(); setLiveCameraActive(false); setCapturedImage(null); }} >Cancel</Button>
                     </HStack>
                   </VStack>
                 )}
               </Dialog.Body>
 
-              <Dialog.Footer borderTopWidth="1px" p={5} bg={useColorModeValue("indigo.50/30", "whiteAlpha.50")}>
+              <Dialog.Footer borderTopWidth="1px" p={5} bg={dialogFooterBg}>
                 <HStack gap={3} w="full">
-                  <Button variant="ghost" flex="1" onClick={onClose} borderRadius="xl">Cancel</Button>
-                  {selectedFiles.length > 0 && (
-                    <Button flex="2" colorPalette="indigo" size="lg" borderRadius="xl" onClick={handleModalConfirm} fontWeight="extrabold" boxShadow="0 8px 20px -4px var(--chakra-colors-indigo-500)">
-                      <LuUpload /> Upload {selectedFiles.length} {selectedFiles.length === 1 ? "File" : "Files"}
+                  <Button variant="ghost" flex="1" onClick={onClose} borderRadius="md">Cancel</Button>
+                  {hasPendingFiles && (
+                    <Button flex="2" colorPalette="indigo" size="md" borderRadius="md" onClick={handleUpload} loading={isUploading} fontWeight="extrabold" boxShadow="0 8px 20px -4px var(--chakra-colors-indigo-500)">
+                      <Upload /> Upload {selectedFileCount} {selectedFileCount === 1 ? "File" : "Files"}
                     </Button>
                   )}
+                  <Button flex="1" colorPalette="green" size="md" borderRadius="md" onClick={onClose} disabled={isUploading}>
+                    <Check /> OK
+                  </Button>
                 </HStack>
               </Dialog.Footer>
             </Dialog.Content>

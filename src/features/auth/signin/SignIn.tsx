@@ -29,7 +29,7 @@ import { startLoading } from "@/app/slices/loader/appLoaderSlice";
 import { POSTAPI } from "@/app/api";
 import AppVersionAlert from "@/features/ui/components/alert/AppVersionAlert";
 import { AlertProps } from "@/app/types/appConfigInterface";
-import { SiAuthelia } from "react-icons/si";
+import { Fingerprint } from "lucide-react";
 import { getOrCreateDeviceId } from "@/utils/services/appServices";
 import { env } from "@/app/env";
 import {
@@ -396,7 +396,7 @@ const SignIn = () => {
                                         ease: "easeInOut"
                                     }}
                                 >
-                                    <Icon as={SiAuthelia} w={7} h={7} />
+                                    <Icon as={Fingerprint} w={7} h={7} />
                                 </MotionBox>
                                 Continue with SSO
                             </Button>

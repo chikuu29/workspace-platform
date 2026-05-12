@@ -14,7 +14,7 @@ import {
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { motion, AnimatePresence } from "framer-motion";
 import PremiumStepper from "../widgets/PremiumStepper";
-import { LuArrowRight, LuArrowLeft, LuCheck } from "react-icons/lu";
+import { ArrowRight, ArrowLeft, Check } from "lucide-react";
 import { UIEngine } from "../renderer/UIEngine";
 import "../widgets"; // Ensure all widgets are registered
 import { useFormStore } from "../store/useFormStore";
@@ -148,7 +148,7 @@ const SectionView = ({ config }: any) => {
                                                         rounded="xl"
                                                     >
                                                         <HStack gap="2">
-                                                            <LuArrowLeft />
+                                                            <ArrowLeft />
                                                             <Text>Previous</Text>
                                                         </HStack>
                                                     </Button>
@@ -166,7 +166,7 @@ const SectionView = ({ config }: any) => {
                                                     >
                                                         <HStack gap="2">
                                                             <Text>{step === sections.length - 1 ? "Complete" : "Next Step"}</Text>
-                                                            <LuArrowRight />
+                                                            <ArrowRight />
                                                         </HStack>
                                                     </Button>
                                                 </Flex>
@@ -177,7 +177,7 @@ const SectionView = ({ config }: any) => {
                                         /* Success State */
                                         <VStack gap="6" py="10">
                                             <Circle size="20" bg="green.500/20" color="green.500" border="2px solid" borderColor="green.500">
-                                                <LuCheck size="40" />
+                            <Icon as={Check} />
                                             </Circle>
                                             <VStack gap="2">
                                                 <Heading size="lg" color={textColor}>Success!</Heading>
@@ -205,11 +205,11 @@ const SectionView = ({ config }: any) => {
                 <Flex mt="8" justify="space-between" align="center" direction={{ base: "column", md: "row" }} gap="4" color={mutedTextColor} fontSize="xs">
                     <HStack gap="6">
                         <HStack gap="1">
-                            <Icon as={LuCheck} />
+                            <Icon as={Check} />
                             <Text>Secure encrypted session</Text>
                         </HStack>
                         <HStack gap="1">
-                            <Icon as={LuCheck} />
+                            <Icon as={Check} />
                             <Text>Changes autosaved 2m ago</Text>
                         </HStack>
                     </HStack>

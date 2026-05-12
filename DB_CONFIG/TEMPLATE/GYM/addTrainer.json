@@ -25,6 +25,26 @@
     },
     "ACTIONS": {
         "showSaveButton": true,
+        "events": {
+            "draft": {
+                "type": "API_CALL",
+                "url": "app/draft",
+                "method": "POST",
+                "successMessage": "Membership details saved as draft!",
+                "errorMessage": "Failed to save draft. Please try again."
+            },
+            "submit": {
+                "type": "API_CALL",
+                "url": "gym/addTrainer",
+                "method": "POST",
+                "successMessage": "Trainer registration successful!",
+                "errorMessage": "Registration failed. Please check the details and try again.",
+                "laterActions": {
+                    "type": "NAVIGATION",
+                    "path": "/app/myGym/TrainerProfile?trainer_id={{trainer_id}}"
+                }
+            }
+        },
         "ACTION_BUTTONS": [
             {
                 "name": "Draft",
@@ -47,7 +67,7 @@
         "description": "Register new trainers with a comprehensive, guided experience.",
         "target": "forms",
         "layoutStyles": {
-            "p": 4
+            "p": 0
         }
     },
     "UI_VIEW": {
@@ -60,7 +80,7 @@
                         "iconName": "LuUser",
                         "widgets": [
                             {
-                                "name": "trainerFirstName",
+                                "name": "firstName",
                                 "text": "First Name",
                                 "description": "Enter trainer's first name",
                                 "widget": "textField",
@@ -69,7 +89,7 @@
                                 "maxLength": 50
                             },
                             {
-                                "name": "trainerLastName",
+                                "name": "lastName",
                                 "text": "Last Name",
                                 "description": "Enter trainer's last name",
                                 "widget": "textField",
@@ -78,7 +98,7 @@
                                 "maxLength": 50
                             },
                             {
-                                "name": "trainerEmail",
+                                "name": "email",
                                 "text": "Email Address",
                                 "description": "Official email for internal communications",
                                 "type": "email",
@@ -87,7 +107,7 @@
                                 "required": true
                             },
                             {
-                                "name": "trainerPhone",
+                                "name": "phone",
                                 "text": "Phone Number",
                                 "description": "Primary contact number",
                                 "type": "tel",
@@ -96,7 +116,7 @@
                                 "required": true
                             },
                             {
-                                "name": "trainerGender",
+                                "name": "gender",
                                 "text": "Gender",
                                 "description": "Select the trainer's gender",
                                 "widget": "radioField",
@@ -118,7 +138,7 @@
                                 ]
                             },
                             {
-                                "name": "trainerAddress",
+                                "name": "address",
                                 "text": "Residential Address",
                                 "description": "Current permanent residence details",
                                 "widget": "textAreaField",

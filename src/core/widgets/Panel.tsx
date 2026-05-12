@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Collapsible, Text, HStack, Icon, SimpleGrid } from "@chakra-ui/react";
 import RunTimeWidgetRender from "../renderer/RunTimeWidget";
-import * as Icons from "react-icons/lu";
+import { icons } from "lucide-react";
 
 interface PanelConfig {
   name: string;
@@ -41,7 +41,9 @@ const CollapsiblePanel: React.FC<PanelConfig> = ({
 
   if (hidden) return null;
 
-  const IconComponent = iconName ? (Icons as any)[iconName] : null;
+  // Backwards compatibility for Lu-prefixed names
+  const normalizedIconName = iconName?.startsWith("Lu") ? iconName.substring(2) : iconName;
+  const IconComponent = normalizedIconName ? (icons as any)[normalizedIconName] : null;
 
   return (
     <Box w="full" mb={6}>

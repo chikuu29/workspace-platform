@@ -1,23 +1,27 @@
-import { ColorModeButton, useColorModeValue } from "@/components/ui/color-mode";
-import { FullscreenButton } from "@/components/ui/fullscreen-button";
+import { useColorModeValue } from "@/components/ui/color-mode";
+import { useNavActionStore } from "@/core/store/useNavActionStore";
+
 import { Box, Breadcrumb, Flex, HStack, Text } from "@chakra-ui/react";
 import React, { forwardRef, useEffect, useState, useMemo } from "react";
 import {
-  LuHouse,
-  LuBox,
-  LuLayers,
-  LuLayoutDashboard,
-  LuChevronRight,
-  LuUser,
-  LuSettings
-} from "react-icons/lu";
-import { FiHelpCircle } from "react-icons/fi";
+  ArrowLeft,
+  Home,
+  Box as BoxIcon,
+  Layers,
+  LayoutDashboard,
+  ChevronRight,
+  Slash,
+  User,
+  Settings,
+  HelpCircle,
+} from "lucide-react";
 import {
   useLocation,
   useNavigate,
   useParams,
   useSearchParams,
 } from "react-router";
+import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 
 interface ConfigItem {
   path: string;
@@ -26,63 +30,62 @@ interface ConfigItem {
 }
 
 const AppBreadcrumb = forwardRef((props, ref) => {
-  const { appCode, view, secondaryView } = useParams();
+  const { view, secondaryView } = useParams();
   const [searchParams] = useSearchParams();
-  const appParam = searchParams.get("app");
-  const appName = useMemo(() => appCode || appParam || "Default", [appCode, appParam]);
   const { pathname } = useLocation();
-  const navigate = useNavigate();
+  const { appName, appCode, workspacePrefix, buildPath, goBack } = useWorkspaceRouter();
+  const breadcrumbActions = useNavActionStore((state) => state.actions);
 
   const [config, setConfig] = useState<ConfigItem[]>([
     {
       path: "/myApps",
       label: "Home",
-      icon: <LuHouse size="14" />
+      icon: <Home size="14" />
     },
   ]);
 
   useEffect(() => {
     const newConfig: ConfigItem[] = [
-      { path: "/myApps", label: "Home", icon: <LuHouse size="14" /> }
+      { path: "/myApps", label: "Home", icon: <Home size="14" /> }
     ];
 
     if (pathname.toLowerCase().includes("/profile")) {
-      newConfig.push({ path: pathname, label: "Profile", icon: <LuUser size="14" /> });
+      newConfig.push({ path: pathname, label: "Profile", icon: <User size="14" /> });
     } else if (pathname.toLowerCase().includes("/settings")) {
-      newConfig.push({ path: pathname, label: "Settings", icon: <LuSettings size="14" /> });
+      newConfig.push({ path: pathname, label: "Settings", icon: <Settings size="14" /> });
     } else if (pathname.toLowerCase().includes("/helpcenter")) {
-      newConfig.push({ path: pathname, label: "Help Center", icon: <FiHelpCircle size="14" /> });
+      newConfig.push({ path: pathname, label: "Help Center", icon: <HelpCircle size="14" /> });
     } else if (!view && !appCode) {
-      newConfig.push({ path: "#", label: "MyApps", icon: <LuLayers size="14" /> });
+      newConfig.push({ path: "#", label: "MyApps", icon: <Layers size="14" /> });
     } else {
-      const appBasePath = appCode ? `/app/${appCode}/home` : `/?app=${appName}`;
+      // App root path — delegated to shared buildPath utility
       newConfig.push({
-        path: `${pathname.split("/workspace")[0]}/workspace${appBasePath}`,
+        path: buildPath("home"),
         label: appName,
-        icon: <LuBox size="14" />
+        icon: <BoxIcon size="14" />
       });
 
       if (view && view !== "home") {
-        const viewPath = appCode ? `/app/${appCode}/${view}` : `/${view}?app=${appName}`;
         newConfig.push({
-          path: `${pathname.split("/workspace")[0]}/workspace${viewPath}`,
+          path: buildPath(view),
           label: view,
-          icon: <LuLayoutDashboard size="14" />
+          icon: <LayoutDashboard size="14" />
         });
       }
 
       if (secondaryView) {
-        const secondaryPath = appCode ? `/app/${appCode}/${view}/${secondaryView}` : `/${view}/${secondaryView}?app=${appName}`;
         newConfig.push({
-          path: `${pathname.split("/workspace")[0]}/workspace${secondaryPath}`,
+          path: buildPath(view || "", secondaryView),
           label: secondaryView,
-          icon: <LuLayers size="14" />
+          icon: <Layers size="14" />
         });
       }
     }
 
     setConfig(newConfig);
-  }, [pathname, view, secondaryView, appName, appCode]);
+  }, [pathname, view, secondaryView, appName, appCode, buildPath]);
+
+  const navigate = useNavigate();
 
   const handleNavigate = (c: ConfigItem, isLast: boolean) => {
     if (!isLast) navigate(c.path);
@@ -92,15 +95,12 @@ const AppBreadcrumb = forwardRef((props, ref) => {
   const inactiveColor = useColorModeValue("gray.500", "whiteAlpha.500");
   const hoverBg = useColorModeValue("blue.50", "whiteAlpha.100");
   const borderColorValue = useColorModeValue("gray.100", "whiteAlpha.100");
-  const bgValue = useColorModeValue("white/90", "rgba(15, 23, 42, 0.9)");
-  const controlsBg = useColorModeValue("gray.50", "whiteAlpha.50");
-  const controlsBorder = useColorModeValue("gray.100", "whiteAlpha.100");
+
 
   return (
     <Box
       w="100%"
       px={{ base: "3", sm: "4", md: "6" }}
-      // py={{ base: "2.5", md: "2" }}
       borderBottom="1px solid"
       borderColor={borderColorValue}
       bg={"app.card.bg"}
@@ -117,8 +117,37 @@ const AppBreadcrumb = forwardRef((props, ref) => {
         justifyContent="space-between"
         gap={{ base: "3", md: "4" }}
       >
-        <Box flex="1" minW="0" overflow="hidden">
+        <HStack gap="0" flex="1" minW="0" overflow="hidden">
+          {config.length > 1 && (
+            <HStack gap="2" align="center">
+              <HStack
+                gap={{ base: "1.5", md: "2" }}
+                px={{ base: "2.5", md: "3" }}
+                py="1.5"
+                rounded="lg"
+                transition="all 0.2s"
+                cursor="pointer"
+                onClick={goBack}
+                _hover={{ bg: hoverBg, transform: "translateY(-1px)" }}
+                color={inactiveColor}
+                minW="fit-content"
+              >
+                <ArrowLeft size="14" />
+                <Text
+                  fontWeight="600"
+                  fontSize={{ base: "11px", md: "xs" }}
+                  letterSpacing="tight"
+                >
+                  Back
+                </Text>
+              </HStack>
+              <ChevronRight size="12" color={inactiveColor} />
+            </HStack>
+          )}
+
           <Box
+            flex="1"
+            minW="0"
             overflowX="auto"
             overflowY="hidden"
             whiteSpace="nowrap"
@@ -137,8 +166,8 @@ const AppBreadcrumb = forwardRef((props, ref) => {
                       <Breadcrumb.Item>
                         <HStack
                           gap={{ base: "1.5", md: "2" }}
-                          px={{ base: "2.5", md: "3" }}
-                          py="1.5"
+                          // px={{ base: "1.5", md: "3" }}
+                          p="1.5"
                           rounded="lg"
                           transition="all 0.2s"
                           cursor={isLast ? "default" : "pointer"}
@@ -162,7 +191,9 @@ const AppBreadcrumb = forwardRef((props, ref) => {
                       </Breadcrumb.Item>
                       {!isLast && (
                         <Breadcrumb.Separator>
-                          <LuChevronRight size="12" color={inactiveColor} />
+                          <Box color={inactiveColor} display="flex" alignItems="center">
+                            <Slash size={12} color="currentColor" strokeWidth={2} />
+                          </Box>
                         </Breadcrumb.Separator>
                       )}
                     </React.Fragment>
@@ -171,29 +202,17 @@ const AppBreadcrumb = forwardRef((props, ref) => {
               </Breadcrumb.List>
             </Breadcrumb.Root>
           </Box>
-        </Box>
-
-        <HStack
-          gap="3"
-          justify={{ base: "flex-end", md: "flex-start" }}
-          alignSelf={{ base: "stretch", md: "center" }}
-          flexShrink={0}
-        >
-          <Flex
-            p="1"
-            bg={controlsBg}
-            rounded="xl"
-            border="1px solid"
-            borderColor={controlsBorder}
-            justify="center"
-            align="center"
-            w={{ base: "full", sm: "auto" }}
-          >
-            <ColorModeButton variant="ghost" size="sm" rounded="lg" />
-            <FullscreenButton variant="ghost" size="sm" rounded="lg" />
-          </Flex>
-
         </HStack>
+
+        {breadcrumbActions && (
+          <Box
+            flexShrink={0}
+            alignSelf={{ base: "stretch", md: "center" }}
+            maxW={{ base: "full", md: "50%" }}
+          >
+            {breadcrumbActions}
+          </Box>
+        )}
       </Flex>
     </Box>
   );

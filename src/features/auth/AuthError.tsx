@@ -11,7 +11,7 @@ import {
     Circle,
 } from "@chakra-ui/react";
 import { Link, useLocation } from "react-router";
-import { LuShieldAlert, LuArrowLeft, LuRefreshCw } from "react-icons/lu";
+import { ShieldAlert, ArrowLeft, RotateCcw } from "lucide-react";
 
 /**
  * AuthError Component
@@ -32,7 +32,7 @@ const AuthError = () => {
             <Container maxW="container.sm" textAlign="center">
                 <VStack gap={8} p={10} borderRadius="3xl" bg="rgba(255, 255, 255, 0.02)" backdropFilter="blur(10px)" border="1px solid" borderColor="whiteAlpha.100">
                     <Circle size="80px" bg="red.500/10" border="1px solid" borderColor="red.500/20">
-                        <Icon as={LuShieldAlert} boxSize="40px" color="red.400" />
+                        <Icon as={ShieldAlert} boxSize="40px" color="red.400" />
                     </Circle>
 
                     <VStack gap={3}>
@@ -54,7 +54,7 @@ const AuthError = () => {
                             px={8}
                         >
                             <Link to="/auth/login">
-                                <Icon as={LuArrowLeft} mr={2} />
+                                <Icon as={ArrowLeft} mr={2} />
                                 Back to Login
                             </Link>
                         </Button>
@@ -66,7 +66,7 @@ const AuthError = () => {
                             px={8}
                             onClick={() => window.location.href = "/auth/login"}
                         >
-                            <Icon as={LuRefreshCw} mr={2} />
+                            <Icon as={RotateCcw} mr={2} />
                             Retry Login
                         </Button>
                     </Flex>

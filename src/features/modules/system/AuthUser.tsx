@@ -11,7 +11,7 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
-import { LuPlus, LuRefreshCw, LuEye, LuPencil } from "react-icons/lu";
+import { Plus, RefreshCw, Eye, Pencil } from "lucide-react";
 import { RootState } from "@/app/store";
 import { GETAPI, POSTAPI } from "@/app/api";
 import { UserDirectoryGrid } from "@/core/widgets/UserDirectoryGrid";
@@ -25,13 +25,13 @@ import { PageLayout } from "@/core/components/PageLayout";
 const USER_ACTIONS: UserCardAction[] = [
   {
     label: "View Details",
-    icon: <LuEye />,
+    icon: <Eye />,
     colorPalette: "blue",
     actionType: "VIEW",
   },
   {
     label: "Edit User",
-    icon: <LuPencil />,
+    icon: <Pencil />,
     colorPalette: "yellow",
     actionType: "EDIT",
   },
@@ -64,6 +64,7 @@ const AuthUsers: React.FC = () => {
         path: "/account/organization/users",
         params: { page, limit: pagination.limit },
         isPrivateApi: true,
+        serverName: "identity",
       }).subscribe({
         next: (res: any) => {
           if (res.success) {
@@ -82,7 +83,7 @@ const AuthUsers: React.FC = () => {
         },
       });
     },
-    [pagination.limit]
+    [pagination.limit],
   );
 
   useEffect(() => {
@@ -97,6 +98,7 @@ const AuthUsers: React.FC = () => {
         path: "/account/organization/users",
         data: userData,
         isPrivateApi: true,
+        serverName: "identity",
       }).subscribe({
         next: (res: any) => {
           if (res.success) {
@@ -118,7 +120,7 @@ const AuthUsers: React.FC = () => {
         },
       });
     },
-    [fetchUsers]
+    [fetchUsers],
   );
 
   // ── Card action handler ─────────────────────────────────────────────────────
@@ -126,7 +128,7 @@ const AuthUsers: React.FC = () => {
     if (actionType === "VIEW") {
       console.log("View user:", user);
     } else if (actionType === "EDIT") {
-      setEditUser(user);   // pre-fill the modal
+      setEditUser(user); // pre-fill the modal
       setModalOpen(true);
     }
   }, []);
@@ -143,7 +145,7 @@ const AuthUsers: React.FC = () => {
           onClick={() => fetchUsers()}
           loading={isLoading}
         >
-          <LuRefreshCw />
+          <RefreshCw />
         </IconButton>
         <Button
           size="sm"
@@ -155,14 +157,17 @@ const AuthUsers: React.FC = () => {
           _hover={{ filter: "brightness(1.1)", transform: "translateY(-1px)" }}
           boxShadow="0 6px 16px -4px rgba(99,102,241,0.4)"
           transition="all 0.2s"
-          onClick={() => { setEditUser(null); setModalOpen(true); }}
+          onClick={() => {
+            setEditUser(null);
+            setModalOpen(true);
+          }}
         >
-          <LuPlus />
+          <Plus />
           Add User
         </Button>
       </HStack>
     ),
-    [isLoading, fetchUsers]
+    [isLoading, fetchUsers],
   );
 
   return (
@@ -179,7 +184,6 @@ const AuthUsers: React.FC = () => {
         }
       >
         <VStack gap={8} align="stretch">
-
           {/* ── User grid (the toolbar, search, filter & cards live here) ── */}
           <UserDirectoryGrid
             users={users}
@@ -196,7 +200,10 @@ const AuthUsers: React.FC = () => {
       {/* ── Create user modal ───────────────────────────────────────────── */}
       <UserModal
         isOpen={isModalOpen}
-        onClose={() => { setModalOpen(false); setEditUser(null); }}
+        onClose={() => {
+          setModalOpen(false);
+          setEditUser(null);
+        }}
         onSubmit={handleCreateUser}
         isLoading={isSubmitting}
         organizationName={organizationName}

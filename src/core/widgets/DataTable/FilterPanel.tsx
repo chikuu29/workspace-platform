@@ -1,6 +1,6 @@
 import React, { memo } from "react";
 import { Stack, Input, Box, Button } from "@chakra-ui/react";
-import { LuSearch, LuX } from "react-icons/lu";
+import { Search, X } from "lucide-react";
 import { InputGroup } from "@/components/ui/input-group";
 import { useColorModeValue } from "@/components/ui/color-mode";
 
@@ -28,7 +28,7 @@ const FilterPanelComponent: React.FC<FilterPanelProps> = ({
         <Stack direction={{ base: "column", md: "row" }} gap={3} w="full" mb={6}>
             <InputGroup
                 flex="1"
-                startElement={<LuSearch color="gray.400" />}
+                startElement={<Search size={16} color="gray.400" />}
                 endElement={
                     searchQuery ? (
                         <Box
@@ -39,7 +39,7 @@ const FilterPanelComponent: React.FC<FilterPanelProps> = ({
                             _hover={{ color: "red.500", bg: "red.50" }}
                             transition="all 0.2s"
                         >
-                            <LuX size="14px" />
+                            <X size={14} />
                         </Box>
                     ) : undefined
                 }

@@ -1,5 +1,5 @@
 import { Box, Flex, Text, VStack, Icon, SimpleGrid } from "@chakra-ui/react";
-import { LuShieldCheck, LuTerminal, LuZap } from "react-icons/lu";
+import { ShieldCheck, Terminal, Zap } from "lucide-react";
 import { memo } from "react";
 import { Card } from "@/core/components/Card";
 
@@ -59,19 +59,19 @@ export const OAuthStats = memo(({ totalClients, activeOAuth }: { totalClients: n
             <StatCard
                 label="Total Clients"
                 value={totalClients}
-                icon={LuTerminal}
+                icon={Terminal}
                 gradient="linear-gradient(135deg, #6366f1 0%, #a855f7 100%)"
             />
             <StatCard
                 label="Active OAuth"
                 value={activeOAuth}
-                icon={LuShieldCheck}
+                icon={ShieldCheck}
                 gradient="linear-gradient(135deg, #10b981 0%, #3b82f6 100%)"
             />
             <StatCard
                 label="API Performance"
                 value="99.9%"
-                icon={LuZap}
+                icon={Zap}
                 gradient="linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)"
             />
         </SimpleGrid>

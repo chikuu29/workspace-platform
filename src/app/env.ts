@@ -33,7 +33,8 @@ type EnvKey =
   | 'VITE_X_CLIENT_ID'
   | 'VITE_IDENTITY_PROVIDER_API_URL'
   | 'VITE_UI_API_URL'
-  | 'VITE_AI_API_URL';
+  | 'VITE_AI_API_URL'
+  | 'VITE_API_VERSION'; // Allow any string key for flexibility
 
 /**
  * Reads an env variable, preferring runtime (window._env_) over build-time (import.meta.env).

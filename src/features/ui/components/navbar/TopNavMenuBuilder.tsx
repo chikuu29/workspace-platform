@@ -40,10 +40,19 @@ const TopNavMenuBuilder = memo(({ FEATURE_LIST, SHOW_TOP_NAV_MENU }: TopNavProps
   if (!SHOW_TOP_NAV_MENU || FEATURE_LIST.length === 0) return null;
 
   return (
-    <Box display={{ base: "none", md: "block" }} px="4" py="2" overflowX="auto" css={scrollbarCss}>
+    <Box
+      display={{ base: "none", lg: "block" }}
+      w="full"
+      minW={0}
+      px={{ lg: 1, xl: 3 }}
+      py="2"
+      overflowX="auto"
+      overflowY="hidden"
+      css={scrollbarCss}
+    >
       {!isPhoneScreen && (
-        <Flex alignItems="center">
-          <Flex gap={2}>
+        <Flex alignItems="center" minW="max-content">
+          <Flex gap={{ lg: 1, xl: 2 }} flexWrap="nowrap">
             {FEATURE_LIST.map((navItem: any) => (
               <Box key={navItem.label} minW="fit-content" display="flex" alignItems="center">
                 <MenuLink menuConfig={navItem} showFullSideBarMenu={true} />

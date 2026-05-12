@@ -1,8 +1,17 @@
-import { Box, Flex, RadioGroup, Stack, Field, Text, Button, IconButton } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  RadioGroup,
+  Stack,
+  Field,
+  Text,
+  Button,
+  IconButton,
+} from "@chakra-ui/react";
 import { useColorModeValue } from "../../components/ui/color-mode";
 import { useEffect, useState, memo, useCallback } from "react";
 import { FieldError, useFormContext, useWatch } from "react-hook-form";
-import { LuX } from "react-icons/lu";
+import { X } from "lucide-react";
 import { ruleEngine } from "../engine/logicEngine";
 import React from "react";
 
@@ -48,7 +57,7 @@ const RadioField = ({
     console.log("clearSelection");
     methods.setValue(name, "", { shouldValidate: true });
     if (events) {
-      ruleEngine.processEvents(events, "", 'change', methods);
+      ruleEngine.processEvents(events, "", "change", methods);
     }
   };
 
@@ -57,10 +66,10 @@ const RadioField = ({
       const newValue = e.target.value;
       methods.setValue(name, newValue, { shouldValidate: true });
       if (events) {
-        ruleEngine.processEvents(events, newValue, 'change', methods);
+        ruleEngine.processEvents(events, newValue, "change", methods);
       }
     },
-    [methods, name, events]
+    [methods, name, events],
   );
 
   const labelWidth = oneLiner ? { base: "full", md: "35%" } : "full";
@@ -81,14 +90,14 @@ const RadioField = ({
           {text && (
             <Box w={labelWidth}>
               <Field.Label
-                fontSize="sm"
+                // fontSize="sm"
+                fontSize="md"
                 fontWeight="semibold"
-                color="fg.muted"
                 transition="color 0.2s"
-                _invalid={{ color: "red.500" }}
+                // _invalid={{ color: "red.500" }}
                 mb={oneLiner ? 0 : 1}
               >
-                {text}
+                {text}  <Field.RequiredIndicator />
               </Field.Label>
               {description && (
                 <Text fontSize="xs" color="fg.subtle" mb={oneLiner ? 0 : 1}>
@@ -124,11 +133,23 @@ const RadioField = ({
                         py={2}
                         borderRadius="lg"
                         borderWidth="1.5px"
-                        borderColor={isSelected ? selectedBorder : useColorModeValue("gray.200", "whiteAlpha.200")}
-                        bg={isSelected ? selectedBg : useColorModeValue("white", "whiteAlpha.50")}
+                        borderColor={
+                          isSelected
+                            ? selectedBorder
+                            : useColorModeValue("gray.200", "whiteAlpha.200")
+                        }
+                        bg={
+                          isSelected
+                            ? selectedBg
+                            : useColorModeValue("white", "whiteAlpha.50")
+                        }
                         _hover={{
-                          borderColor: isSelected ? selectedBorder : useColorModeValue("gray.300", "whiteAlpha.400"),
-                          bg: isSelected ? selectedBg : useColorModeValue("gray.50", "whiteAlpha.100")
+                          borderColor: isSelected
+                            ? selectedBorder
+                            : useColorModeValue("gray.300", "whiteAlpha.400"),
+                          bg: isSelected
+                            ? selectedBg
+                            : useColorModeValue("gray.50", "whiteAlpha.100"),
                         }}
                         transition="all 0.2s"
                         cursor="pointer"
@@ -152,7 +173,9 @@ const RadioField = ({
                           fontWeight="semibold"
                           fontSize="sm"
                           color={isSelected ? "blue.600" : "fg.muted"}
-                          _dark={{ color: isSelected ? "blue.300" : "gray.400" }}
+                          _dark={{
+                            color: isSelected ? "blue.300" : "gray.400",
+                          }}
                         >
                           {option.label}
                         </RadioGroup.ItemText>
@@ -170,12 +193,16 @@ const RadioField = ({
                       _hover={{ bg: "red.50", color: "red.500" }}
                       _dark={{ _hover: { bg: "red.900/30", color: "red.400" } }}
                     >
-                      <LuX />
+                      <X />
                     </IconButton>
                   )}
                 </Stack>
-                <Field.ErrorText fontSize="xs" color="red.500" fontWeight="medium">
-                  {errors?.message?.toString()}
+                <Field.ErrorText
+                  fontSize="md"
+                  color="red.500"
+                  fontWeight="medium"
+                >
+                  <Field.ErrorIcon /> {errors?.message?.toString()}
                 </Field.ErrorText>
               </Flex>
             </RadioGroup.Root>

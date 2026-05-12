@@ -16,7 +16,7 @@ import {
   IconButton,
   Button,
 } from "@chakra-ui/react";
-import { LuBuilding2, LuChevronRight, LuPlus, LuRefreshCw, LuSearch, LuMail, LuServer, LuCalendar } from "react-icons/lu";
+import { Building2, ChevronRight, Plus, RefreshCw, Search, Mail, Server, Calendar } from "lucide-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/store";
 import { GETAPI } from "@/app/api";
@@ -96,7 +96,7 @@ const OrganizationCard = memo(({ organization, onNavigate }: OrganizationCardPro
                 borderRadius="full"
                 bg="rgba(255,255,255,0.22)"
               />
-              <Icon as={LuBuilding2} boxSize={4} color="white" zIndex={1} />
+              <Icon as={Building2} boxSize={4} color="white" zIndex={1} />
             </Box>
 
             <VStack align="start" gap={0} overflow="hidden">
@@ -130,21 +130,21 @@ const OrganizationCard = memo(({ organization, onNavigate }: OrganizationCardPro
 
         <VStack align="start" gap={3} mb={5}>
           <HStack gap={2}>
-            <Icon as={LuMail} boxSize={3.5} color="app.text.accent" />
+            <Icon as={Mail} boxSize={3.5} color="app.text.accent" />
             <Text fontSize="xs" color="app.text.primary" fontWeight="500" lineClamp={1}>
               {organization.organization_email || "N/A"}
             </Text>
           </HStack>
 
           <HStack gap={2}>
-            <Icon as={LuServer} boxSize={3.5} color="app.text.accent" />
+            <Icon as={Server} boxSize={3.5} color="app.text.accent" />
             <Badge size="sm" variant="outline" borderRadius="full" textTransform="capitalize" px={2} border="1px solid" borderColor="app.navbar.border">
               {organization.deployment_type || "Shared"}
             </Badge>
           </HStack>
 
           <HStack gap={2}>
-            <Icon as={LuCalendar} boxSize={3.5} color="app.text.muted" />
+            <Icon as={Calendar} boxSize={3.5} color="app.text.muted" />
             <Text fontSize="2xs" color="app.text.muted" fontWeight="500">
               Created: {organization.created_at ? new Date(organization.created_at).toLocaleDateString() : "N/A"}
             </Text>
@@ -162,7 +162,7 @@ const OrganizationCard = memo(({ organization, onNavigate }: OrganizationCardPro
             >
               View Details
             </Text>
-            <LuChevronRight size={14} color="var(--chakra-colors-app-text-accent)" />
+            <ChevronRight size={14} color="var(--chakra-colors-app-text-accent)" />
           </Flex>
         </Box>
       </VStack>
@@ -218,7 +218,7 @@ const OrganizationView = () => {
             _hover={{ filter: "brightness(1.1)", transform: "translateY(-1px)" }}
             boxShadow="0 6px 16px -4px rgba(99,102,241,0.4)"
           >
-            <LuPlus style={{ marginRight: "6px" }} />
+            <Plus style={{ marginRight: "6px" }} />
             New Organization
           </Button>
         </HStack>
@@ -246,7 +246,7 @@ const OrganizationView = () => {
               bg="rgba(99,102,241,0.08)" border="1px dashed" borderColor="app.card.border"
               display="flex" alignItems="center" justifyContent="center"
             >
-              <Icon as={LuBuilding2} boxSize={7} color="app.text.muted" />
+              <Icon as={Building2} boxSize={7} color="app.text.muted" />
             </Box>
             <Text fontWeight="600" color="app.text.primary">No organizations found</Text>
             <Text fontSize="sm" color="app.text.muted">Try a different search term or add a new organization.</Text>

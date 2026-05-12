@@ -26,7 +26,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { toaster } from "@/components/ui/toaster";
 import UIPermissionGuard from "@/core/guards/UIPermissionGuard";
-import { LuUsers, LuPencil, LuRefreshCw } from "react-icons/lu";
+import { Users, Pencil, RefreshCw } from "lucide-react";
 import { GETAPI, PUTAPI } from "@/app/api";
 import { PageLayout } from "@/core/components/PageLayout";
 
@@ -147,7 +147,7 @@ const OrganizationUsersView = memo(() => {
                         <Table.Cell textAlign="right">
                             <UIPermissionGuard permissions={["ACCOUNT.ROLES.ASSIGN"]}>
                                 <IconButton variant="ghost" size="xs" onClick={() => handleEditClick(user)}>
-                                    <LuPencil />
+                                    <Pencil />
                                 </IconButton>
                             </UIPermissionGuard>
                         </Table.Cell>

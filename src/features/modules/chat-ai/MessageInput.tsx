@@ -16,20 +16,21 @@ import {
   Input,
 } from "@chakra-ui/react";
 import {
-  FaArrowUp,
-  FaPlus,
-  FaCode,
-  FaDatabase,
-  FaSearch,
-  FaFileAlt,
-  FaCalculator,
-  FaImage,
-  FaGlobe,
-  FaTools,
-  FaAngleDoubleDown,
-} from "react-icons/fa";
-import { MdAutoFixHigh, MdAttachFile } from "react-icons/md";
-import { RiRobot2Fill } from "react-icons/ri";
+  ArrowUp,
+  Plus,
+  Code,
+  Database,
+  Search,
+  FileText,
+  Calculator,
+  Image as ImageIcon,
+  Globe,
+  Wrench,
+  ChevronsDown,
+  Sparkles,
+  Paperclip,
+  Bot
+} from "lucide-react";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { InputGroup } from "@/components/ui/input-group";
 import { motion, AnimatePresence } from "framer-motion";
@@ -54,49 +55,49 @@ const mcpTools: MCPTool[] = [
   {
     id: "code_analyzer",
     name: "Code Analyzer",
-    icon: <FaCode />,
+    icon: <Code />,
     description: "Analyze and review code snippets",
     color: "purple",
   },
   {
     id: "database_query",
     name: "Database Query",
-    icon: <FaDatabase />,
+    icon: <Database />,
     description: "Execute database queries and operations",
     color: "blue",
   },
   {
     id: "web_search",
     name: "Web Search",
-    icon: <FaSearch />,
+    icon: <Search />,
     description: "Search the web for information",
     color: "green",
   },
   {
     id: "document_reader",
     name: "Document Reader",
-    icon: <FaFileAlt />,
+    icon: <FileText />,
     description: "Read and analyze documents",
     color: "orange",
   },
   {
     id: "calculator",
     name: "Calculator",
-    icon: <FaCalculator />,
+    icon: <Calculator />,
     description: "Perform mathematical calculations",
     color: "red",
   },
   {
     id: "image_analyzer",
     name: "Image Analyzer",
-    icon: <FaImage />,
+    icon: <ImageIcon />,
     description: "Analyze and describe images",
     color: "pink",
   },
   {
     id: "api_connector",
     name: "API Connector",
-    icon: <FaGlobe />,
+    icon: <Globe />,
     description: "Connect to external APIs",
     color: "cyan",
   },
@@ -245,7 +246,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
             colorPalette={"blue"}
             // transform="translateX(-50%)"
           >
-            <FaAngleDoubleDown />
+            <ChevronsDown />
           </IconButton>
         )}
       </Flex>
@@ -327,7 +328,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
                   colorPalette="green"
                   _hover={{ bg: hoverBg }}
                 >
-                  <FaTools />
+                  <Wrench size={18} />
                 </IconButton>
               </Menu.Trigger>
               <Menu.Positioner>
@@ -417,7 +418,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
               colorPalette="gray"
               _hover={{ bg: hoverBg }}
             >
-              <MdAttachFile />
+              <Paperclip size={18} />
             </IconButton>
 
             {/* AI Enhance Button */}
@@ -428,7 +429,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
               colorPalette="purple"
               _hover={{ bg: useColorModeValue("purple.50", "purple.900") }}
             >
-              <MdAutoFixHigh />
+              <Sparkles size={18} />
             </IconButton>
           </HStack>
 
@@ -448,7 +449,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
             }}
             transition="all 0.2s"
           >
-            <FaArrowUp />
+            <ArrowUp />
           </IconButton>
         </Flex>
       </Box>

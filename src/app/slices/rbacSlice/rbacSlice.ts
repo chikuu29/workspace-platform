@@ -10,15 +10,17 @@ interface RbacState {
     roles: string[];
     permissions: string[];
     scope: string[];
-    user_type: string | "SYSTEM" | "ORGANIZATION" | "UNASSIGNED";
+    user_type: string | null;
     policies: PolicySummary[];
+    is_superuser?: boolean;
+    is_root_user?: boolean;
 }
 
 const initialState: RbacState = {
     roles: [],
     permissions: [],
     scope: [],
-    user_type: "UNASSIGNED",
+    user_type: null,
     policies: [],
 };
 
@@ -32,13 +34,17 @@ const rbacSlice = createSlice({
             if (action.payload.scope) state.scope = action.payload.scope;
             if (action.payload.user_type) state.user_type = action.payload.user_type;
             if (action.payload.policies) state.policies = action.payload.policies;
+            if (action.payload.is_superuser !== undefined) state.is_superuser = action.payload.is_superuser;
+            if (action.payload.is_root_user !== undefined) state.is_root_user = action.payload.is_root_user;
         },
         clearRbac: (state) => {
             state.roles = [];
             state.permissions = [];
             state.scope = [];
-            state.user_type = "UNASSIGNED";
+            state.user_type = null;
             state.policies = [];
+            state.is_superuser = false;
+            state.is_root_user = false;
         }
     },
     extraReducers: (builder) => {
@@ -50,14 +56,18 @@ const rbacSlice = createSlice({
                 state.scope = authz.scope || [];
                 state.user_type = authz.user_type || null;
                 state.policies = authz.policies || [];
+                state.is_superuser = authz.is_superuser || false;
+                state.is_root_user = authz.is_root_user || false;
             }
         });
         builder.addCase(logout, (state) => {
             state.roles = [];
             state.permissions = [];
             state.scope = [];
-            state.user_type = "UNASSIGNED";
+            state.user_type = null;
             state.policies = [];
+            state.is_superuser = false;
+            state.is_root_user = false;
         });
     }
 });

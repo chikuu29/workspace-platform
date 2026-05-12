@@ -1,7 +1,7 @@
 import { Box, Flex, Text, Link, HStack, Icon, Circle } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import React from "react";
-import { LuHeart, LuActivity, LuShieldCheck } from "react-icons/lu";
+import { Heart, Activity, ShieldCheck } from "lucide-react";
 
 /**
  * AppFooter
@@ -43,7 +43,7 @@ const AppFooter = () => {
           <Box h="3px" w="3px" bg={textColor} rounded="full" display={{ base: "none", md: "block" }} />
           <HStack gap="1" display={{ base: "none", md: "flex" }}>
             <Text>Made with</Text>
-            <Icon as={LuHeart} color="red.400" boxSize="3" />
+            <Icon as={Heart} color="red.400" boxSize="3" />
             <Text>for the future.</Text>
           </HStack>
         </HStack>
@@ -80,7 +80,7 @@ const AppFooter = () => {
             Terms of Service
           </Link>
           <HStack gap="1" color="blue.500" cursor="pointer" _hover={{ filter: "brightness(1.2)" }}>
-            <Icon as={LuShieldCheck} />
+            <Icon as={ShieldCheck} />
             <Text>Enterprise Verified</Text>
           </HStack>
         </HStack>

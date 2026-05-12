@@ -41,7 +41,7 @@ import { getOrCreateDeviceId } from '../../utils/services/appServices';
 //    PROD → full backend URL from env
 // ────────────────────────────────────────────────────────────────────────
 
-const BASE_URL = import.meta.env.DEV ? '/api' : import.meta.env.VITE_API_URL;
+const BASE_URL = import.meta.env.DEV ? '/backend' : import.meta.env.VITE_API_URL;
 
 // ────────────────────────────────────────────────────────────────────────
 // 2. HELPERS
@@ -271,7 +271,7 @@ privateAPI.interceptors.response.use(
             // GET /auth/refresh — lightweight endpoint, only returns { access_token }.
             // Uses the httpOnly cookie to exchange refresh_token for a new access_token.
             // Unlike /auth/me, it does NOT fetch user info (saves 1 OAuth2 HTTP call).
-            const { data } = await privateAPI.get('/auth/refresh');
+            const { data } = await privateAPI.get(`v1/auth/refresh`);
 
             if (!data?.success || !data?.access_token) {
                 // Server responded 200 but payload is invalid → treat as failure

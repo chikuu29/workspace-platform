@@ -1,7 +1,7 @@
 import { IconButton, Input, Icon } from "@chakra-ui/react";
 import { InputGroup } from "@/components/ui/input-group";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { LuSearch } from 'react-icons/lu';
+import { Search } from 'lucide-react';
 
 export function SearchBar(props: any) {
   const { variant, background, children, placeholder, borderRadius, ...rest } =
@@ -28,7 +28,7 @@ export function SearchBar(props: any) {
           }}
           aria-label={""}
         >
-          <Icon as={LuSearch} color={searchIconColor} w='15px' h='15px' />
+          <Icon as={Search} color={searchIconColor} w='15px' h='15px' />
         </IconButton>
       }
       {...rest}

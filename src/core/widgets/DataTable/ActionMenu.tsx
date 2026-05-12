@@ -6,7 +6,7 @@ import {
     MenuTrigger
 } from "@/components/ui/menu";
 import { IconButton, Icon } from "@chakra-ui/react";
-import { LuEllipsisVertical } from "react-icons/lu";
+import { MoreVertical } from "lucide-react";
 import { DataTableAction } from "./types";
 import LoadIcon from "../../../utils/hooks/LoadIcon";
 
@@ -35,7 +35,7 @@ function ActionMenu<T>({ row, actions }: ActionMenuProps<T>) {
                     borderRadius="lg"
                     _hover={{ bg: "whiteAlpha.100", color: "blue.500" }}
                 >
-                    <LuEllipsisVertical />
+                    <MoreVertical size={18} />
                 </IconButton>
             </MenuTrigger>
             <MenuContent minW="160px" borderRadius="xl" boxShadow="xl" p={1}>

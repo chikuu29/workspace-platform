@@ -19,7 +19,9 @@ import { useAuthorization } from "@/core/hooks/useAuthorization";
 
 interface UIPermissionGuardProps {
     /** Permission code to check, e.g. "workspace.project.create" */
+    
     permissions: string[];
+    allowedRootUser?:boolean;
     /** Content to render when the user HAS the permission */
     children: ReactNode;
     /** Optional content to render when the user LACKS the permission */
@@ -33,9 +35,9 @@ interface UIPermissionGuardProps {
  * Platform users always see the children.
  */
 const UIPermissionGuard = memo(
-    ({ permissions, children, fallback = null, behavior = "hide" }: UIPermissionGuardProps) => {
-        const hasPermission = useAuthorization(permissions);
-
+    ({ permissions, allowedRootUser, children, fallback = null, behavior = "hide" }: UIPermissionGuardProps) => {
+        const hasPermission = useAuthorization(permissions, allowedRootUser);
+        console.debug("UIPermissionGuard", { permissions, hasPermission });
         if (hasPermission) return children;
 
         if (behavior === "disable") {

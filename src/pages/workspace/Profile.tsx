@@ -15,7 +15,7 @@ import {
   Flex,
   Separator
 } from "@chakra-ui/react";
-import { FiMail, FiUser, FiBriefcase, FiShield, FiMapPin, FiCalendar, FiEdit2 } from "react-icons/fi";
+import { Mail, User, Briefcase, Shield, MapPin, Calendar, Pencil } from "lucide-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/store";
 import { useColorModeValue } from "@/components/ui/color-mode";
@@ -121,15 +121,15 @@ const ProfilePage = () => {
 
                   <VStack gap={4} align="stretch" w="full">
                     <HStack color={textMuted} fontSize="sm" justify="space-between">
-                      <HStack gap={3}><Icon as={FiMapPin} /><Text>Location</Text></HStack>
+                      <HStack gap={3}><Icon as={MapPin} /><Text>Location</Text></HStack>
                       <Text fontWeight="600" color="inherit">United States</Text>
                     </HStack>
                     <HStack color={textMuted} fontSize="sm" justify="space-between">
-                      <HStack gap={3}><Icon as={FiBriefcase} /><Text>Organization</Text></HStack>
+                      <HStack gap={3}><Icon as={Briefcase} /><Text>Organization</Text></HStack>
                       <Text fontWeight="600" color="inherit" lineClamp={1} maxW="120px" textAlign="right">{organizationName || "N/A"}</Text>
                     </HStack>
                     <HStack color={textMuted} fontSize="sm" justify="space-between">
-                      <HStack gap={3}><Icon as={FiCalendar} /><Text>Joined</Text></HStack>
+                      <HStack gap={3}><Icon as={Calendar} /><Text>Joined</Text></HStack>
                       <Text fontWeight="600" color="inherit">Sep 2023</Text>
                     </HStack>
                   </VStack>
@@ -150,7 +150,7 @@ const ProfilePage = () => {
                         <Text color={textMuted} fontSize="sm" mt={1}>Basic info, like your name and photo, that you use on our platform.</Text>
                       </Box>
                       <Box p={2} bg={blockBg} borderRadius="lg" color="brand.500" cursor="pointer" _hover={{ bg: "brand.50" }} transition="all 0.2s">
-                        <Icon as={FiEdit2} boxSize={4} />
+                        <Icon as={Pencil} boxSize={4} />
                       </Box>
                     </Flex>
                   </Card.Header>
@@ -158,7 +158,7 @@ const ProfilePage = () => {
                     <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={6}>
                       <Box p={4} bg={blockBg} borderRadius="xl" borderWidth="1px" borderColor={borderColor}>
                         <HStack gap={4} mb={2}>
-                          <Box p={2} bg={bg} borderRadius="md" shadow="sm"><Icon as={FiUser} boxSize={4} color="brand.500" /></Box>
+                          <Box p={2} bg={bg} borderRadius="md" shadow="sm"><Icon as={User} boxSize={4} color="brand.500" /></Box>
                           <Text fontSize="xs" color={textMuted} fontWeight="700" textTransform="uppercase" letterSpacing="wider">Full Name</Text>
                         </HStack>
                         <Text fontWeight="700" fontSize="md" pl={12}>{fullName}</Text>
@@ -166,7 +166,7 @@ const ProfilePage = () => {
 
                       <Box p={4} bg={blockBg} borderRadius="xl" borderWidth="1px" borderColor={borderColor}>
                         <HStack gap={4} mb={2}>
-                          <Box p={2} bg={bg} borderRadius="md" shadow="sm"><Icon as={FiMail} boxSize={4} color="brand.500" /></Box>
+                          <Box p={2} bg={bg} borderRadius="md" shadow="sm"><Icon as={Mail} boxSize={4} color="brand.500" /></Box>
                           <Text fontSize="xs" color={textMuted} fontWeight="700" textTransform="uppercase" letterSpacing="wider">Email Address</Text>
                         </HStack>
                         <Text fontWeight="700" fontSize="md" pl={12}>{email}</Text>
@@ -174,7 +174,7 @@ const ProfilePage = () => {
 
                       <Box p={4} bg={blockBg} borderRadius="xl" borderWidth="1px" borderColor={borderColor}>
                         <HStack gap={4} mb={2}>
-                          <Box p={2} bg={bg} borderRadius="md" shadow="sm"><Icon as={FiBriefcase} boxSize={4} color="brand.500" /></Box>
+                          <Box p={2} bg={bg} borderRadius="md" shadow="sm"><Icon as={Briefcase} boxSize={4} color="brand.500" /></Box>
                           <Text fontSize="xs" color={textMuted} fontWeight="700" textTransform="uppercase" letterSpacing="wider">Organization</Text>
                         </HStack>
                         <Text fontWeight="700" fontSize="md" pl={12}>{organizationName || "N/A"}</Text>
@@ -182,7 +182,7 @@ const ProfilePage = () => {
 
                       <Box p={4} bg={blockBg} borderRadius="xl" borderWidth="1px" borderColor={borderColor}>
                         <HStack gap={4} mb={2}>
-                          <Box p={2} bg={bg} borderRadius="md" shadow="sm"><Icon as={FiShield} boxSize={4} color="brand.500" /></Box>
+                          <Box p={2} bg={bg} borderRadius="md" shadow="sm"><Icon as={Shield} boxSize={4} color="brand.500" /></Box>
                           <Text fontSize="xs" color={textMuted} fontWeight="700" textTransform="uppercase" letterSpacing="wider">Primary Role</Text>
                         </HStack>
                         <Text fontWeight="700" fontSize="md" pl={12} textTransform="capitalize">{roles?.[0] || "User"}</Text>

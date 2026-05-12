@@ -18,8 +18,7 @@ import { Button, Text, VStack, Box, Icon, Flex, Circle, Badge, HStack, Portal } 
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { motion } from "framer-motion";
 import { useState } from 'react';
-import { FiAlertCircle } from "react-icons/fi";
-import { LuCornerDownRight } from "react-icons/lu";
+import { AlertCircle, CornerDownRight } from "lucide-react";
 
 interface UIEngineProps {
     config: any[]; // Array of widget configs
@@ -32,6 +31,17 @@ interface UIEngineProps {
 
 const EMPTY_INITIAL_DATA: Record<string, any> = {};
 
+const isSameFormValue = (left: any, right: any) => {
+    if (Object.is(left, right)) return true;
+    if (!left || !right || typeof left !== "object" || typeof right !== "object") return false;
+
+    try {
+        return JSON.stringify(left) === JSON.stringify(right);
+    } catch {
+        return false;
+    }
+};
+
 const UIEngineComponent: React.FC<UIEngineProps> = ({ config, initialData = EMPTY_INITIAL_DATA, onSubmit, children, formId, ...rest }) => {
     console.log("===Rendering UIEngine with config===");
     const initialize = useFormStore(state => state.initialize);
@@ -42,10 +52,13 @@ const UIEngineComponent: React.FC<UIEngineProps> = ({ config, initialData = EMPT
     // );
     // const hasMountedRef = useRef(false);
 
-   console.log("Initial Data:", initialData);
+    console.log("Initial Data:", initialData);
     const methods = useForm({
         defaultValues: initialData,
-        mode: "onSubmit" // Change to onSubmit
+        mode: "onSubmit",
+        // Keep field registrations alive even when tabs haven't been visited yet (lazy mount)
+        // Without this, unvisited tabs would silently pass validation since their fields never register.
+        shouldUnregister: false,
     });
 
     const { watch } = methods;
@@ -75,7 +88,7 @@ const UIEngineComponent: React.FC<UIEngineProps> = ({ config, initialData = EMPT
                 const newFieldValue = value[name];
 
                 // Only update store if value implies a change to avoid loops
-                if (currentStoreValue !== newFieldValue) {
+                if (!isSameFormValue(currentStoreValue, newFieldValue)) {
                     setFieldValue(name, newFieldValue);
                 }
             }
@@ -154,7 +167,7 @@ const UIEngineComponent: React.FC<UIEngineProps> = ({ config, initialData = EMPT
                                             // color="white"
                                             shadow="lg"
                                         >
-                                            <Icon as={FiAlertCircle} boxSize={6} />
+                                            <Icon as={AlertCircle} boxSize={6} />
                                         </Circle>
                                     </motion.div>
                                     <VStack align="start" gap={0}>
@@ -227,14 +240,14 @@ const UIEngineComponent: React.FC<UIEngineProps> = ({ config, initialData = EMPT
                                     _active={{ transform: "translateY(0px)" }}
                                     transition="all 0.2s"
                                     onClick={() => setAlertOpen(false)}
-                                    rounded="xl"
-                                    shadow="lg"
+                                    rounded="sm"
+                                    // shadow="lg"
                                     fontWeight="800"
                                     fontSize="md"
                                 >
                                     <HStack gap={2}>
                                         <Text>Acknowledge & Fix</Text>
-                                        <Icon as={LuCornerDownRight} />
+                                        <Icon as={CornerDownRight} />
                                     </HStack>
                                 </Button>
                             </DialogFooter>

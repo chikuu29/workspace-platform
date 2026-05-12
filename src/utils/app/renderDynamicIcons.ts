@@ -1,62 +1,76 @@
-import { IconType } from "react-icons";
+import { type LucideIcon, Info, icons } from "lucide-react";
 
-// Create a function to dynamically import icons based on the prefix of the icon name
-const DynamicIcon = async (iconName: string): Promise<IconType> => {
+/**
+ * Common icon component type. We've migrated to lucide-react.
+ */
+export type AnyIconComponent = LucideIcon;
+
+/**
+ * Normalizes icon names from various react-icons formats to Lucide format.
+ * Strips common prefixes like Lu, Fi, Md, Fa, etc.
+ * Example: "LuUsers" -> "Users", "FiSearch" -> "Search"
+ */
+const normalizeIconName = (name: string): string => {
+  if (!name) return "";
+  
+  // List of prefixes to strip (ordered by length descending)
+  const prefixes = ["Lu", "Fi", "Md", "Fa", "Io", "Ai", "Tb", "Ci", "Ri", "Gr", "Ti", "Hi", "Bs", "Vsc"];
+  
+  for (const prefix of prefixes) {
+    if (name.startsWith(prefix) && name.length > prefix.length) {
+      const potentialName = name.substring(prefix.length);
+      // Check if the stripped name exists in Lucide
+      if (icons[potentialName as keyof typeof icons]) {
+        return potentialName;
+      }
+    }
+  }
+
+  // Handle some manual mappings if necessary
+  const manualMap: Record<string, string> = {
+    "FaPlus": "Plus",
+    "FaFilter": "Filter",
+    "FaEdit": "Pencil",
+    "FaEye": "Eye",
+    "FaTrash": "Trash2",
+    "MdNotificationsNone": "Bell",
+    "IoShieldCheckmarkOutline": "ShieldCheck",
+    "AiTwotoneCloseCircle": "CircleX",
+    "TbLockAccess": "Lock",
+    "SiAuthelia": "ShieldCheck", // Brand fallback
+    "FcHome": "Home",
+    "FcHighPriority": "AlertTriangle",
+  };
+
+  if (manualMap[name]) return manualMap[name];
+
+  return name;
+};
+
+/**
+ * Optimized Dynamic Loader for Lucide Icons.
+ * Provides backwards compatibility for react-icons names used in database configs.
+ */
+const DynamicIcon = async (iconName: string): Promise<AnyIconComponent> => {
+  if (!iconName) return Info;
+
   try {
-    // Check for Flat Color icons
-    if (iconName.startsWith("Fc")) {
-      const iconModule = await import("react-icons/fc");
-      const Icon = iconModule[iconName as keyof typeof iconModule] as IconType;
-      if (Icon) return Icon;
-    }
+    const normalizedName = normalizeIconName(iconName);
+    const LucideIcon = icons[normalizedName as keyof typeof icons];
 
-    if (iconName.startsWith("Lu")) {
-      const iconModule = await import("react-icons/lu");
-      const Icon = iconModule[iconName as keyof typeof iconModule] as IconType;
-      if (Icon) return Icon;
-    }
+    if (LucideIcon) return LucideIcon;
 
-    // Check for Feather icons
-    if (iconName.startsWith("Fi")) {
-      const iconModule = await import("react-icons/fi");
-      const Icon = iconModule[iconName as keyof typeof iconModule] as IconType;
-      if (Icon) return Icon;
-    }
+    // Fallback for names that might already be in Lucide format but didn't match case
+    // (Lucide uses PascalCase)
+    const pascalName = normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1);
+    const FallbackIcon = icons[pascalName as keyof typeof icons];
+    
+    if (FallbackIcon) return FallbackIcon;
 
-    // Check for Material Design icons
-    if (iconName.startsWith("Md")) {
-      const iconModule = await import("react-icons/md");
-      const Icon = iconModule[iconName as keyof typeof iconModule] as IconType;
-      if (Icon) return Icon;
-    }
-
-    // Check for Font Awesome icons
-    if (iconName.startsWith("Fa")) {
-      const iconModule = await import("react-icons/fa");
-      const Icon = iconModule[iconName as keyof typeof iconModule] as IconType;
-      if (Icon) return Icon;
-    }
-
-    // Check for Remix icons
-    if (iconName.startsWith("Ri")) {
-      const iconModule = await import("react-icons/ri");
-      const Icon = iconModule[iconName as keyof typeof iconModule] as IconType;
-      if (Icon) return Icon;
-    }
-
-    // Fallback icon if the requested one is not found or module fails to load
-    const fallbackModule = await import("react-icons/fc");
-    return fallbackModule.FcHighPriority as IconType;
-
+    return Info;
   } catch (error) {
-    // Return fallback icon in case of any error
-    try {
-      const fallbackModule = await import("react-icons/fc");
-      return fallbackModule.FcHighPriority as IconType;
-    } catch (e) {
-      // Return a very basic component as an absolute fallback
-      return (() => null) as unknown as IconType;
-    }
+    console.error(`Failed to resolve icon: ${iconName}`, error);
+    return Info;
   }
 };
 

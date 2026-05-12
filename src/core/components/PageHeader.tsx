@@ -1,5 +1,5 @@
 import { Flex, Stack, Heading, Text, Box, Input, IconButton } from "@chakra-ui/react";
-import { LuSearch, LuRefreshCw } from "react-icons/lu";
+import { Search, RefreshCw } from "lucide-react";
 import { memo } from "react";
 
 interface PageHeaderProps {
@@ -27,9 +27,9 @@ export const PageHeader = memo(({
 }: PageHeaderProps) => {
     return (
         <Flex
-            direction={{ base: "column", md: "row" }}
+            direction={{ base: "column", lg: "row" }}
             justify="space-between"
-            align={{ base: "start", md: "center" }}
+            align={{ base: "start", lg: "center" }}
             mb={8}
             p={6}
             bg="app.card.bg"
@@ -38,43 +38,75 @@ export const PageHeader = memo(({
             borderColor="app.card.border"
             borderRadius="2xl"
             boxShadow="sm"
-            gap={4}
+            gap={6}
+            w="full"
+            position="relative"
+            overflow="hidden"
         >
-            <Stack gap={1}>
+            {/* Background Decorative SVG */}
+            <Box
+                position="absolute"
+                right="-20px"
+                top="-20px"
+                color="app.text.accent/5"
+                zIndex={0}
+                pointerEvents="none"
+            >
+                <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="100" cy="100" r="80" stroke="currentColor" strokeWidth="20" strokeDasharray="40 20" />
+                    <circle cx="100" cy="100" r="40" stroke="currentColor" strokeWidth="10" strokeDasharray="10 5" />
+                </svg>
+            </Box>
+
+            <Stack gap={1.5} flex="1" zIndex={1}>
                 <Heading
-                    size="2xl"
+                    size="3xl"
                     fontWeight="900"
                     letterSpacing="tight"
                     color="app.text.primary"
+                    lineHeight="1"
                 >
                     {title}
                 </Heading>
                 {subtitle && (
-                    <Box fontSize="sm" color="app.text.muted">
+                    <Text fontSize="md" fontWeight="600" color="app.text.muted" maxW="600px">
                         {subtitle}
-                    </Box>
+                    </Text>
                 )}
             </Stack>
-            <Flex align="center" gap={4} flexWrap="wrap" justify={{ base: "flex-start", md: "flex-end" }} mt={{ base: 4, md: 0 }}>
+
+            <Flex 
+                align="center" 
+                gap={3} 
+                flexWrap="wrap" 
+                justify={{ base: "flex-start", lg: "flex-end" }} 
+                w={{ base: "full", lg: "auto" }}
+                zIndex={1}
+            >
                 {/* Search Bar */}
                 {onSearchChange && (
-                    <Box position="relative" w={{ base: "full", md: "250px", lg: "350px" }}>
-                        <Box position="absolute" left={3} top="50%" transform="translateY(-50%)" color="app.text.muted" zIndex={1}>
-                            <LuSearch />
+                    <Box position="relative" w={{ base: "full", md: "300px" }}>
+                        <Box position="absolute" left={3.5} top="50%" transform="translateY(-50%)" color="app.text.muted" zIndex={1}>
+                            <Search size={18} />
                         </Box>
                         <Input
                             placeholder={searchPlaceholder || "Search..."}
                             value={searchValue || ""}
                             onChange={(e) => onSearchChange(e.target.value)}
-                            pl={10}
-                            h="40px"
-                            bg="app.bg"
+                            pl={11}
+                            h="46px"
+                            bg="app.card.bg"
                             border="1px solid"
                             borderColor="app.card.border"
                             borderRadius="lg"
-                            boxShadow="sm"
+                            boxShadow="xs"
+                            fontWeight="600"
                             _hover={{ borderColor: "app.text.accent" }}
-                            _focus={{ borderColor: "app.text.accent", boxShadow: "0 0 0 1px var(--chakra-colors-app-text-accent)" }}
+                            _focus={{ 
+                                borderColor: "app.text.accent", 
+                                boxShadow: "0 0 0 1px var(--chakra-colors-app-text-accent)",
+                                bg: "app.input.bg"
+                            }}
                             transition="all 0.2s"
                         />
                     </Box>
@@ -86,12 +118,15 @@ export const PageHeader = memo(({
                         aria-label="Refresh"
                         onClick={onRefresh}
                         disabled={isRefreshing}
-                        variant="ghost"
-                        size="md"
+                        variant="outline"
+                        h="46px"
+                        w="46px"
+                        borderRadius="lg"
+                        borderColor="app.card.border"
                         color="app.text.muted"
-                        _hover={{ color: "app.text.primary", bg: "rgba(255,255,255,0.05)" }}
+                        _hover={{ color: "app.text.primary", bg: "app.card.bg", borderColor: "app.text.accent" }}
                     >
-                        <LuRefreshCw className={isRefreshing ? "spin-animation" : ""} />
+                        <RefreshCw size={18} className={isRefreshing ? "spin-animation" : ""} />
                     </IconButton>
                 )}
 

@@ -5,7 +5,7 @@ import { SidebarResponsive } from "../sidebar/PanelSideBar";
 import Brand from "../Brand/Brand";
 import TopNavMenuBuilder from "./TopNavMenuBuilder";
 import { memo, useMemo } from "react";
-import { AiOutlineMenuUnfold, AiOutlineMenuFold } from "react-icons/ai";
+import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/store";
@@ -28,6 +28,7 @@ const Navbar = () => {
   const { DISPLAY_TYPE, FEATURE }: APP_CONFIG_STATE = useSelector(
     (state: RootState) => state.app.AppConfigState
   );
+  const showTopNavMenu = (DISPLAY_TYPE.SHOW_TOP_NAV_MENU ?? false) && FEATURE.length > 0;
   // Scroll-aware shadow for depth perception
   const scrollShadow = useScrollShadow();
 
@@ -70,7 +71,7 @@ const Navbar = () => {
 
   // Memoize the sidebar toggle icon to prevent re-creation
   const ToggleIcon = useMemo(
-    () => (isCollapsed ? AiOutlineMenuUnfold : AiOutlineMenuFold),
+    () => (isCollapsed ? PanelLeftOpen : PanelLeftClose),
     [isCollapsed]
   );
 
@@ -95,19 +96,21 @@ const Navbar = () => {
         <Flex
           w="100%"
           h="5.5rem"
-          px={4}
+          px={{ base: 2, md: 4 }}
           align="center"
           justify="space-between"
+          gap={{ base: 1.5, md: 3 }}
         >
           {/* Left: Toggle + Brand */}
-          <Flex alignItems="center" gap={3}>
+          <Flex alignItems="center" gap={{ base: 1, md: 3 }} minW={0} flex="0 1 auto" flexShrink={1}>
             {(DISPLAY_TYPE.SHOW_SIDE_NAV_MENU || FEATURE.length > 0) && (
               <Box
                 display="flex"
                 alignItems="center"
-                gap="2"
-                p="1.5"
-                borderRadius="2xl"
+                gap={{ base: 1, md: 2 }}
+                p={{ base: 1, md: 1.5 }}
+                borderRadius={{ base: "xl", md: "2xl" }}
+                flexShrink={0}
                 bg={controlShellBg}
                 border="1px solid"
                 borderColor={controlShellBorder}
@@ -117,19 +120,20 @@ const Navbar = () => {
                 {DISPLAY_TYPE.SHOW_SIDE_NAV_MENU && (
                   <IconButton
                     aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                    title={isCollapsed ? "Show sidebar" : "Hide sidebar"}
                     display={{ base: "none", xl: "flex" }}
                     onClick={toggleSidebar}
                     size="sm"
                     borderRadius="xl"
-                  color="app.text.primary"
-                  bg={toggleBtnBg}
-                  border="1px solid"
-                  borderColor="app.card.border"
-                  boxShadow="0 12px 24px -20px rgba(15, 23, 42, 0.35)"
-                  _hover={iconBtnHover}
-                  transition={TRANSITION}
-                >
-                    <ToggleIcon size={20} />
+                    color="app.text.primary"
+                    bg={toggleBtnBg}
+                    border="1px solid"
+                    borderColor="app.card.border"
+                    boxShadow="0 12px 24px -20px rgba(15, 23, 42, 0.35)"
+                    _hover={iconBtnHover}
+                    transition={TRANSITION}
+                  >
+                    <ToggleIcon size={18} strokeWidth={2.4} />
                   </IconButton>
                 )}
                 {FEATURE.length > 0 && <SidebarResponsive />}
@@ -139,15 +143,25 @@ const Navbar = () => {
           </Flex>
 
           {/* Center: Dynamic Top Navigation (desktop only) */}
-          <Box display={{ base: "none", lg: "block" }}>
-            <TopNavMenuBuilder
-              FEATURE_LIST={FEATURE}
-              SHOW_TOP_NAV_MENU={DISPLAY_TYPE.SHOW_TOP_NAV_MENU ?? false}
-            />
-          </Box>
+          {showTopNavMenu && (
+            <Box
+              display={{ base: "none", lg: "block" }}
+              flex="1"
+              minW={0}
+              mx={{ lg: 2, xl: 4 }}
+              overflow="hidden"
+            >
+              <TopNavMenuBuilder
+                FEATURE_LIST={FEATURE}
+                SHOW_TOP_NAV_MENU={showTopNavMenu}
+              />
+            </Box>
+          )}
 
           {/* Right: Actions (search, notifications, profile) */}
-          <PanelNavBarAction />
+          <Box flexShrink={0}>
+            <PanelNavBarAction />
+          </Box>
         </Flex>
       </Box>
     </Box>

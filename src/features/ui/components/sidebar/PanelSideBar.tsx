@@ -13,7 +13,7 @@ import Brand from "../Brand/Brand";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/store";
 import { APP_CONFIG_STATE } from "@/app/types/appConfigInterface";
-import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
+import { Menu, X } from "lucide-react";
 import { useSidebar } from "@/contexts/SidebarContext";
 import React, { useCallback } from "react";
 import { useLocation } from "react-router";
@@ -89,6 +89,10 @@ export function SidebarResponsive() {
     "rgba(148, 163, 184, 0.22)",
     "rgba(255, 255, 255, 0.08)"
   );
+  const triggerShadow = useColorModeValue(
+    "0 16px 34px -24px rgba(37, 99, 235, 0.55), inset 0 1px 0 rgba(255,255,255,0.8)",
+    "0 18px 36px -24px rgba(37, 99, 235, 0.36), inset 0 1px 0 rgba(255,255,255,0.12)"
+  );
 
   // Auto-close drawer on route change
   useEffect(() => {
@@ -113,23 +117,28 @@ export function SidebarResponsive() {
       justifyContent="center"
     >
       <IconButton
-        aria-label="Open menu"
+        aria-label="Open sidebar menu"
+        title="Open sidebar"
         cursor="pointer"
-        size="md"
-        borderRadius="xl"
+        h={{ base: "8", sm: "9", md: "10" }}
+        minW={{ base: "8", sm: "9", md: "10" }}
+        borderRadius={{ base: "lg", sm: "xl" }}
         color="app.text.primary"
-        bg={triggerBg}
+        // bg={triggerBg}
+        bg="app.card.bg"
         border="1px solid"
-        borderColor="app.card.border"
-        boxShadow="0 12px 24px -20px rgba(15, 23, 42, 0.35)"
+        borderColor={triggerBorder}
+        // boxShadow={triggerShadow}
+        // backdropFilter="blur(18px) saturate(160%)"
         _hover={{
           transform: "translateY(-1px)",
-          boxShadow: "0 16px 28px -22px rgba(15, 23, 42, 0.4)",
+          borderColor: "brand.300",
+          boxShadow: "0 20px 38px -24px rgba(37, 99, 235, 0.58)",
         }}
         transition="all 0.2s ease"
         onClick={openMobile}
       >
-        <AiOutlineMenuUnfold size={20} />
+        <Menu size={18} strokeWidth={2.5} />
       </IconButton>
 
       <Drawer.Root
@@ -149,13 +158,16 @@ export function SidebarResponsive() {
               >
                 <Brand />
                 <IconButton
-                  aria-label="Close Menu"
+                  aria-label="Close sidebar menu"
+                  title="Close sidebar"
                   variant="ghost"
-                  size="sm"
+                  size="md"
                   borderRadius="xl"
+                  color="app.text.primary"
+                  _hover={{ bg: "blackAlpha.100" }}
                   onClick={closeMobile}
                 >
-                  <AiOutlineMenuFold size={20} />
+                  <X size={18} strokeWidth={2.5} />
                 </IconButton>
               </Flex>
               <Separator />

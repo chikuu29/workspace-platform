@@ -31,6 +31,17 @@ interface UIEngineProps {
 
 const EMPTY_INITIAL_DATA: Record<string, any> = {};
 
+const isSameFormValue = (left: any, right: any) => {
+    if (Object.is(left, right)) return true;
+    if (!left || !right || typeof left !== "object" || typeof right !== "object") return false;
+
+    try {
+        return JSON.stringify(left) === JSON.stringify(right);
+    } catch {
+        return false;
+    }
+};
+
 const UIEngineComponent: React.FC<UIEngineProps> = ({ config, initialData = EMPTY_INITIAL_DATA, onSubmit, children, formId, ...rest }) => {
     console.log("===Rendering UIEngine with config===");
     const initialize = useFormStore(state => state.initialize);
@@ -77,7 +88,7 @@ const UIEngineComponent: React.FC<UIEngineProps> = ({ config, initialData = EMPT
                 const newFieldValue = value[name];
 
                 // Only update store if value implies a change to avoid loops
-                if (currentStoreValue !== newFieldValue) {
+                if (!isSameFormValue(currentStoreValue, newFieldValue)) {
                     setFieldValue(name, newFieldValue);
                 }
             }

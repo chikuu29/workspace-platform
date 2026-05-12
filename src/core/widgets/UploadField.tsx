@@ -80,7 +80,7 @@ const FileItem = memo(({
   const extension = lowerName.split(".").pop() ?? "";
   const isImg = file.type?.startsWith("image/") || ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg"].includes(extension);
   const imageUrl = isImg
-    ? previewUrl || (isUploaded && file.accessObjectPath ? `${location.origin}/api/${file.accessObjectPath}` : undefined)
+    ? previewUrl || (isUploaded && file.accessObjectPath ? `${location.origin}/backend/${file.accessObjectPath}` : undefined)
     : undefined;
 
   const fileAccent = useMemo(() => {
@@ -246,7 +246,7 @@ const UploadField = ({
     if (selectedFiles.length > 0) {
       const uploadURL = defaultApiConfig?.uploadURL;
       if (uploadURL) {
-        const proxyUrl = location.origin + "/api";
+        const proxyUrl = location.origin + "/backend";
         POSTAPI({
           path: uploadURL,
           isPrivateApi: true,
@@ -547,7 +547,7 @@ const UploadField = ({
                               file={file}
                               isUploaded
                               onRemove={() => handleUploadedRemoveFile(i)}
-                              onView={() => window.open(location.origin + "/api/" + file.accessObjectPath, "_blank")}
+                              onView={() => window.open(location.origin + "/backend/" + file.accessObjectPath, "_blank")}
                             />
                           ))}
                         </VStack>

@@ -23,7 +23,7 @@ const FloorCapacityGauge = memo(({ utilization, onViewSchedule }: FloorCapacityG
   const palette = getUtilizationPalette(utilization);
 
   return (
-    <Box p={5} borderRadius="2xl" bg="linear-gradient(145deg, #0f172a, #1e293b)" color="white" border="1px solid" borderColor="whiteAlpha.100" boxShadow="0 4px 24px rgba(0,0,0,0.25)">
+    <Box p={5} borderRadius="2xl" bg="app.card.bg" color="white" border="1px solid" borderColor="whiteAlpha.100" boxShadow="0 4px 24px rgba(0,0,0,0.25)">
       <VStack align="stretch" gap={4}>
         <HStack justify="space-between">
           <VStack align="start" gap={0}>
@@ -42,7 +42,7 @@ const FloorCapacityGauge = memo(({ utilization, onViewSchedule }: FloorCapacityG
           <Text fontSize="xl" fontWeight="900" letterSpacing="tight">{utilization}%</Text>
         </HStack>
         <Separator borderColor="whiteAlpha.200" />
-        <Button variant="surface" bg="white" color="gray.950" borderRadius="xl" fontWeight="900" size="sm" _hover={{ bg: "gray.100" }} onClick={onViewSchedule}>
+        <Button variant="surface" bg="white" color="gray.950" borderRadius="md" fontWeight="900" size="sm" _hover={{ bg: "gray.100" }} onClick={onViewSchedule}>
           View Class Schedule
         </Button>
       </VStack>

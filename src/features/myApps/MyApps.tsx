@@ -98,7 +98,7 @@ const AppCard: React.FC<AppCardProps> = memo(
                   display="flex"
                   alignItems="center"
                   justifyContent="center"
-                  color="brand.500"
+                  color={logo?.iconColor || "brand.500"}
                   dangerouslySetInnerHTML={{ __html: logo.svgIcon }}
                   css={{
                     "& svg": {

@@ -69,7 +69,7 @@ const StatCard = memo(({
     <Box
       p={5}
       borderRadius="2xl"
-      bg={panelBg}
+      bg={'app.card.bg'}
       border="1px solid"
       borderColor={borderColor}
       backdropFilter="blur(16px) saturate(140%)"

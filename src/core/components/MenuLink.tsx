@@ -43,6 +43,8 @@ interface MenuConfig {
     key: string;
     label: string;
     icon: string;
+    /** Custom color for the icon - e.g., "blue.500", "#FF0000", or "app.accent" */
+    iconColor?: string;
     /** Raw SVG markup string — rendered instantly by AsyncLoadIcon when present */
     svgIcon?: string;
     path?: string;
@@ -100,6 +102,7 @@ function buildHoverStyles(hoverBg: string, includeShift: boolean) {
  *  - No inline object literals inside JSX.
  */
 const MenuLink = memo(({ menuConfig, showFullSideBarMenu }: MenuLinkProps) => {
+    // console.log("menuConfig", menuConfig)
     const navigate = useNavigate();
     const location = useLocation();
     const activeBg = useColorModeValue("blue.50", "whiteAlpha.100");
@@ -128,8 +131,8 @@ const MenuLink = memo(({ menuConfig, showFullSideBarMenu }: MenuLinkProps) => {
     // ─── Stable hover style objects ──────────────────────────────────
     // Built once per hoverBg change — not recreated on every render.
     // Both variants share the same border semantics via HOVER_BORDER_COLOR.
-    const expandedHover = useMemo(() => buildHoverStyles(hoverBg, /* shift */ true), [hoverBg]);
-    const collapsedHover = useMemo(() => buildHoverStyles(hoverBg, /* shift */ false), [hoverBg]);
+    // const expandedHover = useMemo(() => buildHoverStyles(hoverBg, /* shift */ true), [hoverBg]);
+    // const collapsedHover = useMemo(() => buildHoverStyles(hoverBg, /* shift */ false), [hoverBg]);
 
     // ─── Stable active style objects ─────────────────────────────────
     const expandedActive = useMemo(() => ({ transform: "scale(0.98)" }), []);
@@ -235,7 +238,13 @@ const MenuLink = memo(({ menuConfig, showFullSideBarMenu }: MenuLinkProps) => {
                 _active={expandedActive}
                 onMouseEnter={checkTruncation}
             >
-                <Box flexShrink={0} display="flex" alignItems="center" justifyContent="center">
+                <Box
+                    flexShrink={0}
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    color={menuConfig.iconColor}
+                >
                     <AsyncLoadIcon iconName={menuConfig.icon} svgIcon={menuConfig.svgIcon} />
                 </Box>
                 <Text
@@ -268,7 +277,13 @@ const MenuLink = memo(({ menuConfig, showFullSideBarMenu }: MenuLinkProps) => {
                 _hover={collapsedHover}
                 _active={collapsedActive}
             >
-                <Box display="flex" alignItems="center" justifyContent="center" h="24px">
+                <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    h="24px"
+                    color={menuConfig.iconColor}
+                >
                     <AsyncLoadIcon iconName={menuConfig.icon} svgIcon={menuConfig.svgIcon} />
                 </Box>
                 <Text
@@ -324,10 +339,11 @@ const MenuLink = memo(({ menuConfig, showFullSideBarMenu }: MenuLinkProps) => {
                         minW="sm"
                         bg="app.card.bg"
                         zIndex="popover"
+
                     >
                         <Stack>
-                            {menuConfig.menu.map((child, index) => (
-                                <MenuLink key={index} menuConfig={child} showFullSideBarMenu={true} />
+                            {menuConfig.menu.map((child: any, index: number) => (
+                                <MenuLink key={index} menuConfig={{ iconColor: menuConfig?.iconColor, ...child }} showFullSideBarMenu={true} />
                             ))}
                         </Stack>
                     </Popover.Content>

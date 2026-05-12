@@ -138,7 +138,7 @@ const SideNavMenuBuilder = memo(({ showFullSideBarMenu }: SideNavPropsType) => {
               {menu.menu?.map((subMenu: any, subIndex: number) => (
                 <MenuLink
                   key={`sub-${index}-${subIndex}`}
-                  menuConfig={subMenu}
+                  menuConfig={{ iconColor: menu.iconColor, ...subMenu }}
                   showFullSideBarMenu={showFullSideBarMenu}
                 />
               ))}

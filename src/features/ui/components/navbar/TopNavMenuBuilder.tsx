@@ -55,7 +55,7 @@ const TopNavMenuBuilder = memo(({ FEATURE_LIST, SHOW_TOP_NAV_MENU }: TopNavProps
           <Flex gap={{ lg: 1, xl: 2 }} flexWrap="nowrap">
             {FEATURE_LIST.map((navItem: any) => (
               <Box key={navItem.label} minW="fit-content" display="flex" alignItems="center">
-                <MenuLink menuConfig={navItem} showFullSideBarMenu={true} />
+                <MenuLink menuConfig={{ iconColor: navItem?.iconColor, ...navItem }} showFullSideBarMenu={true} />
               </Box>
             ))}
           </Flex>

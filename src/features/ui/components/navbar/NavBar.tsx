@@ -34,27 +34,12 @@ const Navbar = () => {
 
   // Theme-aware colors
   // Match project bg.default (gray.50 / dark slate) with slight transparency for blur
-  const navBg = useColorModeValue(
-    "#ffff",
-    "rgba(15, 23, 42, 0.88)"
-  );
   const borderColor = useColorModeValue("gray.100", "whiteAlpha.100");
   const iconHoverBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
-  const controlShellBg = useColorModeValue(
-    "rgba(255, 255, 255, 0.88)",
-    "rgba(15, 23, 42, 0.78)"
-  );
-  const controlShellBorder = useColorModeValue(
-    "rgba(148, 163, 184, 0.22)",
-    "rgba(255, 255, 255, 0.08)"
-  );
+  // controlShellShadow reused in the desktop toggle _hover for depth
   const controlShellShadow = useColorModeValue(
     "0 16px 36px -24px rgba(15, 23, 42, 0.3)",
     "0 18px 36px -26px rgba(2, 6, 23, 0.8)"
-  );
-  const toggleBtnBg = useColorModeValue(
-    "rgba(255,255,255,0.92)",
-    "rgba(15,23,42,0.92)"
   );
 
   // Stable hover object — not re-created every render
@@ -104,40 +89,38 @@ const Navbar = () => {
           {/* Left: Toggle + Brand */}
           <Flex alignItems="center" gap={{ base: 1, md: 3 }} minW={0} flex="0 1 auto" flexShrink={1}>
             {(DISPLAY_TYPE.SHOW_SIDE_NAV_MENU || FEATURE.length > 0) && (
-              <Box
-                display="flex"
-                alignItems="center"
-                gap={{ base: 1, md: 2 }}
-                p={{ base: 1, md: 1.5 }}
-                borderRadius={{ base: "xl", md: "2xl" }}
-                flexShrink={0}
-                bg={controlShellBg}
-                border="1px solid"
-                borderColor={controlShellBorder}
-                boxShadow={controlShellShadow}
-                backdropFilter="blur(18px)"
-              >
+              <Flex alignItems="center" gap={1} flexShrink={0}>
+                {/*
+                 * Desktop-only collapse/expand toggle (xl+).
+                 * Below xl, PanelSideBar is hidden and SidebarResponsive
+                 * owns the mobile drawer trigger — we must NOT render a
+                 * second button here or it will appear twice on mobile.
+                 */}
                 {DISPLAY_TYPE.SHOW_SIDE_NAV_MENU && (
                   <IconButton
                     aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
                     title={isCollapsed ? "Show sidebar" : "Hide sidebar"}
-                    display={{ base: "none", xl: "flex" }}
-                    onClick={toggleSidebar}
-                    size="sm"
+                    display={{ base: "none", xl: "inline-flex" }}
+                    cursor="pointer"
+                    h="10"
+                    // size={'md'}
+                    minW="10"
                     borderRadius="xl"
+                    variant="outline"
                     color="app.text.primary"
-                    bg={toggleBtnBg}
                     border="1px solid"
                     borderColor="app.card.border"
-                    boxShadow="0 12px 24px -20px rgba(15, 23, 42, 0.35)"
-                    _hover={iconBtnHover}
                     transition={TRANSITION}
+                    _hover={iconBtnHover}
+                    onClick={toggleSidebar}
                   >
                     <ToggleIcon size={18} strokeWidth={2.4} />
                   </IconButton>
                 )}
+
+                {/* Mobile drawer trigger — visible only below xl */}
                 {FEATURE.length > 0 && <SidebarResponsive />}
-              </Box>
+              </Flex>
             )}
             <Brand />
           </Flex>

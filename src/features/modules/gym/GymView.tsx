@@ -137,7 +137,7 @@ interface QuickActionsSectionProps {
 }
 
 const QuickActionsSection = memo(({ onNavigate }: QuickActionsSectionProps) => {
-  const panelBg = useColorModeValue("rgba(255,255,255,0.74)", "rgba(15,23,42,0.58)");
+  // const panelBg = useColorModeValue("rgba(255,255,255,0.74)", "rgba(15,23,42,0.58)");
   const borderColor = useColorModeValue("rgba(226,232,240,0.84)", "rgba(255,255,255,0.12)");
 
   /** Stable callbacks map — one per action */
@@ -153,7 +153,7 @@ const QuickActionsSection = memo(({ onNavigate }: QuickActionsSectionProps) => {
     <Box
       p={5}
       borderRadius="2xl"
-      bg={panelBg}
+      bg={"app.card.bg"}
       border="1px solid"
       borderColor={borderColor}
       backdropFilter="blur(16px) saturate(140%)"

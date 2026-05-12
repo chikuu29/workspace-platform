@@ -200,7 +200,7 @@ const MemberTile = memo(({
       role="group"
       p={5}
       borderRadius="2xl"
-      bg={cardBg}
+      bg={"app.card.bg"}
       border="1px solid"
       borderColor={cardBorder}
       boxShadow="0 18px 44px -34px rgba(15, 23, 42, 0.72)"
@@ -518,7 +518,7 @@ const ViewMember = memo(() => {
                 gap={4}
                 p={4}
                 borderRadius="2xl"
-                bg={panelBg}
+                bg={"app.card.bg"}
                 border="1px solid"
                 borderColor={borderColor}
               >
@@ -689,7 +689,7 @@ const ViewMember = memo(() => {
 
           <GridItem>
             <VStack align="stretch" gap={5} position={{ xl: "sticky" }} top={{ xl: "7rem" }}>
-              <Box p={5} borderRadius="2xl" bg={panelBg} border="1px solid" borderColor={borderColor}>
+              <Box p={5} borderRadius="2xl" bg={"app.card.bg"} border="1px solid" borderColor={borderColor}>
                 <VStack align="stretch" gap={4}>
                   <HStack justify="space-between">
                     <VStack align="start" gap={0}>
@@ -750,7 +750,7 @@ const ViewMember = memo(() => {
                 </VStack>
               </Box>
 
-              <Box p={5} borderRadius="2xl" bg={panelBg} border="1px solid" borderColor={borderColor}>
+              <Box p={5} borderRadius="2xl" bg={"app.card.bg"} border="1px solid" borderColor={borderColor}>
                 <VStack align="stretch" gap={4}>
                   <Heading size="sm" fontWeight="900">
                     Retention Health

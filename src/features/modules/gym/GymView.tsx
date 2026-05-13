@@ -218,18 +218,16 @@ const GymView = memo(() => {
     mountNavActions(
       <HStack gap={2}>
         <IconButton
-          // variant=""
           colorPalette="yellow"
           borderRadius="sm"
-          // size="sm"
-          onClick={refresh}
-          aria-label="Refresh dashboard"
-          loading={loading}
           size="md"
           h="40px"
           px={6}
+          onClick={refresh}
+          aria-label="Refresh dashboard"
+          loading={loading}
         >
-          <RefreshCw size={16} /> Sync
+          <RefreshCw size={16} />
         </IconButton>
         <Button
           borderRadius="sm"
@@ -237,6 +235,12 @@ const GymView = memo(() => {
           size="md"
           h="40px"
           px={6}
+          _hover={{
+            transform: "translateY(-1px)",
+            boxShadow: "sm",
+          }}
+          _active={{ transform: "translateY(0)" }}
+          transition="all 0.2s ease"
           onClick={() => navigateTo("members")}
         >
           <Icon as={Users} /> Directory
@@ -248,6 +252,12 @@ const GymView = memo(() => {
           size="md"
           h="40px"
           px={6}
+          _hover={{
+            transform: "translateY(-1px)",
+            boxShadow: "0 10px 24px -8px var(--chakra-colors-blue-500)",
+          }}
+          _active={{ transform: "translateY(0)" }}
+          transition="all 0.2s ease"
           onClick={() => navigateTo("AddMember")}
         >
           <Plus size={16} /> Enroll Member

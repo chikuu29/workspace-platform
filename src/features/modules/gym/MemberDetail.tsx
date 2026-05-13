@@ -138,29 +138,32 @@ const MemberDetail = memo(() => {
     mountNavActions(
       <HStack gap={2}>
         <Button
-          // variant="outline"
-          // borderRadius="sm"
+          variant="outline"
+          borderRadius="sm"
           fontWeight="800"
           size="md"
           h="40px"
           px={6}
           onClick={handleBack}
-        // h="32px"
+          _hover={{
+            transform: "translateY(-1px)",
+            boxShadow: "sm",
+            bg: "whiteAlpha.100",
+          }}
+          _active={{ transform: "translateY(0)" }}
+          transition="all 0.2s ease"
         >
           <ArrowLeft size={14} /> Directory
         </Button>
         <IconButton
-          // variant="subtle"
           colorPalette="yellow"
-          // borderRadius="sm"
+          borderRadius="sm"
           size="md"
           h="40px"
           px={6}
           onClick={refresh}
           aria-label="Refresh profile"
           loading={loading}
-        // h="32px"
-        // w="32px"
         >
           <RefreshCw size={14} />
         </IconButton>

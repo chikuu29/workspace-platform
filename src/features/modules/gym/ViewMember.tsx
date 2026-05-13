@@ -360,12 +360,11 @@ const ViewMember = memo(() => {
     mountNavActions(
       <HStack gap={2}>
         <IconButton
-          // variant="ghost"
           colorPalette="yellow"
-          // borderRadius="sm"
+          borderRadius="sm"
           size="md"
-          // h="40px"
-          // px={6}
+          h="40px"
+          px={6}
           onClick={refresh}
           aria-label="Refresh members"
           loading={loading}
@@ -374,11 +373,17 @@ const ViewMember = memo(() => {
         </IconButton>
         <Button
           colorPalette="blue"
-          // borderRadius="sm"
+          borderRadius="sm"
           size="md"
-          // h="40px"
-          // px={6}
+          h="40px"
+          px={6}
           fontWeight="800"
+          _hover={{
+            transform: "translateY(-1px)",
+            boxShadow: "0 10px 24px -8px var(--chakra-colors-blue-500)",
+          }}
+          _active={{ transform: "translateY(0)" }}
+          transition="all 0.2s ease"
           onClick={() => navigateTo("AddMember")}
         >
           <Plus size={16} /> New Member

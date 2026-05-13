@@ -39,11 +39,13 @@ import {
     ShieldCheck,
     Zap,
     Sparkles,
+    X,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Field } from "@/components/ui/field";
 import { toaster } from "@/components/ui/toaster";
 import { Card } from "@/core/components/Card";
+import { PageHeader } from "@/core/components/PageHeader";
 import { useGymMember } from "./hooks/useGymMember";
 import { useSubscriptionPlans } from "./hooks/useSubscriptionPlans";
 import { GymApiService } from "./services/gymApi.service";
@@ -378,21 +380,25 @@ const SelectPlan = memo(() => {
     useEffect(() => {
         setNavActions(
             <HStack gap={3}>
+                <Button variant="ghost" borderRadius="sm" size="md" h="40px" px={6} onClick={handleBack}>
+                    <X size={14} />
+                    <Text ml={1}>Discard</Text>
+                </Button>
                 <Button
-                    // colorPalette="brand"
+                    colorPalette="brand"
+                    borderRadius="sm"
+                    px={6}
                     size="md"
                     h="40px"
-                    px={6}
-                    // borderRadius="xl"
-                    fontWeight="900"
+                    fontWeight="800"
                     onClick={handleConfirm}
                     disabled={!selectedPlan || isSubmitting || !member}
-                    // bg="brand.500"
-                    // boxShadow="0 8px 16px -4px var(--chakra-colors-brand-500)"
                     _hover={{
                         transform: "translateY(-1px)",
                         boxShadow: "0 12px 20px -6px var(--chakra-colors-brand-500)",
                     }}
+                    _active={{ transform: "translateY(0)" }}
+                    transition="all 0.2s ease"
                 >
                     {isSubmitting ? <Spinner size="xs" borderWidth="2px" /> : (
                         <HStack gap={2}>

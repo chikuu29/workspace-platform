@@ -258,35 +258,50 @@ const Subscription = () => {
                 <IconButton
                     variant="solid"
                     colorPalette="yellow"
-                    // borderRadius="sm"
+                    borderRadius="sm"
                     size="md"
+                    h="40px"
+                    px={6}
                     onClick={handleRefresh}
                     aria-label="Refresh hub"
                     loading={plansLoading || statsLoading}
-                // h="32px"
-                // w="32px"
                 >
                     <RefreshCw size={14} />
                 </IconButton>
                 <Button
-                    // variant="outline"
-                    // borderRadius="sm"
+                    variant="outline"
+                    borderRadius="sm"
                     size="md"
+                    h="40px"
+                    px={6}
                     onClick={handleManagePlans}
-                    // h="32px"
                     fontWeight="800"
+                    _hover={{
+                        transform: "translateY(-1px)",
+                        boxShadow: "sm",
+                        bg: "whiteAlpha.100",
+                    }}
+                    _active={{ transform: "translateY(0)" }}
+                    transition="all 0.2s ease"
                 >
-                    <Settings /> Management
+                    <Settings size={16} /> Management
                 </Button>
                 <Button
                     colorPalette="blue"
-                    // borderRadius="sm"
+                    borderRadius="sm"
                     size="md"
+                    h="40px"
+                    px={6}
                     onClick={handleCreatePlan}
-                // h="32px"
-                // fontWeight="800"
+                    fontWeight="800"
+                    _hover={{
+                        transform: "translateY(-1px)",
+                        boxShadow: "0 10px 24px -8px var(--chakra-colors-blue-500)",
+                    }}
+                    _active={{ transform: "translateY(0)" }}
+                    transition="all 0.2s ease"
                 >
-                    <Plus /> New Plan
+                    <Plus size={16} /> New Plan
                 </Button>
             </HStack>
         );

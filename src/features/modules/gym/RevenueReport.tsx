@@ -108,12 +108,12 @@ const RevenueReport = memo(() => {
           variant="subtle"
           colorPalette="yellow"
           borderRadius="sm"
-          size="sm"
+          size="md"
+          h="40px"
+          px={6}
           onClick={refetch}
           aria-label="Refresh revenue"
           loading={loading}
-          h="32px"
-          w="32px"
         >
           <RefreshCw size={14} />
         </IconButton>

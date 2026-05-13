@@ -14,7 +14,7 @@ import {
 import { useColorModeValue } from "@/components/ui/color-mode";
 import {
   Check, X, Scan, User, CreditCard, History,
-  ArrowRight, Info,
+  ArrowRight, Info, RefreshCw,
 } from "lucide-react";
 import { toaster } from "@/components/ui/toaster";
 import { GymApiService } from "./services/gymApi.service";
@@ -55,6 +55,46 @@ const MemberCheckIn = memo(() => {
   const borderColor = useColorModeValue("rgba(226,232,240,0.84)", "rgba(255,255,255,0.12)");
   const muted = useColorModeValue("gray.500", "gray.400");
 
+  const mountNavActions = useNavActionStore((state) => state.setActions);
+  const unmountNavActions = useNavActionStore((state) => state.clearActions);
+
+  useEffect(() => {
+    mountNavActions(
+      <HStack gap={2}>
+        <IconButton
+          variant="subtle"
+          colorPalette="yellow"
+          borderRadius="sm"
+          size="md"
+          h="40px"
+          px={6}
+          onClick={() => { setMemberId(""); setStatus("idle"); setLastCheckin(null); }}
+          aria-label="Reset terminal"
+        >
+          <RefreshCw size={14} />
+        </IconButton>
+        <Button
+          variant="outline"
+          borderRadius="sm"
+          size="md"
+          h="40px"
+          px={6}
+          fontWeight="800"
+          _hover={{
+            transform: "translateY(-1px)",
+            boxShadow: "sm",
+          }}
+          _active={{ transform: "translateY(0)" }}
+          transition="all 0.2s ease"
+          onClick={() => { /* Navigate to logs */ }}
+        >
+          <History size={16} /> History
+        </Button>
+      </HStack>
+    );
+    return () => unmountNavActions();
+  }, [mountNavActions, unmountNavActions]);
+
   const handleCheckIn = useCallback((id?: string) => {
     const targetId = id || memberId;
     if (!targetId) return;
@@ -93,6 +133,11 @@ const MemberCheckIn = memo(() => {
   return (
     <Flex direction="column" align="center" justify="center" minH="70vh" w="full" py={10} animation="fade-in 0.6s ease">
       <VStack gap={10} w="full" maxW="600px">
+        <PageHeader
+            title="Access Control Terminal"
+            subtitle="Scan member cards or enter ID manually to grant access."
+            align="center"
+        />
         {/* Scanner Visualization */}
         <VStack gap={6}>
           <StatusIndicator status={status} />

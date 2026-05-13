@@ -4,7 +4,7 @@
  * Modern SaaS command center for gym operations.
  */
 
-import { memo, useCallback, useMemo, type ElementType } from "react";
+import { memo, useCallback, useEffect, useMemo, type ElementType } from "react";
 import {
   Avatar,
   Badge,
@@ -17,6 +17,7 @@ import {
   Heading,
   HStack,
   Icon,
+  IconButton,
   Progress,
   Separator,
   SimpleGrid,
@@ -36,6 +37,7 @@ import {
   CreditCard,
   Dumbbell,
   Receipt,
+  RefreshCw,
   TrendingUp,
   UserPlus,
   Users,
@@ -43,6 +45,7 @@ import {
 } from "lucide-react";
 
 import { PageHeader } from "@/core/components/PageHeader";
+import { useNavActionStore } from "@/core/store/useNavActionStore";
 import { useGymDashboard } from "./hooks/useGymDashboard";
 import RevenuAnalytics from "./RevenuAnalytics";
 
@@ -209,7 +212,66 @@ AlertRow.displayName = "AlertRow";
 const GymManagementDashboard = memo(() => {
   const { navigateTo } = useWorkspaceRouter();
 
-  const { stats, loading } = useGymDashboard();
+  const { stats, loading, refresh } = useGymDashboard();
+
+  const mountNavActions = useNavActionStore((state) => state.setActions);
+  const unmountNavActions = useNavActionStore((state) => state.clearActions);
+
+  useEffect(() => {
+    mountNavActions(
+      <HStack gap={2}>
+        <IconButton
+          variant="subtle"
+          colorPalette="yellow"
+          borderRadius="sm"
+          size="md"
+          h="40px"
+          px={6}
+          onClick={refresh}
+          aria-label="Refresh dashboard"
+          loading={loading}
+        >
+          <RefreshCw size={14} />
+        </IconButton>
+        <Button
+          variant="outline"
+          borderRadius="sm"
+          size="md"
+          h="40px"
+          px={6}
+          onClick={() => navigateTo("members")}
+          fontWeight="800"
+          _hover={{
+            transform: "translateY(-1px)",
+            boxShadow: "sm",
+            bg: "whiteAlpha.100",
+          }}
+          _active={{ transform: "translateY(0)" }}
+          transition="all 0.2s ease"
+        >
+          <Users size={16} /> Directory
+        </Button>
+        <Button
+          colorPalette="blue"
+          borderRadius="sm"
+          size="md"
+          h="40px"
+          px={6}
+          onClick={() => navigateTo("AddMember")}
+          fontWeight="800"
+          _hover={{
+            transform: "translateY(-1px)",
+            boxShadow: "0 10px 24px -8px var(--chakra-colors-blue-500)",
+          }}
+          _active={{ transform: "translateY(0)" }}
+          transition="all 0.2s ease"
+        >
+          <UserPlus size={16} /> Enroll Member
+        </Button>
+      </HStack>
+    );
+    return () => unmountNavActions();
+  }, [mountNavActions, unmountNavActions, refresh, loading, navigateTo]);
 
   const kpis = stats?.kpis;
   const totalMembers = kpis?.total_members || 0;
@@ -231,16 +293,6 @@ const GymManagementDashboard = memo(() => {
       <PageHeader
         title="Gym Command Center"
         subtitle="Live overview for members, renewals, floor activity, and revenue performance."
-        actions={
-          <HStack gap={3}>
-            <Button variant="outline" borderRadius="xl" onClick={() => navigateTo("members")} fontWeight="900">
-              <Users size={16} /> Directory
-            </Button>
-            <Button colorPalette="blue" borderRadius="xl" onClick={() => navigateTo("AddMember")} fontWeight="900">
-              <UserPlus size={16} /> Enroll Member
-            </Button>
-          </HStack>
-        }
       />
 
       <VStack align="stretch" gap={6} pb={8}>

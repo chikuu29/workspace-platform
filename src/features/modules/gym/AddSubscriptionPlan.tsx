@@ -316,13 +316,27 @@ const AddSubscriptionPlan = memo(() => {
 
     useEffect(() => {
         mountNavActions(
-            <HStack gap={3}>
-                <Button variant="ghost" borderRadius="sm" size="md" h="40px" onClick={handleBack}>
-                    <X size={14} />
-                    <Text ml={1}>Discard</Text>
+            <HStack gap={2}>
+                <Button
+                    variant="outline"
+                    borderRadius="sm"
+                    size="md"
+                    h="40px"
+                    px={6}
+                    onClick={handleBack}
+                    fontWeight="800"
+                    _hover={{
+                        transform: "translateY(-1px)",
+                        boxShadow: "sm",
+                        bg: "whiteAlpha.100",
+                    }}
+                    _active={{ transform: "translateY(0)" }}
+                    transition="all 0.2s ease"
+                >
+                    <X size={14} /> Discard
                 </Button>
                 <Button
-                    colorPalette="brand"
+                    colorPalette="blue"
                     borderRadius="sm"
                     px={6}
                     size="md"
@@ -331,7 +345,7 @@ const AddSubscriptionPlan = memo(() => {
                     disabled={!isValid || isSubmitting}
                     _hover={{
                         transform: "translateY(-1px)",
-                        boxShadow: "0 10px 24px -8px var(--chakra-colors-brand-500)",
+                        boxShadow: "0 10px 24px -8px var(--chakra-colors-blue-500)",
                     }}
                     _active={{ transform: "translateY(0)" }}
                     transition="all 0.2s ease"

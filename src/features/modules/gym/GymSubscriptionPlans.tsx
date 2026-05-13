@@ -231,7 +231,9 @@ const GymSubscriptionPlans = memo(() => {
           variant="subtle"
           colorPalette="yellow"
           borderRadius="sm"
-          size="sm"
+          size="md"
+          h="40px"
+          px={6}
           onClick={refetch}
           aria-label="Refresh plans"
           loading={isLoading}
@@ -241,9 +243,16 @@ const GymSubscriptionPlans = memo(() => {
         <Button
           colorPalette="blue"
           borderRadius="sm"
-          px={4}
-          size="sm"
+          px={6}
+          size="md"
+          h="40px"
           fontWeight="800"
+          _hover={{
+            transform: "translateY(-1px)",
+            boxShadow: "0 10px 24px -8px var(--chakra-colors-blue-500)",
+          }}
+          _active={{ transform: "translateY(0)" }}
+          transition="all 0.2s ease"
           onClick={handleAddClick}
         >
           <Plus size={16} /> New Plan

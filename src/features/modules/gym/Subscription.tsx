@@ -256,35 +256,35 @@ const Subscription = () => {
         mountNavActions(
             <HStack gap={2}>
                 <IconButton
-                    variant="subtle"
+                    variant="solid"
                     colorPalette="yellow"
-                    borderRadius="sm"
-                    size="sm"
+                    // borderRadius="sm"
+                    size="md"
                     onClick={handleRefresh}
                     aria-label="Refresh hub"
                     loading={plansLoading || statsLoading}
-                    h="32px"
-                    w="32px"
+                // h="32px"
+                // w="32px"
                 >
                     <RefreshCw size={14} />
                 </IconButton>
                 <Button
-                    variant="outline"
-                    borderRadius="sm"
-                    size="sm"
+                    // variant="outline"
+                    // borderRadius="sm"
+                    size="md"
                     onClick={handleManagePlans}
-                    h="32px"
+                    // h="32px"
                     fontWeight="800"
                 >
                     <Settings /> Management
                 </Button>
                 <Button
                     colorPalette="blue"
-                    borderRadius="sm"
-                    size="sm"
+                    // borderRadius="sm"
+                    size="md"
                     onClick={handleCreatePlan}
-                    h="32px"
-                    fontWeight="800"
+                // h="32px"
+                // fontWeight="800"
                 >
                     <Plus /> New Plan
                 </Button>

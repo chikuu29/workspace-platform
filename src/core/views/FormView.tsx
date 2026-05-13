@@ -88,7 +88,7 @@ const FormBreadcrumbActions = React.memo(
 );
 
 const FormView = ({ config, publishActionsToBreadcrumb = true }: any) => {
- 
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const openModal = useModalStore((s) => s.openModal);
@@ -135,11 +135,11 @@ const FormView = ({ config, publishActionsToBreadcrumb = true }: any) => {
       const submitButton = {
         name: "save_submit_generated",
         text: "Save",
-        iconName: "LuSave",
+        iconName: "CloudCheck",
         event: "submit",
         position: "top",
         styles: {
-          variant: "action",
+          variant: "solid",
         },
       };
       return [...buttons, submitButton];

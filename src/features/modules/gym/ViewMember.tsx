@@ -362,10 +362,10 @@ const ViewMember = memo(() => {
         <IconButton
           // variant="ghost"
           colorPalette="yellow"
-          borderRadius="sm"
+          // borderRadius="sm"
           size="md"
-          h="40px"
-          px={6}
+          // h="40px"
+          // px={6}
           onClick={refresh}
           aria-label="Refresh members"
           loading={loading}
@@ -374,10 +374,10 @@ const ViewMember = memo(() => {
         </IconButton>
         <Button
           colorPalette="blue"
-          borderRadius="sm"
+          // borderRadius="sm"
           size="md"
-          h="40px"
-          px={6}
+          // h="40px"
+          // px={6}
           fontWeight="800"
           onClick={() => navigateTo("AddMember")}
         >

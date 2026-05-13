@@ -8,7 +8,7 @@
  * Persists via POST /gym/plans.
  */
 
-import { memo, useState, useCallback, useMemo } from "react";
+import { memo, useState, useCallback, useMemo, useEffect } from "react";
 import {
     Badge,
     Box,
@@ -51,6 +51,8 @@ import { Switch } from "@/components/ui/switch";
 import { toaster } from "@/components/ui/toaster";
 import { GymApiService } from "./services/gymApi.service";
 import type { CreatePlanPayload } from "./types/Gym.types";
+import { useNavActionStore } from "@/core/store/useNavActionStore";
+import { PageHeader } from "@/core/components/PageHeader";
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
@@ -211,6 +213,9 @@ const AddSubscriptionPlan = memo(() => {
     const [isActive, setIsActive] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    const mountNavActions = useNavActionStore((state) => state.setActions);
+    const unmountNavActions = useNavActionStore((state) => state.clearActions);
+
     const validationErrors = useMemo(() => {
         const errors: string[] = [];
         if (!name.trim()) errors.push("Plan name is required");
@@ -309,6 +314,44 @@ const AddSubscriptionPlan = memo(() => {
         return () => sub.unsubscribe();
     }, [isValid, validationErrors, name, code, description, price, currency, billingCycle, isActive, features, accentColor, handleBack]);
 
+    useEffect(() => {
+        mountNavActions(
+            <HStack gap={3}>
+                <Button variant="ghost" borderRadius="sm" size="md" h="40px" onClick={handleBack}>
+                    <X size={14} />
+                    <Text ml={1}>Discard</Text>
+                </Button>
+                <Button
+                    colorPalette="brand"
+                    borderRadius="sm"
+                    px={6}
+                    size="md"
+                    h="40px"
+                    fontWeight="800"
+                    disabled={!isValid || isSubmitting}
+                    _hover={{
+                        transform: "translateY(-1px)",
+                        boxShadow: "0 10px 24px -8px var(--chakra-colors-brand-500)",
+                    }}
+                    _active={{ transform: "translateY(0)" }}
+                    transition="all 0.2s ease"
+                    onClick={() =>
+                        document.getElementById("plan-form")?.dispatchEvent(
+                            new Event("submit", { cancelable: true, bubbles: true })
+                        )
+                    }
+                >
+                    {isSubmitting ? (
+                        <HStack gap={2}><Spinner size="xs" /><Text>Publishing…</Text></HStack>
+                    ) : (
+                        <><Rocket size={14} /><Text ml={1}>Publish Plan</Text></>
+                    )}
+                </Button>
+            </HStack>
+        );
+        return () => unmountNavActions();
+    }, [mountNavActions, unmountNavActions, handleBack, isValid, isSubmitting]);
+
     // ── Theme ──
     const muted = useColorModeValue("gray.500", "gray.400");
     const fieldBg = useColorModeValue("gray.50", "whiteAlpha.50");
@@ -317,71 +360,23 @@ const AddSubscriptionPlan = memo(() => {
         <Box mt={4} w="full" animation="fade-in 0.5s ease-out">
 
             {/* ═══════════════ PAGE HEADER ═══════════════ */}
-            <Flex
-                justify="space-between"
-                align="center"
-                mb={6}
-                p={5}
-                bg="app.card.bg"
-                border="1px solid"
-                borderColor="app.card.border"
-                borderRadius="2xl"
-                backdropFilter="blur(16px)"
-                flexWrap="wrap"
-                gap={3}
-            >
-                <HStack gap={3} align="center">
-                    <Button
-                        variant="ghost"
-                        borderRadius="full"
-                        size="sm"
-                        onClick={handleBack}
-                        aria-label="Go back"
-                    >
-                        <ArrowLeft size={18} />
-                    </Button>
-                    <Separator orientation="vertical" h="20px" opacity={0.15} />
-                    <VStack align="start" gap={0}>
-                        <Heading size="lg" fontWeight="900" letterSpacing="tight" color="app.text.primary">
-                            New Subscription Plan
-                        </Heading>
-                        <Text fontSize="xs" color={muted} fontWeight="600">
-                            Design a membership tier for your gym community
-                        </Text>
-                    </VStack>
-                </HStack>
-
-                <HStack gap={3}>
-                    <Button variant="ghost" borderRadius="xl" onClick={handleBack}>
-                        <X size={14} />
-                        <Text ml={1}>Discard</Text>
-                    </Button>
-                    <Button
-                        colorPalette="brand"
-                        borderRadius="xl"
-                        px={6}
-                        fontWeight="800"
-                        disabled={!isValid || isSubmitting}
-                        _hover={{
-                            transform: "translateY(-1px)",
-                            boxShadow: "0 10px 24px -8px var(--chakra-colors-brand-500)",
-                        }}
-                        _active={{ transform: "translateY(0)" }}
-                        transition="all 0.2s ease"
-                        onClick={() =>
-                            document.getElementById("plan-form")?.dispatchEvent(
-                                new Event("submit", { cancelable: true, bubbles: true })
-                            )
-                        }
-                    >
-                        {isSubmitting ? (
-                            <HStack gap={2}><Spinner size="sm" /><Text>Publishing…</Text></HStack>
-                        ) : (
-                            <><Rocket size={14} /><Text ml={1}>Publish Plan</Text></>
-                        )}
-                    </Button>
-                </HStack>
-            </Flex>
+            <PageHeader
+                title={
+                    <HStack gap={3} align="center">
+                        <IconButton
+                            variant="ghost"
+                            borderRadius="full"
+                            size="sm"
+                            onClick={handleBack}
+                            aria-label="Go back"
+                        >
+                            <ArrowLeft size={18} />
+                        </IconButton>
+                        <Text>New Subscription Plan</Text>
+                    </HStack>
+                }
+                subtitle="Design a membership tier for your gym community"
+            />
 
             {/* ═══════════════ CONTENT: Form + Preview ═══════════════ */}
             <SimpleGrid columns={{ base: 1, xl: 3 }} gap={6} pb={16}>

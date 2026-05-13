@@ -49,10 +49,10 @@
             {
                 "name": "Draft",
                 "text": "Draft",
-                "iconName": "LuSave",
+                "iconName": "CloudRain",
                 "widget": "button",
                 "styles": {
-                    "variant": "action"
+                    "variant": "solid"
                 },
                 "hidden": false,
                 "oneLiner": true,

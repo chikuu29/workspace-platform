@@ -30,7 +30,7 @@ export default defineConfig(({ mode }) => {
       target: 'esnext',
       cssCodeSplit: true,
       sourcemap: false,
-      chunkSizeWarningLimit: 600,
+      chunkSizeWarningLimit: 800,
 
       rollupOptions: {
         output: {

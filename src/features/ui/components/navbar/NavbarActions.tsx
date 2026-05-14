@@ -23,6 +23,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import React, { useCallback } from "react";
+import { useRefreshStore } from "@/core/store/useRefreshStore";
 import NotificationMenu from "./NotificationMenu";
 import { FullscreenButton } from "@/components/ui/fullscreen-button";
 
@@ -54,9 +55,13 @@ const NavbarActions = () => {
     );
   }, [dispatch]);
 
+  // Soft refresh — remounts the current page component without a full browser reload
+  const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);
+  const isRefreshing = useRefreshStore((state) => state.isRefreshing);
+
   const handleRefresh = useCallback(() => {
-    window.location.reload();
-  }, []);
+    triggerRefresh();
+  }, [triggerRefresh]);
 
   // Color Modes
   const textColor = useColorModeValue("secondaryGray.900", "white");
@@ -131,9 +136,20 @@ const NavbarActions = () => {
         aria-label="Refresh Page"
         variant="ghost"
         onClick={handleRefresh}
+        disabled={isRefreshing}
         {...navActionButton}
       >
-        <Icon as={RefreshCw} boxSize={{ base: 3.5, md: 5 }} />
+        <Icon
+          as={RefreshCw}
+          boxSize={{ base: 3.5, md: 5 }}
+          css={isRefreshing ? {
+            animation: "spin 0.8s linear infinite",
+            "@keyframes spin": {
+              from: { transform: "rotate(0deg)" },
+              to: { transform: "rotate(360deg)" },
+            },
+          } : undefined}
+        />
       </IconButton>
 
       <FullscreenButton variant="ghost" size="md" display={{ base: "none", sm: "inline-flex" }} {...navActionButton} />

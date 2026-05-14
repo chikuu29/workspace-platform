@@ -1126,6 +1126,7 @@ const PolicyManagementView = memo(() => {
       <PageLayout
         title="Policy Management"
         subtitle="Configure access policies with fine-grained Allow and Deny rules."
+        icon={ShieldCheck}
         actions={
           <HStack gap={3}>
             <UIPermissionGuard permissions={["SYSTEM.POLICIES.ADD"]} allowedRootUser={true}>
@@ -1133,10 +1134,23 @@ const PolicyManagementView = memo(() => {
                 colorPalette="purple"
                 borderRadius="xl"
                 size="md"
+                gap={2}
                 onClick={handleAddClick}
-                boxShadow="0 4px 12px rgba(139,92,246,0.3)"
+                bg="linear-gradient(135deg, #7c3aed 0%, #a855f7 60%, #c084fc 100%)"
+                color="white"
+                h="44px"
+                px={6}
+                fontWeight="700"
+                boxShadow="0 4px 20px rgba(139,92,246,0.35)"
+                transition="all 0.25s cubic-bezier(0.4,0,0.2,1)"
+                _hover={{
+                  transform: "translateY(-2px) scale(1.02)",
+                  boxShadow: "0 8px 28px rgba(139,92,246,0.5)",
+                }}
+                _active={{ transform: "translateY(0) scale(1)", boxShadow: "none" }}
               >
-                <Plus style={{ marginRight: "8px" }} /> Create Policy
+                <Plus size={18} strokeWidth={3} />
+                Create Policy
               </Button>
             </UIPermissionGuard>
           </HStack>
@@ -1187,12 +1201,26 @@ const PolicyManagementView = memo(() => {
                 <UIPermissionGuard permissions={["SYSTEM.POLICIES.ADD"]} allowedRootUser={true}>
                   <Button
                     mt={2}
-                    size="sm"
                     colorPalette="purple"
                     borderRadius="xl"
+                    size="md"
+                    gap={2}
                     onClick={handleAddClick}
+                    bg="linear-gradient(135deg, #7c3aed 0%, #a855f7 60%, #c084fc 100%)"
+                    color="white"
+                    h="44px"
+                    px={6}
+                    fontWeight="700"
+                    boxShadow="0 4px 20px rgba(139,92,246,0.35)"
+                    transition="all 0.25s cubic-bezier(0.4,0,0.2,1)"
+                    _hover={{
+                      transform: "translateY(-2px) scale(1.02)",
+                      boxShadow: "0 8px 28px rgba(139,92,246,0.5)",
+                    }}
+                    _active={{ transform: "translateY(0) scale(1)", boxShadow: "none" }}
                   >
-                    <Plus style={{ marginRight: "6px" }} /> Create First Policy
+                    <Plus size={18} strokeWidth={3} />
+                    Create First Policy
                   </Button>
                 </UIPermissionGuard>
               )}

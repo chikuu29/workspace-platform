@@ -66,6 +66,7 @@ const OrganizationUsersView = memo(() => {
         GETAPI({
             path: "/platform/users",
             isPrivateApi: true,
+            serverName: 'identity'
         }).subscribe((res) => {
             if (res.success) setUsers(res.data || []);
             setIsLoading(false);
@@ -75,6 +76,7 @@ const OrganizationUsersView = memo(() => {
         GETAPI({
             path: "/account/roles",
             isPrivateApi: true,
+            serverName: 'identity'
         }).subscribe((res) => {
             if (res.success) setAvailableRoles(res.data || []);
         });
@@ -99,6 +101,7 @@ const OrganizationUsersView = memo(() => {
             path: `/account/users/${selectedUser.id}/roles`,
             data: { role_ids: selectedUserRoles },
             isPrivateApi: true,
+            serverName: 'identity'
         }).subscribe((res) => {
             if (res.success) {
                 toaster.create({ title: "User Roles Updated", type: "success" });

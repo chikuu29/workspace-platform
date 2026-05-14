@@ -12,6 +12,7 @@ export interface PageLayoutProps extends Omit<BoxProps, "title"> {
     showRefresh?: boolean;
     onRefresh?: () => void;
     isRefreshing?: boolean;
+    icon?: React.ElementType;
     children: React.ReactNode;
 }
 
@@ -25,6 +26,7 @@ export const PageLayout = memo(({
     showRefresh,
     onRefresh,
     isRefreshing,
+    icon,
     children,
     ...rest
 }: PageLayoutProps) => {
@@ -40,6 +42,7 @@ export const PageLayout = memo(({
                 showRefresh={showRefresh}
                 onRefresh={onRefresh}
                 isRefreshing={isRefreshing}
+                icon={icon}
             />
             <Box
                 bg="app.card.bg"

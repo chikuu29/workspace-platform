@@ -12,6 +12,7 @@ interface PageHeaderProps {
     showRefresh?: boolean;
     onRefresh?: () => void;
     isRefreshing?: boolean;
+    icon?: React.ElementType;
 }
 
 export const PageHeader = memo(({
@@ -23,7 +24,8 @@ export const PageHeader = memo(({
     onSearchChange,
     showRefresh,
     onRefresh,
-    isRefreshing
+    isRefreshing,
+    icon: IconComponent
 }: PageHeaderProps) => {
     return (
         <Flex
@@ -58,8 +60,35 @@ export const PageHeader = memo(({
                 </svg>
             </Box>
 
-            <Stack gap={1.5} flex="1" zIndex={1}>
-                <Heading
+            <Flex align="center" gap={4} flex="1" zIndex={1}>
+                {IconComponent && (
+                    <Flex
+                        align="center"
+                        justify="center"
+                        w="56px"
+                        h="56px"
+                        borderRadius="xl"
+                        bgGradient="linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)"
+                        boxShadow="0 8px 24px -4px rgba(99,102,241,0.4)"
+                        color="white"
+                        flexShrink={0}
+                        position="relative"
+                        overflow="hidden"
+                    >
+                        <Box
+                            position="absolute"
+                            top="2px"
+                            left="4px"
+                            right="4px"
+                            h="12px"
+                            borderRadius="full"
+                            bg="rgba(255,255,255,0.22)"
+                        />
+                        <IconComponent size={28} strokeWidth={2.5} style={{ zIndex: 1 }} />
+                    </Flex>
+                )}
+                <Stack gap={1.5}>
+                    <Heading
                     size="3xl"
                     fontWeight="900"
                     letterSpacing="tight"
@@ -73,7 +102,8 @@ export const PageHeader = memo(({
                         {subtitle}
                     </Text>
                 )}
-            </Stack>
+                </Stack>
+            </Flex>
 
             <Flex 
                 align="center" 

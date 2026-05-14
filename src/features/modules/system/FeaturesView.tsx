@@ -53,7 +53,8 @@ import {
     Search,
     ChevronDown,
     ChevronRight,
-    LayoutGrid
+    LayoutGrid,
+    Sparkles
 } from "lucide-react";
 import { GETAPI, POSTAPI, PUTAPI, DELETEAPI } from "@/app/api";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -100,6 +101,7 @@ const FeaturesView = memo(() => {
         GETAPI({
             path: "/saas/get_apps",
             isPrivateApi: true,
+            serverName: 'identity'
         }).subscribe((res) => {
             if (res.success) {
                 setApps(res.data || []);
@@ -116,6 +118,7 @@ const FeaturesView = memo(() => {
         GETAPI({
             path: `/saas/${appId}/features`,
             isPrivateApi: true,
+            serverName: 'identity'
         }).subscribe((res) => {
             if (res.success) {
                 setFeatures(res.data || []);
@@ -165,8 +168,8 @@ const FeaturesView = memo(() => {
         };
 
         const apiCall = selectedFeature
-            ? PUTAPI({ path: `/saas/features/${selectedFeature.id}`, data, isPrivateApi: true })
-            : POSTAPI({ path: `/saas/${selectedAppId}/features`, data, isPrivateApi: true });
+            ? PUTAPI({ path: `/saas/features/${selectedFeature.id}`, data, isPrivateApi: true, serverName: 'identity' })
+            : POSTAPI({ path: `/saas/${selectedAppId}/features`, data, isPrivateApi: true, serverName: 'identity' });
 
         apiCall.subscribe((res) => {
             if (res.success) {
@@ -192,6 +195,7 @@ const FeaturesView = memo(() => {
         DELETEAPI({
             path: `/saas/features/${id}`,
             isPrivateApi: true,
+            serverName: 'identity'
         }).subscribe((res) => {
             if (res.success) {
                 toaster.create({ title: "Feature Deleted", type: "success" });
@@ -312,6 +316,7 @@ const FeaturesView = memo(() => {
     return (
         <>
             <PageLayout
+                icon={Sparkles}
                 title={
                     <HStack gap={3}>
                         <Text>Features</Text>
@@ -434,9 +439,9 @@ const FeaturesView = memo(() => {
                                 !selectedAppId
                                     ? {}
                                     : {
-                                          transform: "translateY(-2px) scale(1.02)",
-                                          boxShadow: "0 8px 28px rgba(139,92,246,0.5)",
-                                      }
+                                        transform: "translateY(-2px) scale(1.02)",
+                                        boxShadow: "0 8px 28px rgba(139,92,246,0.5)",
+                                    }
                             }
                             _active={{ transform: "translateY(0) scale(1)", boxShadow: "none" }}
                             _disabled={{

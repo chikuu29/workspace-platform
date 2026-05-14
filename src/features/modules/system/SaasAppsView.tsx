@@ -104,6 +104,7 @@ const SaasAppsView = memo(() => {
         GETAPI({
             path: "/saas/get_apps",
             isPrivateApi: true,
+            serverName: 'identity'
         }).subscribe((res: APIResponse) => {
             if (res.success) {
                 setApps(res.data || []);
@@ -160,8 +161,8 @@ const SaasAppsView = memo(() => {
         };
 
         const request = selectedApp
-            ? PUTAPI({ path: `/saas/${selectedApp.id}`, data, isPrivateApi: true })
-            : POSTAPI({ path: "/saas/register", data, isPrivateApi: true });
+            ? PUTAPI({ path: `/saas/${selectedApp.id}`, data, isPrivateApi: true, serverName: 'identity' })
+            : POSTAPI({ path: "/saas/register", data, isPrivateApi: true, serverName: 'identity' });
 
         request.subscribe((res: APIResponse) => {
             if (res.success) {
@@ -188,6 +189,7 @@ const SaasAppsView = memo(() => {
         DELETEAPI({
             path: `/saas/${id}`,
             isPrivateApi: true,
+            serverName: 'identity'
         }).subscribe((res: APIResponse) => {
             if (res.success) {
                 toaster.create({
@@ -339,33 +341,32 @@ const SaasAppsView = memo(() => {
     return (
         <>
             <PageLayout
-                title={
-                    <HStack gap={3}>
-                        <Center boxSize="40px" borderRadius="xl" bg="rgba(6,182,212,0.15)" color="cyan.400" border="1px solid" borderColor="cyan.400/20">
-                            <LayoutGrid size={20} />
-                        </Center>
-                        <Text>Applications</Text>
-                    </HStack>
-                }
-                subtitle={
-                    <Box ml={1}>
-                        Manage your products, pricing, and features.
-                    </Box>
-                }
+                title="Applications"
+                subtitle="Manage your products, pricing, and features."
+                icon={LayoutGrid}
                 actions={
                     <HStack gap={4}>
                         <Button
                             colorPalette="cyan"
                             borderRadius="xl"
                             size="md"
+                            h="44px"
+                            px={6}
+                            gap={2}
                             onClick={handleAddClick}
-                            boxShadow="0 8px 20px rgba(6,182,212,0.25)"
-                            h="48px"
-                            px={8}
+                            bg="linear-gradient(135deg, #06b6d4 0%, #0ea5e9 60%, #38bdf8 100%)"
+                            color="white"
                             fontWeight="700"
-                            _hover={{ transform: "translateY(-1px)", boxShadow: "0 12px 24px rgba(6,182,212,0.35)" }}
+                            boxShadow="0 4px 20px rgba(6,182,212,0.35)"
+                            transition="all 0.25s cubic-bezier(0.4,0,0.2,1)"
+                            _hover={{
+                                transform: "translateY(-2px) scale(1.02)",
+                                boxShadow: "0 8px 28px rgba(6,182,212,0.5)",
+                            }}
+                            _active={{ transform: "translateY(0) scale(1)", boxShadow: "none" }}
                         >
-                            <Plus style={{ strokeWidth: '3px', marginRight: '8px' }} size={18} /> Register Application
+                            <Plus size={18} strokeWidth={3} />
+                            Register Application
                         </Button>
                     </HStack>
                 }

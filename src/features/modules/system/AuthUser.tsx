@@ -11,7 +11,7 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
-import { Plus, RefreshCw, Eye, Pencil } from "lucide-react";
+import { Plus, RefreshCw, Eye, Pencil, Users } from "lucide-react";
 import { RootState } from "@/app/store";
 import { GETAPI, POSTAPI } from "@/app/api";
 import { UserDirectoryGrid } from "@/core/widgets/UserDirectoryGrid";
@@ -148,21 +148,28 @@ const AuthUsers: React.FC = () => {
           <RefreshCw />
         </IconButton>
         <Button
-          size="sm"
-          borderRadius="full"
-          px={5}
-          fontWeight="600"
-          bg="app.gradient.premium"
-          color="white"
-          _hover={{ filter: "brightness(1.1)", transform: "translateY(-1px)" }}
-          boxShadow="0 6px 16px -4px rgba(99,102,241,0.4)"
-          transition="all 0.2s"
+          colorPalette="cyan"
+          borderRadius="xl"
+          size="md"
+          gap={2}
           onClick={() => {
             setEditUser(null);
             setModalOpen(true);
           }}
+          bg="linear-gradient(135deg, #06b6d4 0%, #0ea5e9 60%, #38bdf8 100%)"
+          color="white"
+          h="44px"
+          px={6}
+          fontWeight="700"
+          boxShadow="0 4px 20px rgba(6,182,212,0.35)"
+          transition="all 0.25s cubic-bezier(0.4,0,0.2,1)"
+          _hover={{
+            transform: "translateY(-2px) scale(1.02)",
+            boxShadow: "0 8px 28px rgba(6,182,212,0.5)",
+          }}
+          _active={{ transform: "translateY(0) scale(1)", boxShadow: "none" }}
         >
-          <Plus />
+          <Plus size={18} strokeWidth={3} />
           Add User
         </Button>
       </HStack>
@@ -182,6 +189,7 @@ const AuthUsers: React.FC = () => {
             </Text>
           </>
         }
+        icon={Users}
       >
         <VStack gap={8} align="stretch">
           {/* ── User grid (the toolbar, search, filter & cards live here) ── */}

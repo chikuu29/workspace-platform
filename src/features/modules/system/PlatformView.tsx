@@ -24,6 +24,7 @@ import {
   Sparkles,
   CreditCard,
   Database,
+  Settings,
 } from "lucide-react";
 
 import { NavigationAction } from "@/core/action-engine/types";
@@ -376,6 +377,7 @@ export default memo(function PlatformView() {
     <PageLayout
       title="Admin Console"
       subtitle="Select a module to manage your platform settings"
+      icon={Settings}
     >
 
       {/* ── Module grid by category ──────────────────────────────────────────────── */}

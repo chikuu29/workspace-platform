@@ -184,6 +184,7 @@ const OrganizationView = () => {
     GETAPI({
       path: "/account/organizations",
       isPrivateApi: true,
+      serverName: 'identity'
     }).subscribe((res: any) => {
       if (res.success) {
         setOrganizations(res.data || []);
@@ -210,15 +211,24 @@ const OrganizationView = () => {
       actions={
         <HStack gap={2}>
           <Button
-            size="sm"
-            borderRadius="full"
-            px={5}
-            bg="app.gradient.premium"
+            colorPalette="purple"
+            borderRadius="xl"
+            size="md"
+            gap={2}
+            bg="linear-gradient(135deg, #7c3aed 0%, #a855f7 60%, #c084fc 100%)"
             color="white"
-            _hover={{ filter: "brightness(1.1)", transform: "translateY(-1px)" }}
-            boxShadow="0 6px 16px -4px rgba(99,102,241,0.4)"
+            h="44px"
+            px={6}
+            fontWeight="700"
+            boxShadow="0 4px 20px rgba(139,92,246,0.35)"
+            transition="all 0.25s cubic-bezier(0.4,0,0.2,1)"
+            _hover={{
+              transform: "translateY(-2px) scale(1.02)",
+              boxShadow: "0 8px 28px rgba(139,92,246,0.5)",
+            }}
+            _active={{ transform: "translateY(0) scale(1)", boxShadow: "none" }}
           >
-            <Plus style={{ marginRight: "6px" }} />
+            <Plus size={18} strokeWidth={3} />
             New Organization
           </Button>
         </HStack>
@@ -228,6 +238,7 @@ const OrganizationView = () => {
       onSearchChange={setSearchTerm}
       onRefresh={fetchOrganizations}
       isRefreshing={isLoading}
+      icon={Building2}
     >
 
       {/* Grid Content */}

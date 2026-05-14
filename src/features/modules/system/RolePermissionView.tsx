@@ -193,7 +193,7 @@ const RolePermissionView = memo(() => {
 
   const fetchRoles = useCallback(() => {
     setLoading(true);
-    GETAPI({ path: "/account/organization/roles", isPrivateApi: true }).subscribe({
+    GETAPI({ path: "/account/organization/roles", isPrivateApi: true, serverName: 'identity' }).subscribe({
       next: (res: any) => {
         if (res.success) {
           setRoles(res.data || []);
@@ -214,7 +214,7 @@ const RolePermissionView = memo(() => {
   const handleCreateRole = useCallback(
     (roleData: any) => {
       setSubmitting(true);
-      POSTAPI({ path: "/account/organization/roles", data: roleData, isPrivateApi: true }).subscribe({
+      POSTAPI({ path: "/account/organization/roles", data: roleData, isPrivateApi: true, serverName: 'identity' }).subscribe({
         next: (res: any) => {
           if (res.success) {
             toaster.create({ title: "Role Created", description: "Role created successfully", type: "success" });
@@ -239,6 +239,7 @@ const RolePermissionView = memo(() => {
           <Text as="span" fontWeight="700" color="app.text.accent">{organizationName}</Text>
         </>
       }
+      icon={ShieldCheck}
       actions={
         <HStack gap={2}>
           <IconButton
@@ -252,18 +253,25 @@ const RolePermissionView = memo(() => {
             <RefreshCw />
           </IconButton>
           <Button
-            size="sm"
-            borderRadius="full"
-            px={5}
-            fontWeight="600"
-            bg="app.gradient.premium"
-            color="white"
-            _hover={{ filter: "brightness(1.1)", transform: "translateY(-1px)" }}
-            boxShadow="0 6px 16px -4px rgba(99,102,241,0.4)"
-            transition="all 0.2s"
+            colorPalette="purple"
+            borderRadius="xl"
+            size="md"
+            gap={2}
             onClick={() => setModalOpen(true)}
+            bg="linear-gradient(135deg, #7c3aed 0%, #a855f7 60%, #c084fc 100%)"
+            color="white"
+            h="44px"
+            px={6}
+            fontWeight="700"
+            boxShadow="0 4px 20px rgba(139,92,246,0.35)"
+            transition="all 0.25s cubic-bezier(0.4,0,0.2,1)"
+            _hover={{
+              transform: "translateY(-2px) scale(1.02)",
+              boxShadow: "0 8px 28px rgba(139,92,246,0.5)",
+            }}
+            _active={{ transform: "translateY(0) scale(1)", boxShadow: "none" }}
           >
-            <Plus style={{ marginRight: "6px" }} />
+            <Plus size={18} strokeWidth={3} />
             Create Role
           </Button>
         </HStack>

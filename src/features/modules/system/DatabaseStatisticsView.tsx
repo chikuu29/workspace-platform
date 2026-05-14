@@ -148,12 +148,8 @@ const DatabaseStatistics = () => {
     <PageLayout
       onRefresh={fetchStats}
       isRefreshing={loading}
-      title={
-        <HStack gap={3}>
-          <Icon as={Activity} boxSize={6} color="app.text.accent" />
-          <Text>System Health</Text>
-        </HStack>
-      }
+      title="System Health"
+      icon={Activity}
       subtitle="Database performance and metrics."
     >
 

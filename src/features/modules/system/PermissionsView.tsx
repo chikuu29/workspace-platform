@@ -95,6 +95,7 @@ const PermissionsView = memo(() => {
         GETAPI({
             path: "/saas/get_apps",
             isPrivateApi: true,
+            serverName: 'identity'
         }).subscribe((res) => {
             if (res.success) {
                 setApps(res.data || []);
@@ -104,6 +105,7 @@ const PermissionsView = memo(() => {
         GETAPI({
             path: "/platform/permissions",
             isPrivateApi: true,
+            serverName: 'identity'
         }).subscribe((res) => {
             if (res.success) {
                 setPermissions(res.data || []);
@@ -164,8 +166,8 @@ const PermissionsView = memo(() => {
         }
 
         const apiCall = selectedPermission
-            ? PUTAPI({ path: `/platform/permissions/${selectedPermission.id}`, data, isPrivateApi: true })
-            : POSTAPI({ path: "/platform/permissions", data, isPrivateApi: true });
+            ? PUTAPI({ path: `/platform/permissions/${selectedPermission.id}`, data, isPrivateApi: true, serverName: 'identity' })
+            : POSTAPI({ path: "/platform/permissions", data, isPrivateApi: true, serverName: 'identity' });
 
         apiCall.subscribe((res) => {
             if (res.success) {
@@ -191,6 +193,7 @@ const PermissionsView = memo(() => {
         DELETEAPI({
             path: `/platform/permissions/${id}`,
             isPrivateApi: true,
+            serverName: 'identity'
         }).subscribe((res) => {
             if (res.success) {
                 toaster.create({ title: "Permission Deleted", type: "success" });
@@ -314,6 +317,7 @@ const PermissionsView = memo(() => {
             <PageLayout
                 title="Global Permissions"
                 subtitle="Define and manage access controls across all your apps."
+                icon={Shield}
                 actions={
                     <HStack gap={3}>
 

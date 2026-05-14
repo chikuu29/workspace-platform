@@ -236,7 +236,7 @@ const AccessControlView = memo(() => {
 
   const fetchData = useCallback(() => {
     setLoading(true);
-    GETAPI({ path: "/account/organizations-with-roles", isPrivateApi: true }).subscribe(
+    GETAPI({ path: "/account/organizations-with-roles", isPrivateApi: true, serverName: 'identity' }).subscribe(
       (res: any) => {
         setOrganizationsWithRoles(Array.isArray(res) ? res : []);
         setLoading(false);
@@ -261,6 +261,7 @@ const AccessControlView = memo(() => {
     <PageLayout
       title="Access Control"
       subtitle="Manage roles and policies for each organization."
+      icon={ShieldCheck}
       onRefresh={fetchData}
       isRefreshing={isLoading}
     >

@@ -507,15 +507,30 @@ const OrganizationRolesView = memo(() => {
       <PageLayout
         title="Organization Roles"
         subtitle="Manage roles for your organization. Assign permissions through policies."
+        icon={Shield}
         actions={
           // <UIPermissionGuard permissions={["ACCOUNT.ROLES.CREATE"]}>
           <Button
             colorPalette="purple"
             borderRadius="xl"
-            size="sm"
+            size="md"
+            gap={2}
             onClick={handleAddClick}
+            bg="linear-gradient(135deg, #7c3aed 0%, #a855f7 60%, #c084fc 100%)"
+            color="white"
+            h="44px"
+            px={6}
+            fontWeight="700"
+            boxShadow="0 4px 20px rgba(139,92,246,0.35)"
+            transition="all 0.25s cubic-bezier(0.4,0,0.2,1)"
+            _hover={{
+              transform: "translateY(-2px) scale(1.02)",
+              boxShadow: "0 8px 28px rgba(139,92,246,0.5)",
+            }}
+            _active={{ transform: "translateY(0) scale(1)", boxShadow: "none" }}
           >
-            <Plus style={{ marginRight: "6px" }} /> New Role
+            <Plus size={18} strokeWidth={3} />
+            New Role
           </Button>
           // </UIPermissionGuard>
         }
@@ -557,11 +572,25 @@ const OrganizationRolesView = memo(() => {
               <Button
                 colorPalette="purple"
                 borderRadius="xl"
-                size="sm"
+                size="md"
+                gap={2}
                 mt={2}
                 onClick={handleAddClick}
+                bg="linear-gradient(135deg, #7c3aed 0%, #a855f7 60%, #c084fc 100%)"
+                color="white"
+                h="44px"
+                px={6}
+                fontWeight="700"
+                boxShadow="0 4px 20px rgba(139,92,246,0.35)"
+                transition="all 0.25s cubic-bezier(0.4,0,0.2,1)"
+                _hover={{
+                  transform: "translateY(-2px) scale(1.02)",
+                  boxShadow: "0 8px 28px rgba(139,92,246,0.5)",
+                }}
+                _active={{ transform: "translateY(0) scale(1)", boxShadow: "none" }}
               >
-                <Plus style={{ marginRight: "6px" }} /> Create Role
+                <Plus size={18} strokeWidth={3} />
+                Create Role
               </Button>
               {/* </UIPermissionGuard> */}
             </VStack>

@@ -48,6 +48,7 @@ import {
     ShieldCheck,
     ArrowRight,
     Layers,
+    CreditCard,
 } from "lucide-react";
 import { Field } from "@/components/ui/field";
 import { PageLayout } from "@/core/components/PageLayout";
@@ -96,6 +97,7 @@ const SubscriptionPlansView = memo(() => {
         GETAPI({
             path: "/plans/available_plans",
             isPrivateApi: true,
+            serverName: 'identity'
         }).subscribe((res: APIResponse) => {
             if (res.success) {
                 setPlans(res.data || []);
@@ -132,6 +134,7 @@ const SubscriptionPlansView = memo(() => {
         DELETEAPI({
             path: `/plans/${id}`,
             isPrivateApi: true,
+            serverName: 'identity'
         }).subscribe((res: APIResponse) => {
             if (res.success) {
                 toaster.create({
@@ -168,8 +171,8 @@ const SubscriptionPlansView = memo(() => {
         };
 
         const request = selectedPlan
-            ? PUTAPI({ path: `/plans/${selectedPlan.id}`, data, isPrivateApi: true })
-            : POSTAPI({ path: "/plans/", data, isPrivateApi: true });
+            ? PUTAPI({ path: `/plans/${selectedPlan.id}`, data, isPrivateApi: true, serverName: 'identity' })
+            : POSTAPI({ path: "/plans/", data, isPrivateApi: true, serverName: 'identity' });
 
         request.subscribe((res: APIResponse) => {
             if (res.success) {
@@ -336,17 +339,9 @@ const SubscriptionPlansView = memo(() => {
     return (
         <>
             <PageLayout
-                title={
-                    <HStack gap={3}>
-                        <Icon as={Ticket} boxSize={6} color="cyan.500" />
-                        <Text>Plans & Pricing</Text>
-                    </HStack>
-                }
-                subtitle={
-                    <Box ml={9}>
-                        Configure subscription tiers, limits, and billing.
-                    </Box>
-                }
+                title="Plans & Pricing"
+                subtitle="Configure subscription tiers, limits, and billing."
+                icon={CreditCard}
                 actions={
                     <HStack gap={3}>
 
@@ -354,12 +349,23 @@ const SubscriptionPlansView = memo(() => {
                             colorPalette="cyan"
                             borderRadius="xl"
                             size="md"
-                            height="44px"
+                            h="44px"
                             px={6}
+                            gap={2}
                             onClick={handleAddClick}
-                            boxShadow="0 8px 16px -4px rgba(0, 255, 255, 0.2)"
+                            bg="linear-gradient(135deg, #06b6d4 0%, #0ea5e9 60%, #38bdf8 100%)"
+                            color="white"
+                            fontWeight="700"
+                            boxShadow="0 4px 20px rgba(6,182,212,0.35)"
+                            transition="all 0.25s cubic-bezier(0.4,0,0.2,1)"
+                            _hover={{
+                                transform: "translateY(-2px) scale(1.02)",
+                                boxShadow: "0 8px 28px rgba(6,182,212,0.5)",
+                            }}
+                            _active={{ transform: "translateY(0) scale(1)", boxShadow: "none" }}
                         >
-                            <Plus style={{ marginRight: "8px" }} /> Create Plan
+                            <Plus size={18} strokeWidth={3} />
+                            Create Plan
                         </Button>
                     </HStack>
                 }

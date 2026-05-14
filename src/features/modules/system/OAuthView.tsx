@@ -24,7 +24,7 @@ import {
   DialogActionTrigger,
 } from "@/components/ui/dialog";
 import { Toaster, toaster } from "@/components/ui/toaster";
-import { SquarePen, TriangleAlert, Copy, Check, RefreshCw, ShieldAlert, X } from "lucide-react";
+import { SquarePen, TriangleAlert, Copy, Check, RefreshCw, ShieldAlert, X, KeyRound } from "lucide-react";
 
 import { GETAPI, PUTAPI, POSTAPI, DELETEAPI } from "@/app/api";
 import { TableWidget } from "@/core/widgets/TableWidget";
@@ -61,6 +61,7 @@ const OAuthView = () => {
     GETAPI({
       path: "/applications/clients",
       isPrivateApi: true,
+      serverName: 'identity'
     }).subscribe((res: any) => {
       if (res.success) {
         const clients = res.data?.clients || res.data || [];
@@ -87,6 +88,7 @@ const OAuthView = () => {
     DELETEAPI({
       path: `/applications/clients/${deleteTarget.client_id}`,
       isPrivateApi: true,
+      serverName: 'identity'
     }).subscribe((res: any) => {
       setIsDeleting(false);
       setDeleteTarget(null);
@@ -113,8 +115,8 @@ const OAuthView = () => {
     setServerErrors({});
     const isEdit = actionMode === "EDIT";
     const apiCall = isEdit
-      ? PUTAPI({ path: `/applications/clients/${data.client_id}`, data, isPrivateApi: true })
-      : POSTAPI({ path: "/applications/register", data, isPrivateApi: true });
+      ? PUTAPI({ path: `/applications/clients/${data.client_id}`, data, isPrivateApi: true, serverName: 'identity' })
+      : POSTAPI({ path: "/applications/register", data, isPrivateApi: true, serverName: 'identity' });
 
     apiCall.subscribe((res: any) => {
       if (res.success) {
@@ -156,6 +158,7 @@ const OAuthView = () => {
       path: `/applications/clients/${formData.client_id}/regenerate-secret`,
       data: {},
       isPrivateApi: true,
+      serverName: 'identity'
     }).subscribe((res: any) => {
       setIsRegenerating(false);
       if (res.success) {
@@ -194,6 +197,7 @@ const OAuthView = () => {
       <PageLayout
         title="OAuth Apps"
         subtitle="Manage client credentials and authorization flows."
+        icon={KeyRound}
         actions={
           <Button
             colorPalette="purple"

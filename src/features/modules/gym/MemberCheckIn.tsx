@@ -10,6 +10,7 @@ import { memo, useState, useCallback, useRef, useEffect } from "react";
 import {
   Box, VStack, HStack, Text, Heading, Input, Button, Circle,
   Flex, Icon, Spinner, Badge, Separator, Image,
+  IconButton,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import {
@@ -18,6 +19,8 @@ import {
 } from "lucide-react";
 import { toaster } from "@/components/ui/toaster";
 import { GymApiService } from "./services/gymApi.service";
+import { PageHeader } from "@/core/components/PageHeader";
+import { useNavActionStore } from "@/core/store/useNavActionStore";
 
 // ─── Sub-Components ─────────────────────────────────────────────────
 
@@ -134,9 +137,9 @@ const MemberCheckIn = memo(() => {
     <Flex direction="column" align="center" justify="center" minH="70vh" w="full" py={10} animation="fade-in 0.6s ease">
       <VStack gap={10} w="full" maxW="600px">
         <PageHeader
-            title="Access Control Terminal"
-            subtitle="Scan member cards or enter ID manually to grant access."
-            align="center"
+          title="Access Control Terminal"
+          subtitle="Scan member cards or enter ID manually to grant access."
+        // align="center"
         />
         {/* Scanner Visualization */}
         <VStack gap={6}>
@@ -226,14 +229,14 @@ const MemberCheckIn = memo(() => {
 
         {/* Shortcuts / Quick Tips */}
         <HStack gap={8} opacity={0.6}>
-           <HStack gap={2}>
-              <Circle size="6" bg="gray.500/20"><History size={12} /></Circle>
-              <Text fontSize="xs" fontWeight="700">View Recent Logs</Text>
-           </HStack>
-           <HStack gap={2}>
-              <Circle size="6" bg="gray.500/20"><Info size={12} /></Circle>
-              <Text fontSize="xs" fontWeight="700">Report Issue</Text>
-           </HStack>
+          <HStack gap={2}>
+            <Circle size="6" bg="gray.500/20"><History size={12} /></Circle>
+            <Text fontSize="xs" fontWeight="700">View Recent Logs</Text>
+          </HStack>
+          <HStack gap={2}>
+            <Circle size="6" bg="gray.500/20"><Info size={12} /></Circle>
+            <Text fontSize="xs" fontWeight="700">Report Issue</Text>
+          </HStack>
         </HStack>
       </VStack>
     </Flex>

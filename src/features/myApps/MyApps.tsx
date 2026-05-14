@@ -1,5 +1,7 @@
 import {
+  Badge,
   Box,
+  Circle,
   Flex,
   Image,
   Input,
@@ -15,7 +17,20 @@ import { memo, useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
-import { Search, ChevronRight, LayoutGrid } from "lucide-react";
+import {
+  Search,
+  ChevronRight,
+  LayoutGrid,
+  Sparkles,
+  Zap,
+  Command,
+  Bell,
+  X,
+  Info,
+  AlertTriangle,
+  CheckCircle2,
+  Megaphone,
+} from "lucide-react";
 import * as dynamicFunctions from "../../script/myAppsScript";
 import { InputGroup } from "@/components/ui/input-group";
 import { useColorModeValue } from "@/components/ui/color-mode";
@@ -33,6 +48,161 @@ const APP_GRADIENTS = [
   "linear-gradient(135deg,#8b5cf6,#ec4899)",
   "linear-gradient(135deg,#06b6d4,#3b82f6)",
 ];
+
+// ─── Updates Panel Config ─────────────────────────────────────────────────────
+
+/**
+ * Toggle this flag to show/hide the updates panel.
+ * When wiring to a real API, replace MOCK_UPDATES with fetched data
+ * and set this based on whether the API returns any items.
+ */
+const SHOW_UPDATES_PANEL = false;
+
+interface UpdateItem {
+  id: string;
+  type: "info" | "warning" | "success" | "announcement";
+  title: string;
+  description: string;
+  timestamp: string;
+}
+
+const UPDATE_ICON_MAP = {
+  info: { icon: Info, accent: "blue.500", bg: "blue.500/10", border: "blue.500/20" },
+  warning: { icon: AlertTriangle, accent: "orange.500", bg: "orange.500/10", border: "orange.500/20" },
+  success: { icon: CheckCircle2, accent: "green.500", bg: "green.500/10", border: "green.500/20" },
+  announcement: { icon: Megaphone, accent: "purple.500", bg: "purple.500/10", border: "purple.500/20" },
+} as const;
+
+/** Replace with real API data when ready */
+const MOCK_UPDATES: UpdateItem[] = [
+  {
+    id: "1",
+    type: "announcement",
+    title: "Platform v2.4 Released",
+    description: "New dashboard widgets, improved performance, and dark mode refinements are now live.",
+    timestamp: "2 hours ago",
+  },
+  {
+    id: "2",
+    type: "warning",
+    title: "Scheduled Maintenance",
+    description: "The platform will undergo maintenance on Sunday, 12:00–2:00 AM UTC.",
+    timestamp: "5 hours ago",
+  },
+  {
+    id: "3",
+    type: "success",
+    title: "Billing Synced Successfully",
+    description: "All subscription records have been reconciled with the payment gateway.",
+    timestamp: "1 day ago",
+  },
+  {
+    id: "4",
+    type: "info",
+    title: "New Integration Available",
+    description: "Connect your workspace with Slack, Teams, or Discord for real-time alerts.",
+    timestamp: "2 days ago",
+  },
+];
+
+// ─── UpdatesFeed Component ────────────────────────────────────────────────────
+
+const UpdatesFeed = memo(({ updates }: { updates: UpdateItem[] }) => {
+  const [dismissed, setDismissed] = useState(false);
+
+  if (dismissed || updates.length === 0) return null;
+
+  return (
+    <Box
+      borderRadius="2xl"
+      border="1px solid"
+      borderColor="app.card.border"
+      bg="app.card.bg"
+      backdropFilter="blur(12px)"
+      overflow="hidden"
+      animation="fade-in 0.4s ease-out"
+    >
+      {/* Panel header */}
+      <Flex
+        px={{ base: 4, md: 5 }}
+        py={3}
+        justify="space-between"
+        align="center"
+        borderBottom="1px solid"
+        borderColor="app.divider"
+      >
+        <HStack gap={2.5}>
+          <Circle size="8" bg="brand.500/10" color="brand.500">
+            <Bell size={14} />
+          </Circle>
+          <Text fontSize="sm" fontWeight="900" color="app.text.primary">
+            Live Updates
+          </Text>
+          <Badge
+            colorPalette="blue"
+            variant="subtle"
+            borderRadius="full"
+            px={2}
+            fontSize="2xs"
+            fontWeight="900"
+          >
+            {updates.length}
+          </Badge>
+        </HStack>
+        <Icon
+          as={X}
+          boxSize={4}
+          color="app.text.muted"
+          cursor="pointer"
+          borderRadius="full"
+          transition="all 0.15s"
+          _hover={{ color: "app.text.primary", transform: "scale(1.1)" }}
+          onClick={() => setDismissed(true)}
+          aria-label="Dismiss updates"
+        />
+      </Flex>
+
+      {/* Update items */}
+      <VStack align="stretch" gap={0} maxH="260px" overflowY="auto">
+        {updates.map((item, idx) => {
+          const theme = UPDATE_ICON_MAP[item.type];
+          const UpdateIcon = theme.icon;
+          return (
+            <HStack
+              key={item.id}
+              px={{ base: 4, md: 5 }}
+              py={3.5}
+              gap={3.5}
+              borderBottom={idx < updates.length - 1 ? "1px solid" : undefined}
+              borderColor="app.divider"
+              cursor="pointer"
+              transition="all 0.15s ease"
+              _hover={{ bg: theme.bg }}
+            >
+              <Circle size="9" bg={theme.bg} color={theme.accent} flexShrink={0}>
+                <UpdateIcon size={15} />
+              </Circle>
+              <VStack align="start" gap={0.5} flex={1} minW={0}>
+                <HStack gap={2} w="full" justify="space-between">
+                  <Text fontSize="sm" fontWeight="800" color="app.text.primary" truncate>
+                    {item.title}
+                  </Text>
+                  <Text fontSize="2xs" color="app.text.muted" fontWeight="600" flexShrink={0}>
+                    {item.timestamp}
+                  </Text>
+                </HStack>
+                <Text fontSize="xs" color="app.text.muted" fontWeight="600" lineClamp={1}>
+                  {item.description}
+                </Text>
+              </VStack>
+            </HStack>
+          );
+        })}
+      </VStack>
+    </Box>
+  );
+});
+UpdatesFeed.displayName = "UpdatesFeed";
 
 const getGradient = (seed: string): string => {
   let h = 0;
@@ -228,96 +398,169 @@ function MyApps() {
     <Box p="2">
       <VStack gap={6} align="stretch">
         {/* Header Section */}
+        {/* ── Updates / Notifications Panel ──────────────────────────── */}
+        {SHOW_UPDATES_PANEL && <UpdatesFeed updates={MOCK_UPDATES} />}
 
+        {/* ── High-Tech Hero Header ─────────────────────────────────────── */}
         <Box
-          // borderRadius={20}
           position="sticky"
           top="-1px"
           zIndex={100}
-          bg={"app.card.bg"}
-          backdropFilter="blur(12px)"
+          bg="app.card.bg"
+          backdropFilter="blur(18px) saturate(160%)"
           borderBottom="1px solid"
-          borderColor={useColorModeValue("gray.200", "whiteAlpha.100")}
-          py={3}
-          px={2}
-          boxShadow="sm"
-          borderRadius="md"
+          borderColor="app.card.border"
+          borderRadius="2xl"
+          overflow="hidden"
+          boxShadow={useColorModeValue(
+            "0 8px 32px -12px rgba(99,102,241,0.15)",
+            "0 8px 32px -12px rgba(0,0,0,0.4)"
+          )}
         >
-          {/* <Container maxW="7xl"> */}
-          <Flex justify="space-between" align="center" gap={4} wrap="wrap">
-            <Flex align="center" gap={3}>
-              <Center p={2} bg="brand.500" borderRadius="lg" color="white">
-                <Icon as={LayoutGrid} boxSize={5} />
-              </Center>
-              <VStack align="start" gap={0}>
-                <Text fontSize="lg" fontWeight="bold" lineHeight="1.2">
-                  My Applications
-                </Text>
-                <Text fontSize="xs" color="gray.500">
-                  Launch your workspace applications
-                </Text>
-              </VStack>
-            </Flex>
+          {/* Gradient accent strip */}
+          <Box
+            h="3px"
+            bgGradient="to-r"
+            gradientFrom="brand.500"
+            gradientVia="purple.500"
+            gradientTo="blue.500"
+          />
 
-            <Box>
-              <InputGroup
-                flex="1"
-                startElement={<Icon as={Search} color="gray.400" />}
-              >
-                <Input
-                  placeholder="Search apps..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  // bg={searchBg}
-                  borderRadius="full"
-                  border="1px solid"
-                  borderColor={useColorModeValue("gray.200", "whiteAlpha.200")}
-                  _focus={{
-                    borderColor: "brand.500",
-                    boxShadow: "0 0 0 1px var(--chakra-colors-brand-500)",
+          <Box px={{ base: 4, md: 6 }} py={{ base: 4, md: 5 }}>
+            <Flex
+              justify="space-between"
+              align={{ base: "start", md: "center" }}
+              direction={{ base: "column", md: "row" }}
+              gap={4}
+            >
+              {/* Left: Icon + Title + Subtitle */}
+              <HStack gap={4} align="start">
+                {/* Animated glow icon */}
+                <Circle
+                  size="12"
+                  bgGradient="to-br"
+                  gradientFrom="brand.500"
+                  gradientTo="purple.500"
+                  color="white"
+                  flexShrink={0}
+                  boxShadow="0 0 20px rgba(99,102,241,0.35), 0 0 60px rgba(99,102,241,0.1)"
+                  transition="all 0.3s ease"
+                  _hover={{
+                    transform: "rotate(12deg) scale(1.08)",
+                    boxShadow: "0 0 28px rgba(99,102,241,0.5), 0 0 80px rgba(99,102,241,0.15)",
                   }}
-                />
-              </InputGroup>
-            </Box>
-          </Flex>
-          {/* </Container> */}
+                >
+                  <Command size={22} strokeWidth={2.5} />
+                </Circle>
+
+                <VStack align="start" gap={1}>
+                  <HStack gap={2.5} align="center">
+                    <Heading
+                      size={{ base: "md", md: "lg" }}
+                      fontWeight="900"
+                      letterSpacing="-0.02em"
+                      bgGradient="to-r"
+                      gradientFrom="app.text.primary"
+                      gradientTo="brand.500"
+                      bgClip="text"
+                    >
+                      Command Center
+                    </Heading>
+                    <Badge
+                      colorPalette="purple"
+                      variant="subtle"
+                      borderRadius="full"
+                      px={2.5}
+                      py={0.5}
+                      fontSize="2xs"
+                      fontWeight="900"
+                      textTransform="uppercase"
+                    >
+                      <Zap size={10} /> {filteredApps.length} Apps
+                    </Badge>
+                  </HStack>
+
+                  <Text
+                    fontSize="sm"
+                    color="app.text.muted"
+                    fontWeight="600"
+                  // maxW="420px"
+                  >
+                    Your complete workspace ecosystem — unified, connected, and easy to access.
+                  </Text>
+
+                  {/* Quick-stat chips */}
+                  <HStack gap={2} mt={1} flexWrap="wrap">
+                    <HStack
+                      gap={1.5}
+                      px={2.5}
+                      py={1}
+                      borderRadius="full"
+                      bg={useColorModeValue("blue.50", "blue.500/10")}
+                      border="1px solid"
+                      borderColor={useColorModeValue("blue.100", "blue.500/20")}
+                    >
+                      <Sparkles size={11} color="var(--chakra-colors-blue-500)" />
+                      <Text fontSize="2xs" fontWeight="800" color="blue.500">
+                        {appList.length} Total
+                      </Text>
+                    </HStack>
+                    <HStack
+                      gap={1.5}
+                      px={2.5}
+                      py={1}
+                      borderRadius="full"
+                      bg={useColorModeValue("green.50", "green.500/10")}
+                      border="1px solid"
+                      borderColor={useColorModeValue("green.100", "green.500/20")}
+                    >
+                      <LayoutGrid size={11} color="var(--chakra-colors-green-500)" />
+                      <Text fontSize="2xs" fontWeight="800" color="green.500">
+                        {subscribed_apps.length} Subscribed
+                      </Text>
+                    </HStack>
+                  </HStack>
+                </VStack>
+              </HStack>
+
+              {/* Right: Search */}
+              <Box minW={{ md: "280px" }} maxW={{ md: "320px" }} w={{ base: "full", md: "auto" }}>
+                <InputGroup
+                  flex="1"
+                  startElement={
+                    <Icon
+                      as={Search}
+                      color="app.text.muted"
+                      boxSize={4}
+                    />
+                  }
+                >
+                  <Input
+                    placeholder="Search apps..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    bg={useColorModeValue("white", "whiteAlpha.50")}
+                    borderRadius="xl"
+                    border="1px solid"
+                    borderColor="app.card.border"
+                    fontSize="sm"
+                    fontWeight="600"
+                    _placeholder={{ color: "app.text.muted", fontWeight: "500" }}
+                    _focus={{
+                      borderColor: "brand.500",
+                      boxShadow: "0 0 0 3px rgba(99,102,241,0.15)",
+                    }}
+                    transition="all 0.2s ease"
+                  />
+                </InputGroup>
+              </Box>
+            </Flex>
+          </Box>
         </Box>
 
-        {/* Search Bar */}
-        {/* <Box
-          position="sticky"
-          top="100px"
-          zIndex={10}
-          bg="app.navbar.bg"
-          backdropFilter="blur(16px)"
-          borderRadius="full"
-          border="1px solid"
-          borderColor="app.navbar.border"
-          boxShadow="app.shadow.glass-glow"
-          px={4}
-          py={1.5}
-          width="full"
-        >
-          <InputGroup
-            startElement={<FiSearch color="var(--chakra-colors-app-text-accent)" size={18} />}
-            width="full"
-          >
-            <Input
-              placeholder="Search your apps..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              border="none"
-              outline="none"
-              px={2}
-              fontSize="sm"
-              fontWeight="500"
-              color="app.text.primary"
-              _focus={{ boxShadow: "none", border: "none", outline: "none" }}
-              _active={{ border: "none", outline: "none" }}
-              _placeholder={{ color: "app.text.muted" }}
-            />
-          </InputGroup>
-        </Box> */}
+
+
+
 
         {/* Grid Section */}
         {!error && (

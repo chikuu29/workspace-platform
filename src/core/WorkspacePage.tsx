@@ -3,30 +3,97 @@ import { useParams, useSearchParams } from "react-router"
 import ViewRenderer from "./renderer/ViewRenderer"
 import FallbackRenderer from "./renderer/FallbackRenderer"
 import { GETAPI } from "@/app/api"
-import { Box, Container, HStack, Stack, VStack } from "@chakra-ui/react"
-import { Skeleton, SkeletonCircle, SkeletonText } from "@/components/ui/skeleton"
+import { Box, HStack, SimpleGrid, VStack } from "@chakra-ui/react"
+import { Skeleton, SkeletonCircle } from "@/components/ui/skeleton"
+import { useColorModeValue } from "@/components/ui/color-mode"
 import { useFormStore } from "./store/useFormStore"
 
-const LoadingState = () => (
-    <Container maxW="6xl" py={10}>
-        <VStack gap={8} align="stretch">
-            <HStack gap={4}>
-                <SkeletonCircle size="12" />
-                <VStack align="stretch" flex="1" gap={2}>
-                    <Skeleton height="6" width="30%" />
-                    <Skeleton height="4" width="20%" />
+/**
+ * LoadingState
+ * Glassmorphic skeleton loader that mirrors the bento-style dashboard
+ * layout used across the workspace. Theme-aware via semantic tokens.
+ */
+const LoadingState = memo(() => {
+    /* Theme-aware skeleton shimmer — prevents black skeletons in dark mode */
+    const skeletonCss = useColorModeValue(
+        { "--skeleton-from": "#e2e8f0", "--skeleton-to": "#f1f5f9" },
+        { "--skeleton-from": "rgba(255,255,255,0.06)", "--skeleton-to": "rgba(255,255,255,0.12)" }
+    );
+
+    const panelStyles = {
+        bg: "app.card.bg",
+        border: "1px solid",
+        borderColor: "app.card.border",
+        backdropFilter: "blur(5px)",
+    } as const;
+
+    return (
+        <Box px={{ base: 4, md: 6 }} py={6} w="full" animation="fade-in 0.3s ease-out" css={skeletonCss}>
+            <VStack gap={6} align="stretch">
+                {/* Page title area */}
+                <VStack align="start" gap={2} px={2}>
+                    <HStack gap={2}>
+                        <Skeleton w="50px" h="10px" borderRadius="md" />
+                        <Box w="4px" h="4px" borderRadius="full" bg="gray.400" />
+                        <Skeleton w="80px" h="10px" borderRadius="md" />
+                    </HStack>
+                    <Skeleton w="240px" h="28px" borderRadius="xl" />
+                    <Skeleton w="320px" h="14px" borderRadius="md" />
                 </VStack>
-            </HStack>
-            <Stack gap={6}>
-                <Skeleton height="300px" borderRadius="xl" />
-                <SkeletonText noOfLines={6} gap={4} />
-                <Box pt={4}>
-                    <Skeleton height="200px" borderRadius="xl" />
+
+                {/* KPI stat cards row */}
+                <SimpleGrid columns={{ base: 1, sm: 2, lg: 4 }} gap={4}>
+                    {[1, 2, 3, 4].map((i) => (
+                        <Box key={`stat-${i}`} p={5} borderRadius="2xl" {...panelStyles}>
+                            <VStack align="stretch" gap={3}>
+                                <SkeletonCircle size="32px" />
+                                <Skeleton w="60px" h="10px" borderRadius="md" />
+                                <Skeleton w="100px" h="20px" borderRadius="md" />
+                            </VStack>
+                        </Box>
+                    ))}
+                </SimpleGrid>
+
+                {/* Main content + sidebar panel */}
+                <SimpleGrid columns={{ base: 1, xl: 2 }} gap={6}>
+                    <Box p={6} borderRadius="2xl" minH="280px" {...panelStyles}>
+                        <VStack align="stretch" gap={4}>
+                            <Skeleton w="180px" h="20px" borderRadius="md" mb={2} />
+                            <Skeleton h="180px" w="100%" borderRadius="2xl" />
+                        </VStack>
+                    </Box>
+                    <Box p={6} borderRadius="2xl" minH="280px" {...panelStyles}>
+                        <VStack align="stretch" gap={4}>
+                            <Skeleton w="120px" h="20px" borderRadius="md" mb={2} />
+                            {[1, 2, 3, 4].map((i) => (
+                                <HStack key={`list-${i}`} gap={3}>
+                                    <SkeletonCircle size="32px" />
+                                    <VStack align="stretch" gap={2} flex="1">
+                                        <Skeleton w="100%" h="10px" borderRadius="md" />
+                                        <Skeleton w="60%" h="8px" borderRadius="md" />
+                                    </VStack>
+                                </HStack>
+                            ))}
+                        </VStack>
+                    </Box>
+                </SimpleGrid>
+
+                {/* Bottom wide panel */}
+                <Box p={6} borderRadius="2xl" {...panelStyles}>
+                    <VStack align="stretch" gap={4}>
+                        <Skeleton w="200px" h="20px" borderRadius="md" />
+                        <HStack gap={4} h="100px">
+                            {[1, 2, 3, 4, 5, 6].map((i) => (
+                                <Skeleton key={`bar-${i}`} flex="1" h="100%" borderRadius="xl" />
+                            ))}
+                        </HStack>
+                    </VStack>
                 </Box>
-            </Stack>
-        </VStack>
-    </Container>
-)
+            </VStack>
+        </Box>
+    );
+});
+LoadingState.displayName = "LoadingState";
 
 const WorkspacePage = () => {
     console.log("===Rendering WorkspacePage===")
@@ -78,4 +145,4 @@ const WorkspacePage = () => {
     return <ViewRenderer config={config} />
 }
 
-export default  memo(WorkspacePage)
+export default memo(WorkspacePage)

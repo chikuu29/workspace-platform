@@ -244,7 +244,7 @@ const GymView = memo(() => {
           fontWeight="800"
           size="md"
           h={{ base: "36px", md: "40px" }}
-          px={{ base: 2, md: 6 }}
+          px={{ base: 1.5, md: 6 }}
           flex={{ base: "1", md: "none" }}
           minW={0}
           _hover={{ transform: "translateY(-1px)", boxShadow: "sm" }}
@@ -253,7 +253,9 @@ const GymView = memo(() => {
           onClick={() => navigateTo("members")}
         >
           <Icon as={Users} />
-          <Text display={{ base: "none", sm: "inline" }} ml={1}>Directory</Text>
+          <Text fontSize={{ base: "10px", sm: "xs", md: "sm" }} ml={1}>
+            Directory
+          </Text>
         </Button>
 
         {/* Enroll Member — expands to fill remaining space equally on mobile */}
@@ -263,7 +265,7 @@ const GymView = memo(() => {
           fontWeight="800"
           size="md"
           h={{ base: "36px", md: "40px" }}
-          px={{ base: 2, md: 6 }}
+          px={{ base: 1.5, md: 6 }}
           flex={{ base: "1", md: "none" }}
           minW={0}
           _hover={{
@@ -275,7 +277,9 @@ const GymView = memo(() => {
           onClick={() => navigateTo("AddMember")}
         >
           <Plus size={16} />
-          <Text display={{ base: "none", sm: "inline" }} ml={1}>Enroll Member</Text>
+          <Text fontSize={{ base: "10px", sm: "xs", md: "sm" }} ml={1}>
+            Enroll Member
+          </Text>
         </Button>
       </HStack>
     );

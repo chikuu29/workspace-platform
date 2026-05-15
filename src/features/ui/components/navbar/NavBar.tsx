@@ -4,7 +4,7 @@ import PanelNavBarAction from "./NavbarActions";
 import { SidebarResponsive } from "../sidebar/PanelSideBar";
 import Brand from "../Brand/Brand";
 import TopNavMenuBuilder from "./TopNavMenuBuilder";
-import { memo, useMemo } from "react";
+import { memo, useMemo, useRef, useEffect, useCallback } from "react";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { useSelector } from "react-redux";
@@ -18,25 +18,39 @@ const HOVER_BORDER_COLOR = "app.btn.border";
 const TRANSITION = "all 0.2s ease";
 
 /**
+ * CSS custom property key used to communicate the real navbar height to the
+ * rest of the layout tree (spacer box, breadcrumb sticky offset, etc.).
+ * Any child can read `var(--navbar-height)` without prop-drilling.
+ */
+const NAVBAR_HEIGHT_VAR = "--navbar-height";
+
+/**
  * Navbar
  * Modern sticky header with glassmorphism, scroll-shadow, and integrated actions.
  * Consumes SidebarContext — no prop drilling required.
+ *
+ * Responsive strategy:
+ *  - The header is `position: fixed` so it always sits on top.
+ *  - A ResizeObserver measures the real header height and writes it to the
+ *    CSS variable `--navbar-height` on <html>. The spacer <Box> below reads
+ *    that variable so the content never overlaps the header regardless of
+ *    which breakpoint is active.
  */
 const Navbar = () => {
   const { isCollapsed, toggleSidebar } = useSidebar();
+  const headerRef = useRef<HTMLElement | null>(null);
 
   const { DISPLAY_TYPE, FEATURE }: APP_CONFIG_STATE = useSelector(
     (state: RootState) => state.app.AppConfigState
   );
   const showTopNavMenu = (DISPLAY_TYPE.SHOW_TOP_NAV_MENU ?? false) && FEATURE.length > 0;
+
   // Scroll-aware shadow for depth perception
   const scrollShadow = useScrollShadow();
 
   // Theme-aware colors
-  // Match project bg.default (gray.50 / dark slate) with slight transparency for blur
   const borderColor = useColorModeValue("gray.100", "whiteAlpha.100");
   const iconHoverBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
-  // controlShellShadow reused in the desktop toggle _hover for depth
   const controlShellShadow = useColorModeValue(
     "0 16px 36px -24px rgba(15, 23, 42, 0.3)",
     "0 18px 36px -26px rgba(2, 6, 23, 0.8)"
@@ -60,10 +74,46 @@ const Navbar = () => {
     [isCollapsed]
   );
 
+  /**
+   * Measure real header height and expose it as a CSS variable on <html>.
+   * This ensures the spacer box and any `top` sticky values stay in sync
+   * automatically across breakpoints without any JS polling.
+   */
+  const updateHeightVar = useCallback((el: Element) => {
+    const height = el.getBoundingClientRect().height;
+    document.documentElement.style.setProperty(
+      NAVBAR_HEIGHT_VAR,
+      `${height}px`
+    );
+  }, []);
+
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+
+    // Initial measurement
+    updateHeightVar(el);
+
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) updateHeightVar(entry.target);
+    });
+
+    observer.observe(el);
+
+    // Cleanup on unmount
+    return () => {
+      observer.disconnect();
+      // Reset variable on unmount so no stale value persists
+      document.documentElement.style.removeProperty(NAVBAR_HEIGHT_VAR);
+    };
+  }, [updateHeightVar]);
+
   return (
-    <Box minH="5.5rem">
+    <>
       <Box
         as="header"
+        ref={headerRef as React.RefObject<HTMLDivElement>}
         role="banner"
         aria-label="Main navigation"
         w="100%"
@@ -80,14 +130,20 @@ const Navbar = () => {
       >
         <Flex
           w="100%"
-          h="5.5rem"
-          px={{ base: 2, md: 4 }}
+          py={"0.7rem"}
+          px={{ base: "2", sm: "3", md: "4" }}
           align="center"
           justify="space-between"
           gap={{ base: 1.5, md: 3 }}
         >
           {/* Left: Toggle + Brand */}
-          <Flex alignItems="center" gap={{ base: 1, md: 3 }} minW={0} flex="0 1 auto" flexShrink={1}>
+          <Flex
+            alignItems="center"
+            gap={{ base: 1, md: 3 }}
+            minW={0}
+            flex="0 1 auto"
+            flexShrink={1}
+          >
             {(DISPLAY_TYPE.SHOW_SIDE_NAV_MENU || FEATURE.length > 0) && (
               <Flex alignItems="center" gap={1} flexShrink={0}>
                 {/*
@@ -103,7 +159,6 @@ const Navbar = () => {
                     display={{ base: "none", xl: "inline-flex" }}
                     cursor="pointer"
                     h="10"
-                    // size={'md'}
                     minW="10"
                     borderRadius="xl"
                     variant="outline"
@@ -141,13 +196,25 @@ const Navbar = () => {
             </Box>
           )}
 
-          {/* Right: Actions (search, notifications, profile) */}
+          {/* Right: Actions (refresh, fullscreen, theme, notifications, profile) */}
           <Box flexShrink={0}>
             <PanelNavBarAction />
           </Box>
         </Flex>
       </Box>
-    </Box>
+
+      {/*
+       * Spacer: pushes page content below the fixed header.
+       * Height is driven by the CSS variable set by the ResizeObserver above
+       * so it ALWAYS matches the real rendered header height on every device.
+       */}
+      <Box
+        aria-hidden="true"
+        h={`var(${NAVBAR_HEIGHT_VAR}, 4rem)`}
+        flexShrink={0}
+        w="100%"
+      />
+    </>
   );
 };
 

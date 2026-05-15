@@ -216,42 +216,56 @@ const GymView = memo(() => {
 
   useEffect(() => {
     mountNavActions(
-      <HStack gap={2}>
+      /*
+       * HStack fills 100% width on mobile so each child button can use
+       * flex="1" to equally share the available space. On md+ the HStack
+       * reverts to auto width and buttons use their natural size.
+       */
+      <HStack gap={2} w={{ base: "full", md: "auto" }}>
+        {/* Refresh — icon-only, fixed square so it doesn't expand */}
         <IconButton
           colorPalette="yellow"
           borderRadius="sm"
           size="md"
-          h="40px"
-          px={6}
+          h={{ base: "36px", md: "40px" }}
+          minW={{ base: "36px", md: "40px" }}
+          px={0}
+          flexShrink={0}
           onClick={refresh}
           aria-label="Refresh dashboard"
           loading={loading}
         >
           <RefreshCw size={16} />
         </IconButton>
+
+        {/* Directory — expands to fill remaining space equally on mobile */}
         <Button
           borderRadius="sm"
           fontWeight="800"
           size="md"
-          h="40px"
-          px={6}
-          _hover={{
-            transform: "translateY(-1px)",
-            boxShadow: "sm",
-          }}
+          h={{ base: "36px", md: "40px" }}
+          px={{ base: 2, md: 6 }}
+          flex={{ base: "1", md: "none" }}
+          minW={0}
+          _hover={{ transform: "translateY(-1px)", boxShadow: "sm" }}
           _active={{ transform: "translateY(0)" }}
           transition="all 0.2s ease"
           onClick={() => navigateTo("members")}
         >
-          <Icon as={Users} /> Directory
+          <Icon as={Users} />
+          <Text display={{ base: "none", sm: "inline" }} ml={1}>Directory</Text>
         </Button>
+
+        {/* Enroll Member — expands to fill remaining space equally on mobile */}
         <Button
           colorPalette="blue"
           borderRadius="sm"
           fontWeight="800"
           size="md"
-          h="40px"
-          px={6}
+          h={{ base: "36px", md: "40px" }}
+          px={{ base: 2, md: 6 }}
+          flex={{ base: "1", md: "none" }}
+          minW={0}
           _hover={{
             transform: "translateY(-1px)",
             boxShadow: "0 10px 24px -8px var(--chakra-colors-blue-500)",
@@ -260,7 +274,8 @@ const GymView = memo(() => {
           transition="all 0.2s ease"
           onClick={() => navigateTo("AddMember")}
         >
-          <Plus size={16} /> Enroll Member
+          <Plus size={16} />
+          <Text display={{ base: "none", sm: "inline" }} ml={1}>Enroll Member</Text>
         </Button>
       </HStack>
     );

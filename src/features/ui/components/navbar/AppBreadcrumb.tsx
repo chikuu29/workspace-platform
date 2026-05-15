@@ -1,8 +1,7 @@
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { useNavActionStore } from "@/core/store/useNavActionStore";
-
 import { Box, Breadcrumb, Flex, HStack, Text } from "@chakra-ui/react";
-import React, { forwardRef, useEffect, useState, useMemo } from "react";
+import React, { forwardRef, useEffect, useState } from "react";
 import {
   ArrowLeft,
   Home,
@@ -15,12 +14,7 @@ import {
   Settings,
   HelpCircle,
 } from "lucide-react";
-import {
-  useLocation,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 
 interface ConfigItem {
@@ -29,55 +23,59 @@ interface ConfigItem {
   icon?: React.ReactElement;
 }
 
-const AppBreadcrumb = forwardRef((props, ref) => {
+/**
+ * AppBreadcrumb
+ * Sticky sub-header with breadcrumb navigation + optional page-level actions.
+ *
+ * Responsive layout:
+ *  - base (mobile): breadcrumb trail row on top, action buttons in a
+ *    dedicated full-width row below — prevents cramped side-by-side layout.
+ *  - md+: breadcrumb trail on the left, actions on the right in one row.
+ *
+ * Sticky positioning uses top="0" because the component lives inside the
+ * scrollable content Box that already starts below the fixed Navbar spacer.
+ */
+const AppBreadcrumb = forwardRef((_props, _ref) => {
   const { view, secondaryView } = useParams();
-  const [searchParams] = useSearchParams();
   const { pathname } = useLocation();
-  const { appName, appCode, workspacePrefix, buildPath, goBack } = useWorkspaceRouter();
+  const { appName, appCode, buildPath, goBack } = useWorkspaceRouter();
   const breadcrumbActions = useNavActionStore((state) => state.actions);
 
   const [config, setConfig] = useState<ConfigItem[]>([
-    {
-      path: "/myApps",
-      label: "Home",
-      icon: <Home size="14" />
-    },
+    { path: "/myApps", label: "Home", icon: <Home size={14} /> },
   ]);
 
   useEffect(() => {
     const newConfig: ConfigItem[] = [
-      { path: "/myApps", label: "Home", icon: <Home size="14" /> }
+      { path: "/myApps", label: "Home", icon: <Home size={14} /> },
     ];
 
     if (pathname.toLowerCase().includes("/profile")) {
-      newConfig.push({ path: pathname, label: "Profile", icon: <User size="14" /> });
+      newConfig.push({ path: pathname, label: "Profile", icon: <User size={14} /> });
     } else if (pathname.toLowerCase().includes("/settings")) {
-      newConfig.push({ path: pathname, label: "Settings", icon: <Settings size="14" /> });
+      newConfig.push({ path: pathname, label: "Settings", icon: <Settings size={14} /> });
     } else if (pathname.toLowerCase().includes("/helpcenter")) {
-      newConfig.push({ path: pathname, label: "Help Center", icon: <HelpCircle size="14" /> });
+      newConfig.push({ path: pathname, label: "Help Center", icon: <HelpCircle size={14} /> });
     } else if (!view && !appCode) {
-      newConfig.push({ path: "#", label: "MyApps", icon: <Layers size="14" /> });
+      newConfig.push({ path: "#", label: "MyApps", icon: <Layers size={14} /> });
     } else {
-      // App root path — delegated to shared buildPath utility
       newConfig.push({
         path: buildPath("home"),
         label: appName,
-        icon: <BoxIcon size="14" />
+        icon: <BoxIcon size={14} />,
       });
-
       if (view && view !== "home") {
         newConfig.push({
           path: buildPath(view),
           label: view,
-          icon: <LayoutDashboard size="14" />
+          icon: <LayoutDashboard size={14} />,
         });
       }
-
       if (secondaryView) {
         newConfig.push({
           path: buildPath(view || "", secondaryView),
           label: secondaryView,
-          icon: <Layers size="14" />
+          icon: <Layers size={14} />,
         });
       }
     }
@@ -96,33 +94,40 @@ const AppBreadcrumb = forwardRef((props, ref) => {
   const hoverBg = useColorModeValue("blue.50", "whiteAlpha.100");
   const borderColorValue = useColorModeValue("gray.100", "whiteAlpha.100");
 
+  // Hidden-scrollbar CSS — reused in both scroll boxes
+  const noScrollbar = {
+    scrollbarWidth: "none" as const,
+    msOverflowStyle: "none" as const,
+    "&::-webkit-scrollbar": { display: "none" },
+  };
 
   return (
     <Box
       w="100%"
+      py={{ base: "0.5rem", md: "0.65rem" }}
       px={{ base: "3", sm: "4", md: "6" }}
       borderBottom="1px solid"
       borderColor={borderColorValue}
-      bg={"app.card.bg"}
+      bg="app.card.bg"
       backdropFilter="blur(12px)"
       position="sticky"
       top="0"
-      zIndex="sticky"
-      borderBottomRadius="20px"
+      zIndex={998}
     >
+      {/* ── Top row: Back + breadcrumb trail (always) + actions on md+ ── */}
       <Flex
-        minH={{ base: "auto", md: "56px" }}
-        direction={{ base: "column", md: "row" }}
-        align={{ base: "stretch", md: "center" }}
-        justifyContent="space-between"
-        gap={{ base: "3", md: "4" }}
+        align="center"
+        justify="space-between"
+        gap={{ base: 2, md: 4 }}
+        minH={{ base: "36px", md: "44px" }}
       >
-        <HStack gap="0" flex="1" minW="0" overflow="hidden">
+        {/* Left: Back button + horizontally scrollable trail */}
+        <Flex align="center" gap={0} flex="1" minW={0} overflow="hidden">
           {config.length > 1 && (
-            <HStack gap="2" align="center">
+            <HStack gap={2} align="center" flexShrink={0}>
               <HStack
-                gap={{ base: "1.5", md: "2" }}
-                px={{ base: "2.5", md: "3" }}
+                gap={{ base: "1", md: "1.5" }}
+                px={{ base: "2", md: "2.5" }}
                 py="1.5"
                 rounded="lg"
                 transition="all 0.2s"
@@ -130,32 +135,29 @@ const AppBreadcrumb = forwardRef((props, ref) => {
                 onClick={goBack}
                 _hover={{ bg: hoverBg, transform: "translateY(-1px)" }}
                 color={inactiveColor}
-                minW="fit-content"
               >
-                <ArrowLeft size="14" />
+                <ArrowLeft size={13} />
                 <Text
                   fontWeight="600"
-                  fontSize={{ base: "11px", md: "xs" }}
+                  fontSize={{ base: "10px", md: "xs" }}
                   letterSpacing="tight"
+                  display={{ base: "none", sm: "block" }}
                 >
                   Back
                 </Text>
               </HStack>
-              <ChevronRight size="12" color={inactiveColor} />
+              <ChevronRight size={11} color={inactiveColor} />
             </HStack>
           )}
 
+          {/* Horizontally scrollable breadcrumb trail */}
           <Box
             flex="1"
-            minW="0"
+            minW={0}
             overflowX="auto"
             overflowY="hidden"
             whiteSpace="nowrap"
-            css={{
-              scrollbarWidth: "none",
-              msOverflowStyle: "none",
-            }}
-            _webkit-scrollbar={{ display: "none" }}
+            css={noScrollbar}
           >
             <Breadcrumb.Root variant="plain" size="sm">
               <Breadcrumb.List flexWrap="nowrap" minW="max-content">
@@ -165,24 +167,36 @@ const AppBreadcrumb = forwardRef((props, ref) => {
                     <React.Fragment key={index}>
                       <Breadcrumb.Item>
                         <HStack
-                          gap={{ base: "1.5", md: "2" }}
-                          // px={{ base: "1.5", md: "3" }}
+                          gap={{ base: "1", md: "1.5" }}
                           p="1.5"
                           rounded="lg"
                           transition="all 0.2s"
                           cursor={isLast ? "default" : "pointer"}
                           onClick={() => handleNavigate(c, isLast)}
-                          _hover={!isLast ? { bg: hoverBg, transform: "translateY(-1px)" } : {}}
+                          _hover={
+                            !isLast
+                              ? { bg: hoverBg, transform: "translateY(-1px)" }
+                              : {}
+                          }
                           color={isLast ? activeColor : inactiveColor}
                           minW="fit-content"
                         >
-                          {c.icon && <Box color={isLast ? activeColor : "inherit"}>{c.icon}</Box>}
+                          {c.icon && (
+                            <Box color={isLast ? activeColor : "inherit"}>
+                              {c.icon}
+                            </Box>
+                          )}
                           <Text
                             fontWeight={isLast ? "bold" : "600"}
                             fontSize={{ base: "11px", md: "xs" }}
                             textTransform="capitalize"
                             letterSpacing="tight"
-                            maxW={{ base: "112px", sm: "160px", md: "220px" }}
+                            maxW={{
+                              base: "80px",
+                              sm: "140px",
+                              md: "200px",
+                              lg: "260px",
+                            }}
                             truncate
                           >
                             {c.label}
@@ -192,7 +206,7 @@ const AppBreadcrumb = forwardRef((props, ref) => {
                       {!isLast && (
                         <Breadcrumb.Separator>
                           <Box color={inactiveColor} display="flex" alignItems="center">
-                            <Slash size={12} color="currentColor" strokeWidth={2} />
+                            <Slash size={11} color="currentColor" strokeWidth={2} />
                           </Box>
                         </Breadcrumb.Separator>
                       )}
@@ -202,20 +216,40 @@ const AppBreadcrumb = forwardRef((props, ref) => {
               </Breadcrumb.List>
             </Breadcrumb.Root>
           </Box>
-        </HStack>
+        </Flex>
 
+        {/*
+         * Desktop actions (md+) — sits to the right of the breadcrumb trail.
+         * Hidden on mobile to prevent the cramped side-by-side squeeze.
+         */}
         {breadcrumbActions && (
-          <Box
-            flexShrink={0}
-            alignSelf={{ base: "stretch", md: "center" }}
-            maxW={{ base: "full", md: "50%" }}
-          >
+          <Box flexShrink={0} display={{ base: "none", md: "block" }}>
             {breadcrumbActions}
           </Box>
         )}
       </Flex>
+
+      {/*
+       * Mobile-only actions row (hidden on md+).
+       * Renders full-width below the breadcrumb trail so buttons always have
+       * enough room to be readable and comfortably tappable on small screens.
+       * Scrolls horizontally if there are many buttons.
+       */}
+      {breadcrumbActions && (
+        <Box
+          display={{ base: "flex", md: "none" }}
+          w="full"
+          pt={2}
+          overflowX="auto"
+          css={noScrollbar}
+        >
+          {breadcrumbActions}
+        </Box>
+      )}
     </Box>
   );
 });
+
+AppBreadcrumb.displayName = "AppBreadcrumb";
 
 export default AppBreadcrumb;

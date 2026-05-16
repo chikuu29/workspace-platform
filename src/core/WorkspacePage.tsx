@@ -19,7 +19,7 @@ const LoadingState = memo(() => {
         { "--skeleton-from": "#e2e8f0", "--skeleton-to": "#f1f5f9" },
         { "--skeleton-from": "rgba(255,255,255,0.06)", "--skeleton-to": "rgba(255,255,255,0.12)" }
     );
-
+    const bg = useColorModeValue('', 'navy.700')
     const panelStyles = {
         bg: "app.card.bg",
         border: "1px solid",
@@ -28,9 +28,9 @@ const LoadingState = memo(() => {
     } as const;
 
     return (
-        <Box px={{ base: 4, md: 6 }} py={6} w="full" animation="fade-in 0.3s ease-out" css={skeletonCss}>
+        <Box px={{ base: 2, md: 2 }} py={2} w="full"  >
             <VStack gap={6} align="stretch">
-                {/* Page title area */}
+                {/* Page title area
                 <VStack align="start" gap={2} px={2}>
                     <HStack gap={2}>
                         <Skeleton w="50px" h="10px" borderRadius="md" />
@@ -39,16 +39,16 @@ const LoadingState = memo(() => {
                     </HStack>
                     <Skeleton w="240px" h="28px" borderRadius="xl" />
                     <Skeleton w="320px" h="14px" borderRadius="md" />
-                </VStack>
+                </VStack> */}
 
                 {/* KPI stat cards row */}
                 <SimpleGrid columns={{ base: 1, sm: 2, lg: 4 }} gap={4}>
                     {[1, 2, 3, 4].map((i) => (
                         <Box key={`stat-${i}`} p={5} borderRadius="2xl" {...panelStyles}>
                             <VStack align="stretch" gap={3}>
-                                <SkeletonCircle size="32px" />
-                                <Skeleton w="60px" h="10px" borderRadius="md" />
-                                <Skeleton w="100px" h="20px" borderRadius="md" />
+                                <SkeletonCircle size="32px" bg={bg} />
+                                <Skeleton w="60px" h="10px" borderRadius="md" bg={bg} />
+                                <Skeleton w="100px" h="20px" borderRadius="md" bg={bg} />
                             </VStack>
                         </Box>
                     ))}
@@ -58,19 +58,19 @@ const LoadingState = memo(() => {
                 <SimpleGrid columns={{ base: 1, xl: 2 }} gap={6}>
                     <Box p={6} borderRadius="2xl" minH="280px" {...panelStyles}>
                         <VStack align="stretch" gap={4}>
-                            <Skeleton w="180px" h="20px" borderRadius="md" mb={2} />
-                            <Skeleton h="180px" w="100%" borderRadius="2xl" />
+                            <Skeleton w="180px" h="20px" borderRadius="md" mb={2} bg={bg} />
+                            <Skeleton h="180px" w="100%" borderRadius="2xl" bg={bg} />
                         </VStack>
                     </Box>
                     <Box p={6} borderRadius="2xl" minH="280px" {...panelStyles}>
                         <VStack align="stretch" gap={4}>
-                            <Skeleton w="120px" h="20px" borderRadius="md" mb={2} />
+                            <Skeleton w="120px" h="20px" borderRadius="md" mb={2} bg={bg} />
                             {[1, 2, 3, 4].map((i) => (
                                 <HStack key={`list-${i}`} gap={3}>
-                                    <SkeletonCircle size="32px" />
+                                    <SkeletonCircle size="32px" bg={bg} />
                                     <VStack align="stretch" gap={2} flex="1">
-                                        <Skeleton w="100%" h="10px" borderRadius="md" />
-                                        <Skeleton w="60%" h="8px" borderRadius="md" />
+                                        <Skeleton w="100%" h="10px" borderRadius="md" bg={bg} />
+                                        <Skeleton w="60%" h="8px" borderRadius="md" bg={bg} />
                                     </VStack>
                                 </HStack>
                             ))}
@@ -81,21 +81,23 @@ const LoadingState = memo(() => {
                 {/* Bottom wide panel */}
                 <Box p={6} borderRadius="2xl" {...panelStyles}>
                     <VStack align="stretch" gap={4}>
-                        <Skeleton w="200px" h="20px" borderRadius="md" />
+                        <Skeleton w="200px" h="20px" borderRadius="md" bg={bg} />
                         <HStack gap={4} h="100px">
                             {[1, 2, 3, 4, 5, 6].map((i) => (
-                                <Skeleton key={`bar-${i}`} flex="1" h="100%" borderRadius="xl" />
+                                <Skeleton key={`bar-${i}`} flex="1" h="100%" borderRadius="xl" bg={bg} />
                             ))}
                         </HStack>
                     </VStack>
                 </Box>
             </VStack>
         </Box>
+
     );
 });
 LoadingState.displayName = "LoadingState";
 
 const WorkspacePage = () => {
+    // return <LoadingState />
     console.log("===Rendering WorkspacePage===")
     const { appCode, view: UITemplateID, organization_name } = useParams()
     const [searchParams] = useSearchParams()

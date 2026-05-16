@@ -61,6 +61,7 @@ const TabsWidget: React.FC<TabsWidgetProps> = ({ tabs, defaultValue, ...rest }) 
                 transition="all 0.3s ease"
             >
                 <TabsList
+                    position="relative"
                     display="flex"
                     flexDirection="row"
                     alignItems="center"
@@ -79,7 +80,7 @@ const TabsWidget: React.FC<TabsWidgetProps> = ({ tabs, defaultValue, ...rest }) 
                             key={tab.title}
                             value={tab.title}
                             py="4"
-                            px="2"
+                            px="6"
                             fontSize="sm"
                             fontWeight="semibold"
                             color={inactiveColor}
@@ -87,17 +88,6 @@ const TabsWidget: React.FC<TabsWidgetProps> = ({ tabs, defaultValue, ...rest }) 
                             flexShrink={0}
                             _selected={{
                                 color: textColor,
-                                _after: {
-                                    content: '""',
-                                    position: "absolute",
-                                    bottom: "-2px",
-                                    left: "0",
-                                    right: "0",
-                                    height: "3px",
-                                    bg: activeColor,
-                                    borderRadius: "full",
-                                    boxShadow: `0 0 12px ${activeColor}`,
-                                }
                             }}
                             _hover={{
                                 color: activeColor,
@@ -116,6 +106,20 @@ const TabsWidget: React.FC<TabsWidgetProps> = ({ tabs, defaultValue, ...rest }) 
                             </HStack>
                         </TabsTrigger>
                     ))}
+                    <TabsIndicator
+                        zIndex="-1"
+                        height="36px"
+                        top="0"
+                        bottom="0"
+                        my="auto"
+                        bg={useColorModeValue("rgba(199, 153, 255, 0.12)", "rgba(199, 153, 255, 0.08)")}
+                        backdropFilter="blur(20px)"
+                        borderRadius="full"
+                        boxShadow="0 4px 20px 0 rgba(199, 153, 255, 0.15)"
+                        border="1px solid"
+                        borderColor={useColorModeValue("rgba(199, 153, 255, 0.4)", "rgba(199, 153, 255, 0.2)")}
+                        transition="all 0.4s cubic-bezier(0.16, 1, 0.3, 1)"
+                    />
                 </TabsList>
             </Box>
 
@@ -123,8 +127,8 @@ const TabsWidget: React.FC<TabsWidgetProps> = ({ tabs, defaultValue, ...rest }) 
                 <TabsContent
                     key={tab.title}
                     value={tab.title}
-                    px={{ base: "6", md: "12" }}
-                    py={{ base: "8", md: "12" }}
+                    px={{ base: "2", md: "6" }}
+                    py={{ base: "2", md: "6" }}
                     position="relative"
                 >
                     <AnimatePresence mode="wait">
@@ -139,17 +143,26 @@ const TabsWidget: React.FC<TabsWidgetProps> = ({ tabs, defaultValue, ...rest }) 
                             }}
                         >
                             <VStack align="start" gap="2" mb="6" >
+
                                 <Heading
-                                    size="xl"
+                                    size={{ base: "md", md: "xl" }}
                                     fontWeight="extrabold"
-                                    color={textColor}
+                                    color={'app.text.muted'}
                                     letterSpacing="tight"
                                 >
                                     {tab.headerTitle || tab.title}
                                 </Heading>
-                                <Text color={"text.muted"} fontSize="lg" lineHeight="tall">
+
+
+                                <Text
+                                    fontSize={{ base: "sm", md: "lg" }}
+                                    lineHeight="tall"
+                                    fontWeight="medium"
+                                    color={'app.text.muted'}
+                                >
                                     {tab.description || "Refine and manage your workspace settings and configurations."}
                                 </Text>
+
                             </VStack>
 
                             <Box

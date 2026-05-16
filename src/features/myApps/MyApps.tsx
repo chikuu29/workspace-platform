@@ -13,7 +13,7 @@ import {
   Heading,
   Center,
 } from "@chakra-ui/react";
-import { memo, useEffect, useState, useCallback, useMemo } from "react";
+import { memo, useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
@@ -346,6 +346,33 @@ function MyApps() {
     [organizations?.organization?.subscribed_apps],
   );
 
+  // Define sticky-state colors at the top level to follow Rules of Hooks
+  const stuckBg = useColorModeValue("app.card.bg", "navy.700");
+  const stuckBorder = useColorModeValue("brand.500", "rgba(199, 153, 255, 0.3)");
+  const normalBorder = useColorModeValue("rgba(0,0,0,0.05)", "rgba(255,255,255,0.1)");
+  const stuckShadow = useColorModeValue("0 8px 30px rgba(0,0,0,0.08)", "0 20px 60px rgba(0,0,0,0.6)");
+  const normalShadow = useColorModeValue("0 4px 20px -5px rgba(0,0,0,0.05)", "0 10px 40px -20px rgba(0,0,0,0.5)");
+
+  const [isStuck, setIsStuck] = useState(false);
+  const stickyRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = stickyRef.current;
+    if (!el) return;
+
+    // We use rootMargin: "-1px 0px 0px 0px" to detect when the element 
+    // hits the top of the screen (sticky position).
+    const observer = new IntersectionObserver(
+      ([e]) => {
+        setIsStuck(e.intersectionRatio < 1);
+      },
+      { threshold: [1], rootMargin: "-1px 0px 0px 0px" }
+    );
+
+    observer.observe(el);
+    return () => observer.unobserve(el);
+  }, []);
+
   const filteredApps = useMemo(() => {
     // Inline permission check — rbacPermissions/is_root_user/is_superuser are closed-over
     // from the top-level selectors above, so no hook is called inside this callback.
@@ -395,167 +422,161 @@ function MyApps() {
   );
 
   return (
-    <Box p="2">
+    <Box>
       <VStack gap={6} align="stretch">
         {/* Header Section */}
         {/* ── Updates / Notifications Panel ──────────────────────────── */}
         {SHOW_UPDATES_PANEL && <UpdatesFeed updates={MOCK_UPDATES} />}
 
         {/* ── High-Tech Hero Header ─────────────────────────────────────── */}
+        {/* ── High-Tech Hero Banner (Static) ─────────────────────────────────── */}
         <Box
+          // bg={useColorModeValue("rgba(255, 255, 255, 0.4)", "rgba(15, 15, 25, 0.4)")}
+          bg="app.card.bg"
+          backdropFilter="blur(10px)"
+          border="1px solid"
+          borderColor={useColorModeValue("rgba(0,0,0,0.05)", "rgba(255,255,255,0.05)")}
+          borderRadius="3xl"
+          overflow="hidden"
+          p={{ base: 3, md: 8 }}
+          transition="all 0.3s ease"
+        >
+          <Flex
+            justify="space-between"
+            align={{ base: "start", md: "center" }}
+            direction={{ base: "column", md: "row" }}
+            gap={6}
+          >
+            {/* Branding & Intelligence */}
+            <HStack gap={{ base: 4, md: 6 }} align="start" w="full">
+              <Circle
+                size={{ base: "12", md: "14" }}
+                bgGradient="to-br"
+                gradientFrom="#6366f1"
+                gradientTo="#c799ff"
+                color="white"
+                flexShrink={0}
+                boxShadow="0 8px 30px rgba(99,102,241,0.3)"
+              >
+                <Command size={26} strokeWidth={2.5} />
+              </Circle>
+
+              <VStack align="start" gap={1.5} w="full">
+                <HStack gap={3} align="center" flexWrap="wrap">
+                  <Heading
+                    size={{ base: "md", md: "xl" }}
+                    fontWeight="900"
+                    letterSpacing="-0.03em"
+                    bgGradient="to-br"
+                    gradientFrom={useColorModeValue("gray.900", "white")}
+                    gradientTo={useColorModeValue("gray.600", "gray.400")}
+                    bgClip="text"
+                  >
+                    Command Center
+                  </Heading>
+                  <Badge
+                    bg={useColorModeValue("purple.50", "rgba(199, 153, 255, 0.1)")}
+                    color={useColorModeValue("purple.600", "#c799ff")}
+                    variant="subtle"
+                    borderRadius="full"
+                    px={3}
+                    py={1}
+                    fontSize="xs"
+                    fontWeight="800"
+                  >
+                    <HStack gap={1.5}>
+                      <Zap size={12} fill="currentColor" />
+                      <Text>{filteredApps.length} ACTIVE</Text>
+                    </HStack>
+                  </Badge>
+                </HStack>
+
+                <Text
+                  fontSize={{ base: "xs", md: "sm" }}
+                  color={useColorModeValue("gray.500", "gray.400")}
+                  fontWeight="500"
+                  maxW="600px"
+                >
+                  Manage your unified workspace ecosystem with connected tools and intelligence.
+                </Text>
+
+                <HStack gap={3} mt={1} flexWrap="wrap">
+                  <HStack
+                    gap={1.5}
+                    px={3}
+                    py={1}
+                    borderRadius="full"
+                    bg={useColorModeValue("blue.50/50", "rgba(59, 130, 246, 0.05)")}
+                    border="1px solid"
+                    borderColor={useColorModeValue("blue.100", "rgba(59, 130, 246, 0.1)")}
+                  >
+                    <Sparkles size={12} color="#3b82f6" />
+                    <Text fontSize="10px" fontWeight="800" color="blue.500" textTransform="uppercase" letterSpacing="widest">
+                      {appList.length} Nodes
+                    </Text>
+                  </HStack>
+                  <HStack
+                    gap={1.5}
+                    px={3}
+                    py={1}
+                    borderRadius="full"
+                    bg={useColorModeValue("green.50/50", "rgba(34, 197, 94, 0.05)")}
+                    border="1px solid"
+                    borderColor={useColorModeValue("green.100", "rgba(34, 197, 94, 0.1)")}
+                  >
+                    <LayoutGrid size={12} color="#22c55e" />
+                    <Text fontSize="10px" fontWeight="800" color="green.500" textTransform="uppercase" letterSpacing="widest">
+                      {subscribed_apps.length} Connected
+                    </Text>
+                  </HStack>
+                </HStack>
+              </VStack>
+            </HStack>
+          </Flex>
+        </Box>
+
+        {/* ── Sticky Command Search Bar ─────────────────────────────────────── */}
+        <Box
+          ref={stickyRef}
           position="sticky"
           top="-1px"
-          zIndex={100}
-          bg="app.card.bg"
-          backdropFilter="blur(18px) saturate(160%)"
+          zIndex={999}
+          bg={isStuck ? stuckBg : "app.card.bg"}
+          backdropFilter="blur(20px) saturate(180%)"
           borderBottom="1px solid"
-          borderColor="app.card.border"
-          borderRadius="2xl"
-          overflow="hidden"
-          boxShadow={useColorModeValue(
-            "0 8px 32px -12px rgba(99,102,241,0.15)",
-            "0 8px 32px -12px rgba(0,0,0,0.4)"
-          )}
+          borderColor={isStuck ? stuckBorder : normalBorder}
+          borderRadius={isStuck ? "lg" : "2xl"}
+          mx={{ base: "-2", md: "1" }}
+          p={2}
+          transition="all 0.4s cubic-bezier(0.16, 1, 0.3, 1)"
+          boxShadow={isStuck ? stuckShadow : normalShadow}
         >
-          {/* Gradient accent strip */}
-          <Box
-            h="3px"
-            bgGradient="to-r"
-            gradientFrom="brand.500"
-            gradientVia="purple.500"
-            gradientTo="blue.500"
-          />
-
-          <Box px={{ base: 4, md: 6 }} py={{ base: 4, md: 5 }}>
-            <Flex
-              justify="space-between"
-              align={{ base: "start", md: "center" }}
-              direction={{ base: "column", md: "row" }}
-              gap={4}
-            >
-              {/* Left: Icon + Title + Subtitle */}
-              <HStack gap={4} align="start">
-                {/* Animated glow icon */}
-                <Circle
-                  size="12"
-                  bgGradient="to-br"
-                  gradientFrom="brand.500"
-                  gradientTo="purple.500"
-                  color="white"
-                  flexShrink={0}
-                  boxShadow="0 0 20px rgba(99,102,241,0.35), 0 0 60px rgba(99,102,241,0.1)"
-                  transition="all 0.3s ease"
-                  _hover={{
-                    transform: "rotate(12deg) scale(1.08)",
-                    boxShadow: "0 0 28px rgba(99,102,241,0.5), 0 0 80px rgba(99,102,241,0.15)",
-                  }}
-                >
-                  <Command size={22} strokeWidth={2.5} />
-                </Circle>
-
-                <VStack align="start" gap={1}>
-                  <HStack gap={2.5} align="center">
-                    <Heading
-                      size={{ base: "md", md: "lg" }}
-                      fontWeight="900"
-                      letterSpacing="-0.02em"
-                      bgGradient="to-r"
-                      gradientFrom="app.text.primary"
-                      gradientTo="brand.500"
-                      bgClip="text"
-                    >
-                      Command Center
-                    </Heading>
-                    <Badge
-                      colorPalette="purple"
-                      variant="subtle"
-                      borderRadius="full"
-                      px={2.5}
-                      py={0.5}
-                      fontSize="2xs"
-                      fontWeight="900"
-                      textTransform="uppercase"
-                    >
-                      <Zap size={10} /> {filteredApps.length} Apps
-                    </Badge>
-                  </HStack>
-
-                  <Text
-                    fontSize="sm"
-                    color="app.text.muted"
-                    fontWeight="600"
-                  // maxW="420px"
-                  >
-                    Your complete workspace ecosystem — unified, connected, and easy to access.
-                  </Text>
-
-                  {/* Quick-stat chips */}
-                  <HStack gap={2} mt={1} flexWrap="wrap">
-                    <HStack
-                      gap={1.5}
-                      px={2.5}
-                      py={1}
-                      borderRadius="full"
-                      bg={useColorModeValue("blue.50", "blue.500/10")}
-                      border="1px solid"
-                      borderColor={useColorModeValue("blue.100", "blue.500/20")}
-                    >
-                      <Sparkles size={11} color="var(--chakra-colors-blue-500)" />
-                      <Text fontSize="2xs" fontWeight="800" color="blue.500">
-                        {appList.length} Total
-                      </Text>
-                    </HStack>
-                    <HStack
-                      gap={1.5}
-                      px={2.5}
-                      py={1}
-                      borderRadius="full"
-                      bg={useColorModeValue("green.50", "green.500/10")}
-                      border="1px solid"
-                      borderColor={useColorModeValue("green.100", "green.500/20")}
-                    >
-                      <LayoutGrid size={11} color="var(--chakra-colors-green-500)" />
-                      <Text fontSize="2xs" fontWeight="800" color="green.500">
-                        {subscribed_apps.length} Subscribed
-                      </Text>
-                    </HStack>
-                  </HStack>
-                </VStack>
-              </HStack>
-
-              {/* Right: Search */}
-              <Box minW={{ md: "280px" }} maxW={{ md: "320px" }} w={{ base: "full", md: "auto" }}>
-                <InputGroup
-                  flex="1"
-                  startElement={
-                    <Icon
-                      as={Search}
-                      color="app.text.muted"
-                      boxSize={4}
-                    />
-                  }
-                >
-                  <Input
-                    placeholder="Search apps..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    bg={useColorModeValue("white", "whiteAlpha.50")}
-                    borderRadius="xl"
-                    border="1px solid"
-                    borderColor="app.card.border"
-                    fontSize="sm"
-                    fontWeight="600"
-                    _placeholder={{ color: "app.text.muted", fontWeight: "500" }}
-                    _focus={{
-                      borderColor: "brand.500",
-                      boxShadow: "0 0 0 3px rgba(99,102,241,0.15)",
-                    }}
-                    transition="all 0.2s ease"
-                  />
-                </InputGroup>
-              </Box>
-            </Flex>
-          </Box>
+          <InputGroup
+            w="full"
+            startElement={
+              <Icon
+                as={Search}
+                color={useColorModeValue("gray.400", "gray.500")}
+                boxSize={4}
+              />
+            }
+          >
+            <Input
+              placeholder="Search your workspace commands..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              bg="transparent"
+              borderRadius="xl"
+              h="12"
+              border="none"
+              fontSize="md"
+              fontWeight="600"
+              _placeholder={{ color: "gray.500", fontWeight: "500" }}
+              _focus={{
+                boxShadow: "none",
+              }}
+            />
+          </InputGroup>
         </Box>
 
 
@@ -564,7 +585,35 @@ function MyApps() {
 
         {/* Grid Section */}
         {!error && (
-          <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4, xl: 5 }} gap={4}>
+          <SimpleGrid columns={{ base: 2, sm: 2, md: 3, lg: 4, xl: 5 }} gap={4}>
+            {filteredApps.map((app: any, index: number) => (
+              <AppCard
+                key={index}
+                appConfig={app}
+                handleNavigate={handleDefaultNavigate}
+              />
+            ))}
+            {filteredApps.map((app: any, index: number) => (
+              <AppCard
+                key={index}
+                appConfig={app}
+                handleNavigate={handleDefaultNavigate}
+              />
+            ))}
+            {filteredApps.map((app: any, index: number) => (
+              <AppCard
+                key={index}
+                appConfig={app}
+                handleNavigate={handleDefaultNavigate}
+              />
+            ))}
+            {filteredApps.map((app: any, index: number) => (
+              <AppCard
+                key={index}
+                appConfig={app}
+                handleNavigate={handleDefaultNavigate}
+              />
+            ))}
             {filteredApps.map((app: any, index: number) => (
               <AppCard
                 key={index}

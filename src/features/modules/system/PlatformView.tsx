@@ -9,6 +9,7 @@ import {
   VStack,
   HStack,
   Icon,
+  SimpleGrid,
 } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
@@ -214,7 +215,7 @@ const AdminModuleCard = memo(({ module, onNavigate }: AdminModuleCardProps) => {
       borderRadius="2xl"
       border="1px solid"
       borderColor="app.card.border"
-      bg="app.navbar.bg"
+      bg="app.card.bg"
       backdropFilter="blur(16px)"
       boxShadow="app.shadow.glass-glow"
       overflow="hidden"
@@ -266,7 +267,7 @@ const AdminModuleCard = memo(({ module, onNavigate }: AdminModuleCardProps) => {
               right="4px"
               h="10px"
               borderRadius="full"
-              bg="rgba(255,255,255,0.22)"
+            // bg="rgba(255,255,255,0.22)"
             />
             <Icon as={module.icon} boxSize={5} color="white" zIndex={1} />
           </Box>
@@ -448,14 +449,10 @@ const CategorySection = memo(({ category, modules, onNavigate }: CategorySection
         <Box flex={1} h="1px" bg="app.divider" opacity={0.6} />
       </HStack>
 
-      <Grid
-        templateColumns={{
-          base: "1fr",
-          sm: "repeat(2, 1fr)",
-          lg: "repeat(3, 1fr)",
-          xl: "repeat(4, 1fr)",
-        }}
-        gap={4}
+      <SimpleGrid
+
+        columns={{ base: 2, sm: 2, md: 3, lg: 4, xl: 5 }} gap={4}
+
       >
         {modules.map((module) => (
           <UIPermissionGuard
@@ -463,12 +460,12 @@ const CategorySection = memo(({ category, modules, onNavigate }: CategorySection
             permissions={module.permissions || []}
             behavior="hide"
           >
-            <GridItem>
-              <AdminModuleCard module={module} onNavigate={onNavigate} />
-            </GridItem>
+            {/* <GridItem> */}
+            <AdminModuleCard module={module} onNavigate={onNavigate} />
+            {/* </GridItem> */}
           </UIPermissionGuard>
         ))}
-      </Grid>
+      </SimpleGrid>
     </Box>
   );
 });

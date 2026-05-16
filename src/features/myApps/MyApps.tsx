@@ -593,7 +593,7 @@ function MyApps() {
                 handleNavigate={handleDefaultNavigate}
               />
             ))}
-            {filteredApps.map((app: any, index: number) => (
+            {/* {filteredApps.map((app: any, index: number) => (
               <AppCard
                 key={index}
                 appConfig={app}
@@ -620,7 +620,7 @@ function MyApps() {
                 appConfig={app}
                 handleNavigate={handleDefaultNavigate}
               />
-            ))}
+            ))} */}
           </SimpleGrid>
         )}
 

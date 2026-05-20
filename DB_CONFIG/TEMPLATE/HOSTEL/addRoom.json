@@ -1,0 +1,120 @@
+{
+  "id": "hostel-add-room",
+  "pageName": "addRoom",
+  "route": "addRoom",
+  "appName": "myHostel",
+  "active": true,
+  "appMeta": {
+    "appName": "Hostel",
+    "viewName": "addRoom",
+    "viewId": "hostel-add-room",
+    "version": "1.0.0",
+    "owner": "Suryanarayan Biswal",
+    "createdAt": "2026-05-20"
+  },
+  "ACTIONS": {
+    "showSaveButton": true,
+    "events": {
+      "submit": {
+        "type": "API_CALL",
+        "url": "hostel/addRoom",
+        "method": "POST",
+        "successMessage": "Hostel room created successfully!",
+        "errorMessage": "Failed to create room. Please verify the room details.",
+        "laterActions": {
+          "type": "NAVIGATION",
+          "path": "/app/myHostel/rooms"
+        }
+      }
+    }
+  },
+  "UI_TYPE": {
+    "type": "FORM_VIEW",
+    "title": "Add New Room / Unit",
+    "description": "Expand your hostel facility structure by adding building rooms and setting occupancy details.",
+    "target": "forms",
+    "layoutStyles": {
+      "p": "0"
+    }
+  },
+  "UI_VIEW": {
+    "schema": {
+      "forms": {
+        "tabs": [
+          {
+            "title": "Room Configurations",
+            "description": "Core specifications of the physical room unit.",
+            "iconName": "Building",
+            "widgets": [
+              {
+                "name": "buildingName",
+                "text": "Building / Block Name",
+                "description": "Select the building block where the room is situated.",
+                "widget": "selectField",
+                "mandatory": true,
+                "oneLiner": true,
+                "apiPath": "hostel/buildings/options",
+                "labelField": "name",
+                "valueField": "id"
+              },
+              {
+                "name": "roomNumber",
+                "text": "Room Number",
+                "description": "Assign a unique room identifier (e.g. A-101, B-302)",
+                "widget": "textField",
+                "oneLiner": true,
+                "mandatory": true
+              },
+              {
+                "name": "roomType",
+                "text": "Room Type",
+                "description": "Choose bed configuration",
+                "widget": "selectField",
+                "mandatory": true,
+                "oneLiner": true,
+                "options": [
+                  { "label": "Single Sharing (Private)", "value": "Single" },
+                  { "label": "Double Sharing", "value": "Double" },
+                  { "label": "Triple Sharing", "value": "Triple" },
+                  { "label": "Dormitory Sharing", "value": "Dormitory" }
+                ]
+              },
+              {
+                "name": "capacity",
+                "text": "Max Capacity (Beds)",
+                "description": "Total allowable bed spaces/residents in this room unit.",
+                "widget": "selectField",
+                "mandatory": true,
+                "oneLiner": true,
+                "options": [
+                  { "label": "1 Resident", "value": 1 },
+                  { "label": "2 Residents", "value": 2 },
+                  { "label": "3 Residents", "value": 3 },
+                  { "label": "4 Residents", "value": 4 },
+                  { "label": "6 Residents", "value": 6 }
+                ]
+              },
+              {
+                "name": "rentAmount",
+                "text": "Monthly Base Rent (INR)",
+                "description": "Monthly base rent amount per resident.",
+                "widget": "textField",
+                "type": "number",
+                "oneLiner": true,
+                "mandatory": true
+              },
+              {
+                "name": "description",
+                "text": "Facilities / Amenities Notes",
+                "description": "List standard room properties (e.g. Balcony, AC, Attached Bath)",
+                "widget": "textAreaField",
+                "oneLiner": true
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "active": true
+}

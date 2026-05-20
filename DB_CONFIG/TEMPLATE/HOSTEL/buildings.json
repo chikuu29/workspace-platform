@@ -1,0 +1,79 @@
+{
+  "id": "hostel-buildings",
+  "pageName": "buildings",
+  "route": "buildings",
+  "appName": "myHostel",
+  "active": true,
+  "appMeta": {
+    "appName": "Hostel",
+    "viewName": "buildings",
+    "viewId": "hostel-buildings",
+    "version": "1.0.0",
+    "owner": "Suryanarayan Biswal",
+    "createdAt": "2026-05-20"
+  },
+  "UI_TYPE": {
+    "type": "GRID_VIEW",
+    "title": "Buildings & Blocks Directory",
+    "description": "Manage multi-property blocks and locations across different campuses and campus sectors.",
+    "target": "grids",
+    "layoutStyles": {
+      "templateColumns": "1fr",
+      "gap": "6"
+    }
+  },
+  "UI_VIEW": {
+    "schema": {
+      "grids": [
+        {
+          "id": "hostel-buildings-table",
+          "UI_TYPE": "TABLE_VIEW",
+          "title": "Buildings Registry",
+          "TABLES": {
+            "apis": {
+              "loadData": {
+                "path": "hostel/buildings",
+                "method": "GET",
+                "params": {
+                  "tenantId": "{{tenantId}}"
+                }
+              }
+            },
+            "SETTINGS": {
+              "columns": [
+                {
+                  "label": "Building Name",
+                  "key": "data.name",
+                  "width": "180px",
+                  "isSortable": true,
+                  "isSearchable": true
+                },
+                {
+                  "label": "Location / Campus",
+                  "key": "data.location",
+                  "width": "220px",
+                  "isSearchable": true
+                },
+                {
+                  "label": "Description",
+                  "key": "data.description",
+                  "width": "300px"
+                },
+                {
+                  "label": "Record ID",
+                  "key": "_meta.record_id",
+                  "width": "120px",
+                  "textAlign": "center"
+                }
+              ],
+              "pagination": {
+                "enabled": true,
+                "pageSize": 10
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "id": "hostel-rooms",
+  "pageName": "rooms",
+  "route": "rooms",
+  "appName": "myHostel",
+  "active": true,
+  "appMeta": {
+    "appName": "Hostel",
+    "viewName": "rooms",
+    "viewId": "hostel-rooms",
+    "version": "1.0.0",
+    "owner": "Suryanarayan Biswal",
+    "createdAt": "2026-05-20"
+  },
+  "UI_TYPE": {
+    "type": "GRID_VIEW",
+    "title": "Rooms & Beds Management",
+    "description": "Monitor and update hostel room structures, capacity limits, and current resident assignments.",
+    "target": "grids",
+    "layoutStyles": {
+      "templateColumns": "1fr",
+      "gap": "6"
+    }
+  },
+  "UI_VIEW": {
+    "schema": {
+      "grids": [
+        {
+          "id": "hostel-rooms-table",
+          "UI_TYPE": "TABLE_VIEW",
+          "title": "Room Inventory Directory",
+          "TABLES": {
+            "apis": {
+              "loadData": {
+                "path": "hostel/rooms",
+                "method": "GET",
+                "params": {
+                  "tenantId": "{{tenantId}}"
+                }
+              }
+            },
+            "SETTINGS": {
+              "columns": [
+                {
+                  "label": "Room Number",
+                  "key": "data.roomNumber",
+                  "width": "120px",
+                  "isSortable": true
+                },
+                {
+                  "label": "Building Block",
+                  "key": "data.buildingName",
+                  "width": "150px",
+                  "isSearchable": true
+                },
+                {
+                  "label": "Room Type",
+                  "key": "data.roomType",
+                  "width": "150px",
+                  "isSearchable": true
+                },
+                {
+                  "label": "Capacity (Beds)",
+                  "key": "data.capacity",
+                  "width": "120px",
+                  "textAlign": "center"
+                },
+                {
+                  "label": "Status",
+                  "key": "data.status",
+                  "width": "160px",
+                  "textAlign": "center",
+                  "isStatus": true,
+                  "isSearchable": true
+                },
+                {
+                  "label": "Monthly Base Rent",
+                  "key": "data.rentAmount",
+                  "width": "150px",
+                  "textAlign": "right"
+                }
+              ],
+              "filters": [
+                {
+                  "UI_TYPE": "FILTER_SECTION",
+                  "key": "status",
+                  "type": "select",
+                  "label": "Occupancy",
+                  "options": [
+                    { "label": "All", "value": "all" },
+                    { "label": "Empty", "value": "Empty" },
+                    { "label": "Partially Occupied", "value": "Partially Occupied" },
+                    { "label": "Fully Occupied", "value": "Fully Occupied" }
+                  ]
+                }
+              ],
+              "pagination": {
+                "enabled": true,
+                "pageSize": 10
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

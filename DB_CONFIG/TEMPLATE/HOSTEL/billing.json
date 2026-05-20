@@ -1,0 +1,117 @@
+{
+  "id": "hostel-billing",
+  "pageName": "billing",
+  "route": "billing",
+  "appName": "myHostel",
+  "active": true,
+  "appMeta": {
+    "appName": "Hostel",
+    "viewName": "billing",
+    "viewId": "hostel-billing",
+    "version": "1.0.0",
+    "owner": "Suryanarayan Biswal",
+    "createdAt": "2026-05-20"
+  },
+  "UI_TYPE": {
+    "type": "GRID_VIEW",
+    "title": "Billing & Rent Ledger",
+    "description": "Process and review monthly tenant rent invoices, safety deposits and dynamic roommate utility splits.",
+    "target": "grids",
+    "layoutStyles": {
+      "templateColumns": "1fr",
+      "gap": "6"
+    }
+  },
+  "UI_VIEW": {
+    "schema": {
+      "grids": [
+        {
+          "id": "hostel-billing-table",
+          "UI_TYPE": "TABLE_VIEW",
+          "title": "Invoices Ledger",
+          "TABLES": {
+            "apis": {
+              "loadData": {
+                "path": "hostel/billing",
+                "method": "GET"
+              }
+            },
+            "SETTINGS": {
+              "columns": [
+                {
+                  "label": "Invoice ID",
+                  "key": "data.invoice_id",
+                  "width": "120px",
+                  "isSortable": true
+                },
+                {
+                  "label": "Tenant Name",
+                  "key": "data.tenant_name",
+                  "width": "180px",
+                  "isSearchable": true
+                },
+                {
+                  "label": "Room Number",
+                  "key": "data.room_number",
+                  "width": "110px",
+                  "isSearchable": true
+                },
+                {
+                  "label": "Base Rent (INR)",
+                  "key": "data.base_rent",
+                  "width": "130px",
+                  "textAlign": "right"
+                },
+                {
+                  "label": "Utility Split (INR)",
+                  "key": "data.utility_charge",
+                  "width": "130px",
+                  "textAlign": "right"
+                },
+                {
+                  "label": "Total Amount (INR)",
+                  "key": "data.amount_due",
+                  "width": "150px",
+                  "textAlign": "right",
+                  "isSortable": true
+                },
+                {
+                  "label": "Billing Date",
+                  "key": "data.billing_date",
+                  "width": "130px",
+                  "isSortable": true
+                },
+                {
+                  "label": "Status",
+                  "key": "data.status",
+                  "width": "130px",
+                  "textAlign": "center",
+                  "isStatus": true,
+                  "isSearchable": true
+                }
+              ],
+              "filters": [
+                {
+                  "UI_TYPE": "FILTER_SECTION",
+                  "key": "status",
+                  "type": "select",
+                  "label": "Status",
+                  "options": [
+                    { "label": "All", "value": "all" },
+                    { "label": "Paid", "value": "Paid" },
+                    { "label": "Unpaid", "value": "Unpaid" },
+                    { "label": "Partially Paid", "value": "Partially Paid" }
+                  ]
+                }
+              ],
+              "pagination": {
+                "enabled": true,
+                "pageSize": 10
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

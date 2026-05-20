@@ -1,0 +1,78 @@
+{
+  "id": "hostel-add-building",
+  "pageName": "addBuilding",
+  "route": "addBuilding",
+  "appName": "myHostel",
+  "active": true,
+  "appMeta": {
+    "appName": "Hostel",
+    "viewName": "addBuilding",
+    "viewId": "hostel-add-building",
+    "version": "1.0.0",
+    "owner": "Suryanarayan Biswal",
+    "createdAt": "2026-05-20"
+  },
+  "ACTIONS": {
+    "showSaveButton": true,
+    "events": {
+      "submit": {
+        "type": "API_CALL",
+        "url": "hostel/addBuilding",
+        "method": "POST",
+        "successMessage": "Building added successfully!",
+        "errorMessage": "Failed to add building. Please verify details.",
+        "laterActions": {
+          "type": "NAVIGATION",
+          "path": "/app/myHostel/buildings"
+        }
+      }
+    }
+  },
+  "UI_TYPE": {
+    "type": "FORM_VIEW",
+    "title": "Add New Building Block / Property",
+    "description": "Register a new building block or location sector to manage room allotments and billing scoping.",
+    "target": "forms",
+    "layoutStyles": {
+      "p": "0"
+    }
+  },
+  "UI_VIEW": {
+    "schema": {
+      "forms": {
+        "tabs": [
+          {
+            "title": "Building Configuration",
+            "description": "Primary settings of the physical building/property.",
+            "iconName": "Building",
+            "widgets": [
+              {
+                "name": "name",
+                "text": "Building Name",
+                "description": "Give a unique building identifier (e.g. Block A, Krishna Residency, North Wing)",
+                "widget": "textField",
+                "oneLiner": true,
+                "mandatory": true
+              },
+              {
+                "name": "location",
+                "text": "Location / Campus / Sector",
+                "description": "Specify location address or branch campus name (e.g. Main Campus, Sector-4)",
+                "widget": "textField",
+                "oneLiner": true,
+                "mandatory": true
+              },
+              {
+                "name": "description",
+                "text": "Detailed Description / Amenities",
+                "description": "Notes about facilities or types of rooms in this building",
+                "widget": "textAreaField",
+                "oneLiner": true
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

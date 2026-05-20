@@ -1,0 +1,162 @@
+{
+  "id": "hostel-home",
+  "pageName": "home",
+  "route": "home",
+  "appName": "myHostel",
+  "active": true,
+  "appMeta": {
+    "appName": "Hostel",
+    "viewName": "home",
+    "viewId": "hostel-home",
+    "version": "1.0.0",
+    "owner": "Suryanarayan Biswal",
+    "createdAt": "2026-05-20"
+  },
+  "UI_TYPE": {
+    "type": "GRID_VIEW",
+    "title": "Hostel Operations Command Center",
+    "description": "Premium multi-tenant real-time metrics, room allocations, occupancy tracking and dues analytics.",
+    "target": "grids",
+    "layoutStyles": {
+      "templateColumns": "repeat(2, minmax(0, 1fr))",
+      "gap": "6"
+    }
+  },
+  "UI_VIEW": {
+    "schema": {
+      "grids": [
+        {
+          "title": "Key Operational Metrics",
+          "UI_TYPE": "KPI_SECTION",
+          "layout": {
+            "gridColumn": "1 / -1"
+          },
+          "apis": {
+            "loadData": {
+              "path": "hostel/analytics/kpis",
+              "method": "GET"
+            }
+          },
+          "KPIS": [
+            {
+              "label": "Beds Occupancy Rate",
+              "value": "{{apis.loadData.kpis.occupancy_rate}}",
+              "helpText": "{{apis.loadData.kpis.occupied_beds}} / {{apis.loadData.kpis.total_beds}} beds allocated",
+              "trend": "up",
+              "widget": "KPI_CARD",
+              "colorPalette": "cyan",
+              "subKpis": [
+                {
+                  "label": "Occupied Beds",
+                  "value": "{{apis.loadData.kpis.occupied_beds}}"
+                },
+                {
+                  "label": "Total Beds",
+                  "value": "{{apis.loadData.kpis.total_beds}}"
+                }
+              ]
+            },
+            {
+              "label": "Active Boarded Tenants",
+              "value": "{{apis.loadData.kpis.active_tenants}}",
+              "helpText": "All active student/professional allocations",
+              "trend": "neutral",
+              "widget": "KPI_CARD",
+              "colorPalette": "green",
+              "subKpis": [
+                {
+                  "label": "In-Residence",
+                  "value": "{{apis.loadData.kpis.active_tenants}}"
+                }
+              ]
+            },
+            {
+              "label": "Outstanding Dues",
+              "value": "₹{{apis.loadData.kpis.total_dues}}",
+              "helpText": "Total pending rent and utilities bills",
+              "trend": "down",
+              "widget": "KPI_CARD",
+              "colorPalette": "purple",
+              "subKpis": [
+                {
+                  "label": "Pending Payments",
+                  "value": "₹{{apis.loadData.kpis.total_dues}}"
+                }
+              ]
+            },
+            {
+              "label": "Active Maintenance Tickets",
+              "value": "{{apis.loadData.kpis.open_complaints}}",
+              "helpText": "Tickets pending resolution",
+              "trend": "neutral",
+              "widget": "KPI_CARD",
+              "colorPalette": "red",
+              "subKpis": [
+                {
+                  "label": "Open Requests",
+                  "value": "{{apis.loadData.kpis.open_complaints}}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "recent-tenants-table",
+          "UI_TYPE": "TABLE_VIEW",
+          "title": "Recently Onboarded Tenants",
+          "layout": {
+            "gridColumn": "1 / -1"
+          },
+          "TABLES": {
+            "apis": {
+              "loadData": {
+                "path": "hostel/tenants",
+                "method": "GET",
+                "params": {
+                  "skip": 0,
+                  "limit": 5
+                }
+              }
+            },
+            "SETTINGS": {
+              "columns": [
+                {
+                  "label": "ID",
+                  "key": "data.tenant_id",
+                  "width": "90px",
+                  "textAlign": "center"
+                },
+                {
+                  "label": "Tenant Name",
+                  "key": "data.firstName",
+                  "width": "200px"
+                },
+                {
+                  "label": "Allocated Room",
+                  "key": "data.room_number",
+                  "width": "120px"
+                },
+                {
+                  "label": "Contact Phone",
+                  "key": "data.phone",
+                  "width": "160px"
+                },
+                {
+                  "label": "Rent Status",
+                  "key": "data.rent_status",
+                  "width": "120px",
+                  "textAlign": "center",
+                  "isStatus": true
+                }
+              ],
+              "pagination": {
+                "enabled": false,
+                "pageSize": 5
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

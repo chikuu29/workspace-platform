@@ -255,9 +255,87 @@
                 "MENU": [
                     {
                         "label": "Home",
-                        "icon": "FcHome",
+                        "icon": "House",
+                        "iconColor": "cyan.400",
                         "path": "/app/myHostel/home",
                         "isMaster": true
+                    },
+                    {
+                        "label": "Rooms & Beds",
+                        "isMaster": false,
+                        "icon": "Layers",
+                        "iconColor": "orange.400",
+                        "menu": [
+                            {
+                                "label": "List Rooms",
+                                "icon": "List",
+                                "path": "/app/myHostel/rooms"
+                            },
+                            {
+                                "label": "Add Room",
+                                "icon": "Plus",
+                                "path": "/app/myHostel/addRoom"
+                            },
+                            {
+                                "label": "List Buildings",
+                                "icon": "Building",
+                                "path": "/app/myHostel/buildings"
+                            },
+                            {
+                                "label": "Add Building",
+                                "icon": "Plus",
+                                "path": "/app/myHostel/addBuilding"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Tenants Directory",
+                        "isMaster": false,
+                        "icon": "Users",
+                        "iconColor": "emerald.400",
+                        "menu": [
+                            {
+                                "label": "List Tenants",
+                                "icon": "List",
+                                "path": "/app/myHostel/tenants"
+                            },
+                            {
+                                "label": "Add Tenant",
+                                "icon": "UserPlus",
+                                "path": "/app/myHostel/addTenant"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Billing & Rent",
+                        "isMaster": false,
+                        "icon": "CreditCard",
+                        "iconColor": "purple.400",
+                        "menu": [
+                            {
+                                "label": "Invoices",
+                                "icon": "Receipt",
+                                "path": "/app/myHostel/billing"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Complaints Desk",
+                        "isMaster": false,
+                        "icon": "Wrench",
+                        "iconColor": "red.400",
+                        "menu": [
+                            {
+                                "label": "Ticket Backlog",
+                                "icon": "ClipboardList",
+                                "path": "/app/myHostel/complaints"
+                            },
+                            {
+                                "label": "Raise Ticket",
+                                "icon": "Plus",
+                                "path": "/app/myHostel/raiseComplaint"
+                            }
+                        ]
                     }
                 ]
             },

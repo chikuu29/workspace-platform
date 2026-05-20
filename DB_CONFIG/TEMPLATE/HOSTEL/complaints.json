@@ -1,0 +1,104 @@
+{
+  "id": "hostel-complaints",
+  "pageName": "complaints",
+  "route": "complaints",
+  "appName": "myHostel",
+  "active": true,
+  "appMeta": {
+    "appName": "Hostel",
+    "viewName": "complaints",
+    "viewId": "hostel-complaints",
+    "version": "1.0.0",
+    "owner": "Suryanarayan Biswal",
+    "createdAt": "2026-05-20"
+  },
+  "UI_TYPE": {
+    "type": "GRID_VIEW",
+    "title": "Maintenance & Complaints Backlog",
+    "description": "Monitor and assign active repair requests, facility complaints, plumbing, electrical and general support tickets.",
+    "target": "grids",
+    "layoutStyles": {
+      "templateColumns": "1fr",
+      "gap": "6"
+    }
+  },
+  "UI_VIEW": {
+    "schema": {
+      "grids": [
+        {
+          "id": "hostel-complaints-table",
+          "UI_TYPE": "TABLE_VIEW",
+          "title": "Support Tickets Backlog",
+          "TABLES": {
+            "apis": {
+              "loadData": {
+                "path": "hostel/complaints",
+                "method": "GET"
+              }
+            },
+            "SETTINGS": {
+              "columns": [
+                {
+                  "label": "Ticket ID",
+                  "key": "data.ticket_id",
+                  "width": "120px",
+                  "isSortable": true
+                },
+                {
+                  "label": "Room Number",
+                  "key": "data.room_number",
+                  "width": "120px",
+                  "isSearchable": true
+                },
+                {
+                  "label": "Issue Category",
+                  "key": "data.category",
+                  "width": "150px",
+                  "isSearchable": true
+                },
+                {
+                  "label": "Urgency / Priority",
+                  "key": "data.urgency",
+                  "width": "150px",
+                  "isStatus": true,
+                  "isSearchable": true
+                },
+                {
+                  "label": "Ticket Status",
+                  "key": "data.status",
+                  "width": "130px",
+                  "textAlign": "center",
+                  "isStatus": true,
+                  "isSearchable": true
+                },
+                {
+                  "label": "Problem Description",
+                  "key": "data.description",
+                  "width": "300px"
+                }
+              ],
+              "filters": [
+                {
+                  "UI_TYPE": "FILTER_SECTION",
+                  "key": "status",
+                  "type": "select",
+                  "label": "Status",
+                  "options": [
+                    { "label": "All Tickets", "value": "all" },
+                    { "label": "Pending", "value": "Pending" },
+                    { "label": "In-Progress", "value": "In-Progress" },
+                    { "label": "Resolved", "value": "Resolved" }
+                  ]
+                }
+              ],
+              "pagination": {
+                "enabled": true,
+                "pageSize": 10
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

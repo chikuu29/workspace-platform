@@ -1,0 +1,115 @@
+{
+  "id": "hostel-tenants",
+  "pageName": "tenants",
+  "route": "tenants",
+  "appName": "myHostel",
+  "active": true,
+  "appMeta": {
+    "appName": "Hostel",
+    "viewName": "tenants",
+    "viewId": "hostel-tenants",
+    "version": "1.0.0",
+    "owner": "Suryanarayan Biswal",
+    "createdAt": "2026-05-20"
+  },
+  "UI_TYPE": {
+    "type": "GRID_VIEW",
+    "title": "Tenants & Residents Directory",
+    "description": "Comprehensive index of currently onboarded hostel tenants, emergency contacts, and active room placements.",
+    "target": "grids",
+    "layoutStyles": {
+      "templateColumns": "1fr",
+      "gap": "6"
+    }
+  },
+  "UI_VIEW": {
+    "schema": {
+      "grids": [
+        {
+          "id": "hostel-tenants-table",
+          "UI_TYPE": "TABLE_VIEW",
+          "title": "Resident Directory Details",
+          "TABLES": {
+            "apis": {
+              "loadData": {
+                "path": "hostel/tenants",
+                "method": "GET"
+              }
+            },
+            "SETTINGS": {
+              "columns": [
+                {
+                  "label": "Tenant ID",
+                  "key": "data.tenant_id",
+                  "width": "110px",
+                  "textAlign": "center",
+                  "isSortable": true
+                },
+                {
+                  "label": "First Name",
+                  "key": "data.firstName",
+                  "width": "150px",
+                  "isSearchable": true
+                },
+                {
+                  "label": "Last Name",
+                  "key": "data.lastName",
+                  "width": "150px",
+                  "isSearchable": true
+                },
+                {
+                  "label": "Room Number",
+                  "key": "data.room_number",
+                  "width": "130px",
+                  "isSearchable": true
+                },
+                {
+                  "label": "Email Address",
+                  "key": "data.email",
+                  "width": "200px"
+                },
+                {
+                  "label": "Phone Number",
+                  "key": "data.phone",
+                  "width": "150px"
+                },
+                {
+                  "label": "Rent Status",
+                  "key": "data.rent_status",
+                  "width": "130px",
+                  "textAlign": "center",
+                  "isStatus": true,
+                  "isSearchable": true
+                },
+                {
+                  "label": "General Status",
+                  "key": "data.status",
+                  "width": "120px",
+                  "textAlign": "center",
+                  "isStatus": true
+                }
+              ],
+              "filters": [
+                {
+                  "UI_TYPE": "FILTER_SECTION",
+                  "key": "rent_status",
+                  "type": "select",
+                  "label": "Rent Dues",
+                  "options": [
+                    { "label": "All Statuses", "value": "all" },
+                    { "label": "Paid", "value": "Paid" },
+                    { "label": "Overdue", "value": "Overdue" }
+                  ]
+                }
+              ],
+              "pagination": {
+                "enabled": true,
+                "pageSize": 10
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

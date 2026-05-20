@@ -1,0 +1,101 @@
+{
+  "id": "hostel-raise-complaint",
+  "pageName": "raiseComplaint",
+  "route": "raiseComplaint",
+  "appName": "myHostel",
+  "active": true,
+  "appMeta": {
+    "appName": "Hostel",
+    "viewName": "raiseComplaint",
+    "viewId": "hostel-raise-complaint",
+    "version": "1.0.0",
+    "owner": "Suryanarayan Biswal",
+    "createdAt": "2026-05-20"
+  },
+  "ACTIONS": {
+    "showSaveButton": true,
+    "events": {
+      "submit": {
+        "type": "API_CALL",
+        "url": "hostel/complaints",
+        "method": "POST",
+        "successMessage": "Maintenance ticket logged successfully!",
+        "errorMessage": "Failed to log maintenance ticket. Please verify inputs.",
+        "laterActions": {
+          "type": "NAVIGATION",
+          "path": "/app/myHostel/complaints"
+        }
+      }
+    }
+  },
+  "UI_TYPE": {
+    "type": "FORM_VIEW",
+    "title": "Log Repair / Support Ticket",
+    "description": "Submit building maintenance or technical utility issues to hostel staff.",
+    "target": "forms",
+    "layoutStyles": {
+      "p": "0"
+    }
+  },
+  "UI_VIEW": {
+    "schema": {
+      "forms": {
+        "tabs": [
+          {
+            "title": "Ticket Details",
+            "description": "Information about the physical maintenance or support request.",
+            "iconName": "Wrench",
+            "widgets": [
+              {
+                "name": "room_number",
+                "text": "Room Number / Location",
+                "description": "Specify location of the issue (e.g. A-101, Corridor 2)",
+                "widget": "textField",
+                "oneLiner": true,
+                "mandatory": true
+              },
+              {
+                "name": "category",
+                "text": "Support Category",
+                "description": "Select the domain of the support concern.",
+                "widget": "selectField",
+                "mandatory": true,
+                "oneLiner": true,
+                "options": [
+                  { "label": "Plumbing & Water Supply", "value": "Plumbing" },
+                  { "label": "Electrical / Light / Fan", "value": "Electrical" },
+                  { "label": "Internet & Wi-Fi Access", "value": "Wi-Fi" },
+                  { "label": "Housekeeping & Cleaning", "value": "Cleaning" },
+                  { "label": "General Carpentry & Locks", "value": "General" }
+                ]
+              },
+              {
+                "name": "urgency",
+                "text": "Priority Status",
+                "description": "Determine the urgency context.",
+                "widget": "selectField",
+                "mandatory": true,
+                "oneLiner": true,
+                "options": [
+                  { "label": "Low - General Improvement", "value": "Low" },
+                  { "label": "Medium - Standard Repair", "value": "Medium" },
+                  { "label": "High - Immediate Action Needed", "value": "High" },
+                  { "label": "Emergency - Critical Danger / Flooding", "value": "Emergency" }
+                ]
+              },
+              {
+                "name": "description",
+                "text": "Issue Description",
+                "description": "Explain the concern with precise details so our staff can bring the right tools.",
+                "widget": "textAreaField",
+                "oneLiner": true,
+                "mandatory": true
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "active": true
+}

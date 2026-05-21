@@ -62,7 +62,8 @@ function DataTable<T extends Record<string, any>>({
                         <Box
                             borderRadius="lg"
                             p={6}
-                            bg={emptyCardBg}
+                            // bg={emptyCardBg}
+
                             border="1px dashed"
                             borderColor={borderColor}
                             textAlign="center"
@@ -142,13 +143,15 @@ function DataTable<T extends Record<string, any>>({
             />
 
             <Box
-                boxShadow="xl"
+                boxShadow="md"
+                    // boxShadow={useColorModeValue("0 4px 12px rgba(0, 0, 0, 0.05)", "0 1px 3px rgba(0,0,0,0.04)")}
                 borderRadius="xl"
-                bg={panelBg}
+                // bg={panelBg}
+                bg={"app.card.bg"}
                 border="1px solid"
                 borderColor={borderColor}
                 transition="all 0.25s"
-                _hover={{ boxShadow: "0 18px 40px -24px rgba(0, 0, 0, 0.35)" }}
+                // _hover={{ boxShadow: "0 18px 40px -24px rgba(0, 0, 0, 0.35)" }}
             >
                 {tableContent}
             </Box>

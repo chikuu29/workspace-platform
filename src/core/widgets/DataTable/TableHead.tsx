@@ -32,7 +32,8 @@ function TableHead<T>({
     return (
         <Table.Header position="sticky" top={0} zIndex={20}>
             <Table.Row
-                bg={glassBg}
+                // bg={glassBg}
+                bg="app.card.bg"
                 backdropFilter="blur(10px)"
                 borderBottom="1px solid"
                 borderColor={borderColor}

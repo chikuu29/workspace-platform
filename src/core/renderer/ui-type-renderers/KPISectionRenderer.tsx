@@ -3,7 +3,7 @@ import { Box, Text, SimpleGrid, HStack, Heading } from "@chakra-ui/react";
 import { WidgetRegistry } from "@/core/registry/WidgetRegistry";
 
 import type { SectionRendererProps } from "./types";
-import { log } from "node:console";
+
 
 const KPISectionRenderer: React.FC<SectionRendererProps> = ({ component, resolveData }) => {
   console.log("Rendering KPISection with component:", component);

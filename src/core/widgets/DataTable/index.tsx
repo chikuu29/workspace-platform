@@ -7,8 +7,10 @@ import {
     Table as ChakraTable,
     Text,
     HStack,
-    useBreakpointValue
+    useBreakpointValue,
+    Icon
 } from "@chakra-ui/react";
+import { Database, Layers } from "lucide-react";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { useDataTable } from "./hooks/useDataTable";
 import { DataTableColumn, DataTableAction, DataTableState } from "./types";
@@ -55,7 +57,7 @@ function DataTable<T extends Record<string, any>>({
             return (
                 <VStack gap={3} align="stretch" w="full" p={{ base: 3, sm: 4 }}>
                     {processedData.map((row, idx) => (
-                        <MobileTableCard key={idx} row={row} columns={columns} />
+                        <MobileTableCard key={idx} row={row} columns={columns} actions={actions} />
                     ))}
 
                     {processedData.length === 0 && (
@@ -82,6 +84,18 @@ function DataTable<T extends Record<string, any>>({
                 overflowY="hidden"
                 borderRadius="xl"
                 w="full"
+                css={{
+                    scrollbarWidth: "thin",
+                    "&::-webkit-scrollbar": { height: "6px" },
+                    "&::-webkit-scrollbar-track": { background: "transparent" },
+                    "&::-webkit-scrollbar-thumb": { 
+                        background: useColorModeValue("rgba(0,0,0,0.08)", "rgba(255,255,255,0.08)"), 
+                        borderRadius: "8px" 
+                    },
+                    "&::-webkit-scrollbar-thumb:hover": { 
+                        background: useColorModeValue("rgba(0,0,0,0.16)", "rgba(255,255,255,0.16)") 
+                    }
+                }}
             >
                 <ChakraTable.Root size="md" variant="line" minW="760px">
                     <TableHead
@@ -122,18 +136,72 @@ function DataTable<T extends Record<string, any>>({
 
     return (
         <VStack align="stretch" gap={0} w="full">
-            <Flex justify="space-between" align="end" mb={6} wrap="wrap" gap={3}>
-                <VStack align="start" gap={1}>
-                    <Heading size="lg" fontWeight="900" letterSpacing="tight">
-                        {title || "Data Management"}
-                    </Heading>
-                    <HStack gap={2}>
-                        <Box w="8px" h="8px" borderRadius="full" bg="green.500" boxShadow="0 0 8px var(--chakra-colors-green-500)" />
-                        <Text fontSize="xs" fontWeight="700" color="gray.500" textTransform="uppercase" letterSpacing="widest">
-                            {pagination.totalCount} Active Records
-                        </Text>
+            <Flex
+              
+                justify="space-between"
+                         align={{ base: "start", md: "center" }}
+                         direction={{ base: "column", md: "row" }}
+                         gap={4}
+                         mb={6}
+                         p={4}
+                         borderRadius="2xl"
+                         bg={"app.card.bg"}
+                         border="1px solid"
+                         borderColor={useColorModeValue("gray.100", "whiteAlpha.100")}
+                         backdropFilter="blur(8px)"
+            >
+                <VStack align="start" gap={1.5}>
+                    <HStack gap={2.5}>
+                        <Icon as={Database} color="blue.500" fontSize="18px" />
+                        <Heading
+                            fontSize={{ base: "xl", md: "2xl" }}
+                            fontWeight="950"
+                            letterSpacing="tight"
+                            color={useColorModeValue("gray.950", "white")}
+                        >
+                            {title || "Data Management"}
+                        </Heading>
                     </HStack>
+                    <Text fontSize="xs" fontWeight="700" color="gray.500">
+                        Real-time tracking, sorting, and management dashboard.
+                    </Text>
                 </VStack>
+
+                <HStack
+                    gap={2}
+                    px={3.5}
+                    py={1.5}
+                    // bg={useColorModeValue("blue.50/30", "whiteAlpha.50")}
+                    border="1px solid"
+                    borderColor={useColorModeValue("blue.100/60", "whiteAlpha.100")}
+                    borderRadius="full"
+                    boxShadow="sm"
+                >
+                    <Box
+                        w="6px"
+                        h="6px"
+                        borderRadius="full"
+                        bg="green.500"
+                        css={{
+                            animation: "pulse-glow 2.5s infinite",
+                            "@keyframes pulse-glow": {
+                                "0%": { transform: "scale(0.9)", boxShadow: "0 0 0 0 rgba(72, 187, 120, 0.6)" },
+                                "70%": { transform: "scale(1)", boxShadow: "0 0 0 6px rgba(72, 187, 120, 0)" },
+                                "100%": { transform: "scale(0.9)", boxShadow: "0 0 0 0 rgba(72, 187, 120, 0)" }
+                            }
+                        }}
+                    />
+                    <Icon as={Layers} color={useColorModeValue("blue.500", "blue.400")} fontSize="11px" />
+                    <Text
+                        fontSize="10px"
+                        fontWeight="800"
+                        color={useColorModeValue("blue.800", "blue.300")}
+                        textTransform="uppercase"
+                        letterSpacing="widest"
+                    >
+                        {pagination.totalCount} Active Records
+                    </Text>
+                </HStack>
             </Flex>
 
             <FilterPanel

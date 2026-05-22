@@ -5,6 +5,7 @@ import KPISectionRenderer from "@/core/renderer/ui-type-renderers/KPISectionRend
 import TableSectionRenderer from "@/core/renderer/ui-type-renderers/TableSectionRenderer";
 import ChartSectionRenderer from "@/core/renderer/ui-type-renderers/ChartSectionRenderer";
 import ActionSectionRenderer from "@/core/renderer/ui-type-renderers/ActionSectionRenderer";
+import GridLayoutRenderer from "@/core/renderer/ui-type-renderers/GridLayoutRenderer";
 
 export type UITypeRendererComponent = React.ComponentType<SectionRendererProps>;
 
@@ -36,3 +37,4 @@ UITypeRegistry.register(UISectionType.KPI_SECTION, KPISectionRenderer);
 UITypeRegistry.register(UISectionType.TABLE_SECTION, TableSectionRenderer);
 UITypeRegistry.register(UISectionType.CHART_SECTION, ChartSectionRenderer);
 UITypeRegistry.register(UISectionType.ACTION_SECTION, ActionSectionRenderer);
+UITypeRegistry.register(UISectionType.GRID_LAYOUT, GridLayoutRenderer);

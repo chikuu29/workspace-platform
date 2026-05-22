@@ -32,6 +32,7 @@ export interface DashboardComponentConfig {
   dataSource?: string;
   actionRef?: string;
   uiConfig?: Record<string, any>;
+  components?: DashboardComponentConfig[];
   APIS?: {
     path: string,
     method: "GET",

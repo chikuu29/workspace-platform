@@ -19,7 +19,7 @@
     "target": "UI_VIEW.schema.components",
     "layoutStyles": {
       "p": {
-        "base":1,
+        "base": 1,
         "md": 4
       }
     }
@@ -129,60 +129,116 @@
           ]
         },
         {
-          "id": "recent-tenants-table",
-          "UI_TYPE": "TABLE_VIEW",
-          "title": "Recently Onboarded Tenants",
+          "id": "hostel-dashboard-grid-layout",
+          "UI_TYPE": "GRID_LAYOUT",
           "layout": {
-            "gridColumn": "1 / -1"
+            "columns": { "base": 1, "md": 12 },
+            "gap": 6
           },
-          "TABLES": {
-            "apis": {
-              "loadData": {
-                "path": "hostel/tenants",
-                "method": "GET",
-                "params": {
-                  "skip": 0,
-                  "limit": 5
+          "components": [
+            {
+              "id": "recent-tenants-table",
+              "UI_TYPE": "TABLE_VIEW",
+              "title": "Recently Onboarded Tenants",
+              "layout": {
+                "gridColumn": { "base": "span 12", "md": "span 8" }
+              },
+              "TABLES": {
+                "APIS": {
+                  "path": "hostel/tenants",
+                  "method": "GET",
+                  "params": {
+                    "skip": 0,
+                    "limit": 5
+                  }
+                },
+                "SETTINGS": {
+                  "columns": [
+                    {
+                      "label": "ID",
+                      "key": "data.tenant_id",
+                      "width": "90px",
+                      "textAlign": "center"
+                    },
+                    {
+                      "label": "Tenant Name",
+                      "key": "data.firstName",
+                      "width": "200px"
+                    },
+                    {
+                      "label": "Allocated Room",
+                      "key": "data.room_number",
+                      "width": "120px"
+                    },
+                    {
+                      "label": "Contact Phone",
+                      "key": "data.phone",
+                      "width": "160px"
+                    },
+                    {
+                      "label": "Rent Status",
+                      "key": "data.rent_status",
+                      "width": "120px",
+                      "textAlign": "center",
+                      "isStatus": true
+                    }
+                  ],
+                  "pagination": {
+                    "enabled": false,
+                    "pageSize": 5
+                  }
                 }
               }
             },
-            "SETTINGS": {
-              "columns": [
-                {
-                  "label": "ID",
-                  "key": "data.tenant_id",
-                  "width": "90px",
-                  "textAlign": "center"
+            {
+              "id": "recent-complaints-table",
+              "UI_TYPE": "TABLE_VIEW",
+              "title": "Recent Support Tickets",
+              "layout": {
+                "gridColumn": { "base": "span 12", "md": "span 4" }
+              },
+              "TABLES": {
+                "APIS": {
+                  "path": "hostel/complaints",
+                  "method": "GET",
+                  "params": {
+                    "skip": 0,
+                    "limit": 5
+                  }
                 },
-                {
-                  "label": "Tenant Name",
-                  "key": "data.firstName",
-                  "width": "200px"
-                },
-                {
-                  "label": "Allocated Room",
-                  "key": "data.room_number",
-                  "width": "120px"
-                },
-                {
-                  "label": "Contact Phone",
-                  "key": "data.phone",
-                  "width": "160px"
-                },
-                {
-                  "label": "Rent Status",
-                  "key": "data.rent_status",
-                  "width": "120px",
-                  "textAlign": "center",
-                  "isStatus": true
+                "SETTINGS": {
+                  "columns": [
+                    {
+                      "label": "Room",
+                      "key": "data.room_number",
+                      "width": "80px"
+                    },
+                    {
+                      "label": "Category",
+                      "key": "data.category",
+                      "width": "120px"
+                    },
+                    {
+                      "label": "Urgency",
+                      "key": "data.urgency",
+                      "width": "100px",
+                      "isStatus": true
+                    },
+                    {
+                      "label": "Status",
+                      "key": "data.status",
+                      "width": "100px",
+                      "isStatus": true
+                    }
+                  ],
+                  "pagination": {
+                    "enabled": false,
+                    "pageSize": 5
+                  }
                 }
-              ],
-              "pagination": {
-                "enabled": false,
-                "pageSize": 5
               }
             }
-          }
+          ]
         }
       ]
     }

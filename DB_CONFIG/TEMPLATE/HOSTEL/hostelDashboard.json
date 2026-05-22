@@ -31,9 +31,16 @@
           "title": "Key Operational Metrics",
           "UI_TYPE": "KPI_SECTION",
           "layout": {
-            "gridColumn": "1 / -1"
+            "columns": {
+              "base": 2,
+              "sm": 2,
+              "md": 3,
+              "lg": 4,
+              "xl": 5
+            },
+            "gap": 4
           },
-          "apis": {
+          "APIS": {
             "path": "hostel/analytics/kpis",
             "method": "GET",
             "key": "loadData"
@@ -41,61 +48,65 @@
           "KPIS": [
             {
               "label": "Beds Occupancy Rate",
-              "value": "{{apis.loadData.kpis.occupancy_rate}}",
-              "helpText": "{{apis.loadData.kpis.occupied_beds}} / {{apis.loadData.kpis.total_beds}} beds allocated",
+              "value": "{{occupancy_rate}}",
+              "helpText": "{{occupied_beds}} / {{total_beds}} beds allocated",
               "trend": "up",
               "widget": "KPI_CARD",
+              "icon": "MonitorCog",
               "colorPalette": "cyan",
               "subKpis": [
                 {
                   "label": "Occupied Beds",
-                  "value": "{{apis.loadData.kpis.occupied_beds}}"
+                  "value": "{{occupied_beds}}"
                 },
                 {
                   "label": "Total Beds",
-                  "value": "{{apis.loadData.kpis.total_beds}}"
+                  "value": "{{total_beds}}"
                 }
               ]
             },
             {
               "label": "Active Boarded Tenants",
-              "value": "{{apis.loadData.kpis.active_tenants}}",
+              "value": "{{active_tenants}}",
               "helpText": "All active student/professional allocations",
               "trend": "neutral",
               "widget": "KPI_CARD",
+              "icon": "MonitorCog",
               "colorPalette": "green",
               "subKpis": [
                 {
                   "label": "In-Residence",
-                  "value": "{{apis.loadData.kpis.active_tenants}}"
+                  "value": "{{active_tenants}}"
                 }
               ]
             },
             {
               "label": "Outstanding Dues",
-              "value": "₹{{apis.loadData.kpis.total_dues}}",
+              "value": "₹{{total_dues}}",
               "helpText": "Total pending rent and utilities bills",
               "trend": "down",
               "widget": "KPI_CARD",
+              "icon": "MonitorCog",
               "colorPalette": "purple",
               "subKpis": [
                 {
                   "label": "Pending Payments",
-                  "value": "₹{{apis.loadData.kpis.total_dues}}"
+                  "value": "₹{{total_dues}}"
                 }
               ]
             },
             {
               "label": "Active Maintenance Tickets",
-              "value": "{{apis.loadData.kpis.open_complaints}}",
+              "value": "{{open_complaints}}",
               "helpText": "Tickets pending resolution",
               "trend": "neutral",
               "widget": "KPI_CARD",
+              "icon": "MonitorCog",
               "colorPalette": "red",
               "subKpis": [
                 {
                   "label": "Open Requests",
-                  "value": "{{apis.loadData.kpis.open_complaints}}"
+                  "value": "{{open_complaints}}"
                 }
               ]
             }

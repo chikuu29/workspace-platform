@@ -8,7 +8,7 @@ import type { SectionRendererProps } from "./types";
 const KPISectionRenderer: React.FC<SectionRendererProps> = ({ component, resolveData }) => {
   console.log("Rendering KPISection with component:", component);
   console.log("Data source:", resolveData);
-
+  
   const records = component.dataSource ? resolveData(component.dataSource) : (component.KPIS || []);
   const columns = component.uiConfig?.columns || { base: 1, md: 2, lg: 3 };
 
@@ -23,7 +23,7 @@ const KPISectionRenderer: React.FC<SectionRendererProps> = ({ component, resolve
   
 
   return (
-    <Box {...(component.layout || {})}>
+    <Box>
       {component.title && (
         <HStack align="start" gap={3} mb={4}>
           <Box w="3px" h="42px" borderRadius="full" bg="blue.500" />
@@ -39,7 +39,7 @@ const KPISectionRenderer: React.FC<SectionRendererProps> = ({ component, resolve
           </Box>
         </HStack>
       )}
-      <SimpleGrid columns={columns} gap={component.uiConfig?.gap || 6}>
+      <SimpleGrid columns={component.layout?.columns} gap={component.layout?.gap || 6}>
         {records.map((item: any, index: number) => {
           const widgetKey = resolveWidgetKey(item?.widget);
           const WidgetComponent = WidgetRegistry.get(widgetKey);

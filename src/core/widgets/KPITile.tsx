@@ -10,7 +10,7 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, MonitorCog } from "lucide-react";
 // ── Gradient background for the icon circle ──────────────────────────
 
 const ACCENT_GRADIENTS: Record<string, string> = {
@@ -66,11 +66,9 @@ interface KPITilesProps {
   accentColor: string;
   /** Show skeleton while data loads */
   loading?: boolean;
-  helpText?:string;
-  colorPalette?:any
-  subKpis?:any[]
-
-
+  helpText?: string;
+  colorPalette?: any;
+  subKpis?: any[];
 }
 
 /** Fallback gradient if the accent isn't in the map */
@@ -83,7 +81,7 @@ const KPITile = memo(
     helpText,
     colorPalette,
     subKpis,
-    icon: IconComponent,
+    icon: IconComponent = MonitorCog,
     accentColor,
     loading = false,
   }: KPITilesProps) => {
@@ -114,73 +112,78 @@ const KPITile = memo(
           boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
         }}
         role="group"
+
       >
-        <HStack justify="space-between" align="start" gap={4}>
-          {/* Text block */}
-          <VStack align="start" gap={1} minW={0}>
-            <Text
-              fontSize="xs"
-              fontWeight="700"
-              color="app.text.muted"
-              textTransform="uppercase"
-              letterSpacing="0.05em"
-            >
-              {label}
-            </Text>
-
-            <Skeleton loading={false} borderRadius="md" minH="30px">
-              <Heading
-                size="xl"
-                fontWeight="900"
-                color="app.text.primary"
-                letterSpacing="tight"
-                lineHeight="1.1"
+        <VStack>
+          <HStack justify="space-between" align="start" gap={4}>
+            {/* Text block */}
+            <VStack align="start" gap={1} minW={0}>
+              <Text
+                fontSize="xs"
+                fontWeight="700"
+                color="app.text.muted"
+                textTransform="uppercase"
+                letterSpacing="0.05em"
               >
-                {value}
-              </Heading>
-            </Skeleton>
+                {label}
+              </Text>
 
-            {/* <Text fontSize="xs" fontWeight="600" color="app.text.muted">
+              <Skeleton loading={false} borderRadius="md" minH="30px">
+                <Heading
+                  size="xl"
+                  fontWeight="900"
+                  color="app.text.primary"
+                  letterSpacing="tight"
+                  lineHeight="1.1"
+                >
+                  {value}
+                </Heading>
+              </Skeleton>
+
+              {/* <Text fontSize="xs" fontWeight="600" color="app.text.muted">
             {subtitle}
           </Text> */}
-          </VStack>
+            </VStack>
 
-          {/* Gradient icon badge */}
-          <Flex
-            align="center"
-            justify="center"
-            w="44px"
-            h="44px"
-            borderRadius="xl"
-            bg={gradient}
-            color="white"
-            flexShrink={0}
-          >
-            {/* <IconComponent size={20} strokeWidth={2} /> */}
-          </Flex>
-        </HStack>
-        <Stat.Root>
-          <Stat.Label fontSize="sm" fontWeight="600" color={labelColor}>
-            {label}
-          </Stat.Label>
-          <Stat.ValueText
-            mt={1}
-            fontSize="2xl"
-            fontWeight="800"
-            color={valueColor}
-          >
-            {value}
-          </Stat.ValueText>
-          {helpText && <Stat.HelpText fontSize="xs">{helpText}</Stat.HelpText>}
-        </Stat.Root>
-
-        {Array.isArray(subKpis) && subKpis.length > 0 && (
-          <HStack gap={2} w="full" mt={4}>
-            {subKpis.map((sub: any, idx: number) => (
-              <SubKPITile key={`${label}-${idx}`} config={sub} />
-            ))}
+            {/* Gradient icon badge */}
+            <Flex
+              align="center"
+              justify="center"
+              w="44px"
+              h="44px"
+              borderRadius="xl"
+              bg={gradient}
+              color="white"
+              flexShrink={0}
+            >
+              <IconComponent size={20} strokeWidth={2} />
+            </Flex>
           </HStack>
-        )}
+          <Stat.Root>
+            <Stat.Label fontSize="sm" fontWeight="600" color={labelColor}>
+              {label}
+            </Stat.Label>
+            <Stat.ValueText
+              mt={1}
+              fontSize="2xl"
+              fontWeight="800"
+              color={valueColor}
+            >
+              {value}
+            </Stat.ValueText>
+            {helpText && (
+              <Stat.HelpText fontSize="xs">{helpText}</Stat.HelpText>
+            )}
+          </Stat.Root>
+
+          {Array.isArray(subKpis) && subKpis.length > 0 && (
+            <HStack gap={2} w="full" mt={4}>
+              {subKpis.map((sub: any, idx: number) => (
+                <SubKPITile key={`${label}-${idx}`} config={sub} />
+              ))}
+            </HStack>
+          )}
+        </VStack>
       </Box>
     );
   },

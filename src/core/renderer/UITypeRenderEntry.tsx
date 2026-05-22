@@ -4,6 +4,8 @@ import { UITypeRegistry } from "@/core/registry/UITypeRegistry";
 import type { SectionRendererProps } from "@/core/renderer/ui-type-renderers/types";
 
 const UITypeRenderEntry: React.FC<SectionRendererProps> = (props) => {
+  console.log("UITypeRenderEntry==",props);
+  
   const Renderer = UITypeRegistry.resolve(props.component.UI_TYPE);
 
   if (!Renderer) {

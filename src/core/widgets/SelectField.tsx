@@ -1,4 +1,4 @@
-import { Box, Flex, Field as ChakraField, Text, HStack, createListCollection } from "@chakra-ui/react";
+import { Box, Flex, Field, Text, HStack, createListCollection } from "@chakra-ui/react";
 import { useColorModeValue } from "../../components/ui/color-mode";
 import React, { memo, useEffect, useState, useMemo } from "react";
 import { Controller, useFormContext } from "react-hook-form";
@@ -20,6 +20,7 @@ interface SELECTFIELD {
     hidden?: boolean;
     oneLiner?: boolean;
     required?: boolean;
+    mandatory?: boolean;
     options?: { label: string; value: string }[];
     apiPath?: string;
     serverName?: string;
@@ -38,6 +39,7 @@ const SelectField = ({
     hidden = false,
     oneLiner = false,
     required = false,
+    mandatory = false,
     options: initialOptions = [],
     apiPath,
     serverName = "core",
@@ -47,29 +49,42 @@ const SelectField = ({
     events,
     errors,
 }: SELECTFIELD) => {
-    const [options, setOptions] = useState<any[]>(initialOptions);
+    const isRequired = required || mandatory;
+    const [apiOptions, setApiOptions] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (apiPath && initialOptions.length === 0) {
+        if (apiPath && (!initialOptions || initialOptions.length === 0)) {
             setLoading(true);
-            GETAPI({
+            const subscription = GETAPI({
                 path: apiPath,
                 serverName: serverName as APIService,
                 isPrivateApi: true,
-            }).subscribe((res: any) => {
-                if (res.success && (res.result || res.data)) {
-                    const data = res.result || res.data;
-                    const mapped = data.map((item: any) => ({
-                        label: item[labelField],
-                        value: item[valueField],
-                    }));
-                    setOptions(mapped);
+            }).subscribe({
+                next: (res: any) => {
+                    if (res.success && (res.result || res.data)) {
+                        const data = res.result || res.data;
+                        const mapped = data.map((item: any) => ({
+                            label: item[labelField] || "",
+                            value: String(item[valueField] || ""),
+                        }));
+                        setApiOptions(mapped);
+                    }
+                    setLoading(false);
+                },
+                error: (err) => {
+                    console.error("Failed to fetch select options:", err);
+                    setLoading(false);
                 }
-                setLoading(false);
             });
+
+            return () => {
+                subscription.unsubscribe();
+            };
         }
-    }, [apiPath, serverName, labelField, valueField, initialOptions]);
+    }, [apiPath, serverName, labelField, valueField, initialOptions?.length]);
+
+    const options = apiPath && (!initialOptions || initialOptions.length === 0) ? apiOptions : initialOptions;
 
     const collection = useMemo(() =>
         createListCollection({
@@ -91,9 +106,9 @@ const SelectField = ({
                 control={methods.control}
                 name={name}
                 defaultValue={defaultValue}
-                rules={{ required: required ? `${text} is required` : false }}
+                rules={{ required: isRequired ? `${text} is required` : false }}
                 render={({ field }) => (
-                    <ChakraField.Root invalid={!!errors} required={required} disabled={disabled}>
+                    <Field.Root invalid={!!errors} required={isRequired} disabled={disabled}>
                         <Flex
                             direction={oneLiner ? { base: "column", md: "row" } : "column"}
                             align={oneLiner ? { base: "stretch", md: "center" } : "stretch"}
@@ -102,15 +117,30 @@ const SelectField = ({
                         >
                             {text && (
                                 <Box w={labelWidth}>
-                                    <ChakraField.Label
+                                    <Field.Label
                                         htmlFor={name}
-                                        fontSize="sm"
+                                        fontSize="md"
                                         fontWeight="semibold"
-                                        color="fg.muted"
+                                        transition="color 0.2s"
                                         mb={oneLiner ? 0 : 1}
                                     >
-                                        {text}
-                                    </ChakraField.Label>
+                                        <Flex as="span" align="center" gap={1}>
+                                            {text}
+                                            {isRequired && (
+                                                <Text
+                                                    as="span"
+                                                    color="red.500"
+                                                    fontSize="md"
+                                                    fontWeight="bold"
+                                                    lineHeight="1"
+                                                    aria-hidden
+                                                    title="Required"
+                                                >
+                                                    *
+                                                </Text>
+                                            )}
+                                        </Flex>
+                                    </Field.Label>
                                     {description && !oneLiner && (
                                         <Text fontSize="xs" color="fg.subtle" mb={1}>
                                             {description}
@@ -124,7 +154,7 @@ const SelectField = ({
                                     collection={collection}
                                     value={field.value ? [field.value] : []}
                                     onValueChange={(e) => {
-                                        const val = e.value[0];
+                                        const val = e.value[0] ?? "";
                                         field.onChange(val);
                                         if (events) {
                                             ruleEngine.processEvents(events, val, 'change', methods);
@@ -134,54 +164,87 @@ const SelectField = ({
                                     width="full"
                                     positioning={{ sameWidth: true, strategy: "fixed" }}
                                 >
-                                    <ComboboxControl>
+                                    <ComboboxControl clearable>
                                         <ComboboxInput
                                             placeholder={oneLiner ? description : `Select ${text}`}
-                                            bg={useColorModeValue("white", "whiteAlpha.50")}
+                                            bg={"app.input.bg"}
                                             borderRadius="lg"
                                             borderWidth="1.5px"
-                                            borderColor={useColorModeValue("gray.200", "whiteAlpha.200")}
+                                            borderColor="app.input.border"
                                             h="48px"
                                             px={4}
                                             fontWeight="600"
-                                            transition="all 0.2s"
+                                            transition="all 0.22s cubic-bezier(0.4,0,0.2,1)"
                                             _hover={{
-                                                borderColor: useColorModeValue("gray.300", "whiteAlpha.400"),
+                                                borderColor: "app.input.border.focus",
+                                            }}
+                                            _invalid={{
+                                                borderColor: "red.500",
+                                                boxShadow: "0 0 0 3px rgba(239,68,68,0.2)",
                                             }}
                                             _focus={{
-                                                borderColor: "blue.500",
-                                                boxShadow: "0 0 0 1px rgba(66, 153, 225, 0.6)",
-                                                bg: useColorModeValue("white", "whiteAlpha.100"),
+                                                borderColor: "app.input.border.focus",
+                                                boxShadow: "app.input.glow",
+                                                outline: "none",
                                             }}
                                         />
                                     </ComboboxControl>
                                     <ComboboxContent
-                                        bg="app.bg.primary"
+                                        bg="app.card.bg"
                                         borderColor="app.card.border"
+                                        borderWidth="1px"
+                                        borderRadius="xl"
+                                        p={1.5}
                                         zIndex={9999}
-                                        boxShadow="2xl"
+                                        boxShadow="0 10px 30px rgba(0, 0, 0, 0.1), 0 1px 8px rgba(0, 0, 0, 0.05)"
                                     >
                                         {collection.items.length > 0 ? (
                                             collection.items.map((item) => (
                                                 <ComboboxItem
                                                     key={item.value}
                                                     item={item}
-                                                    _hover={{ bg: "whiteAlpha.100", color: "cyan.400" }}
+                                                    px={4}
+                                                    py={3}
+                                                    my={1}
+                                                    borderRadius="lg"
+                                                    fontWeight="600"
+                                                    fontSize="sm"
+                                                    cursor="pointer"
+                                                    transition="all 0.22s cubic-bezier(0.4, 0, 0.2, 1)"
+                                                    color="app.text.primary"
+                                                    bg="transparent"
+                                                    _hover={{
+                                                        bg: useColorModeValue("rgba(66, 42, 251, 0.06)", "rgba(117, 81, 255, 0.15)"),
+                                                        color: useColorModeValue("brand.500", "brand.200"),
+                                                        transform: "translateX(4px)",
+                                                    }}
+                                                    _selected={{
+                                                        bg: useColorModeValue("rgba(66, 42, 251, 0.1)", "rgba(117, 81, 255, 0.2)"),
+                                                        color: useColorModeValue("brand.500", "brand.100"),
+                                                        fontWeight: "700",
+                                                    }}
                                                 >
-                                                    {item.label}
+                                                    <Flex w="full" align="center" justify="space-between">
+                                                        <Text fontSize="sm" fontWeight="inherit">
+                                                            {item.label}
+                                                        </Text>
+                                                    </Flex>
                                                 </ComboboxItem>
                                             ))
                                         ) : (
-                                            <Box p={2} color="fg.subtle">No options found</Box>
+                                            <Box p={3} textAlign="center" color="app.text.muted" fontSize="sm" fontWeight="medium">
+                                                No options found
+                                            </Box>
                                         )}
                                     </ComboboxContent>
                                 </ComboboxRoot>
-                                <ChakraField.ErrorText fontSize="xs" color="red.500" fontWeight="medium" mt={1}>
+                                <Field.ErrorText fontSize="md" color="red.500" fontWeight="medium" mt={1}>
+                                    <Field.ErrorIcon />
                                     {errors?.message?.toString()}
-                                </ChakraField.ErrorText>
+                                </Field.ErrorText>
                             </Box>
                         </Flex>
-                    </ChakraField.Root>
+                    </Field.Root>
                 )}
             />
         </Box>

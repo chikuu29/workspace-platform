@@ -13,18 +13,20 @@
     "createdAt": "2026-05-20"
   },
   "UI_TYPE": {
-    "type": "GRID_VIEW",
+    "type": "CONTAINER_VIEW",
     "title": "Hostel Operations Command Center",
     "description": "Premium multi-tenant real-time metrics, room allocations, occupancy tracking and dues analytics.",
-    "target": "grids",
+    "target": "UI_VIEW.schema.components",
     "layoutStyles": {
-      "templateColumns": "repeat(2, minmax(0, 1fr))",
-      "gap": "6"
+      "p": {
+        "base": 4,
+        "md": 8
+      }
     }
   },
   "UI_VIEW": {
     "schema": {
-      "grids": [
+      "components": [
         {
           "title": "Key Operational Metrics",
           "UI_TYPE": "KPI_SECTION",
@@ -32,10 +34,9 @@
             "gridColumn": "1 / -1"
           },
           "apis": {
-            "loadData": {
-              "path": "hostel/analytics/kpis",
-              "method": "GET"
-            }
+            "path": "hostel/analytics/kpis",
+            "method": "GET",
+            "key": "loadData"
           },
           "KPIS": [
             {

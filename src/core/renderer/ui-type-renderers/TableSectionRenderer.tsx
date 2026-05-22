@@ -22,6 +22,7 @@ const toLegacyActions = (events?: Record<string, any>) => {
 };
 
 const TableSectionRenderer: React.FC<SectionRendererProps> = ({ component, resolveData, resolveActions, fallbackTableColumns }) => {
+  console.log("Rendering TableSection with component:", component);
   const rows = component.dataSource
     ? resolveData(component.dataSource)
     : (component.TABLES?.data?.length ? component.TABLES.data : DEFAULT_TABLE_DATA);

@@ -9,6 +9,10 @@ interface AsyncLoadIconProps {
   iconName: string;
   /** Raw SVG markup string from config — rendered instantly when valid */
   svgIcon?: string;
+  /** Custom box size for standard layouts (e.g. "4", "44px") */
+  boxSize?: any;
+  /** Native icon size parameter */
+  size?: number;
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────
@@ -29,12 +33,12 @@ const isValidSvgMarkup = (raw: string): boolean => {
  * Strips any existing width/height attributes and injects w=16 h=16
  * so the icon always fits the 4×4 box used by the nav.
  */
-const normalizeSvgSize = (raw: string): string => {
+const normalizeSvgSize = (raw: string, size: number): string => {
   let svg = raw.trim();
   // Remove existing width/height to avoid double-specification
   svg = svg.replace(/\s(width|height)="[^"]*"/gi, "");
-  // Inject width="16" height="16" after the opening <svg tag
-  svg = svg.replace("<svg", '<svg width="16" height="16"');
+  // Inject width and height after the opening <svg tag
+  svg = svg.replace("<svg", `<svg width="${size}" height="${size}"`);
   return svg;
 };
 
@@ -42,17 +46,17 @@ const normalizeSvgSize = (raw: string): string => {
 // Static cache to store loaded icon components and avoid redundant imports
 const iconCache: Record<string, ComponentType<any>> = {};
 
-const AsyncLoadIcon = React.memo(({ iconName, svgIcon }: AsyncLoadIconProps) => {
+const AsyncLoadIcon = React.memo(({ iconName, svgIcon, boxSize = "4", size = 16 }: AsyncLoadIconProps) => {
   // console.debug("[AsyncLoadIcon] Rendering with iconName:", iconName);
   // ── Fast path: inline SVG from config ──────────────────────────────
   const sanitizedSvg = useMemo(() => {
     if (!svgIcon || !isValidSvgMarkup(svgIcon)) return null;
     try {
-      return normalizeSvgSize(svgIcon);
+      return normalizeSvgSize(svgIcon, size);
     } catch {
       return null;
     }
-  }, [svgIcon]);
+  }, [svgIcon, size]);
 
   const svgHtml = useMemo(
     () => (sanitizedSvg ? { __html: sanitizedSvg } : null),
@@ -108,7 +112,7 @@ const AsyncLoadIcon = React.memo(({ iconName, svgIcon }: AsyncLoadIconProps) => 
   if (svgHtml) {
     return (
       <Box
-        boxSize="4"
+        boxSize={boxSize}
         display="flex"
         alignItems="center"
         justifyContent="center"
@@ -121,7 +125,7 @@ const AsyncLoadIcon = React.memo(({ iconName, svgIcon }: AsyncLoadIconProps) => 
   // ── Render: async loading state ────────────────────────────────────
   if (loading) {
     return (
-      <Box boxSize="4" display="flex" alignItems="center" justifyContent="center">
+      <Box boxSize={boxSize} display="flex" alignItems="center" justifyContent="center">
         <Spinner size="xs" />
       </Box>
     );
@@ -130,7 +134,7 @@ const AsyncLoadIcon = React.memo(({ iconName, svgIcon }: AsyncLoadIconProps) => 
   // ── Render: error fallback ─────────────────────────────────────────
   if (error || !IconComponent) {
     return (
-      <Box boxSize="4" display="flex" alignItems="center" justifyContent="center">
+      <Box boxSize={boxSize} display="flex" alignItems="center" justifyContent="center">
         <Box boxSize="1.5" borderRadius="full" bg="red.400" />
       </Box>
     );
@@ -138,8 +142,8 @@ const AsyncLoadIcon = React.memo(({ iconName, svgIcon }: AsyncLoadIconProps) => 
 
   // ── Render: async-loaded icon ──────────────────────────
   return (
-    <Box boxSize="4" display="flex" alignItems="center" justifyContent="center">
-      <IconComponent size={16} />
+    <Box boxSize={boxSize} display="flex" alignItems="center" justifyContent="center">
+      <IconComponent size={size} />
     </Box>
   );
 });

@@ -10,16 +10,21 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { LucideIcon, MonitorCog } from "lucide-react";
+import AsyncLoadIcon from "@/utils/hooks/AsyncLoadIcon";
+
 // ── Gradient background for the icon circle ──────────────────────────
 
 const ACCENT_GRADIENTS: Record<string, string> = {
-  "blue.500": "linear-gradient(135deg, #3b82f6, #6366f1)",
-  "green.500": "linear-gradient(135deg, #10b981, #059669)",
-  "purple.500": "linear-gradient(135deg, #8b5cf6, #7c3aed)",
-  "orange.500": "linear-gradient(135deg, #f59e0b, #ef4444)",
-  "teal.500": "linear-gradient(135deg, #14b8a6, #0ea5e9)",
-  "pink.500": "linear-gradient(135deg, #ec4899, #f43f5e)",
+  "blue": "linear-gradient(135deg, #3b82f6, #6366f1)",
+  "green": "linear-gradient(135deg, #10b981, #059669)",
+  "purple": "linear-gradient(135deg, #8b5cf6, #7c3aed)",
+  "orange": "linear-gradient(135deg, #f59e0b, #ef4444)",
+  "teal": "linear-gradient(135deg, #14b8a6, #0ea5e9)",
+  "pink": "linear-gradient(135deg, #ec4899, #f43f5e)",
+  "red": "linear-gradient(135deg, #ef4444, #dc2626)",
+  "cyan": "linear-gradient(135deg, #06b6d4, #0891b2)",
+  "yellow": "linear-gradient(135deg, #eab308, #ca8a04)",
+  "gray": "linear-gradient(135deg, #6b7280, #4b5563)",
 };
 
 const SubKPITile = ({ config }: { config: any }) => {
@@ -32,6 +37,7 @@ const SubKPITile = ({ config }: { config: any }) => {
       gap={0}
       p={2}
       bg={useColorModeValue("gray.50", "whiteAlpha.50")}
+      // bg={"app.card.bg"}
       borderRadius="md"
       flex="1"
     >
@@ -60,14 +66,13 @@ interface KPITilesProps {
   value: string;
   /** Small caption below the value */
   subtitle: string;
-  /** Lucide icon component from lucide-react */
-  icon: LucideIcon;
+  /** Lucide icon component from lucide-react or name of it */
+  icon?: any;
   /** Chakra color token for accent (e.g. "blue.500") */
-  accentColor: string;
   /** Show skeleton while data loads */
   loading?: boolean;
   helpText?: string;
-  colorPalette?: any;
+  colorPalette?: string;
   subKpis?: any[];
 }
 
@@ -79,13 +84,13 @@ const KPITile = memo(
     label,
     value,
     helpText,
-    colorPalette,
+    colorPalette="blue",
     subKpis,
-    icon: IconComponent = MonitorCog,
-    accentColor,
+    icon,
     loading = false,
   }: KPITilesProps) => {
-    const gradient = ACCENT_GRADIENTS[accentColor] || fallbackGradient;
+    const basePalette = colorPalette ? colorPalette.split(".")[0] : "blue";
+    const gradient = ACCENT_GRADIENTS[colorPalette] || ACCENT_GRADIENTS[basePalette] || fallbackGradient;
     const bg = useColorModeValue("white", "whiteAlpha.50");
     const borderColor = useColorModeValue("gray.100", "whiteAlpha.100");
     const labelColor = useColorModeValue("gray.500", "gray.400");
@@ -114,35 +119,48 @@ const KPITile = memo(
         role="group"
 
       >
-        <VStack>
-          <HStack justify="space-between" align="start" gap={4}>
+        <VStack align="stretch" gap={4} w="full">
+          <HStack justify="space-between" align="start" gap={4} w="full">
             {/* Text block */}
-            <VStack align="start" gap={1} minW={0}>
+            <VStack align="start" gap={1} minW={0} flex={1}>
               <Text
                 fontSize="xs"
                 fontWeight="700"
                 color="app.text.muted"
                 textTransform="uppercase"
                 letterSpacing="0.05em"
+                wordBreak="break-word"
+                whiteSpace="normal"
               >
                 {label}
               </Text>
 
-              <Skeleton loading={false} borderRadius="md" minH="30px">
+              <Skeleton loading={loading} borderRadius="md" minH="30px" w="full">
                 <Heading
                   size="xl"
                   fontWeight="900"
                   color="app.text.primary"
                   letterSpacing="tight"
                   lineHeight="1.1"
+                  wordBreak="break-word"
+                  whiteSpace="normal"
                 >
                   {value}
                 </Heading>
               </Skeleton>
 
-              {/* <Text fontSize="xs" fontWeight="600" color="app.text.muted">
-            {subtitle}
-          </Text> */}
+              {helpText && (
+                <Text
+                  fontSize="xs"
+                  fontWeight="600"
+                  color="app.text.muted"
+                  mt={1}
+                  wordBreak="break-word"
+                  whiteSpace="normal"
+                >
+                  {helpText}
+                </Text>
+              )}
             </VStack>
 
             {/* Gradient icon badge */}
@@ -156,28 +174,16 @@ const KPITile = memo(
               color="white"
               flexShrink={0}
             >
-              <IconComponent size={20} strokeWidth={2} />
+              {typeof icon === "string" || !icon ? (
+                <AsyncLoadIcon iconName={icon || "MonitorCog"} size={20} boxSize="5" />
+              ) : (
+                React.createElement(icon, { size: 20 })
+              )}
             </Flex>
           </HStack>
-          <Stat.Root>
-            <Stat.Label fontSize="sm" fontWeight="600" color={labelColor}>
-              {label}
-            </Stat.Label>
-            <Stat.ValueText
-              mt={1}
-              fontSize="2xl"
-              fontWeight="800"
-              color={valueColor}
-            >
-              {value}
-            </Stat.ValueText>
-            {helpText && (
-              <Stat.HelpText fontSize="xs">{helpText}</Stat.HelpText>
-            )}
-          </Stat.Root>
 
           {Array.isArray(subKpis) && subKpis.length > 0 && (
-            <HStack gap={2} w="full" mt={4}>
+            <HStack gap={2} w="full" mt={1}>
               {subKpis.map((sub: any, idx: number) => (
                 <SubKPITile key={`${label}-${idx}`} config={sub} />
               ))}

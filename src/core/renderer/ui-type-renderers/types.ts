@@ -28,9 +28,15 @@ export interface DashboardComponentConfig {
   title?: string;
   description?: string;
   layout?: Record<string, any>;
+  icon?: string;
   dataSource?: string;
   actionRef?: string;
   uiConfig?: Record<string, any>;
+  APIS?: {
+    path: string,
+    method: "GET",
+    key: "loadData"
+  }
   KPIS?: any[];
   TABLES?: {
     data?: any[];
@@ -45,7 +51,7 @@ export interface DashboardComponentConfig {
 
 export interface DashboardPageConfig {
   title?: string;
-  appMeta?: { version?: string; owner?: string; [key: string]: any };
+  appMeta?: { version?: string; owner?: string;[key: string]: any };
   layout?: { maxW?: string; contentPadding?: Record<string, any>; sectionGap?: number };
   dataSource?: Record<string, DashboardDataSource>;
   actions?: Record<string, DashboardActionConfig[]>;

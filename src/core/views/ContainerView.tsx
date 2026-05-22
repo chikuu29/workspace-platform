@@ -69,9 +69,8 @@ const ContainerView: React.FC<{ config: any }> = ({ config }) => {
   };
 
   return (
-    <Box {...layoutStyles}>
+    <Box >
       <Flex
-       
         direction={{ base: "column", sm: "row" }}
         justify="space-between"
         align={{ base: "start", sm: "center" }}
@@ -97,7 +96,7 @@ const ContainerView: React.FC<{ config: any }> = ({ config }) => {
           )}
         </VStack>
       </Flex>
-      <VStack  mt={4}>
+      <VStack mt={2} {...layoutStyles}>
         <Box>
           {blocks.map((block, index) => {
             const normalizedBlock: DashboardComponentConfig = {

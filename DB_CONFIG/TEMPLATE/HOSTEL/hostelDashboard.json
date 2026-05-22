@@ -30,6 +30,7 @@
         {
           "title": "Key Operational Metrics",
           "UI_TYPE": "KPI_SECTION",
+          "icon": "Activity",
           "layout": {
             "columns": {
               "base": 2,
@@ -52,7 +53,7 @@
               "helpText": "{{occupied_beds}} / {{total_beds}} beds allocated",
               "trend": "up",
               "widget": "KPI_CARD",
-              "icon": "MonitorCog",
+              "icon": "Bed",
               "colorPalette": "cyan",
               "subKpis": [
                 {
@@ -71,7 +72,7 @@
               "helpText": "All active student/professional allocations",
               "trend": "neutral",
               "widget": "KPI_CARD",
-              "icon": "MonitorCog",
+              "icon": "Users",
               "colorPalette": "green",
               "subKpis": [
                 {
@@ -86,7 +87,7 @@
               "helpText": "Total pending rent and utilities bills",
               "trend": "down",
               "widget": "KPI_CARD",
-              "icon": "MonitorCog",
+              "icon": "IndianRupee",
               "colorPalette": "purple",
               "subKpis": [
                 {
@@ -101,12 +102,27 @@
               "helpText": "Tickets pending resolution",
               "trend": "neutral",
               "widget": "KPI_CARD",
-              "icon": "MonitorCog",
+              "icon": "Wrench",
               "colorPalette": "red",
               "subKpis": [
                 {
                   "label": "Open Requests",
                   "value": "{{open_complaints}}"
+                }
+              ]
+            },
+            {
+              "label": "Managed Buildings",
+              "value": "{{total_buildings}}",
+              "helpText": "Active hostel buildings and blocks",
+              "trend": "up",
+              "widget": "KPI_CARD",
+              "icon": "Building",
+              "colorPalette": "orange",
+              "subKpis": [
+                {
+                  "label": "Blocks",
+                  "value": "{{total_buildings}}"
                 }
               ]
             }

@@ -58,6 +58,22 @@
                 "valueField": "id"
               },
               {
+                "name": "floorNumber",
+                "text": "Floor Number",
+                "description": "Select the building floor where the room is situated.",
+                "widget": "selectField",
+                "mandatory": true,
+                "oneLiner": true,
+                "options": [
+                  { "label": "Ground Floor", "value": "0" },
+                  { "label": "1st Floor", "value": "1" },
+                  { "label": "2nd Floor", "value": "2" },
+                  { "label": "3rd Floor", "value": "3" },
+                  { "label": "4th Floor", "value": "4" },
+                  { "label": "5th Floor", "value": "5" }
+                ]
+              },
+              {
                 "name": "roomNumber",
                 "text": "Room Number",
                 "description": "Assign a unique room identifier (e.g. A-101, B-302)",

@@ -96,12 +96,50 @@
             "iconName": "Bed",
             "widgets": [
               {
+                "name": "buildingName",
+                "text": "Select Building",
+                "description": "Select the building block where the tenant will reside.",
+                "widget": "selectField",
+                "mandatory": true,
+                "oneLiner": true,
+                "apiPath": "hostel/buildings/options",
+                "labelField": "name",
+                "valueField": "id",
+                "events": {
+                  "change": [
+                    {
+                      "actions": [
+                        {
+                          "type": "disabled",
+                          "target": "room_number",
+                          "value": false
+                        },
+                        {
+                          "type": "setProp",
+                          "target": "room_number",
+                          "prop": "apiPath",
+                          "value": "hostel/rooms/options?buildingName={{value}}"
+                        },
+                        {
+                          "type": "setValue",
+                          "target": "room_number",
+                          "value": ""
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
                 "name": "room_number",
                 "text": "Select Room Number",
-                "description": "Input or assign the specific room unit (e.g. A-101). Note: The system will verify availability.",
-                "widget": "textField",
+                "description": "Assign the specific available room unit in the selected building block.",
+                "widget": "selectField",
+                "mandatory": true,
                 "oneLiner": true,
-                "mandatory": true
+                "labelField": "name",
+                "valueField": "id",
+                "disabled": true
               },
               {
                 "name": "allotmentDate",

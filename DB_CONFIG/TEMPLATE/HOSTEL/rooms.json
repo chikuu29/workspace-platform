@@ -54,6 +54,12 @@
                   "isSearchable": true
                 },
                 {
+                  "label": "Floor Number",
+                  "key": "data.floorNumber",
+                  "width": "120px",
+                  "isSortable": true
+                },
+                {
                   "label": "Room Type",
                   "key": "data.roomType",
                   "width": "150px",

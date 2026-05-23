@@ -54,9 +54,9 @@ const SwitchField = ({
                                 <Box w={labelWidth}>
                                     <Field.Label
                                         htmlFor={name}
-                                        fontSize="sm"
+                                        fontSize="md"
                                         fontWeight="semibold"
-                                        color="fg.muted"
+                                        transition="color 0.2s"
                                         mb={oneLiner ? 0 : 1}
                                     >
                                         {text}

@@ -514,11 +514,31 @@ const UploadField = ({
         >
           {text && (
             <Box w={labelWidth}>
-              <Field.Label fontSize="md" fontWeight="semibold" >
-                {text}  <Field.RequiredIndicator />
+              <Field.Label
+                htmlFor={name}
+                fontSize="md"
+                fontWeight="semibold"
+                transition="color 0.2s"
+              >
+                <Flex as="span" align="center" gap={1}>
+                  {text}
+                  {mandatory && (
+                    <Text
+                      as="span"
+                      color="red.500"
+                      fontSize="md"
+                      fontWeight="bold"
+                      lineHeight="1"
+                      aria-hidden
+                      title="Required"
+                    >
+                      *
+                    </Text>
+                  )}
+                </Flex>
               </Field.Label>
               {description && !oneLiner && (
-                <Text fontSize="xs" color="fg.subtle">
+                <Text fontSize="xs" color="fg.subtle" mb={1}>
                   {description}
                 </Text>
               )}
@@ -530,14 +550,18 @@ const UploadField = ({
               <Box flex="1" position="relative">
                 <Box w="full" onClick={onOpen} cursor="pointer">
                   <Input
+                    id={name}
                     readOnly
                     value={uploadedFileCount > 0 ? `${uploadedFileCount} file(s) uploaded` : ""}
-                    placeholder="Click to upload files..."
-                    size="md"
-                    borderRadius="xl"
+                    placeholder={oneLiner ? description : "Click to upload files..."}
+                    size="lg"
+                    borderRadius="lg"
                     borderWidth="1.5px"
-                    bg={fieldBg}
-                    _focus={{ borderColor: "indigo.500", boxShadow: "0 0 0 1px var(--chakra-colors-indigo-500)" }}
+                    bg={"app.input.bg"}
+                    borderColor="app.input.border"
+                    _hover={{ borderColor: "app.input.border.focus" }}
+                    _focus={{ borderColor: "app.input.border.focus", boxShadow: "app.input.glow" }}
+                    transition="all 0.22s cubic-bezier(0.4,0,0.2,1)"
                   />
                   <Center position="absolute" right="3" top="50%" transform="translateY(-50%)" color="gray.400">
                     <Camera size={18} />

@@ -51,7 +51,9 @@ function DataTable<T extends Record<string, any>>({
     const panelBg = useColorModeValue("white", "whiteAlpha.50");
     const borderColor = useColorModeValue("gray.100", "whiteAlpha.100");
     const emptyCardBg = useColorModeValue("gray.50", "whiteAlpha.100");
-
+    const scrollbarThumbBg = useColorModeValue("rgba(0,0,0,0.08)", "rgba(255,255,255,0.08)");
+    const scrollbarThumbHoverBg = useColorModeValue("rgba(0,0,0,0.16)", "rgba(255,255,255,0.16)");
+ 
     const tableContent = useMemo(() => {
         if (isMobile) {
             return (
@@ -59,13 +61,13 @@ function DataTable<T extends Record<string, any>>({
                     {processedData.map((row, idx) => (
                         <MobileTableCard key={idx} row={row} columns={columns} actions={actions} />
                     ))}
-
+ 
                     {processedData.length === 0 && (
                         <Box
                             borderRadius="lg"
                             p={6}
                             // bg={emptyCardBg}
-
+ 
                             border="1px dashed"
                             borderColor={borderColor}
                             textAlign="center"
@@ -77,7 +79,7 @@ function DataTable<T extends Record<string, any>>({
                 </VStack>
             );
         }
-
+ 
         return (
             <Box
                 overflowX="auto"
@@ -89,11 +91,11 @@ function DataTable<T extends Record<string, any>>({
                     "&::-webkit-scrollbar": { height: "6px" },
                     "&::-webkit-scrollbar-track": { background: "transparent" },
                     "&::-webkit-scrollbar-thumb": { 
-                        background: useColorModeValue("rgba(0,0,0,0.08)", "rgba(255,255,255,0.08)"), 
+                        background: scrollbarThumbBg, 
                         borderRadius: "8px" 
                     },
                     "&::-webkit-scrollbar-thumb:hover": { 
-                        background: useColorModeValue("rgba(0,0,0,0.16)", "rgba(255,255,255,0.16)") 
+                        background: scrollbarThumbHoverBg 
                     }
                 }}
             >
@@ -132,7 +134,7 @@ function DataTable<T extends Record<string, any>>({
                 </ChakraTable.Root>
             </Box>
         );
-    }, [isMobile, processedData, columns, actions, state.sortBy, state.sortOrder, handlers.handleSort, borderColor, emptyCardBg]);
+    }, [isMobile, processedData, columns, actions, state.sortBy, state.sortOrder, handlers.handleSort, borderColor, scrollbarThumbBg, scrollbarThumbHoverBg]);
 
     return (
         <VStack align="stretch" gap={0} w="full">

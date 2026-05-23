@@ -210,11 +210,33 @@ const DateTimeField = ({
                     {/* Label */}
                     {text && (
                         <Box w={labelWidth}>
-                            <Field.Label fontSize="sm" fontWeight="600" color="fg.default">
-                                {text} <Field.RequiredIndicator />
+                            <Field.Label
+                                htmlFor={name}
+                                fontSize="md"
+                                fontWeight="semibold"
+                                transition="color 0.2s"
+                            >
+                                <Flex as="span" align="center" gap={1}>
+                                    {text}
+                                    {mandatory && (
+                                        <Text
+                                            as="span"
+                                            color="red.500"
+                                            fontSize="md"
+                                            fontWeight="bold"
+                                            lineHeight="1"
+                                            aria-hidden
+                                            title="Required"
+                                        >
+                                            *
+                                        </Text>
+                                    )}
+                                </Flex>
                             </Field.Label>
                             {description && !oneLiner && (
-                                <Text fontSize="xs" color="fg.muted" mt={0.5}>{description}</Text>
+                                <Text fontSize="xs" color="fg.subtle" mb={1}>
+                                    {description}
+                                </Text>
                             )}
                         </Box>
                     )}
@@ -233,33 +255,35 @@ const DateTimeField = ({
                                 <Box position="relative" w="full">
                                     <DatePicker.Trigger asChild unstyled>
                                         <Button
+                                            id={name}
                                             variant="outline"
                                             w="full"
-                                            h="40px"
+                                            h="48px"
                                             justifyContent="space-between"
-                                            borderRadius="xl"
+                                            borderRadius="lg"
                                             borderWidth="1.5px"
-                                            borderColor={hasError ? "red.400" : borderColor}
-                                            bg={inputBg}
-                                            fontSize="sm"
-                                            fontWeight={displayLabel ? "600" : "400"}
-                                            color={displayLabel ? "fg.default" : mutedColor}
+                                            borderColor={hasError ? "red.500" : "app.input.border"}
+                                            bg={"app.input.bg"}
+                                            fontSize="md"
+                                            fontWeight={displayLabel ? "600" : "600"}
+                                            color={displayLabel ? "fg.default" : "app.text.muted"}
                                             disabled={disabled}
-                                            px={3}
+                                            px={4}
+                                            _hover={{ borderColor: "app.input.border.focus" }}
                                             _focus={{
                                                 outline: "none",
-                                                borderColor: hasError ? "red.400" : accent,
+                                                borderColor: hasError ? "red.500" : "app.input.border.focus",
                                                 boxShadow: hasError
-                                                    ? "0 0 0 3px rgba(239,68,68,0.18)"
-                                                    : "0 0 0 3px rgba(99,102,241,0.18)",
+                                                    ? "0 0 0 3px rgba(239,68,68,0.2)"
+                                                    : "app.input.glow",
                                             }}
-                                            transition="all 0.2s"
+                                            transition="all 0.22s cubic-bezier(0.4,0,0.2,1)"
                                         >
-                                            <Box style={{ color: hasError ? "#f87171" : accent }} mr={2} flexShrink={0}>
+                                            <Box style={{ color: hasError ? "#ef4444" : accent }} mr={2} flexShrink={0}>
                                                 <Calendar size={15} />
                                             </Box>
                                             <Text flex={1} textAlign="left" truncate>
-                                                {displayLabel || "Select date & time..."}
+                                                {displayLabel || (oneLiner ? description : "Select date & time...")}
                                             </Text>
                                         </Button>
                                     </DatePicker.Trigger>

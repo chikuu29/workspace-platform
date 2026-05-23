@@ -21,11 +21,11 @@ export const ruleEngine = {
                     const isMatch = ruleEngine.checkCondition(rule.condition, value);
                     if (isMatch || !rule.condition) { // Allow rules without condition
                         rule.actions.forEach((action: any) => {
-                            ruleEngine.applyAction(action, context);
+                            ruleEngine.applyAction(action, context, value);
                         });
                     } else if (rule.elseActions) {
                         rule.elseActions.forEach((action: any) => {
-                            ruleEngine.applyAction(action, context);
+                            ruleEngine.applyAction(action, context, value);
                         });
                     }
                 });
@@ -45,7 +45,7 @@ export const ruleEngine = {
         }
     },
 
-    applyAction: (action: any, context?: any) => {
+    applyAction: (action: any, context?: any, value?: any) => {
         const store = useFormStore.getState();
         // target can be optional for runScript
         const targets = action.target ? (Array.isArray(action.target) ? action.target : [action.target]) : [];
@@ -65,6 +65,12 @@ export const ruleEngine = {
                 break;
             case "setValue":
                 targets.forEach((t: string) => store.setFieldValue(t, action.value));
+                break;
+            case "setProp":
+                const resolvedVal = typeof action.value === 'string' && action.value.includes('{{value}}')
+                    ? action.value.replace('{{value}}', value ?? '')
+                    : action.value;
+                store.changeUI(targets, { [action.prop]: resolvedVal });
                 break;
             case "runScript":
                 const scriptName = action.script;

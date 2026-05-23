@@ -32,12 +32,14 @@ export interface DashboardComponentConfig {
   dataSource?: string;
   actionRef?: string;
   uiConfig?: Record<string, any>;
+  actions?: any[];
   components?: DashboardComponentConfig[];
   APIS?: {
     path: string,
     method: "GET",
     key: "loadData"
   }
+  layoutStyles?: Record<string, any>;
   KPIS?: any[];
   TABLES?: {
     APIS?: {

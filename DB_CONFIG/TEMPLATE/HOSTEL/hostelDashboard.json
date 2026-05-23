@@ -131,17 +131,18 @@
         {
           "id": "hostel-dashboard-grid-layout",
           "UI_TYPE": "GRID_LAYOUT",
-          "layout": {
-            "columns": { "base": 1, "md": 12 },
-            "gap": 6
+          "layoutStyles": {
+            "templateColumns": { "base": "1fr", "xl": "minmax(0, 1fr) 360px" },
+            "gap": { "base": 6, "xl": 8 }
           },
           "components": [
             {
               "id": "recent-tenants-table",
               "UI_TYPE": "TABLE_VIEW",
               "title": "Recently Onboarded Tenants",
-              "layout": {
-                "gridColumn": { "base": "span 12", "md": "span 8" }
+              "layoutStyles": {
+                "gridColumn": { "base": "12", "md": "8" },
+                "gap": 4
               },
               "TABLES": {
                 "APIS": {
@@ -193,54 +194,70 @@
               }
             },
             {
-              "id": "recent-complaints-table",
-              "UI_TYPE": "TABLE_VIEW",
-              "title": "Recent Support Tickets",
-              "layout": {
-                "gridColumn": { "base": "span 12", "md": "span 4" }
+              "id": "quick-actions-section",
+              "UI_TYPE": "ACTION_BUTTON",
+              "title": "Quick Admin Actions",
+              "description": "Common operational workflows & shortcuts.",
+              "icon": "Zap",
+              "layoutStyles": {
+                "gridColumn": { "base": "12", "md": "4" }
               },
-              "TABLES": {
-                "APIS": {
-                  "loadData": {
-                    "path": "hostel/complaints",
-                    "method": "GET",
-                    "params": {
-                      "skip": 0,
-                      "limit": 5
-                    }
+              "uiConfig": {
+                "layoutStyles": "vertical",
+                "gap": 3
+              },
+              "actions": [
+                {
+                  "label": "Onboard New Tenant",
+                  "description": "Register a new guest & allocate rooms",
+                  "icon": "UserPlus",
+                  "colorPalette": "emerald",
+                  "action": {
+                    "type": "route",
+                    "path": "/app/myHostel/addTenant"
                   }
                 },
-                "SETTINGS": {
-                  "columns": [
-                    {
-                      "label": "Room",
-                      "key": "data.room_number",
-                      "width": "80px"
-                    },
-                    {
-                      "label": "Category",
-                      "key": "data.category",
-                      "width": "120px"
-                    },
-                    {
-                      "label": "Urgency",
-                      "key": "data.urgency",
-                      "width": "100px",
-                      "isStatus": true
-                    },
-                    {
-                      "label": "Status",
-                      "key": "data.status",
-                      "width": "100px",
-                      "isStatus": true
-                    }
-                  ],
-                  "pagination": {
-                    "enabled": false,
-                    "pageSize": 5
+                {
+                  "label": "Allocate a Room",
+                  "description": "Create & allot new rooms to blocks",
+                  "icon": "BedDouble",
+                  "colorPalette": "cyan",
+                  "action": {
+                    "type": "route",
+                    "path": "/app/myHostel/addRoom"
+                  }
+                },
+                {
+                  "label": "Record Rent & Billing",
+                  "description": "Generate invoices & track rent payments",
+                  "icon": "Receipt",
+                  "colorPalette": "orange",
+                  "action": {
+                    "type": "route",
+                    "path": "/app/myHostel/billing"
+                  }
+                },
+                {
+                  "label": "Register New Building",
+                  "description": "Add a new block under management",
+                  "icon": "Building",
+                  "colorPalette": "purple",
+                  "action": {
+                    "type": "route",
+                    "path": "/app/myHostel/addBuilding"
+                  }
+                },
+                {
+                  "label": "Raise Support Ticket",
+                  "description": "Submit maintenance requests for units",
+                  "icon": "Wrench",
+                  "colorPalette": "red",
+                  "action": {
+                    "type": "route",
+                    "path": "/app/myHostel/raiseComplaint"
                   }
                 }
-              }
+              ]
             }
           ]
         }

@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Grid, Heading, Text } from "@chakra-ui/react";
+import { Box, Grid, GridItem, Heading, Text } from "@chakra-ui/react";
 import UITypeRenderEntry from "@/core/renderer/UITypeRenderEntry";
 import type { SectionRendererProps } from "./types";
 
@@ -51,9 +51,8 @@ const GridLayoutRenderer: React.FC<SectionRendererProps> = ({
       )}
 
       <Grid
-        templateColumns={templateColumns}
-        gap={gridGap}
-        w="100%"
+        {...component.layoutStyles}
+        // w="100%"
       >
         {subComponents.map((sub, index) => {
           // Default column span to full width on mobile/base if not defined, otherwise read custom spans
@@ -62,10 +61,10 @@ const GridLayoutRenderer: React.FC<SectionRendererProps> = ({
           const layoutStyles = sub.layout?.layoutStyles || {};
 
           return (
-            <Box
+            <GridItem
               key={sub.id || `grid-sub-${index}`}
-              gridColumn={gridColumn}
-              gridRow={gridRow}
+              // gridColumn={gridColumn}
+              // gridRow={gridRow}
               w="100%"
               {...layoutStyles}
             >
@@ -76,7 +75,7 @@ const GridLayoutRenderer: React.FC<SectionRendererProps> = ({
                 resolveActions={resolveActions}
                 fallbackTableColumns={fallbackTableColumns}
               />
-            </Box>
+            </GridItem>
           );
         })}
       </Grid>

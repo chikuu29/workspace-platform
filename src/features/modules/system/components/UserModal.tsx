@@ -93,32 +93,38 @@ const UserModal: React.FC<UserModalProps> = React.memo((
                     <VStack gap={4} as="form" id="user-form" onSubmit={handleSubmit(handleFormSubmit)}>
                         <HStack w="full" gap={4}>
                             <Field.Root invalid={!!errors.first_name}>
-                                <Field.Label>First Name</Field.Label>
+                                <Field.Label htmlFor="first_name">First Name</Field.Label>
                                 <Input
+                                    id="first_name"
                                     {...register('first_name', { required: 'First name is required' })}
                                     placeholder="John"
                                     borderRadius="lg"
+                                    autoComplete="given-name"
                                 />
                                 <Field.ErrorText>{errors.first_name?.message as string}</Field.ErrorText>
                             </Field.Root>
 
                             <Field.Root invalid={!!errors.last_name}>
-                                <Field.Label>Last Name</Field.Label>
+                                <Field.Label htmlFor="last_name">Last Name</Field.Label>
                                 <Input
+                                    id="last_name"
                                     {...register('last_name', { required: 'Last name is required' })}
                                     placeholder="Doe"
                                     borderRadius="lg"
+                                    autoComplete="family-name"
                                 />
                                 <Field.ErrorText>{errors.last_name?.message as string}</Field.ErrorText>
                             </Field.Root>
                         </HStack>
 
                         <Field.Root invalid={!!errors.username}>
-                            <Field.Label>username</Field.Label>
+                            <Field.Label htmlFor="username">username</Field.Label>
                             <Input
+                                id="username"
                                 {...register('username', { required: 'username is required' })}
                                 placeholder="johndoe"
                                 borderRadius="lg"
+                                autoComplete="username"
                                 // username is readonly in edit mode (it's typically an immutable ID)
                                 readOnly={isEditMode}
                                 opacity={isEditMode ? 0.7 : 1}
@@ -127,14 +133,16 @@ const UserModal: React.FC<UserModalProps> = React.memo((
                         </Field.Root>
 
                         <Field.Root invalid={!!errors.email}>
-                            <Field.Label>Email Address</Field.Label>
+                            <Field.Label htmlFor="email">Email Address</Field.Label>
                             <Input
+                                id="email"
                                 {...register('email', {
                                     required: 'Email is required',
                                     pattern: { value: /^\S+@\S+$/i, message: 'Invalid email' },
                                 })}
                                 placeholder="john@example.com"
                                 borderRadius="lg"
+                                autoComplete="email"
                             />
                             <Field.ErrorText>{errors.email?.message as string}</Field.ErrorText>
                         </Field.Root>
@@ -142,8 +150,9 @@ const UserModal: React.FC<UserModalProps> = React.memo((
                         {/* Password — only shown in CREATE mode */}
                         {!isEditMode && (
                             <Field.Root invalid={!!errors.password}>
-                                <Field.Label>Password</Field.Label>
+                                <Field.Label htmlFor="password">Password</Field.Label>
                                 <Input
+                                    id="password"
                                     type="password"
                                     {...register('password', {
                                         required: 'Password is required',
@@ -151,14 +160,15 @@ const UserModal: React.FC<UserModalProps> = React.memo((
                                     })}
                                     placeholder="••••••••"
                                     borderRadius="lg"
+                                    autoComplete="new-password"
                                 />
                                 <Field.ErrorText>{errors.password?.message as string}</Field.ErrorText>
                             </Field.Root>
                         )}
 
                         <Field.Root>
-                            <Field.Label>Organization</Field.Label>
-                            <Input value={organizationName} disabled borderRadius="lg" />
+                            <Field.Label htmlFor="org_name">Organization</Field.Label>
+                            <Input id="org_name" value={organizationName} disabled borderRadius="lg" />
                             <Field.HelperText>Users belong to your current organization.</Field.HelperText>
                         </Field.Root>
                     </VStack>

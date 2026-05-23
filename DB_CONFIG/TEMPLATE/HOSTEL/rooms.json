@@ -30,7 +30,7 @@
           "UI_TYPE": "TABLE_VIEW",
           "title": "Room Inventory Directory",
           "TABLES": {
-            "apis": {
+            "APIS": {
               "loadData": {
                 "path": "hostel/rooms",
                 "method": "GET",

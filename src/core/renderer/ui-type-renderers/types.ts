@@ -40,6 +40,13 @@ export interface DashboardComponentConfig {
   }
   KPIS?: any[];
   TABLES?: {
+    APIS?: {
+      loadData: {
+        path: string,
+        method: "GET",
+        key: "loadData"
+      }
+    }
     data?: any[];
     SETTINGS?: {
       columns?: any[];

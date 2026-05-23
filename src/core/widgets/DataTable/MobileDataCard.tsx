@@ -72,7 +72,7 @@ function MobileDataCardComponent<T extends Record<string, any>>({ row, columns }
             borderRadius="xl"
             border="1px solid"
             borderColor={borderColor}
-            boxShadow="sm"
+            // boxShadow="sm"
             _hover={{ transform: "translateY(-2px)", boxShadow: "md", borderColor: "blue.500/20" }}
         >
             <VStack align="stretch" gap={3}>

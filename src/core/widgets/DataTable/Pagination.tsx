@@ -62,7 +62,7 @@ function PaginationComponent({ pagination, onPageChange, onPageSizeChange }: Pag
             bg={"app.card.bg"}
             border="1px solid"
             borderColor={shellBorder}
-            boxShadow="sm"
+            // boxShadow="sm"
             wrap="wrap"
         >
             {/* Left: Telemetry Info & Page Size Switcher */}

@@ -145,11 +145,13 @@
               },
               "TABLES": {
                 "APIS": {
-                  "path": "hostel/tenants",
-                  "method": "GET",
-                  "params": {
-                    "skip": 0,
-                    "limit": 5
+                  "loadData": {
+                    "path": "hostel/tenants",
+                    "method": "GET",
+                    "params": {
+                      "skip": 0,
+                      "limit": 5
+                    }
                   }
                 },
                 "SETTINGS": {
@@ -199,11 +201,13 @@
               },
               "TABLES": {
                 "APIS": {
-                  "path": "hostel/complaints",
-                  "method": "GET",
-                  "params": {
-                    "skip": 0,
-                    "limit": 5
+                  "loadData": {
+                    "path": "hostel/complaints",
+                    "method": "GET",
+                    "params": {
+                      "skip": 0,
+                      "limit": 5
+                    }
                   }
                 },
                 "SETTINGS": {

@@ -1,5 +1,5 @@
-import React from "react";
-import { Box, Text } from "@chakra-ui/react";
+import React, { useMemo } from "react";
+import { Box } from "@chakra-ui/react";
 import DataTable from "@/core/widgets/DataTable";
 import type { SectionRendererProps } from "./types";
 
@@ -23,9 +23,16 @@ const toLegacyActions = (events?: Record<string, any>) => {
 
 const TableSectionRenderer: React.FC<SectionRendererProps> = ({ component, resolveData, resolveActions, fallbackTableColumns }) => {
   console.log("Rendering TableSection with component:", component);
-  const rows = component.dataSource
-    ? resolveData(component.dataSource)
-    : (component.TABLES?.data?.length ? component.TABLES.data : DEFAULT_TABLE_DATA);
+  
+  const apiConfig = useMemo(() => {
+    return component.TABLES?.APIS?.loadData;
+  }, [component.TABLES]);
+
+  const rows = useMemo(() => {
+    if (component.dataSource) return resolveData(component.dataSource);
+    return component.TABLES?.data?.length ? component.TABLES.data : undefined;
+  }, [component.dataSource, component.TABLES?.data, resolveData]);
+
   const columns = component.uiConfig?.columns || component.TABLES?.SETTINGS?.columns || fallbackTableColumns || [];
   const actions = component.actionRef
     ? resolveActions(component.actionRef, component.id)
@@ -33,10 +40,10 @@ const TableSectionRenderer: React.FC<SectionRendererProps> = ({ component, resol
 
   return (
     <Box {...(component.layout || {})}>
-      {/* {component.title && <Text fontSize="lg" fontWeight="800" mb={4}>{component.title}</Text>} */}
       <DataTable
         title={component.uiConfig?.tableTitle || component.title || "Data Table"}
         data={rows}
+        apiConfig={apiConfig}
         columns={columns as any}
         actions={actions}
         initialState={component.uiConfig?.initialState || {

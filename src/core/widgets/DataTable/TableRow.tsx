@@ -167,6 +167,17 @@ const RowActions = memo(function RowActions<T>({ row, actions }: { row: T; actio
     );
 });
 
+const getNestedValue = (obj: any, path: string): any => {
+    if (!obj || !path) return undefined;
+    const parts = path.split(".");
+    let current = obj;
+    for (const part of parts) {
+        if (current === null || current === undefined) return undefined;
+        current = current[part];
+    }
+    return current;
+};
+
 /**
  * TableRow
  * Animated body row with inline context icons and sticky action shortcut columns.
@@ -188,7 +199,7 @@ function TableRowComponent<T>({ row, columns, actions, borderColor, index }: Tab
             position="relative"
         >
             {columns.map((col, cIdx) => {
-                const rawValue = row[col.key as keyof T];
+                const rawValue = getNestedValue(row, String(col.key));
                 const normalizedValue = rawValue ?? "-";
                 const shouldRenderBadge = col.isStatus || String(col.key).toLowerCase().includes("status") || String(col.key).toLowerCase().includes("plan") || String(col.key).toLowerCase().includes("urgency");
 

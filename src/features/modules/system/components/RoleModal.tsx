@@ -56,8 +56,9 @@ const RoleModal: React.FC<RoleModalProps> = React.memo(({
                 <DialogBody>
                     <VStack gap={4} as="form" id="role-form" onSubmit={handleSubmit(handleFormSubmit)}>
                         <Field.Root invalid={!!errors.role_name}>
-                            <Field.Label>Role Name</Field.Label>
+                            <Field.Label htmlFor="role_name">Role Name</Field.Label>
                             <Input
+                                id="role_name"
                                 {...register('role_name', { required: 'Role name is required' })}
                                 placeholder="e.g. Editor, Support, Manager"
                                 borderRadius="lg"
@@ -66,8 +67,9 @@ const RoleModal: React.FC<RoleModalProps> = React.memo(({
                         </Field.Root>
 
                         <Field.Root invalid={!!errors.description}>
-                            <Field.Label>Description</Field.Label>
+                            <Field.Label htmlFor="description">Description</Field.Label>
                             <Textarea
+                                id="description"
                                 {...register('description')}
                                 placeholder="Briefly describe the responsibilities of this role..."
                                 borderRadius="lg"

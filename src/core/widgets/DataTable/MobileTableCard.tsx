@@ -80,6 +80,17 @@ const SmartBadge = ({ value }: { value: any }) => {
     );
 };
 
+const getNestedValue = (obj: any, path: string): any => {
+    if (!obj || !path) return undefined;
+    const parts = path.split(".");
+    let current = obj;
+    for (const part of parts) {
+        if (current === null || current === undefined) return undefined;
+        current = current[part];
+    }
+    return current;
+};
+
 /**
  * MobileTableCard
  * Redesigned generic card renderer for mobile viewports, complete with row-actions support.
@@ -104,8 +115,8 @@ function MobileTableCardComponent<T extends Record<string, any>>({ row, columns,
         };
     }, [columns]);
 
-    const primaryValue = primaryColumn ? row[primaryColumn.key as keyof T] : "Record";
-    const statusValue = statusColumn ? row[statusColumn.key as keyof T] : null;
+    const primaryValue = primaryColumn ? getNestedValue(row, String(primaryColumn.key)) : "Record";
+    const statusValue = statusColumn ? getNestedValue(row, String(statusColumn.key)) : null;
 
     const visibleActions = useMemo(() => {
         if (!actions) return [];
@@ -124,7 +135,7 @@ function MobileTableCardComponent<T extends Record<string, any>>({ row, columns,
             borderRadius="xl"
             border="1px solid"
             borderColor={borderColor}
-            boxShadow="sm"
+            // boxShadow="sm"
             _hover={{ transform: "translateY(-1px)", boxShadow: "md", borderColor: "blue.200" }}
         >
             <VStack align="stretch" gap={3}>
@@ -156,7 +167,7 @@ function MobileTableCardComponent<T extends Record<string, any>>({ row, columns,
                 {detailColumns.length > 0 ? (
                     <SimpleGrid columns={2} gap={3.5}>
                         {detailColumns.map((col) => {
-                            const value = row[col.key as keyof T];
+                            const value = getNestedValue(row, String(col.key));
                             const CellIcon = getCellIcon(String(col.key));
                             return (
                                 <VStack key={String(col.key)} align="start" gap={0.5} minW={0}>

@@ -28,7 +28,7 @@ const TabsWidget: React.FC<TabsWidgetProps> = ({ tabs, defaultValue, ...rest }) 
     if (!tabs || tabs.length === 0) return null;
 
     // Premium adaptive theme colors
-    const activeColor = "#c799ff"; // Modern purple accent
+    const activeColor = "blue.500"; // Modern purple accent
     const inactiveColor = useColorModeValue("gray.500", "whiteAlpha.600");
     const textColor = useColorModeValue("gray.900", "white");
     const mutedTextColor = useColorModeValue("gray.600", "gray.400");
@@ -90,7 +90,7 @@ const TabsWidget: React.FC<TabsWidgetProps> = ({ tabs, defaultValue, ...rest }) 
                                 color: textColor,
                             }}
                             _hover={{
-                                color: activeColor,
+                                // color: activeColor,
                                 transform: "translateY(-1px)"
                             }}
                             transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
@@ -114,7 +114,7 @@ const TabsWidget: React.FC<TabsWidgetProps> = ({ tabs, defaultValue, ...rest }) 
                         my="auto"
                         bg={useColorModeValue("rgba(199, 153, 255, 0.12)", "rgba(199, 153, 255, 0.08)")}
                         backdropFilter="blur(20px)"
-                        borderRadius="full"
+                        // borderRadius="full"
                         boxShadow="0 4px 20px 0 rgba(199, 153, 255, 0.15)"
                         border="1px solid"
                         borderColor={useColorModeValue("rgba(199, 153, 255, 0.4)", "rgba(199, 153, 255, 0.2)")}
@@ -168,10 +168,10 @@ const TabsWidget: React.FC<TabsWidgetProps> = ({ tabs, defaultValue, ...rest }) 
                             <Box
                                 bg={useColorModeValue("whiteAlpha.500", "whiteAlpha.50")}
                                 borderRadius="2xl"
-                                p={{ base: "4", md: "8" }}
+                                p={{ base: "2", md: "2" }}
                                 border="1px solid"
                                 borderColor={borderColor}
-                                shadow="sm"
+                                // shadow="sm"
                             >
                                 <RunTimeWidgetRender
                                     configs={tab.widgets}

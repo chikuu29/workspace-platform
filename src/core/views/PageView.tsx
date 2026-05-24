@@ -1,12 +1,13 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router";
 import { Box, Button, HStack, Icon, Text } from "@chakra-ui/react";
-import { icons, Plus, Save } from "lucide-react";
+import { Plus, Save } from "lucide-react";
 import { PageHeader } from "../components/PageHeader";
 import { PageLayout } from "../components/PageLayout";
 import { UIEngine } from "../renderer/UIEngine";
 import { actionEngine } from "../engine/logicEngine";
 import { useFormStore } from "../store/useFormStore";
+import AsyncLoadIcon from "../utils/hooks/AsyncLoadIcon";
 import {
     DrawerRoot,
     DrawerBackdrop,
@@ -69,26 +70,17 @@ const ActionPanel = () => {
                 <DrawerHeader borderBottom="1px solid" borderColor="app.card.border" py={10} px={{ base: 6, md: 12 }}>
                     <HStack gap={6}>
                         {/* We could make icon configurable, default to Plus */}
-                        {(() => {
-                            const normalized = panelConfig.iconName?.startsWith("Lu") ? panelConfig.iconName.substring(2) : panelConfig.iconName;
-                            const IconComponent = normalized ? (icons as any)[normalized] : null;
-                            if (IconComponent) {
-                                return (
-                                    <Box display="inline-block">
-                                        <Icon as={IconComponent} boxSize={8} />
-                                    </Box>
-                                );
-                            }
-                            return (
-                                <Box
-                                    w={16} h={16} borderRadius="2xl" bg="cyan.500" color="white"
-                                    boxShadow="0 12px 24px rgba(6,182,212,0.3)"
-                                    display="flex" alignItems="center" justifyContent="center"
-                                >
-                                    <Icon as={Plus} boxSize={8} />
-                                </Box>
-                            );
-                        })()}
+                        <Box
+                            w={16} h={16} borderRadius="2xl" bg="cyan.500" color="white"
+                            boxShadow="0 12px 24px rgba(6,182,212,0.3)"
+                            display="flex" alignItems="center" justifyContent="center"
+                        >
+                            {panelConfig.iconName ? (
+                                <AsyncLoadIcon iconName={panelConfig.iconName} boxSize="8" size={32} />
+                            ) : (
+                                <Icon as={Plus} boxSize={8} />
+                            )}
+                        </Box>
                         <Box display="flex" flexDirection="column" gap={0} alignItems="flex-start">
                             <Text fontSize="2xl" fontWeight="900" letterSpacing="tight" color="app.text.primary" m={0}>
                                 {panelConfig.title || "Action"}
@@ -141,8 +133,6 @@ const PageView = ({ config }: { config: any }) => {
         return (
             <HStack gap={4}>
                 {actions.map((action: any, index: number) => {
-                    const normalized = action.iconName?.startsWith("Lu") ? action.iconName.substring(2) : action.iconName;
-                    const IconComponent = normalized ? (icons as any)[normalized] : null;
                     return (
                         <Button
                             key={index}
@@ -160,7 +150,7 @@ const PageView = ({ config }: { config: any }) => {
                                 });
                             }}
                         >
-                            {IconComponent && <Icon as={IconComponent} boxSize={5} style={{ strokeWidth: '3px' }} />}
+                            {action.iconName && <AsyncLoadIcon iconName={action.iconName} boxSize="5" size={20} />}
                             {action.label}
                         </Button>
                     );

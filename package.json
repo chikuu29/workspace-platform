@@ -10,7 +10,7 @@
     "postinstall": "npx @chakra-ui/cli typegen ./src/theme/index.ts",
     "lint": "eslint .",
     "preview": "vite preview",
-    "analyze": "vite build"
+    "analyze": "vite build --mode analyze"
   },
   "dependencies": {
     "@chakra-ui/react": "^3.33.0",

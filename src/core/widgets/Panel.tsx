@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Box, Collapsible, Text, HStack, Icon, SimpleGrid } from "@chakra-ui/react";
+import { Box, Collapsible, Text, HStack, SimpleGrid } from "@chakra-ui/react";
 import RunTimeWidgetRender from "../renderer/RunTimeWidget";
-import { icons } from "lucide-react";
+import AsyncLoadIcon from "../utils/hooks/AsyncLoadIcon";
 
 interface PanelConfig {
   name: string;
@@ -41,10 +41,6 @@ const CollapsiblePanel: React.FC<PanelConfig> = ({
 
   if (hidden) return null;
 
-  // Backwards compatibility for Lu-prefixed names
-  const normalizedIconName = iconName?.startsWith("Lu") ? iconName.substring(2) : iconName;
-  const IconComponent = normalizedIconName ? (icons as any)[normalizedIconName] : null;
-
   return (
     <Box w="full" mb={6}>
       <HStack
@@ -55,8 +51,10 @@ const CollapsiblePanel: React.FC<PanelConfig> = ({
         userSelect="none"
         _hover={{ "& .panel-icon": { transform: "scale(1.2)" } }}
       >
-        {IconComponent ? (
-          <Icon as={IconComponent} color="cyan.400" size="md" className="panel-icon" transition="transform 0.2s" />
+        {iconName ? (
+          <Box color="cyan.400" className="panel-icon" transition="transform 0.2s">
+            <AsyncLoadIcon iconName={iconName} boxSize="4" size={16} />
+          </Box>
         ) : (
           <Box w="4px" h="14px" bg="cyan.400" borderRadius="full" />
         )}
@@ -74,7 +72,7 @@ const CollapsiblePanel: React.FC<PanelConfig> = ({
 
       <Collapsible.Root open={open}>
         <Collapsible.Content>
-          <Box pl={IconComponent ? 6 : 0}>
+          <Box pl={iconName ? 6 : 0}>
             <SimpleGrid
               columns={columns || { base: 1, md: 2 }}
               gap={gap || 6}

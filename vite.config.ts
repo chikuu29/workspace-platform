@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url'
 export default defineConfig(({ mode }) => {
   const __dirname = path.dirname(fileURLToPath(import.meta.url))
   const env = loadEnv(mode, process.cwd())
+  const analyzeBuild = mode === 'analyze'
 
   return {
     resolve: {
@@ -19,7 +20,7 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       createVersionPlugin(),
-      mode === 'production' &&
+      analyzeBuild &&
       visualizer({
         filename: './dist/stats.html',
         open: true,
@@ -38,7 +39,6 @@ export default defineConfig(({ mode }) => {
            * Chunk strategy (load order awareness):
            *
            *  react-core    → always first, tiny, cached forever
-           *  lucide-icons  → large tree, lazy-safe to isolate
            *  chakra        → all @chakra-ui/* in one chunk (they share internals)
            *  emotion       → peer dep of chakra, loaded in parallel
            *  framer        → peer dep of chakra, loaded in parallel
@@ -57,13 +57,6 @@ export default defineConfig(({ mode }) => {
               /node_modules\/(react|react-dom|react-router|react-router-dom|scheduler)\//.test(id)
             ) {
               return 'react-core'
-            }
-
-            // ── Lucide icons ────────────────────────────────────────────────
-            // Large package (~4k exports). Isolating it lets tree-shaking
-            // work per-chunk and avoids poisoning vendor with icon weight.
-            if (/node_modules\/lucide-react\//.test(id)) {
-              return 'lucide-icons'
             }
 
             // ── Chakra UI ───────────────────────────────────────────────────

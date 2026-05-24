@@ -289,20 +289,20 @@
                         ]
                     },
                     {
-                        "label": "Tenants Directory",
+                        "label": "Guests Directory",
                         "isMaster": false,
                         "icon": "Users",
                         "iconColor": "emerald.400",
                         "menu": [
                             {
-                                "label": "List Tenants",
+                                "label": "List Guests",
                                 "icon": "List",
                                 "path": "/app/myHostel/tenants"
                             },
                             {
-                                "label": "Add Tenant",
+                                "label": "Add Guest",
                                 "icon": "UserPlus",
-                                "path": "/app/myHostel/addTenant"
+                                "path": "/app/myHostel/addGuest"
                             }
                         ]
                     },

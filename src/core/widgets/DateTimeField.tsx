@@ -77,8 +77,6 @@ const DateTimeField = ({
     events,
     errors,
 }: DATETIMEFIELD) => {
-    if (hidden) return null;
-
     const methods = useFormContext();
     const { control, register, setValue, unregister } = methods;
     const rhfValue = useWatch({ control, name });
@@ -197,6 +195,8 @@ const DateTimeField = ({
 
     const labelWidth = oneLiner ? { base: "full", md: "35%" } : "full";
     const inputWidth = oneLiner ? { base: "full", md: "65%" } : "full";
+
+    if (hidden || !methods) return null;
 
     return (
         <Box w="full" py={2} px={1}>

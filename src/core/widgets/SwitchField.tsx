@@ -28,10 +28,11 @@ const SwitchField = ({
     events,
     errors,
 }: SWITCHFIELD) => {
-    if (hidden) return null;
-
     const methods = useFormContext();
-    if (!methods) return null;
+    const switchBg = useColorModeValue("white", "whiteAlpha.50");
+    const switchBorderColor = useColorModeValue("gray.200", "whiteAlpha.200");
+
+    if (hidden || !methods) return null;
 
     const labelWidth = oneLiner ? { base: "full", md: "35%" } : "full";
     const inputWidth = oneLiner ? { base: "full", md: "65%" } : "full";
@@ -74,10 +75,10 @@ const SwitchField = ({
                                     gap={4}
                                     w="full"
                                     align="center"
-                                    bg={useColorModeValue("white", "whiteAlpha.50")}
+                                    bg={switchBg}
                                     borderRadius="lg"
                                     borderWidth="1.5px"
-                                    borderColor={useColorModeValue("gray.200", "whiteAlpha.200")}
+                                    borderColor={switchBorderColor}
                                     h="48px"
                                     px={4}
                                     transition="all 0.2s"

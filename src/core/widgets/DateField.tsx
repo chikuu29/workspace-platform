@@ -52,8 +52,6 @@ const DateField = ({
   events,
   errors,
 }: DATEFIELD) => {
-  if (hidden) return null;
-
   const methods = useFormContext();
   const value = useWatch({
     control: methods.control,
@@ -72,6 +70,7 @@ const DateField = ({
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.200");
   const bg = useColorModeValue("white", "rgba(15, 23, 42, 0.9)");
   const mutedColor = useColorModeValue("gray.500", "whiteAlpha.600");
+  const headerBtnHoverBg = useColorModeValue("gray.100", "whiteAlpha.100");
 
   // Sync from outer value
   useEffect(() => {
@@ -149,6 +148,8 @@ const DateField = ({
 
   const labelWidth = oneLiner ? { base: "full", md: "35%" } : "full";
   const inputWidth = oneLiner ? { base: "full", md: "65%" } : "full";
+
+  if (hidden || !methods) return null;
 
   return (
     <Box w="full" py={2} px={1} transition="all 0.2s">
@@ -278,7 +279,7 @@ const DateField = ({
                           )
                         }
                         _hover={{
-                          bg: useColorModeValue("gray.100", "whiteAlpha.100"),
+                          bg: headerBtnHoverBg,
                         }}
                       >
                         {viewMode === "calendar"

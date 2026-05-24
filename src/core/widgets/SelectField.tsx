@@ -49,6 +49,7 @@ const SelectField = ({
     events,
     errors,
 }: SELECTFIELD) => {
+    const methods = useFormContext();
     const isRequired = required || mandatory;
     const [apiOptions, setApiOptions] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
@@ -92,10 +93,12 @@ const SelectField = ({
         }), [options]
     );
 
-    if (hidden) return null;
+    const bgHover = useColorModeValue("rgba(66, 42, 251, 0.06)", "rgba(117, 81, 255, 0.15)");
+    const colorHover = useColorModeValue("brand.500", "brand.200");
+    const bgSelected = useColorModeValue("rgba(66, 42, 251, 0.1)", "rgba(117, 81, 255, 0.2)");
+    const colorSelected = useColorModeValue("brand.500", "brand.100");
 
-    const methods = useFormContext();
-    if (!methods) return null;
+    if (hidden || !methods) return null;
 
     const labelWidth = oneLiner ? { base: "full", md: "35%" } : "full";
     const inputWidth = oneLiner ? { base: "full", md: "65%" } : "full";
@@ -214,13 +217,13 @@ const SelectField = ({
                                                     color="app.text.primary"
                                                     bg="transparent"
                                                     _hover={{
-                                                        bg: useColorModeValue("rgba(66, 42, 251, 0.06)", "rgba(117, 81, 255, 0.15)"),
-                                                        color: useColorModeValue("brand.500", "brand.200"),
+                                                        bg: bgHover,
+                                                        color: colorHover,
                                                         transform: "translateX(4px)",
                                                     }}
                                                     _selected={{
-                                                        bg: useColorModeValue("rgba(66, 42, 251, 0.1)", "rgba(117, 81, 255, 0.2)"),
-                                                        color: useColorModeValue("brand.500", "brand.100"),
+                                                        bg: bgSelected,
+                                                        color: colorSelected,
                                                         fontWeight: "700",
                                                     }}
                                                 >

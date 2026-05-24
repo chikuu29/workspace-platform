@@ -501,7 +501,7 @@ const UploadField = ({
   const labelWidth = oneLiner ? { base: "full", md: "35%" } : "full";
   const contentWidth = oneLiner ? { base: "full", md: "65%" } : "full";
 
-  if (hidden) return null;
+  if (hidden || !methods) return null;
 
   return (
     <Box w="full" py={2} px={1}>

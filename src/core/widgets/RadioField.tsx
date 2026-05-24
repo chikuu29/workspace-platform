@@ -44,8 +44,6 @@ const RadioField = ({
   events,
   errors,
 }: RADIO) => {
-  if (hidden) return null;
-
   const methods = useFormContext();
 
   const value = useWatch({
@@ -98,6 +96,8 @@ const RadioField = ({
    * browser warning — RadioGroup.Root renders a <div>, not a labelable input.
    */
   const labelId = `${name}-label`;
+
+  if (hidden || !methods) return null;
 
   return (
     <Box w="full" py={2} px={1}>

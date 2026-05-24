@@ -92,8 +92,6 @@ const TextField = ({
   patternMessage,
   autoComplete,
 }: TEXTFIELD) => {
-  if (hidden) return null;
-
   const methods = useFormContext();
   const control = methods.control;
 
@@ -156,6 +154,8 @@ const TextField = ({
    *   "A form field recognized by autofill has no autocomplete attribute."
    */
   const resolvedAutoComplete = autoComplete ?? deriveAutoComplete(name, type);
+
+  if (hidden || !methods) return null;
 
   return (
     <Box w="full" py={2} px={1} transition="all 0.2s">

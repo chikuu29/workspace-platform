@@ -37,8 +37,6 @@ const TextArea = ({
   minLength,
   errors,
 }: TEXTAREA) => {
-  if (hidden) return null;
-
   const methods = useFormContext();
   const control = methods.control;
 
@@ -63,6 +61,8 @@ const TextArea = ({
   const inputBorder = useColorModeValue("gray.200", "whiteAlpha.200");
   const inputHoverBorder = useColorModeValue("gray.300", "whiteAlpha.400");
   const inputFocusBg = useColorModeValue("white", "whiteAlpha.100");
+
+  if (hidden || !methods) return null;
 
   return (
     <Box w="full" py={2} px={1} transition="all 0.2s">

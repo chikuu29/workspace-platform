@@ -30,7 +30,7 @@
           "UI_TYPE": "TABLE_VIEW",
           "title": "Invoices Ledger",
           "TABLES": {
-            "apis": {
+            "APIS": {
               "loadData": {
                 "path": "hostel/billing",
                 "method": "GET"

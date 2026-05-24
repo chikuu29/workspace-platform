@@ -30,7 +30,7 @@
           "UI_TYPE": "TABLE_VIEW",
           "title": "Buildings Registry",
           "TABLES": {
-            "apis": {
+            "APIS": {
               "loadData": {
                 "path": "hostel/buildings",
                 "method": "GET",

@@ -30,7 +30,7 @@
           "UI_TYPE": "TABLE_VIEW",
           "title": "Resident Directory Details",
           "TABLES": {
-            "apis": {
+            "APIS": {
               "loadData": {
                 "path": "hostel/tenants",
                 "method": "GET"

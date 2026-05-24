@@ -138,7 +138,6 @@
               {
                 "name": "room_number",
                 "text": "Select Room Number",
-                "description": "Assign the specific available room unit in the selected building block.",
                 "widget": "selectField",
                 "mandatory": true,
                 "oneLiner": true,

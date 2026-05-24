@@ -2,7 +2,7 @@
 import React from 'react';
 import { Box, Heading, Text, VStack, HStack, Icon, List, Separator } from "@chakra-ui/react";
 import { AlertTriangle, Circle } from "lucide-react";
-import { ParsedError } from "@/utils/apiErrorParser";
+import { ParsedError } from "@/core/utils/apiErrorParser";
 
 interface ErrorSummaryProps {
     error: ParsedError | null;

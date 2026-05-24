@@ -30,13 +30,13 @@ import { POSTAPI } from "@/app/api";
 import AppVersionAlert from "@/features/ui/components/alert/AppVersionAlert";
 import { AlertProps } from "@/app/types/appConfigInterface";
 import { Fingerprint } from "lucide-react";
-import { getOrCreateDeviceId } from "@/utils/services/appServices";
+import { getOrCreateDeviceId } from "@/core/utils/services/appServices";
 import { env } from "@/app/env";
 import {
     generateCodeVerifier,
     generateCodeChallenge,
     storeCodeVerifier,
-} from "@/utils/services/pkceService";
+} from "@/core/utils/services/pkceService";
 
 const MotionBox = motion.create(Box);
 const MotionStack = motion.create(Stack);

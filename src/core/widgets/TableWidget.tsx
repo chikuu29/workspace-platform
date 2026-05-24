@@ -36,8 +36,8 @@ import {
     ListFilter 
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { formatKey } from "@/utils/formatKey";
-import { formatValue } from "@/utils/formatters";
+import { formatKey } from "@/core/utils/formatKey";
+import { formatValue } from "@/core/utils/formatters";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

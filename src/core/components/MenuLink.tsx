@@ -2,7 +2,7 @@ import { Box, HStack, VStack, Text, Popover, Stack } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { NavLink, useNavigate, useLocation } from "react-router";
 import { buildWorkspacePath } from "@/core/utils/pathBuilder";
-import AsyncLoadIcon from "@/utils/hooks/AsyncLoadIcon";
+import AsyncLoadIcon from "@/core/utils/hooks/AsyncLoadIcon";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/store";
 import { Tooltip } from "@/components/ui/tooltip";

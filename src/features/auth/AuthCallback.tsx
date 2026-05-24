@@ -1,8 +1,8 @@
 import { useEffect, useState, startTransition } from "react";
 import { useNavigate } from "react-router";
 import { POSTAPI } from "../../app/api";
-import { getOrCreateDeviceId } from "../../utils/services/appServices";
-import { getStoredCodeVerifier } from "../../utils/services/pkceService";
+import { getOrCreateDeviceId } from "@/core/utils/services/appServices";
+import { getStoredCodeVerifier } from "@/core/utils/services/pkceService";
 import { fetchAppConfig } from "../../app/slices/appConfig/appConfigSlice";
 import { login } from "../../app/slices/auth/authSlice";
 import { useDispatch } from "react-redux";

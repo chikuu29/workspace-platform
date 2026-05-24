@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/app/store";
 import Loader from "@/features/ui/components/Loader/Loader";
 import FallbackRenderer from "../renderer/FallbackRenderer";
-import { GetNavMenuConfig } from "@/utils/services/appServices";
+import { GetNavMenuConfig } from "@/core/utils/services/appServices";
 
 interface RouterGuardProps {
   children: React.ReactNode;

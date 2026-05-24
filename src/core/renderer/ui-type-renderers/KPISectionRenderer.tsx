@@ -3,7 +3,7 @@ import { Box, Text, SimpleGrid, HStack, Heading, Badge, Flex } from "@chakra-ui/
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { WidgetRegistry } from "@/core/registry/WidgetRegistry";
 import { GETAPI } from "@/app/api";
-import AsyncLoadIcon from "@/utils/hooks/AsyncLoadIcon";
+import AsyncLoadIcon from "@/core/utils/hooks/AsyncLoadIcon";
 
 import type { SectionRendererProps } from "./types";
 

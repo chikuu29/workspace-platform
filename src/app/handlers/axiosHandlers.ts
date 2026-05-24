@@ -33,7 +33,7 @@ import axios, {
 } from 'axios';
 import { RootState, store } from '../store';
 import { login, logout } from '../slices/auth/authSlice';
-import { getOrCreateDeviceId } from '../../utils/services/appServices';
+import { getOrCreateDeviceId } from '@/core/utils/services/appServices';
 
 // ────────────────────────────────────────────────────────────────────────
 // 1. BASE URL

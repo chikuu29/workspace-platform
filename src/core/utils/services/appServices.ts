@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useSearchParams } from "react-router";
-import { AppDispatch, RootState } from "../../app/store";
-import { SET_APP_CONFIG_STATE } from "../../app/slices/appConfig/appConfigSlice";
+import { AppDispatch, RootState } from "@/app/store";
+import { SET_APP_CONFIG_STATE } from "@/app/slices/appConfig/appConfigSlice";
 import { useEffect, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
 

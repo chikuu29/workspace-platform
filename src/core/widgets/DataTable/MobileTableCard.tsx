@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { DataTableColumn, DataTableAction } from "./types";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import LoadIcon from "@/utils/hooks/LoadIcon";
+import LoadIcon from "@/core/utils/hooks/LoadIcon";
 import { motion } from "framer-motion";
 
 const MotionBox = motion.create(Box as any);

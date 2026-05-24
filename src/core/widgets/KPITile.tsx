@@ -10,7 +10,7 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import AsyncLoadIcon from "@/utils/hooks/AsyncLoadIcon";
+import AsyncLoadIcon from "@/core/utils/hooks/AsyncLoadIcon";
 
 // ── Gradient background for the icon circle ──────────────────────────
 

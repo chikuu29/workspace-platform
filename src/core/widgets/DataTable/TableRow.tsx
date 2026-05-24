@@ -17,7 +17,7 @@ import {
 import { DataTableColumn, DataTableAction } from "./types";
 import ActionMenu from "./ActionMenu";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import LoadIcon from "@/utils/hooks/LoadIcon";
+import LoadIcon from "@/core/utils/hooks/LoadIcon";
 import { motion } from "framer-motion";
 
 const MotionRow = motion.create(Table.Row as any);
@@ -88,7 +88,7 @@ const SmartBadge = ({ value }: { value: any }) => {
  * Renders row actions dynamically using direct buttons for quick access 
  * and a clean vertical dropdown for secondary options.
  */
-const RowActions = memo(function RowActions<T>({ row, actions }: { row: T; actions: DataTableAction<T>[] }) {
+function RowActionsComponent<T>({ row, actions }: { row: T; actions: DataTableAction<T>[] }) {
     const visibleActions = actions.filter(a => !a.isVisible || a.isVisible(row));
 
     if (visibleActions.length === 0) return null;
@@ -165,7 +165,9 @@ const RowActions = memo(function RowActions<T>({ row, actions }: { row: T; actio
             <ActionMenu row={row} actions={visibleActions.slice(1)} />
         </HStack>
     );
-});
+}
+
+const RowActions = memo(RowActionsComponent) as typeof RowActionsComponent;
 
 const getNestedValue = (obj: any, path: string): any => {
     if (!obj || !path) return undefined;

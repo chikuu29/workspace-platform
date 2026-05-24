@@ -1,6 +1,6 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { parseApiError, ParsedError } from '@/utils/apiErrorParser';
+import { parseApiError, ParsedError } from '@/core/utils/apiErrorParser';
 
 interface ErrorState {
     globalError: ParsedError | null;

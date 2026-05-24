@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import loadScripts from "@/utils/app/loadScript";
+import loadScripts from "@/core/utils/app/loadScript";
 import Loader from "../Loader/Loader";
 // Define the shape of your context
 interface DynamicImportContextType {

@@ -10,7 +10,7 @@ import { useSidebar } from "@/contexts/SidebarContext";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/store";
 import { APP_CONFIG_STATE } from "@/app/types/appConfigInterface";
-import useScrollShadow from "@/utils/hooks/useScrollShadow";
+import useScrollShadow from "@/core/utils/hooks/useScrollShadow";
 
 // Centralized hover border — same token used across nav / sidebar / menu items
 const HOVER_BORDER_COLOR = "app.btn.border";

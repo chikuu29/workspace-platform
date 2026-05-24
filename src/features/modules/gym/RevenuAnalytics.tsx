@@ -14,7 +14,7 @@ import {
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Users, TrendingUp, Activity } from "lucide-react";
-import LoadIcon from "../../../utils/hooks/LoadIcon";
+import LoadIcon from "@/core/utils/hooks/LoadIcon";
 
 const MotionBox = motion.create(Box as any);
 

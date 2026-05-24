@@ -12,7 +12,7 @@ import {
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { UIEngine } from "../renderer/UIEngine";
 import "../widgets";
-import AsyncLoadIcon from "@/utils/hooks/AsyncLoadIcon";
+import AsyncLoadIcon from "@/core/utils/hooks/AsyncLoadIcon";
 import { useFormStore } from "../store/useFormStore";
 import { ActionEngine } from "../action-engine/ActionEngine";
 import { useDispatch, useSelector } from "react-redux";

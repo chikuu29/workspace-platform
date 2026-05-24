@@ -4,7 +4,7 @@ import { useColorModeValue } from "@/components/ui/color-mode";
 import { useNavigate, useParams } from "react-router";
 import { useModalStore } from "@/core/store/useModalStore";
 import { ActionEngine } from "@/core/action-engine/ActionEngine";
-import AsyncLoadIcon from "@/utils/hooks/AsyncLoadIcon";
+import AsyncLoadIcon from "@/core/utils/hooks/AsyncLoadIcon";
 import { ChevronRight } from "lucide-react";
 import type { SectionRendererProps } from "./types";
 

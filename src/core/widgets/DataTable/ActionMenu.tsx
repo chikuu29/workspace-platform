@@ -8,7 +8,7 @@ import {
 import { IconButton, Icon } from "@chakra-ui/react";
 import { MoreVertical } from "lucide-react";
 import { DataTableAction } from "./types";
-import LoadIcon from "../../../utils/hooks/LoadIcon";
+import LoadIcon from "@/core/utils/hooks/LoadIcon";
 
 interface ActionMenuProps<T> {
     row: T;

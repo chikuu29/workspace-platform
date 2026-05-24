@@ -1,8 +1,8 @@
 import { Navigate, createBrowserRouter, RouteObject } from "react-router";
 import { Suspense, lazy } from "react";
 import { AppLoader } from "./features/ui/components/Loader/Loader";
-import HandleDynamicView from "./utils/app/HandleDynamicView";
-import DynamicLayout from "./utils/app/DynamicLayout";
+import HandleDynamicView from "@/core/utils/app/HandleDynamicView";
+import DynamicLayout from "@/core/utils/app/DynamicLayout";
 
 const PageNotFound = lazy(() => import("@/pages/NoPageFound"));
 const UnauthorizedAccess = lazy(() => import("@/pages/UnauthorizedAccess"));

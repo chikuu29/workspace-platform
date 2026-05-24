@@ -4,7 +4,7 @@ import { TabsRoot, TabsList, TabsTrigger, TabsContent, TabsIndicator } from "@/c
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { motion, AnimatePresence } from "framer-motion";
 import RunTimeWidgetRender from "../renderer/RunTimeWidget";
-import AsyncLoadIcon from "@/utils/hooks/AsyncLoadIcon";
+import AsyncLoadIcon from "@/core/utils/hooks/AsyncLoadIcon";
 
 interface TabConfig {
     title: string;

@@ -67,7 +67,7 @@
               ]
             },
             {
-              "label": "Active Boarded Tenants",
+              "label": "Active Boarded Guests",
               "value": "{{active_tenants}}",
               "helpText": "All active student/professional allocations",
               "trend": "neutral",
@@ -137,9 +137,9 @@
           },
           "components": [
             {
-              "id": "recent-tenants-table",
+              "id": "recent-guests-table",
               "UI_TYPE": "TABLE_VIEW",
-              "title": "Recently Onboarded Tenants",
+              "title": "Recently Onboarded Guests",
               "layoutStyles": {
                 "gridColumn": { "base": "12", "md": "8" },
                 "gap": 4
@@ -147,7 +147,7 @@
               "TABLES": {
                 "APIS": {
                   "loadData": {
-                    "path": "hostel/tenants",
+                    "path": "hostel/guests",
                     "method": "GET",
                     "params": {
                       "skip": 0,
@@ -159,12 +159,12 @@
                   "columns": [
                     {
                       "label": "ID",
-                      "key": "data.tenant_id",
+                      "key": "data.guest_id",
                       "width": "90px",
                       "textAlign": "center"
                     },
                     {
-                      "label": "Tenant Name",
+                      "label": "Guest Name",
                       "key": "data.firstName",
                       "width": "200px"
                     },
@@ -208,13 +208,13 @@
               },
               "actions": [
                 {
-                  "label": "Onboard New Tenant",
+                  "label": "Onboard New Guest",
                   "description": "Register a new guest & allocate rooms",
                   "icon": "UserPlus",
                   "colorPalette": "emerald",
                   "action": {
                     "type": "route",
-                    "path": "/app/myHostel/addTenant"
+                    "path": "/app/myHostel/addGuest"
                   }
                 },
                 {

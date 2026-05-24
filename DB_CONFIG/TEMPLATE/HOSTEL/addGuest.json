@@ -17,13 +17,13 @@
     "events": {
       "submit": {
         "type": "API_CALL",
-        "url": "hostel/addTenant",
+        "url": "hostel/addGuest",
         "method": "POST",
         "successMessage": "Guest successfully registered and allocated to room!",
         "errorMessage": "Failed to onboard guest. Please check room availability and field inputs.",
         "laterActions": {
           "type": "NAVIGATION",
-          "path": "/app/myHostel/tenants"
+          "path": "/app/myHostel/guests"
         }
       }
     }

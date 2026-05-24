@@ -297,7 +297,7 @@
                             {
                                 "label": "List Guests",
                                 "icon": "List",
-                                "path": "/app/myHostel/tenants"
+                                "path": "/app/myHostel/guests"
                             },
                             {
                                 "label": "Add Guest",

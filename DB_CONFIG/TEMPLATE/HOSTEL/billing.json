@@ -15,7 +15,7 @@
   "UI_TYPE": {
     "type": "GRID_VIEW",
     "title": "Billing & Rent Ledger",
-    "description": "Process and review monthly tenant rent invoices, safety deposits and dynamic roommate utility splits.",
+    "description": "Process and review monthly guest rent invoices, safety deposits and dynamic roommate utility splits.",
     "target": "grids",
     "layoutStyles": {
       "templateColumns": "1fr",
@@ -45,8 +45,8 @@
                   "isSortable": true
                 },
                 {
-                  "label": "Tenant Name",
-                  "key": "data.tenant_name",
+                  "label": "Guest Name",
+                  "key": "data.guest_name",
                   "width": "180px",
                   "isSearchable": true
                 },

@@ -124,6 +124,11 @@
                           "type": "setValue",
                           "target": "room_number",
                           "value": ""
+                        },
+                        {
+                          "type": "setValue",
+                          "target": "securityDeposit",
+                          "value": ""
                         }
                       ]
                     }
@@ -139,7 +144,33 @@
                 "oneLiner": true,
                 "labelField": "name",
                 "valueField": "id",
-                "disabled": true
+                "disabled": true,
+                "events": {
+                  "change": [
+                    {
+                      "actions": [
+                        {
+                          "type": "apiCall",
+                          "apiPath": "hostel/rooms/security-deposit?buildingName={{buildingName}}&roomNumber={{value}}",
+                          "method": "GET",
+                          "next": [
+                            {
+                              "type": "setValue",
+                              "target": "securityDeposit",
+                              "value": "{{data.securityDeposit}}"
+                            },
+                            {
+                              "type": "setProp",
+                              "target": "securityDeposit",
+                              "prop": "description",
+                              "value": "{{data.securityDepositNote}}"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
               },
               {
                 "name": "allotmentDate",
@@ -156,7 +187,8 @@
                 "widget": "textField",
                 "type": "number",
                 "oneLiner": true,
-                "mandatory": true
+                "mandatory": true,
+                "disabled": true
               }
             ]
           },

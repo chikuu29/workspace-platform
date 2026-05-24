@@ -265,6 +265,11 @@ const TextField = ({
                 />
               )}
             </HStack>
+            {description && (
+              <Field.HelperText fontSize="xs" color="fg.subtle" mt={1.5}>
+                {description}
+              </Field.HelperText>
+            )}
 
             <Flex mt={2} gap={4} align="center" justify={oneLiner ? "space-between" : "flex-start"}>
               <Field.ErrorText fontSize="md" color="red.500" fontWeight="medium">

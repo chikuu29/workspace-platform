@@ -128,6 +128,15 @@ const registry: RegistryConfig = {
         attendanceReport: () => import("@/features/modules/gym/AttendanceReport"),
         performanceReport: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.PerformanceReport })),
     },
+    myHostel: {
+        layout: () => import("@/theme/layouts/workspace"),
+        // Portfolio overview — shows all buildings in a grid
+        portfolio: () => import("@/features/modules/myHostel/MultiBuildingHostelPortfolio"),
+        // Building drill-down — separate page for rooms, guests, info
+        building: () => import("@/features/modules/myHostel/BuildingDetailPage"),
+        // Legacy alias kept for backwards-compat with any bookmarked URLs
+        // MultiBuildingHostelPortfolio: () => import("@/features/modules/myHostel/MultiBuildingHostelPortfolio"),
+    },
     Default: {
         workspacePage: () => import("@/core/WorkspacePage"),
         layout: () => import("@/theme/layouts/workspace"),

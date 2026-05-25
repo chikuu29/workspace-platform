@@ -32,14 +32,14 @@ export const PageHeader = memo(({
             direction={{ base: "column", lg: "row" }}
             justify="space-between"
             align={{ base: "start", lg: "center" }}
-            mb={8}
+            mb={4}
             p={6}
-            bg="app.card.bg"
+            // bg="app.card.bg"
             backdropFilter="blur(16px)"
-            border="1px solid"
+            // border="1px solid"
             borderColor="app.card.border"
             borderRadius="2xl"
-            boxShadow="sm"
+            // boxShadow="sm"
             gap={6}
             w="full"
             position="relative"
@@ -60,13 +60,13 @@ export const PageHeader = memo(({
                 </svg>
             </Box>
 
-            <Flex align="center" gap={4} flex="1" zIndex={1}>
+            <Flex align="center" gap={2} flex="1" zIndex={1}>
                 {IconComponent && (
                     <Flex
                         align="center"
                         justify="center"
-                        w="56px"
-                        h="56px"
+                        w="40px"
+                        h="40px"
                         borderRadius="xl"
                         bgGradient="linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)"
                         boxShadow="0 8px 24px -4px rgba(99,102,241,0.4)"
@@ -80,16 +80,16 @@ export const PageHeader = memo(({
                             top="2px"
                             left="4px"
                             right="4px"
-                            h="12px"
+                            h="6px"
                             borderRadius="full"
                             bg="rgba(255,255,255,0.22)"
                         />
-                        <IconComponent size={28} strokeWidth={2.5} style={{ zIndex: 1 }} />
+                        <IconComponent size={20} strokeWidth={2.5} style={{ zIndex: 1 }} />
                     </Flex>
                 )}
                 <Stack gap={1.5}>
                     <Heading
-                    size="3xl"
+                    // size="3xl"
                     fontWeight="900"
                     letterSpacing="tight"
                     color="app.text.primary"

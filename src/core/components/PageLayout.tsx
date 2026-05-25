@@ -45,11 +45,11 @@ export const PageLayout = memo(({
                 icon={icon}
             />
             <Box
-                bg="app.card.bg"
+                // bg="app.card.bg"
                 backdropFilter="blur(16px)"
-                border="1px solid"
+                // border="1px solid"
                 borderColor="app.card.border"
-                borderRadius="2xl"
+                // borderRadius="2xl"
                 overflow="hidden"
                 boxShadow="inner-xl"
                 p={4}

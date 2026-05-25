@@ -20,20 +20,20 @@ export default function Brand() {
         minW={0}
         flexShrink={1}
         // bg={useColorModeValue("white", "whiteAlpha.200")}
-        p={{ base: 0.5, sm: 1, md: 3 }}
+        p={{ base: 0.5, sm: 1, md: 1}}
         borderRadius="xl"
         // boxShadow="lg"
         transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
-        _hover={{
-          transform: "translateY(-2px)",
-          boxShadow: "xl"
-        }}
+        // _hover={{
+        //   transform: "translateY(-2px)",
+        //   boxShadow: "xl"
+        // }}
       >
         <Image
           src="/assets/icons/workspace-logo.svg"
           alt="Workspace Logo"
           loading="eager"
-          h={{ base: "38px", sm: "44px", md: "52px" }}
+          h={{ base: "38px", sm: "44px", md: "30px" }}
           maxW={{ base: "128px", sm: "172px", md: "260px" }}
           w="auto"
           objectFit="contain"

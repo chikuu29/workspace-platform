@@ -16,6 +16,7 @@ import { ArrowRight, MapPin } from "lucide-react";
 import type { BuildingStats, HostelBuilding } from "../types/Hostel.types";
 import { getFloors, getOccupancyPalette, ROOM_STATUS_META } from "../utils/hostel.utils";
 import FloorProgressRow from "./FloorProgressRow";
+import { useColorModeValue } from "@/components/ui/color-mode";
 
 interface BuildingCardProps {
   building: HostelBuilding;
@@ -26,12 +27,31 @@ interface BuildingCardProps {
 /**
  * BuildingCard — memoised portfolio grid card.
  *
- * Upgraded with:
- * 1. A Live Room Heatmap Strip showing status blocks for all rooms in a contributing graph style.
- * 2. Premium drop-shadow hover triggers and interactive transitions.
+ * Fully redesigned for ultra-premium dark & light modes. Features:
+ * 1. Adaptive shadows and borders for maximum web aesthetics.
+ * 2. Visual card components with subtle status blocks and modern progress lines.
+ * 3. A Live Room Heatmap Grid styled like a high-tech activity map.
+ * 4. Micro-layouts and hover scaling animations.
  */
 const BuildingCard = memo(({ building, stats, onOpen }: BuildingCardProps) => {
   const handleOpen = useCallback(() => onOpen(building.id), [building.id, onOpen]);
+
+  const cardBg = useColorModeValue("white", "app.card.bg");
+  const cardBorder = useColorModeValue("rgba(226, 232, 240, 0.8)", "app.card.border");
+  const cardShadow = useColorModeValue(
+    "0 10px 30px -10px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02)",
+    "app.shadow.glass-glow"
+  );
+  const cardHoverShadow = useColorModeValue(
+    "0 20px 40px -12px rgba(49, 46, 129, 0.08)",
+    "0 20px 40px -12px rgba(99, 102, 241, 0.22)"
+  );
+  
+  const iconBg = useColorModeValue(building.color.bg, "whiteAlpha.100");
+  const metaColor = useColorModeValue("gray.600", "gray.400");
+  const titleColor = useColorModeValue("gray.800", "white");
+  const dividerColor = useColorModeValue("gray.200", "whiteAlpha.100");
+  const heatmapBg = useColorModeValue("rgba(249, 250, 251, 0.8)", "whiteAlpha.50");
 
   const floorGroups = useMemo(
     () =>
@@ -50,9 +70,9 @@ const BuildingCard = memo(({ building, stats, onOpen }: BuildingCardProps) => {
         return (
           <Box
             key={room.n}
-            w="6px"
-            h="6px"
-            borderRadius="1px"
+            w="7px"
+            h="7px"
+            borderRadius="1.5px"
             bg={meta.dot}
             opacity={0.9}
             transition="all 0.15s ease"
@@ -68,27 +88,34 @@ const BuildingCard = memo(({ building, stats, onOpen }: BuildingCardProps) => {
       as="button"
       textAlign="left"
       border="1px solid"
-      borderColor="app.card.border"
+      borderColor={cardBorder}
       borderRadius="2xl"
-      bg="app.card.bg"
+      bg={cardBg}
       cursor="pointer"
       overflow="hidden"
-      transition="all 0.25s cubic-bezier(0.16, 1, 0.3, 1)"
+      boxShadow={cardShadow}
+      transition="all 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
       onClick={handleOpen}
-      _hover={{ borderColor: building.color.icon, transform: "translateY(-5px)", shadow: "xl" }}
+      w="full"
+      _hover={{ 
+        borderColor: building.color.icon, 
+        transform: "translateY(-5px)", 
+        shadow: cardHoverShadow 
+      }}
       _focusVisible={{ outline: "2px solid", outlineColor: building.color.icon, outlineOffset: "2px" }}
     >
       {/* Brand gradient strip */}
       <Box h="5px" bgGradient={`linear(to-r, ${building.color.gradStart}, ${building.color.gradEnd})`} />
 
-      <VStack align="stretch" gap={4} p={{ base: 4, md: 5 }}>
+      <VStack align="stretch" gap={4.5} p={{ base: 5, md: 6 }}>
         {/* Icon + occupancy badge */}
         <HStack justify="space-between" align="center" gap={3}>
-          <Circle size="12" bg={building.color.bg} color={building.color.icon} shadow="xs">
+          <Circle size="12" bg={iconBg} color={building.color.icon} border="1px solid" borderColor="whiteAlpha.100" shadow="xs">
             <Icon as={building.icon} boxSize={5} />
           </Circle>
           <Badge
             colorPalette={getOccupancyPalette(stats.pct)}
+            variant="subtle"
             borderRadius="full"
             px={3}
             py={1}
@@ -100,22 +127,22 @@ const BuildingCard = memo(({ building, stats, onOpen }: BuildingCardProps) => {
         </HStack>
 
         {/* Name & meta */}
-        <VStack align="start" gap={1}>
-          <Text fontSize="md" fontWeight="900" color="app.text.primary" lineHeight="1.2">
+        <VStack align="start" gap={1.5}>
+          <Text fontSize="md" fontWeight="950" color={titleColor} lineHeight="1.2" letterSpacing="-0.01em">
             {building.name}
           </Text>
-          <HStack gap={1.5} color="app.text.muted" fontSize="xs" fontWeight="700" flexWrap="wrap">
-            <Icon as={MapPin} boxSize={3} />
+          <HStack gap={1.5} color={metaColor} fontSize="xs" fontWeight="700" flexWrap="wrap">
+            <Icon as={MapPin} boxSize={3.5} color="red.400" />
             <Text>{building.location}</Text>
-            <Text opacity={0.4}>·</Text>
+            <Text opacity={0.3}>·</Text>
             <Text>{building.floors} floors</Text>
-            <Text opacity={0.4}>·</Text>
+            <Text opacity={0.3}>·</Text>
             <Text>{stats.total} rooms</Text>
           </HStack>
         </VStack>
 
         {/* Per-floor occupancy bars */}
-        <VStack align="stretch" gap={2.5}>
+        <VStack align="stretch" gap={3} pt={1}>
           {floorGroups.map(({ floor, rooms }) => (
             <FloorProgressRow
               key={floor}
@@ -127,17 +154,17 @@ const BuildingCard = memo(({ building, stats, onOpen }: BuildingCardProps) => {
         </VStack>
 
         {/* Live Heatmap Strip */}
-        <VStack align="start" gap={1.5} pt={1}>
-          <Text fontSize="3xs" fontWeight="900" color="app.text.muted" textTransform="uppercase" letterSpacing="0.08em">
+        <VStack align="start" gap={2} pt={1.5}>
+          <Text fontSize="3xs" fontWeight="900" color={metaColor} textTransform="uppercase" letterSpacing="0.08em">
             Live Occupancy Grid
           </Text>
-          <Flex gap={1} flexWrap="wrap" p={2} bg="bg.subtle" borderRadius="xl" w="full" minH="22px" align="center">
+          <Flex gap={1} flexWrap="wrap" p={2.5} bg={heatmapBg} borderRadius="xl" w="full" minH="24px" align="center">
             {heatmapCells}
           </Flex>
         </VStack>
 
         {/* Amenity chips */}
-        <HStack gap={1.5} flexWrap="wrap">
+        <HStack gap={1.5} flexWrap="wrap" pt={0.5}>
           {building.amenities.map((amenity) => (
             <Badge
               key={amenity}
@@ -147,32 +174,32 @@ const BuildingCard = memo(({ building, stats, onOpen }: BuildingCardProps) => {
               px={2.5}
               py={0.5}
               fontSize="2xs"
-              fontWeight="700"
+              fontWeight="800"
             >
               {amenity}
             </Badge>
           ))}
         </HStack>
 
-        <Separator />
+        <Separator borderColor={dividerColor} />
 
-        {/* Stats footer */}
+        {/* Stats footer in premium blocks */}
         <SimpleGrid columns={4} gap={2} alignItems="center">
-          <VStack align="start" gap={0.5}>
-            <Text fontSize="sm" color="#1D4ED8" fontWeight="900" lineHeight="1">{stats.occ}</Text>
-            <Text fontSize="2xs" color="app.text.muted" fontWeight="700">Occupied</Text>
+          <VStack align="center" gap={0.5} py={2} borderRadius="xl" bg={useColorModeValue("blue.50/40", "whiteAlpha.50")}>
+            <Text fontSize="sm" color="#1D4ED8" fontWeight="950" lineHeight="1">{stats.occ}</Text>
+            <Text fontSize="3xs" color={metaColor} fontWeight="800" textTransform="uppercase">Occupied</Text>
           </VStack>
-          <VStack align="start" gap={0.5}>
-            <Text fontSize="sm" color="#15803D" fontWeight="900" lineHeight="1">{stats.vac}</Text>
-            <Text fontSize="2xs" color="app.text.muted" fontWeight="700">Vacant</Text>
+          <VStack align="center" gap={0.5} py={2} borderRadius="xl" bg={useColorModeValue("green.50/40", "whiteAlpha.50")}>
+            <Text fontSize="sm" color="#15803D" fontWeight="950" lineHeight="1">{stats.vac}</Text>
+            <Text fontSize="3xs" color={metaColor} fontWeight="800" textTransform="uppercase">Vacant</Text>
           </VStack>
-          <VStack align="start" gap={0.5}>
-            <Text fontSize="sm" color="#C2410C" fontWeight="900" lineHeight="1">{stats.maint}</Text>
-            <Text fontSize="2xs" color="app.text.muted" fontWeight="700">Maint.</Text>
+          <VStack align="center" gap={0.5} py={2} borderRadius="xl" bg={useColorModeValue("orange.50/40", "whiteAlpha.50")}>
+            <Text fontSize="sm" color="#C2410C" fontWeight="950" lineHeight="1">{stats.maint}</Text>
+            <Text fontSize="3xs" color={metaColor} fontWeight="800" textTransform="uppercase">Maint.</Text>
           </VStack>
-          <HStack justify="end" color={building.color.icon} fontWeight="800" fontSize="xs" gap={1}>
+          <HStack justify="center" color={building.color.icon} fontWeight="900" fontSize="xs" gap={0.5}>
             <Text>View</Text>
-            <ArrowRight size={13} />
+            <ArrowRight size={13} strokeWidth={2.5} />
           </HStack>
         </SimpleGrid>
       </VStack>

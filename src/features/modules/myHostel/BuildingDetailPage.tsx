@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Circle,
+  Container,
   Flex,
   Heading,
   HStack,
@@ -16,7 +17,6 @@ import {
 import {
   Activity,
   ArrowLeft,
-  Building,
   Home,
   LayoutGrid,
   MapPin,
@@ -32,7 +32,7 @@ import BuildingInfo from "./components/BuildingInfo";
 import StatTile     from "./components/StatTile";
 import type { BuildingStats, BuildingTab, HostelBuilding } from "./types/Hostel.types";
 
-// ─── BuildingDetailHeader ─────────────────────────────────────────────────────
+// ─── TYPES ───────────────────────────────────────────────────────────────────
 
 interface BuildingDetailHeaderProps {
   building: HostelBuilding;
@@ -40,195 +40,181 @@ interface BuildingDetailHeaderProps {
   onBack:   () => void;
 }
 
+interface BuildingTabsProps {
+  activeTab:   BuildingTab;
+  onTabChange: (tab: BuildingTab) => void;
+}
+
+interface NotFoundStateProps {
+  onBack: () => void;
+}
+
+// ─── BUILDING DETAIL HEADER ───────────────────────────────────────────────────
+
 /**
- * BuildingDetailHeader — Upgraded with a rich brand-matched gradient banner card
- * and dynamic metrics dashboard tiles.
+ * BuildingDetailHeader — Redesigned with a beautiful, clean minimalist SaaS header.
+ * Replaces the heavy brand-gradient colored panel with a sleek panel, structured typography,
+ * consistent spacing, and crisp modern badges.
  */
 const BuildingDetailHeader = memo(({ building, stats, onBack }: BuildingDetailHeaderProps) => (
   <VStack align="stretch" gap={5}>
-    {/* Gradient Brand Hero Card */}
+    {/* Clean Minimal Page Header Block */}
     <Box
-      position="relative"
-      bgGradient={`linear(to-br, ${building.color.gradStart}, ${building.color.gradEnd})`}
-      borderRadius="2xl"
+      // bg="bg.panel"
+      // border="1px solid"
+      // borderColor="border.muted"
+      // borderRadius="xl"
       p={{ base: 5, md: 6 }}
-      color="white"
+      // shadow="sm"
+      position="relative"
       overflow="hidden"
-      shadow="md"
+      transition="all 200ms ease"
     >
-      {/* Soft light halo inside the brand card */}
-      <Box
-        position="absolute"
-        top="-40%"
-        right="-5%"
-        w="220px"
-        h="220px"
-        borderRadius="full"
-        bg="white"
-        opacity={0.12}
-        filter="blur(50px)"
-        pointerEvents="none"
-      />
-
-      <VStack align="stretch" gap={4} position="relative" zIndex={1}>
-        {/* Breadcrumb Back row */}
-        <HStack justify="space-between" align="center" flexWrap="wrap" gap={2}>
-          <HStack gap={1.5} fontSize="xs" fontWeight="800">
-            <Button
-              size="xs"
-              variant="ghost"
-              onClick={onBack}
-              borderRadius="lg"
-              fontWeight="900"
-              color="white"
-              bg="rgba(255,255,255,0.15)"
-              _hover={{ bg: "rgba(255,255,255,0.25)" }}
-              px={3}
-            >
-              <ArrowLeft size={13} />
-              Portfolio
-            </Button>
-            <Text opacity={0.6}>/</Text>
-            <HStack gap={1}>
+      <VStack align="stretch" gap={4}>
+        {/* Navigation & Breadcrumb Row */}
+        <HStack justify="space-between" align="center" flexWrap="wrap" gap={3}>
+          <HStack gap={2} fontSize="xs" fontWeight="medium">
+           
+           
+            <HStack gap={1.5} color="fg.muted">
               <Icon as={building.icon} boxSize={3.5} />
-              <Text>{building.name}</Text>
+              <Text fontWeight="semibold">{building.name}</Text>
             </HStack>
           </HStack>
 
-          <Badge bg="rgba(255,255,255,0.2)" color="white" borderRadius="full" px={2.5} py={0.5} fontSize="2xs" fontWeight="900">
+          <Badge
+            variant="outline"
+            colorPalette="gray"
+            borderRadius="md"
+            px={2.5}
+            py={0.5}
+            fontSize="2xs"
+            fontWeight="semibold"
+          >
             ID: {building.id}
           </Badge>
         </HStack>
 
-        {/* Title row */}
-        <VStack align="start" gap={1}>
-          <Heading size={{ base: "lg", md: "xl" }} fontWeight="900" letterSpacing="-0.02em">
+        {/* Title, location, and structural information */}
+        <VStack align="start" gap={2}>
+          <Heading size={{ base: "xl", md: "2xl" }} fontWeight="semibold" letterSpacing="-0.02em" color="fg">
             {building.name}
           </Heading>
-          <HStack gap={2.5} opacity={0.9} fontSize="xs" fontWeight="600">
-            <Icon as={MapPin} boxSize={3.5} />
-            <Text>{building.location} · Bhubaneswar hub</Text>
-            <Text opacity={0.5}>·</Text>
+          <HStack gap={3} flexWrap="wrap" fontSize="xs" color="fg.muted" fontWeight="medium">
+            <HStack gap={1}>
+              <Icon as={MapPin} boxSize={3.5} color="emerald.500" />
+              <Text>{building.location} · Bhubaneswar Hub</Text>
+            </HStack>
+            <Text color="border.muted">|</Text>
             <Text>{building.floors} floors total</Text>
           </HStack>
         </VStack>
       </VStack>
     </Box>
 
-    {/* KPI tiles row */}
-    <SimpleGrid columns={{ base: 1, sm: 2, xl: 4 }} gap={3.5}>
+    {/* Metric / KPI tiles row using unified, sleek colors */}
+    <SimpleGrid columns={{ base: 1, sm: 2, xl: 4 }} gap={4}>
       <StatTile
         label="Location Address"
         value={building.location}
         subtitle={`${building.floors} levels built`}
         icon={MapPin}
-        accent="app.text.primary"
+        accent="fg"
       />
       <StatTile
         label="Beds Occupied"
         value={stats.occ}
         subtitle={`out of ${stats.total} total rooms`}
         icon={Users}
-        accent="#1D4ED8"
-        gradStart="#3B82F6"
-        gradEnd="#1D4ED8"
+        accent="blue.500"
+        gradStart="blue.500"
+        gradEnd="blue.600"
       />
       <StatTile
         label="Beds Vacant"
         value={stats.vac}
         subtitle="Instantly allocatable"
         icon={Home}
-        accent="#15803D"
-        gradStart="#22C55E"
-        gradEnd="#15803D"
+        accent="emerald.500"
+        gradStart="emerald.500"
+        gradEnd="emerald.600"
       />
       <StatTile
         label="Fill Percentage"
         value={`${stats.pct}%`}
         subtitle="Current occupancy rate"
         icon={Activity}
-        accent={building.color.icon}
-        gradStart={building.color.gradStart}
-        gradEnd={building.color.gradEnd}
+        accent="indigo.500"
+        gradStart="indigo.500"
+        gradEnd="indigo.600"
       />
     </SimpleGrid>
   </VStack>
 ));
 BuildingDetailHeader.displayName = "BuildingDetailHeader";
 
-// ─── BuildingTabs ─────────────────────────────────────────────────────────────
-
-interface BuildingTabsProps {
-  activeTab:   BuildingTab;
-  building:    HostelBuilding;
-  onTabChange: (tab: BuildingTab) => void;
-}
+// ─── BUILDING TABS ────────────────────────────────────────────────────────────
 
 /**
- * BuildingTabs — Restyled as floating glass pills for responsive controls.
+ * BuildingTabs — Completely redesigned from flashy colorful pills to a clean,
+ * consistent, high-end professional SaaS tab switcher with stable layout structures.
  */
-const BuildingTabs = memo(({ activeTab, building, onTabChange }: BuildingTabsProps) => (
-  <Box
-    bg="bg.subtle"
-    p={1}
-    borderRadius="2xl"
-    border="1px solid"
-    borderColor="app.card.border"
-    w="fit-content"
-    overflowX="auto"
-  >
-    <HStack gap={1} flexWrap="nowrap">
-      {TAB_ITEMS.map((tab) => {
-        const active = activeTab === tab.value;
-        const activeBg = { base: building.color.icon, _dark: building.color.bar };
-        const hoverColor = { base: building.color.icon, _dark: building.color.bar };
-        const hoverBg = active ? activeBg : { base: "rgba(0,0,0,0.03)", _dark: "rgba(255,255,255,0.05)" };
+const BuildingTabs = memo(({ activeTab, onTabChange }: BuildingTabsProps) => {
+  return (
+    <Box
+      // bg="app.card.bg"
+      p={1}
+      borderRadius="lg"
+      border="1px solid"
+      borderColor="border.subtle"
+      w="fit-content"
+      overflowX="auto"
+    >
+      <HStack gap={1} flexWrap="nowrap">
+        {TAB_ITEMS.map((tab) => {
+          const isActive = activeTab === tab.value;
 
-        return (
-          <Button
-            key={tab.value}
-            variant="ghost"
-            size="sm"
-            borderRadius="xl"
-            bg={active ? activeBg : "transparent"}
-            color={active ? "white" : "app.text.muted"}
-            fontWeight="800"
-            px={5}
-            py={2.5}
-            h="auto"
-            transition="all 0.25s cubic-bezier(0.16, 1, 0.3, 1)"
-            onClick={() => onTabChange(tab.value)}
-            _hover={{
-              color: active ? "white" : hoverColor,
-              bg: hoverBg,
-            }}
-          >
-            <Icon as={tab.icon} boxSize={3.5} />
-            {tab.label}
-          </Button>
-        );
-      })}
-    </HStack>
-  </Box>
-));
+          return (
+            <Button
+              key={tab.value}
+              variant={isActive ? "solid" : "ghost"}
+              colorPalette={isActive ? "indigo" : "gray"}
+              size="sm"
+              borderRadius="md"
+              fontWeight="medium"
+              px={4}
+              py={1.5}
+              h="auto"
+              transition="all 150ms ease"
+              onClick={() => onTabChange(tab.value)}
+              _hover={isActive ? undefined : {
+                bg: "bg.panel",
+                color: "fg",
+              }}
+            >
+              <Icon as={tab.icon} boxSize={3.5} />
+              {tab.label}
+            </Button>
+          );
+        })}
+      </HStack>
+    </Box>
+  );
+});
 BuildingTabs.displayName = "BuildingTabs";
 
-// ─── NotFoundState ────────────────────────────────────────────────────────────
-
-interface NotFoundStateProps {
-  onBack: () => void;
-}
+// ─── NOT FOUND STATE ──────────────────────────────────────────────────────────
 
 const NotFoundState = memo(({ onBack }: NotFoundStateProps) => (
   <VStack align="center" justify="center" gap={4} py={20}>
     <Text fontSize="3xl">🏚️</Text>
-    <VStack gap={1}>
-      <Text fontSize="md" fontWeight="900" color="app.text.primary">Building not found</Text>
-      <Text fontSize="sm" color="app.text.muted" fontWeight="600">
+    <VStack gap={1} align="center">
+      <Text fontSize="md" fontWeight="semibold" color="fg">Building not found</Text>
+      <Text fontSize="sm" color="fg.muted">
         The building you're looking for doesn't exist in this portfolio.
       </Text>
     </VStack>
-    <Button size="sm" variant="outline" borderRadius="lg" onClick={onBack}>
+    <Button size="sm" variant="outline" borderRadius="md" onClick={onBack}>
       <LayoutGrid size={14} />
       Back to portfolio
     </Button>
@@ -236,7 +222,7 @@ const NotFoundState = memo(({ onBack }: NotFoundStateProps) => (
 ));
 NotFoundState.displayName = "NotFoundState";
 
-// ─── BuildingDetailPage (Page Root) ───────────────────────────────────────────
+// ─── BUILDING DETAIL PAGE ROOT ────────────────────────────────────────────────
 
 const BuildingDetailPage = memo(() => {
   const { navigateTo } = useWorkspaceRouter();
@@ -245,21 +231,28 @@ const BuildingDetailPage = memo(() => {
   const [activeTab,          setActiveTab]          = useState<BuildingTab>("rooms");
   const [selectedRoomNumber, setSelectedRoomNumber] = useState<string | null>(null);
 
+  // Safely extract buildingId from route params
   const buildingId = useMemo(() => params?.split("/")[0] ?? null, [params]);
-  const building   = useMemo(
+  
+  // Find building config in stable memory
+  const building = useMemo(
     () => BUILDINGS.find((b) => b.id === buildingId) ?? null,
     [buildingId],
   );
+
+  // Compute building-specific stats on-demand
   const stats = useMemo(
     () => (building ? calcStats(building) : null),
     [building],
   );
 
+  // Find active room selection details
   const selectedRoom = useMemo(
     () => (activeTab === "rooms" ? building?.rooms.find((r) => r.n === selectedRoomNumber) ?? null : null),
     [building, selectedRoomNumber, activeTab],
   );
 
+  // Stable navigation and interaction callbacks
   const goPortfolio = useCallback(() => navigateTo("portfolio"), [navigateTo]);
 
   const handleTabChange = useCallback((tab: BuildingTab) => {
@@ -274,6 +267,7 @@ const BuildingDetailPage = memo(() => {
     () => navigateTo("buildingInfo", buildingId ?? undefined),
     [navigateTo, buildingId],
   );
+  
   const buildingRevenue = useCallback(
     () => navigateTo("revenueReport", buildingId ?? undefined),
     [navigateTo, buildingId],
@@ -284,15 +278,16 @@ const BuildingDetailPage = memo(() => {
   }
 
   return (
-    <Box w="full" pb={8}>
-      <VStack align="stretch" gap={5.5}>
-        {/* Breadcrumb + name + KPI tiles */}
+    // <Box  pb={8}>
+      <Container maxW="7xl" px={{ base: 4, md: 6 }} py={6}>
+      <VStack align="stretch" gap={6}>
+        {/* Crisp Header section with Navigation, Title, and unified KPIs */}
         <BuildingDetailHeader building={building} stats={stats} onBack={goPortfolio} />
 
-        {/* Tab strip (Rooms / Guests / Info) */}
-        <BuildingTabs activeTab={activeTab} building={building} onTabChange={handleTabChange} />
+        {/* Flat Professional Switcher Tabs */}
+        <BuildingTabs activeTab={activeTab} onTabChange={handleTabChange} />
 
-        {/* Rooms tab */}
+        {/* Render Tab Contents */}
         {activeTab === "rooms" && (
           <Box>
             <RoomGrid
@@ -304,12 +299,10 @@ const BuildingDetailPage = memo(() => {
           </Box>
         )}
 
-        {/* Guests tab */}
         {activeTab === "guests" && (
           <GuestsTable guests={building.guests} />
         )}
 
-        {/* Info tab */}
         {activeTab === "info" && (
           <BuildingInfo
             building={building}
@@ -319,7 +312,8 @@ const BuildingDetailPage = memo(() => {
           />
         )}
       </VStack>
-    </Box>
+      </Container>
+    // </Box>
   );
 });
 

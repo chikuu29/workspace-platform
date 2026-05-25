@@ -67,10 +67,30 @@ interface UpdateItem {
 }
 
 const UPDATE_ICON_MAP = {
-  info: { icon: Info, accent: "blue.500", bg: "blue.500/10", border: "blue.500/20" },
-  warning: { icon: AlertTriangle, accent: "orange.500", bg: "orange.500/10", border: "orange.500/20" },
-  success: { icon: CheckCircle2, accent: "green.500", bg: "green.500/10", border: "green.500/20" },
-  announcement: { icon: Megaphone, accent: "purple.500", bg: "purple.500/10", border: "purple.500/20" },
+  info: {
+    icon: Info,
+    accent: "blue.500",
+    bg: "blue.500/10",
+    border: "blue.500/20",
+  },
+  warning: {
+    icon: AlertTriangle,
+    accent: "orange.500",
+    bg: "orange.500/10",
+    border: "orange.500/20",
+  },
+  success: {
+    icon: CheckCircle2,
+    accent: "green.500",
+    bg: "green.500/10",
+    border: "green.500/20",
+  },
+  announcement: {
+    icon: Megaphone,
+    accent: "purple.500",
+    bg: "purple.500/10",
+    border: "purple.500/20",
+  },
 } as const;
 
 /** Replace with real API data when ready */
@@ -79,28 +99,32 @@ const MOCK_UPDATES: UpdateItem[] = [
     id: "1",
     type: "announcement",
     title: "Platform v2.4 Released",
-    description: "New dashboard widgets, improved performance, and dark mode refinements are now live.",
+    description:
+      "New dashboard widgets, improved performance, and dark mode refinements are now live.",
     timestamp: "2 hours ago",
   },
   {
     id: "2",
     type: "warning",
     title: "Scheduled Maintenance",
-    description: "The platform will undergo maintenance on Sunday, 12:00–2:00 AM UTC.",
+    description:
+      "The platform will undergo maintenance on Sunday, 12:00–2:00 AM UTC.",
     timestamp: "5 hours ago",
   },
   {
     id: "3",
     type: "success",
     title: "Billing Synced Successfully",
-    description: "All subscription records have been reconciled with the payment gateway.",
+    description:
+      "All subscription records have been reconciled with the payment gateway.",
     timestamp: "1 day ago",
   },
   {
     id: "4",
     type: "info",
     title: "New Integration Available",
-    description: "Connect your workspace with Slack, Teams, or Discord for real-time alerts.",
+    description:
+      "Connect your workspace with Slack, Teams, or Discord for real-time alerts.",
     timestamp: "2 days ago",
   },
 ];
@@ -179,19 +203,39 @@ const UpdatesFeed = memo(({ updates }: { updates: UpdateItem[] }) => {
               transition="all 0.15s ease"
               _hover={{ bg: theme.bg }}
             >
-              <Circle size="9" bg={theme.bg} color={theme.accent} flexShrink={0}>
+              <Circle
+                size="9"
+                bg={theme.bg}
+                color={theme.accent}
+                flexShrink={0}
+              >
                 <UpdateIcon size={15} />
               </Circle>
               <VStack align="start" gap={0.5} flex={1} minW={0}>
                 <HStack gap={2} w="full" justify="space-between">
-                  <Text fontSize="sm" fontWeight="800" color="app.text.primary" truncate>
+                  <Text
+                    fontSize="sm"
+                    fontWeight="800"
+                    color="app.text.primary"
+                    truncate
+                  >
                     {item.title}
                   </Text>
-                  <Text fontSize="2xs" color="app.text.muted" fontWeight="600" flexShrink={0}>
+                  <Text
+                    fontSize="2xs"
+                    color="app.text.muted"
+                    fontWeight="600"
+                    flexShrink={0}
+                  >
                     {item.timestamp}
                   </Text>
                 </HStack>
-                <Text fontSize="xs" color="app.text.muted" fontWeight="600" lineClamp={1}>
+                <Text
+                  fontSize="xs"
+                  color="app.text.muted"
+                  fontWeight="600"
+                  lineClamp={1}
+                >
                   {item.description}
                 </Text>
               </VStack>
@@ -332,11 +376,18 @@ function MyApps() {
   const error = useSelector((state: RootState) => state.app.error);
   const auth = useSelector((state: RootState) => state.auth);
   const organizations = useSelector((state: RootState) => state.organizations);
+  const profile = useSelector((state: RootState) => state.user?.profile);
   const user_type = useSelector((state: RootState) => state.rbac.user_type);
   // Read raw RBAC state at hook-level so it can be safely closed-over inside useMemo.
-  const rbacPermissions = useSelector((state: RootState) => state.rbac.permissions);
-  const is_root_user = useSelector((state: RootState) => state.rbac.is_root_user);
-  const is_superuser = useSelector((state: RootState) => state.rbac.is_superuser);
+  const rbacPermissions = useSelector(
+    (state: RootState) => state.rbac.permissions,
+  );
+  const is_root_user = useSelector(
+    (state: RootState) => state.rbac.is_root_user,
+  );
+  const is_superuser = useSelector(
+    (state: RootState) => state.rbac.is_superuser,
+  );
   const navigate = useNavigate();
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -348,10 +399,22 @@ function MyApps() {
 
   // Define sticky-state colors at the top level to follow Rules of Hooks
   const stuckBg = useColorModeValue("app.card.bg", "navy.700");
-  const stuckBorder = useColorModeValue("brand.500", "rgba(199, 153, 255, 0.3)");
-  const normalBorder = useColorModeValue("rgba(0,0,0,0.05)", "rgba(255,255,255,0.1)");
-  const stuckShadow = useColorModeValue("0 8px 30px rgba(0,0,0,0.08)", "0 20px 60px rgba(0,0,0,0.6)");
-  const normalShadow = useColorModeValue("0 4px 20px -5px rgba(0,0,0,0.05)", "0 10px 40px -20px rgba(0,0,0,0.5)");
+  const stuckBorder = useColorModeValue(
+    "brand.500",
+    "rgba(199, 153, 255, 0.3)",
+  );
+  const normalBorder = useColorModeValue(
+    "rgba(0,0,0,0.05)",
+    "rgba(255,255,255,0.1)",
+  );
+  const stuckShadow = useColorModeValue(
+    "0 8px 30px rgba(0,0,0,0.08)",
+    "0 20px 60px rgba(0,0,0,0.6)",
+  );
+  const normalShadow = useColorModeValue(
+    "0 4px 20px -5px rgba(0,0,0,0.05)",
+    "0 10px 40px -20px rgba(0,0,0,0.5)",
+  );
 
   const [isStuck, setIsStuck] = useState(false);
   const stickyRef = useRef<HTMLDivElement>(null);
@@ -360,13 +423,13 @@ function MyApps() {
     const el = stickyRef.current;
     if (!el) return;
 
-    // We use rootMargin: "-1px 0px 0px 0px" to detect when the element 
+    // We use rootMargin: "-1px 0px 0px 0px" to detect when the element
     // hits the top of the screen (sticky position).
     const observer = new IntersectionObserver(
       ([e]) => {
         setIsStuck(e.intersectionRatio < 1);
       },
-      { threshold: [1], rootMargin: "-1px 0px 0px 0px" }
+      { threshold: [1], rootMargin: "-1px 0px 0px 0px" },
     );
 
     observer.observe(el);
@@ -390,9 +453,12 @@ function MyApps() {
         const required: string[] = app.required_permissions || [];
         if (required.length > 0 && !isPrivileged) {
           const hasAll = required.every((reqPerm) =>
-            userPerms.some((p) =>
-              p === reqPerm || (p.endsWith(".*") && reqPerm.startsWith(p.slice(0, -2))) || p === "*"
-            )
+            userPerms.some(
+              (p) =>
+                p === reqPerm ||
+                (p.endsWith(".*") && reqPerm.startsWith(p.slice(0, -2))) ||
+                p === "*",
+            ),
           );
           if (!hasAll) return false;
         }
@@ -400,7 +466,15 @@ function MyApps() {
 
       return app.name.toLowerCase().includes(searchTerm.toLowerCase());
     });
-  }, [searchTerm, appList, subscribed_apps, user_type, rbacPermissions, is_root_user, is_superuser]);
+  }, [
+    searchTerm,
+    appList,
+    subscribed_apps,
+    user_type,
+    rbacPermissions,
+    is_root_user,
+    is_superuser,
+  ]);
 
   const handleDefaultNavigate = useCallback(
     (e: React.MouseEvent, cfg: any) => {
@@ -420,6 +494,44 @@ function MyApps() {
     },
     [auth?.isAuthenticated, organizations?.organization?.name, navigate],
   );
+  const userName = useMemo(() => {
+    return (
+      profile?.first_name || profile?.full_name || profile?.username || "User"
+    );
+  }, [profile]);
+
+  const greeting = useMemo(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good Morning";
+    if (hour < 17) return "Good Afternoon";
+    return "Good Evening";
+  }, []);
+
+  const quotes = useMemo(() => [
+    {
+      text: "A man who dares to waste one hour of time has not discovered the value of life.",
+      author: "Charles Darwin"
+    },
+    {
+      text: "Nothing will move unless you do.",
+      author: "Maya Angelou"
+    }
+  ], []);
+
+  const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
+  const [fadeState, setFadeState] = useState<"in" | "out">("in");
+
+  useEffect(() => {
+    const quoteInterval = setInterval(() => {
+      setFadeState("out");
+      setTimeout(() => {
+        setCurrentQuoteIndex((prev) => (prev + 1) % quotes.length);
+        setFadeState("in");
+      }, 1000);
+    }, 8000);
+
+    return () => clearInterval(quoteInterval);
+  }, [quotes.length]);
 
   return (
     <Box>
@@ -433,9 +545,6 @@ function MyApps() {
         <Box
           p={{ base: 5, md: 8 }}
           borderRadius="3xl"
-          bg={useColorModeValue("white", "app.card.bg")}
-          border="1px solid"
-          borderColor={useColorModeValue("gray.100", "whiteAlpha.100")}
           position="relative"
           overflow="hidden"
           transition="all 0.3s ease"
@@ -476,6 +585,14 @@ function MyApps() {
               50% { transform: scale(1.25) rotate(15deg); opacity: 0.16; }
               100% { transform: scale(1) rotate(0deg); opacity: 0.08; }
             }
+            @keyframes fade-out-slow {
+              0% { opacity: 1; transform: translateY(0px); filter: blur(0px); }
+              100% { opacity: 0; transform: translateY(4px); filter: blur(3px); }
+            }
+            @keyframes fade-in-slow {
+              0% { opacity: 0; transform: translateY(-4px); filter: blur(3px); }
+              100% { opacity: 1; transform: translateY(0px); filter: blur(0px); }
+            }
           `}</style>
 
           {/* Dynamic Concentric Circular Radar Overlay */}
@@ -490,23 +607,43 @@ function MyApps() {
               animation: "rotate-slow 60s infinite linear",
             }}
           >
-            <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="100" cy="100" r="80" stroke="currentColor" strokeWidth="20" strokeDasharray="40 20" />
-              <circle cx="100" cy="100" r="40" stroke="currentColor" strokeWidth="10" strokeDasharray="10 5" />
+            <svg
+              width="200"
+              height="200"
+              viewBox="0 0 200 200"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="100"
+                cy="100"
+                r="80"
+                stroke="currentColor"
+                strokeWidth="20"
+                strokeDasharray="40 20"
+              />
+              <circle
+                cx="100"
+                cy="100"
+                r="40"
+                stroke="currentColor"
+                strokeWidth="10"
+                strokeDasharray="10 5"
+              />
             </svg>
           </Box>
 
           {/* Scattered Background Shape Textures (starting >30% from the left to prevent text overlapping) */}
           {[
-            {
-              id: "shield-security",
-              path: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
-              size: 64,
-              top: "-10px",
-              right: "8%",
-              opacity: 0.08,
-              animation: "pulse-scale 9s infinite ease-in-out"
-            },
+            // {
+            //   id: "shield-security",
+            //   path: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
+            //   size: 64,
+            //   top: "-10px",
+            //   right: "8%",
+            //   opacity: 0.08,
+            //   animation: "pulse-scale 9s infinite ease-in-out",
+            // },
             {
               id: "gear-operations",
               path: "M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z",
@@ -514,7 +651,8 @@ function MyApps() {
               bottom: "-20px",
               left: "40%",
               opacity: 0.07,
-              animation: "rotate-slow 28s infinite linear"
+              animation: "rotate-slow 28s infinite linear",
+              display: { base: "none", md: "block" },
             },
             {
               id: "computer-terminal",
@@ -523,53 +661,54 @@ function MyApps() {
               top: "25%",
               left: "32%",
               opacity: 0.08,
-              animation: "drift-float 12s infinite ease-in-out"
+              animation: "drift-float 12s infinite ease-in-out",
+              display: { base: "none", md: "block" },
             },
-            {
-              id: "database-analytics",
-              path: "M12 5c5.52 0 10-1.79 10-4S17.52 1 12 1 2 2.79 2 5s4.48 4 10 4zm0 6c5.52 0 10-1.79 10-4S17.52 7 12 7 2 8.79 2 11s4.48 4 10 4zm0 6c5.52 0 10-1.79 10-4S17.52 13 12 13 2 14.79 2 17s4.48 4 10 4z",
-              size: 60,
-              bottom: "5px",
-              right: "32%",
-              opacity: 0.06,
-              animation: "float-shape-1 18s infinite ease-in-out"
-            },
-            {
-              id: "key-occupancy",
-              path: "M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l1.5 1.5M15.5 7.5L14 6",
-              size: 48,
-              top: "-5px",
-              left: "48%",
-              opacity: 0.09,
-              animation: "sideways-sway 14s infinite ease-in-out"
-            },
-            {
-              id: "lock-privacy",
-              path: "M19 11H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2zm-12 0V7a5 5 0 0 1 10 0v4",
-              size: 50,
-              top: "35%",
-              right: "22%",
-              opacity: 0.08,
-              animation: "complex-float 15s infinite ease-in-out"
-            },
-            {
-              id: "building-block",
-              path: "M3 21h18M3 21V8a2 2 0 0 1 2-2h3m10 13V4a2 2 0 0 0-2-2h-3m-6 20V12a2 2 0 0 1 2-2h2m0 0v12",
-              size: 68,
-              top: "-15px",
-              left: "58%",
-              opacity: 0.07,
-              animation: "drift-float 16s infinite ease-in-out"
-            },
-            {
-              id: "receipt-billing",
-              path: "M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1zm12 4H8m8 4H8m8 4H8",
-              size: 54,
-              bottom: "-10px",
-              right: "5%",
-              opacity: 0.08,
-              animation: "float-shape-1 10s infinite ease-in-out"
-            },
+            // {
+            //   id: "database-analytics",
+            //   path: "M12 5c5.52 0 10-1.79 10-4S17.52 1 12 1 2 2.79 2 5s4.48 4 10 4zm0 6c5.52 0 10-1.79 10-4S17.52 7 12 7 2 8.79 2 11s4.48 4 10 4zm0 6c5.52 0 10-1.79 10-4S17.52 13 12 13 2 14.79 2 17s4.48 4 10 4z",
+            //   size: 60,
+            //   bottom: "5px",
+            //   right: "32%",
+            //   opacity: 0.06,
+            //   animation: "float-shape-1 18s infinite ease-in-out",
+            // },
+            // {
+            //   id: "key-occupancy",
+            //   path: "M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l1.5 1.5M15.5 7.5L14 6",
+            //   size: 48,
+            //   top: "-5px",
+            //   left: "48%",
+            //   opacity: 0.09,
+            //   animation: "sideways-sway 14s infinite ease-in-out",
+            // },
+            // {
+            //   id: "lock-privacy",
+            //   path: "M19 11H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2zm-12 0V7a5 5 0 0 1 10 0v4",
+            //   size: 50,
+            //   top: "35%",
+            //   right: "22%",
+            //   opacity: 0.08,
+            //   animation: "complex-float 15s infinite ease-in-out",
+            // },
+            // {
+            //   id: "building-block",
+            //   path: "M3 21h18M3 21V8a2 2 0 0 1 2-2h3m10 13V4a2 2 0 0 0-2-2h-3m-6 20V12a2 2 0 0 1 2-2h2m0 0v12",
+            //   size: 68,
+            //   top: "-15px",
+            //   left: "58%",
+            //   opacity: 0.07,
+            //   animation: "drift-float 16s infinite ease-in-out",
+            // },
+            // {
+            //   id: "receipt-billing",
+            //   path: "M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1zm12 4H8m8 4H8m8 4H8",
+            //   size: 54,
+            //   bottom: "-10px",
+            //   right: "5%",
+            //   opacity: 0.08,
+            //   animation: "float-shape-1 10s infinite ease-in-out",
+            // },
             {
               id: "star-premium",
               path: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",
@@ -577,7 +716,8 @@ function MyApps() {
               top: "15%",
               right: "45%",
               opacity: 0.08,
-              animation: "shine-pulse 7s infinite ease-in-out"
+              animation: "shine-pulse 7s infinite ease-in-out",
+              display: { base: "none", md: "block" },
             },
             {
               id: "chakra-mandala",
@@ -586,7 +726,8 @@ function MyApps() {
               bottom: "-30px",
               right: "18%",
               opacity: 0.07,
-              animation: "rotate-slow 45s infinite linear"
+              animation: "rotate-slow 45s infinite linear",
+              display: { base: "none", md: "block" }
             },
             {
               id: "code-brackets",
@@ -595,8 +736,8 @@ function MyApps() {
               top: "45%",
               left: "68%",
               opacity: 0.08,
-              animation: "drift-float 11s infinite ease-in-out"
-            }
+              animation: "drift-float 11s infinite ease-in-out",
+            },
           ].map((shape) => (
             <Box
               key={shape.id}
@@ -614,6 +755,7 @@ function MyApps() {
               css={{
                 animation: shape.animation,
               }}
+              display={shape.display || "block"}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -643,25 +785,14 @@ function MyApps() {
             <HStack gap={{ base: 4, md: 6 }} align="start" w="full">
               <Box
                 w="4px"
-                h="60px"
+                h="auto"
                 borderRadius="full"
                 bgGradient="linear(to-b, blue.500, purple.500)"
-                alignSelf="center"
+                alignSelf="stretch"
                 flexShrink={0}
               />
-              <Circle
-                size={{ base: "12", md: "14" }}
-                bgGradient="to-br"
-                gradientFrom="#6366f1"
-                gradientTo="#c799ff"
-                color="white"
-                flexShrink={0}
-                boxShadow="0 8px 30px rgba(99,102,241,0.3)"
-              >
-                <Command size={26} strokeWidth={2.5} />
-              </Circle>
 
-              <VStack align="start" gap={1.5} w="full">
+              <VStack gap={2} align="start" flex={1}>
                 <HStack gap={3} align="center" flexWrap="wrap">
                   <Heading
                     size={{ base: "md", md: "xl" }}
@@ -672,64 +803,35 @@ function MyApps() {
                     gradientTo={useColorModeValue("gray.600", "gray.400")}
                     bgClip="text"
                   >
-                    Command Center
+                    {greeting}, {userName}
                   </Heading>
-                  <Badge
-                    bg={useColorModeValue("purple.50", "rgba(199, 153, 255, 0.1)")}
-                    color={useColorModeValue("purple.600", "#c799ff")}
-                    variant="subtle"
-                    borderRadius="full"
-                    px={3}
-                    py={1}
-                    fontSize="xs"
-                    fontWeight="800"
-                  >
-                    <HStack gap={1.5}>
-                      <Zap size={12} fill="currentColor" />
-                      <Text>{filteredApps.length} ACTIVE</Text>
-                    </HStack>
-                  </Badge>
                 </HStack>
-
+                
                 <Text
                   fontSize={{ base: "xs", md: "sm" }}
-                  color={useColorModeValue("gray.500", "gray.400")}
-                  fontWeight="500"
-                  maxW="600px"
+                  fontWeight="600"
+                  color="app.text.muted"
+                  fontStyle="italic"
+                  maxW="2xl"
+                  lineHeight="tall"
+                  css={{
+                    animation: fadeState === "in" 
+                      ? "fade-in-slow 1s forwards cubic-bezier(0.16, 1, 0.3, 1)" 
+                      : "fade-out-slow 1s forwards cubic-bezier(0.16, 1, 0.3, 1)"
+                  }}
                 >
-                  Manage your unified workspace ecosystem with connected tools and intelligence.
+                  “{quotes[currentQuoteIndex].text}”
+                  <Text
+                    as="span"
+                    fontStyle="normal"
+                    fontWeight="700"
+                    color="brand.500"
+                    ml={2}
+                    whiteSpace="nowrap"
+                  >
+                    — {quotes[currentQuoteIndex].author}
+                  </Text>
                 </Text>
-
-                <HStack gap={3} mt={1} flexWrap="wrap">
-                  <HStack
-                    gap={1.5}
-                    px={3}
-                    py={1}
-                    borderRadius="full"
-                    bg={useColorModeValue("blue.50/50", "rgba(59, 130, 246, 0.05)")}
-                    border="1px solid"
-                    borderColor={useColorModeValue("blue.100", "rgba(59, 130, 246, 0.1)")}
-                  >
-                    <Sparkles size={12} color="#3b82f6" />
-                    <Text fontSize="10px" fontWeight="800" color="blue.500" textTransform="uppercase" letterSpacing="widest">
-                      {appList.length} Nodes
-                    </Text>
-                  </HStack>
-                  <HStack
-                    gap={1.5}
-                    px={3}
-                    py={1}
-                    borderRadius="full"
-                    bg={useColorModeValue("green.50/50", "rgba(34, 197, 94, 0.05)")}
-                    border="1px solid"
-                    borderColor={useColorModeValue("green.100", "rgba(34, 197, 94, 0.1)")}
-                  >
-                    <LayoutGrid size={12} color="#22c55e" />
-                    <Text fontSize="10px" fontWeight="800" color="green.500" textTransform="uppercase" letterSpacing="widest">
-                      {subscribed_apps.length} Connected
-                    </Text>
-                  </HStack>
-                </HStack>
               </VStack>
             </HStack>
           </Flex>
@@ -746,7 +848,7 @@ function MyApps() {
           borderBottom="1px solid"
           borderColor={isStuck ? stuckBorder : normalBorder}
           borderRadius={isStuck ? "lg" : "2xl"}
-          mx={{ base: "-2", md: "1" }}
+          // mx={{ base: "-2", md: "1" }}
           p={2}
           transition="all 0.4s cubic-bezier(0.16, 1, 0.3, 1)"
           boxShadow={isStuck ? stuckShadow : normalShadow}
@@ -774,18 +876,16 @@ function MyApps() {
               _placeholder={{ color: "gray.500", fontWeight: "500" }}
               _focus={{
                 boxShadow: "none",
+                border:'none',
+                outline:'none'
               }}
             />
           </InputGroup>
         </Box>
 
-
-
-
-
         {/* Grid Section */}
         {!error && (
-          <SimpleGrid columns={{ base: 2, sm: 2, md: 3, lg: 4, xl: 5 }} gap={4}>
+          <SimpleGrid columns={{ base: 2, sm: 2, md: 3, lg: 4, xl: 5 }} gap={2}>
             {filteredApps.map((app: any, index: number) => (
               <AppCard
                 key={index}
@@ -793,34 +893,7 @@ function MyApps() {
                 handleNavigate={handleDefaultNavigate}
               />
             ))}
-            {/* {filteredApps.map((app: any, index: number) => (
-              <AppCard
-                key={index}
-                appConfig={app}
-                handleNavigate={handleDefaultNavigate}
-              />
-            ))}
-            {filteredApps.map((app: any, index: number) => (
-              <AppCard
-                key={index}
-                appConfig={app}
-                handleNavigate={handleDefaultNavigate}
-              />
-            ))}
-            {filteredApps.map((app: any, index: number) => (
-              <AppCard
-                key={index}
-                appConfig={app}
-                handleNavigate={handleDefaultNavigate}
-              />
-            ))}
-            {filteredApps.map((app: any, index: number) => (
-              <AppCard
-                key={index}
-                appConfig={app}
-                handleNavigate={handleDefaultNavigate}
-              />
-            ))} */}
+           
           </SimpleGrid>
         )}
 

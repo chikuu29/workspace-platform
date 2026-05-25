@@ -12,12 +12,12 @@ import type { BuildingStats, GuestStatus, HostelBuilding, RoomStatus } from "../
 
 export const ROOM_STATUS_META: Record<
   RoomStatus,
-  { label: string; bg: string; border: string; color: string; dot: string }
+  { label: string; bg: string; border: string; color: string; dot: string; palette: string }
 > = {
-  vacant:      { label: "Vacant",      bg: "#F0FDF4", border: "#86EFAC", color: "#15803D", dot: "#22C55E" },
-  occupied:    { label: "Occupied",    bg: "#EFF6FF", border: "#93C5FD", color: "#1D4ED8", dot: "#3B82F6" },
-  maintenance: { label: "Maintenance", bg: "#FFF7ED", border: "#FDBA74", color: "#C2410C", dot: "#F97316" },
-  reserved:    { label: "Reserved",    bg: "#F5F3FF", border: "#C4B5FD", color: "#6D28D9", dot: "#8B5CF6" },
+  vacant:      { label: "Vacant",      bg: "#F0FDF4", border: "#86EFAC", color: "#15803D", dot: "#22C55E", palette: "green"  },
+  occupied:    { label: "Occupied",    bg: "#EFF6FF", border: "#93C5FD", color: "#1D4ED8", dot: "#3B82F6", palette: "blue"   },
+  maintenance: { label: "Maintenance", bg: "#FFF7ED", border: "#FDBA74", color: "#C2410C", dot: "#F97316", palette: "orange" },
+  reserved:    { label: "Reserved",    bg: "#F5F3FF", border: "#C4B5FD", color: "#6D28D9", dot: "#8B5CF6", palette: "purple" },
 };
 
 export const GUEST_STATUS_META: Record<GuestStatus, { label: string; palette: string }> = {
@@ -269,4 +269,3 @@ export const getBedOccupancy = (room: Room): BedOccupancyInfo => {
     vacant: Math.max(0, total - occupied),
   };
 };
-

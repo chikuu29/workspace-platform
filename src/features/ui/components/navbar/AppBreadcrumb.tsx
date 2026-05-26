@@ -104,11 +104,11 @@ const AppBreadcrumb = forwardRef((_props, _ref) => {
   return (
     <Box
       w="100%"
-      py={{ base: "0.5rem", md: "0.65rem" }}
+      // py={{ base: "0.5rem", md: "0.65rem" }}
       px={{ base: "3", sm: "4", md: "6" }}
-      borderBottom="1px solid"
-      borderColor={borderColorValue}
-      bg="app.card.bg"
+      // borderBottom="1px solid"
+      // borderColor={borderColorValue}
+      // bg="app.card.bg"
       backdropFilter="blur(12px)"
       position="sticky"
       top="0"

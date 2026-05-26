@@ -121,7 +121,7 @@ const Navbar = () => {
         top="0"
         left="0"
         zIndex={999}
-        bg={"app.card.bg"}
+        // bg={"app.card.bg"}
         backdropFilter="blur(16px)"
         borderBottom="1px solid"
         borderColor={borderColor}
@@ -130,8 +130,9 @@ const Navbar = () => {
       >
         <Flex
           w="100%"
-          py={"0.7rem"}
-          px={{ base: "2", sm: "3", md: "4" }}
+          // py={"0.7rem"}
+          // px={{ base: "2", sm: "3", md: "4" }}
+          p={{ base: "3", sm: "4", md: "3" }}
           align="center"
           justify="space-between"
           gap={{ base: 1.5, md: 3 }}

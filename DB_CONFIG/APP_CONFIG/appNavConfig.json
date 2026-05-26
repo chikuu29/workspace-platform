@@ -128,7 +128,7 @@
             "myApps": {},
             "myGym": {
                 "SHOW_SIDE_NAV_MENU": true,
-                "SHOW_TOP_NAV_MENU": true,
+                "SHOW_TOP_NAV_MENU": false,
                 "MENU": [
                     {
                         "label": "Home",

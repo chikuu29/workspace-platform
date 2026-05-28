@@ -214,6 +214,8 @@ export interface ActivateSubscriptionPayload {
   start_date?: string;
   is_paid?: boolean;
   payment_amount?: number;
+  payment_method?: string;
+  transaction_ref?: string;
   notes?: string;
 }
 
@@ -228,6 +230,12 @@ export interface ActivateSubscriptionResponse {
     plan_name: string;
     start_date: string;
     end_date: string;
+    invoice?: {
+      invoice_number: string;
+      total: number;
+      status: string;
+      balance_due: number;
+    };
   };
 }
 

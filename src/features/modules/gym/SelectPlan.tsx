@@ -45,6 +45,7 @@ import {
     Printer,
     CheckCircle2,
     User,
+    Info,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Field } from "@/components/ui/field";
@@ -400,7 +401,8 @@ const SelectPlan = memo(() => {
 
     // Enrollment config are auto-created
     const startDate = useMemo(() => new Date().toISOString().split("T")[0], []);
-    const isPaid = true; // Always upfront checkout payment is required
+    const [sendPaymentLink, setSendPaymentLink] = useState(false);
+    const isPaid = useMemo(() => !sendPaymentLink, [sendPaymentLink]);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -543,6 +545,29 @@ const SelectPlan = memo(() => {
 
     const handleSetStepSelect = useCallback(() => setCurrentStep("select"), []);
 
+    const handlePaymentLinkToggle = useCallback((e: { checked: boolean }) => {
+        setSendPaymentLink(e.checked);
+    }, []);
+
+    const step2PaymentLink = "https://pay.gym.saas/checkout/pending";
+    const handleCopyStep2Link = useCallback(() => {
+        navigator.clipboard.writeText(step2PaymentLink);
+        toaster.create({ title: "Link Copied", description: "Payment link copied to clipboard.", type: "success" });
+    }, []);
+
+    const handleCopyStep3Link = useCallback(() => {
+        if (!successData?.invoiceNumber) return;
+        const link = `https://pay.gym.saas/invoice/${successData.invoiceNumber}`;
+        navigator.clipboard.writeText(link);
+        toaster.create({ title: "Link Copied", description: "Payment link copied to clipboard.", type: "success" });
+    }, [successData?.invoiceNumber]);
+
+    const handleOpenStep3Link = useCallback(() => {
+        if (!successData?.invoiceNumber) return;
+        const link = `https://pay.gym.saas/invoice/${successData.invoiceNumber}`;
+        window.open(link, "_blank");
+    }, [successData?.invoiceNumber]);
+
     // Quick cash handlers
     const handleQuickCash500 = useCallback(() => setCashReceived(prev => {
         const current = parseFloat(prev) || 0;
@@ -559,7 +584,7 @@ const SelectPlan = memo(() => {
     const handleQuickCashExact = useCallback(() => setCashReceived(total.toFixed(0)), [total]);
     const handleQuickCashClear = useCallback(() => setCashReceived(""), []);
 
-    const handleConfirm = useCallback(() => {
+    const handleConfirm = useCallback((isPaidOverride?: boolean) => {
         const effectiveMemberId = member?.data?.member_id || memberId;
 
         if (!selectedPlan) {
@@ -573,18 +598,24 @@ const SelectPlan = memo(() => {
 
         setIsSubmitting(true);
 
+        const shouldBePaid = isPaidOverride !== undefined
+            ? isPaidOverride
+            : (sendPaymentLink ? false : (paymentMethod === "payment_link" ? false : true));
+
         const payload: ActivateSubscriptionPayload = {
             member_id: effectiveMemberId,
             plan_code: selectedPlan.data.code,
             start_date: startDate,
-            is_paid: isPaid,
+            is_paid: shouldBePaid,
             payment_amount: total,
-            payment_method: paymentMethod,
-            transaction_ref: paymentMethod === "card"
-                ? "CRD-TXN-" + Math.floor(100000 + Math.random() * 900000)
-                : paymentMethod === "payment_link"
-                ? "UPI-QR-" + Math.floor(100000 + Math.random() * 900000)
-                : "CSH-" + Math.floor(100000 + Math.random() * 900000),
+            payment_method: sendPaymentLink ? "payment_link" : paymentMethod,
+            transaction_ref: shouldBePaid
+                ? paymentMethod === "card"
+                    ? "CRD-TXN-" + Math.floor(100000 + Math.random() * 900000)
+                    : paymentMethod === "payment_link"
+                    ? "UPI-QR-" + Math.floor(100000 + Math.random() * 900000)
+                    : "CSH-" + Math.floor(100000 + Math.random() * 900000)
+                : undefined,
         };
 
         const sub = GymApiService.activateSubscription(payload).subscribe({
@@ -602,7 +633,7 @@ const SelectPlan = memo(() => {
                         invoiceNumber: res.data.invoice?.invoice_number || "INV-GEN-DRAFT",
                         total: res.data.invoice?.total || total,
                         balanceDue: res.data.invoice?.balance_due || 0,
-                        status: res.data.invoice?.status || "paid",
+                        status: res.data.invoice?.status || (shouldBePaid ? "paid" : "sent"),
                     });
 
                     setCurrentStep("success");
@@ -625,15 +656,24 @@ const SelectPlan = memo(() => {
         });
 
         return () => sub.unsubscribe();
-    }, [selectedPlan, memberId, member?.data?.member_id, startDate, isPaid, total, paymentMethod, memberName]);
+    }, [selectedPlan, memberId, member?.data?.member_id, startDate, sendPaymentLink, total, paymentMethod, memberName]);
+
+    const handleProcessCheckout = useCallback(() => {
+        const shouldBePaid = paymentMethod === "payment_link" ? false : true;
+        handleConfirm(shouldBePaid);
+    }, [handleConfirm, paymentMethod]);
 
     const handleCheckoutNext = useCallback(() => {
         if (!selectedPlan) {
             toaster.create({ title: "Select a Plan", description: "Pick a subscription plan first.", type: "warning" });
             return;
         }
-        setCurrentStep("payment");
-    }, [selectedPlan]);
+        if (sendPaymentLink) {
+            handleConfirm(false);
+        } else {
+            setCurrentStep("payment");
+        }
+    }, [selectedPlan, sendPaymentLink, handleConfirm]);
 
     const simulateQrPayment = useCallback(() => {
         setQrStatus("verifying");
@@ -644,7 +684,7 @@ const SelectPlan = memo(() => {
                 description: "Simulated UPI Payment notification received.",
                 type: "success",
             });
-            handleConfirm();
+            handleConfirm(true);
         }, 1500);
     }, [handleConfirm]);
 
@@ -660,6 +700,11 @@ const SelectPlan = memo(() => {
         if (/^3[47]/.test(clean)) return "AMEX";
         return "CARD";
     }, [cardNumber]);
+
+    const checkoutButtonText = useMemo(() => {
+        if (isSubmitting) return "Processing...";
+        return sendPaymentLink ? "Send Payment Link" : "Proceed to Payment";
+    }, [isSubmitting, sendPaymentLink]);
 
     // ── Theme & Styles ──
     const muted = useColorModeValue("gray.500", "gray.400");
@@ -891,6 +936,46 @@ const SelectPlan = memo(() => {
                                     ))}
                                 </SimpleGrid>
                             )}
+
+                            {/* Additional Options Card (Send Payment Link option) */}
+                            <Card p={6} borderRadius="3xl" bg="app.card.bg" borderColor="app.card.border" backdropFilter="blur(20px)" gap={4}>
+                                <Flex justify="space-between" align="center" flexWrap="wrap" gap={4}>
+                                    <HStack gap={3}>
+                                        <Circle size={8} bg="purple.500/10" color="purple.500" border="1px solid" borderColor="purple.500/25">
+                                            <QrCode size={16} />
+                                        </Circle>
+                                        <VStack align="start" gap={0}>
+                                            <Text fontSize="sm" fontWeight="900" color="app.text.primary">
+                                                Digital Billing Delivery
+                                            </Text>
+                                            <Text fontSize="10px" color={muted} fontWeight="600">
+                                                Dispatch a secure billing page to the member's email/phone for remote checkout.
+                                            </Text>
+                                        </VStack>
+                                    </HStack>
+                                    <HStack
+                                        justify="space-between"
+                                        h="44px"
+                                        px={4}
+                                        borderRadius="xl"
+                                        bg={sendPaymentLink ? "purple.500/5" : settingBg}
+                                        border="1px solid"
+                                        borderColor={sendPaymentLink ? "purple.500/25" : "transparent"}
+                                        transition="all 0.3s"
+                                        minW="180px"
+                                    >
+                                        <Text fontSize="xs" fontWeight="900" color={sendPaymentLink ? "purple.500" : "app.text.primary"}>
+                                            {sendPaymentLink ? "Send Payment Link" : "Collect Immediately"}
+                                        </Text>
+                                        <Switch
+                                            colorPalette="purple"
+                                            size="md"
+                                            checked={sendPaymentLink}
+                                            onCheckedChange={handlePaymentLinkToggle}
+                                        />
+                                    </HStack>
+                                </Flex>
+                            </Card>
                         </VStack>
                     </Box>
 
@@ -970,7 +1055,7 @@ const SelectPlan = memo(() => {
                                 >
                                     {isSubmitting ? <Spinner size="sm" /> : (
                                         <HStack gap={2}>
-                                            <Text>Proceed to Payment</Text>
+                                            <Text>{checkoutButtonText}</Text>
                                             <ArrowRight size={14} />
                                         </HStack>
                                     )}
@@ -1034,7 +1119,7 @@ const SelectPlan = memo(() => {
                                 _hover={{ bg: paymentMethod === "payment_link" ? "brand.500" : "whiteAlpha.50" }}
                             >
                                 <QrCode size={18} />
-                                <Text fontSize="9px" fontWeight="900" letterSpacing="wider">QR LINK</Text>
+                                <Text fontSize="9px" fontWeight="900" letterSpacing="wider">PAYMENT LINK</Text>
                             </Button>
                         </SimpleGrid>
 
@@ -1306,7 +1391,7 @@ const SelectPlan = memo(() => {
 
                                         <circle cx="38" cy="68" r="2.5" fill="#422AFB" />
                                         <circle cx="48" cy="78" r="2.5" fill="#7551FF" />
-                                        <circle cx="58" cy="68" r="2" fill="#1b3bbb" />
+                                        <circle cx="58" cy="68" r="2.5" fill="#1b3bbb" />
                                         <circle cx="68" cy="78" r="2" fill="#422AFB" />
 
                                         <circle cx="78" cy="78" r="2" fill="#7551FF" />
@@ -1331,6 +1416,34 @@ const SelectPlan = memo(() => {
                                         Dynamic UPI code generated. Expires shortly.
                                     </Text>
                                 </VStack>
+
+                                {/* Mock Payment Link copyable block */}
+                                <Field label={<Text fontSize="9px" fontWeight="900" color={muted} letterSpacing="wider" mb={1}>SECURE CHECKOUT URL</Text>} w="full" px={4}>
+                                    <HStack w="full" gap={2}>
+                                        <Input
+                                            readOnly
+                                            value={step2PaymentLink}
+                                            h="36px"
+                                            borderRadius="xl"
+                                            bg="blackAlpha.200"
+                                            border="1px solid"
+                                            borderColor={borderColor}
+                                            fontWeight="600"
+                                            fontSize="xs"
+                                        />
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            h="36px"
+                                            borderRadius="xl"
+                                            onClick={handleCopyStep2Link}
+                                            minW="70px"
+                                            color="app.text.primary"
+                                        >
+                                            <Text fontSize="10px" fontWeight="800">Copy</Text>
+                                        </Button>
+                                    </HStack>
+                                </Field>
 
                                 <VStack gap={2} w="full" px={4}>
                                     <HStack gap={3} w="full" justify="center" p={3} bg="whiteAlpha.50" borderRadius="xl" border="1px solid" borderColor={borderColor}>
@@ -1437,7 +1550,7 @@ const SelectPlan = memo(() => {
                                 fontSize="xs"
                                 letterSpacing="widest"
                                 textTransform="uppercase"
-                                onClick={handleConfirm}
+                                onClick={handleProcessCheckout}
                                 disabled={
                                     isSubmitting ||
                                     (paymentMethod === "card" && (!cardNumber || !cardHolder || !cardCvv))
@@ -1452,7 +1565,9 @@ const SelectPlan = memo(() => {
                                 {isSubmitting ? <Spinner size="sm" /> : (
                                     <HStack gap={2}>
                                         <Lock size={13} />
-                                        <Text>PROCESS SECURE CHECKOUT</Text>
+                                        <Text>
+                                            {paymentMethod === "payment_link" ? "GENERATE & SEND PAYMENT LINK" : "PROCESS SECURE CHECKOUT"}
+                                        </Text>
                                     </HStack>
                                 )}
                             </Button>
@@ -1548,11 +1663,63 @@ const SelectPlan = memo(() => {
                                 </Flex>
                                 <Separator opacity={0.06} />
                                 <Flex justify="space-between" align="center">
-                                    <Text fontSize="10px" color="app.text.primary" fontWeight="900" letterSpacing="wider">AMOUNT COLLECTED</Text>
-                                    <Text fontSize="md" color="green.500" fontWeight="950">{formatINR(successData.total)}</Text>
+                                    <Text fontSize="10px" color="app.text.primary" fontWeight="900" letterSpacing="wider">
+                                        {successData.status === "paid" ? "AMOUNT COLLECTED" : "AMOUNT DUE"}
+                                    </Text>
+                                    <Text fontSize="md" color={successData.status === "paid" ? "green.500" : "orange.500"} fontWeight="950">
+                                        {formatINR(successData.total)}
+                                    </Text>
                                 </Flex>
                             </VStack>
                         </Box>
+
+                        {/* Dispatch Notice if unpaid link sent */}
+                        {successData.status !== "paid" && (
+                            <VStack bg="purple.500/5" border="1px solid" borderColor="purple.500/20" p={4} borderRadius="xl" gap={3} w="full" alignItems="stretch">
+                                <HStack color="purple.500" gap={2}>
+                                    <Info size={14} />
+                                    <Text fontSize="xs" fontWeight="950">Payment Link Generated & Sent</Text>
+                                </HStack>
+                                <Text fontSize="10px" color={muted} fontWeight="600" lineHeight="normal" textAlign="left">
+                                    A secure payment page has been dispatched to {member?.data?.email || "the customer's email"}. The operator can also copy or open the payment link directly below:
+                                </Text>
+                                <HStack w="full" gap={2}>
+                                    <Input
+                                        readOnly
+                                        value={`https://pay.gym.saas/invoice/${successData.invoiceNumber}`}
+                                        h="36px"
+                                        borderRadius="xl"
+                                        bg="blackAlpha.200"
+                                        border="1px solid"
+                                        borderColor={borderColor}
+                                        fontWeight="600"
+                                        fontSize="xs"
+                                        color="app.text.primary"
+                                    />
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        h="36px"
+                                        borderRadius="xl"
+                                        onClick={handleCopyStep3Link}
+                                        minW="70px"
+                                        color="app.text.primary"
+                                    >
+                                        <Text fontSize="10px" fontWeight="800">Copy</Text>
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        colorPalette="purple"
+                                        h="36px"
+                                        borderRadius="xl"
+                                        onClick={handleOpenStep3Link}
+                                        minW="70px"
+                                    >
+                                        <Text fontSize="10px" fontWeight="800">Open</Text>
+                                    </Button>
+                                </HStack>
+                            </VStack>
+                        )}
 
                         {/* Post-Checkout Actions */}
                         <VStack gap={3} w="full" mt={4}>

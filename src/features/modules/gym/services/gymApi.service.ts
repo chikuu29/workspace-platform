@@ -22,6 +22,13 @@ import type {
   AttendanceStats,
   TrainerDocument,
   TrainersResponse,
+  EnrollMembershipPayload,
+  EnrollMembershipResponse,
+  CollectPaymentPayload,
+  CollectPaymentResponse,
+  SendPaymentLinkPayload,
+  SendPaymentLinkResponse,
+  MembershipInvoiceResponse,
 } from "../types/Gym.types";
 
 export const GymApiService = {
@@ -107,6 +114,43 @@ export const GymApiService = {
       data: payload,
       isPrivateApi: true,
     }).pipe(map((res: any) => res as ActivateSubscriptionResponse));
+  },
+
+  // ── Membership Billing Flow ─────────────────────────────────────────
+
+  /** Enrolls a member in a plan — creates subscription + invoice (no payment). */
+  enrollMembership: (payload: EnrollMembershipPayload) => {
+    return POSTAPI({
+      path: "/v1/gym/membership/enroll",
+      data: payload,
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as EnrollMembershipResponse));
+  },
+
+  /** Records payment against a subscription's invoice. */
+  collectPayment: (subscriptionId: string, payload: CollectPaymentPayload) => {
+    return POSTAPI({
+      path: `/v1/gym/membership/${subscriptionId}/collect-payment`,
+      data: payload,
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as CollectPaymentResponse));
+  },
+
+  /** Sends a payment link for a subscription's invoice. */
+  sendPaymentLink: (subscriptionId: string, payload?: SendPaymentLinkPayload) => {
+    return POSTAPI({
+      path: `/v1/gym/membership/${subscriptionId}/send-payment-link`,
+      data: payload || {},
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as SendPaymentLinkResponse));
+  },
+
+  /** Fetches invoice details for a subscription. */
+  getSubscriptionInvoice: (subscriptionId: string) => {
+    return GETAPI({
+      path: `/v1/gym/membership/${subscriptionId}/invoice`,
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as MembershipInvoiceResponse));
   },
 
   // ── Subscription Stats ──────────────────────────────────────────────

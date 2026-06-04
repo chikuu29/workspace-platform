@@ -281,3 +281,163 @@ export interface CreatePlanPayload {
   features?: string[];
   accent_color?: string;
 }
+
+// ─── Membership Billing Flow (New endpoints) ────────────────────────────────
+
+/** Payment mode — first-level choice in checkout */
+export type GymPaymentMode = "cash" | "online";
+
+/** Online payment sub-options */
+export type OnlinePaymentMethod = "upi" | "card" | "payment_link";
+
+/** Tax breakdown from server-computed invoice */
+export interface InvoiceTaxBreakdown {
+  total_tax: number;
+  cgst_amount: number;
+  sgst_amount: number;
+  igst_amount: number;
+  tax_rate: number;
+  tax_type?: string;
+  taxable_amount?: number;
+  cgst_rate?: number;
+  sgst_rate?: number;
+  igst_rate?: number;
+  is_inter_state?: boolean;
+}
+
+/** Invoice summary returned by enroll endpoint */
+export interface EnrollInvoiceSummary {
+  invoice_number: string;
+  subtotal: number;
+  tax_breakdown: InvoiceTaxBreakdown;
+  total: number;
+  balance_due: number;
+  status: string;
+  currency: string;
+}
+
+/** Payload for POST /gym/membership/enroll */
+export interface EnrollMembershipPayload {
+  member_id: string;
+  plan_code: string;
+  start_date?: string;
+  notes?: string;
+}
+
+/** Response from POST /gym/membership/enroll */
+export interface EnrollMembershipResponse {
+  success: boolean;
+  message: string;
+  data: {
+    subscription_id: string;
+    member_id: string;
+    plan_name: string;
+    plan_code: string;
+    start_date: string;
+    end_date: string;
+    /** Billing order number (invoice is created only when payment is collected) */
+    order_number: string;
+    /** Server-computed total (plan price + tax) */
+    order_total: number;
+    /** Subtotal before tax */
+    order_subtotal: number;
+    /** Tax amount */
+    order_tax: number;
+    /** Subscription status: always 'pending' until payment */
+    status: "pending";
+    /** True if user already had a pending subscription for this plan */
+    is_resumed?: boolean;
+  };
+}
+
+/** Payload for POST /gym/membership/{id}/collect-payment */
+export interface CollectPaymentPayload {
+  payment_method: "cash" | "upi" | "card" | "net_banking" | "bank_transfer";
+  transaction_ref?: string;
+  notes?: string;
+}
+
+/** Response from POST /gym/membership/{id}/collect-payment */
+export interface CollectPaymentResponse {
+  success: boolean;
+  message: string;
+  data: {
+    payment_number: string;
+    payment_method: string;
+    amount_paid: number;
+    invoice_number: string;
+    invoice_status: string;
+    balance_due: number;
+    is_fully_paid: boolean;
+    subscription_id: string;
+    subscription_status: "active" | "pending";
+  };
+}
+
+/** Payload for POST /gym/membership/{id}/send-payment-link */
+export interface SendPaymentLinkPayload {
+  send_via?: "email" | "sms" | "both";
+}
+
+/** Response from POST /gym/membership/{id}/send-payment-link */
+export interface SendPaymentLinkResponse {
+  success: boolean;
+  message: string;
+  data: {
+    payment_link_url: string;
+    invoice_number: string;
+    invoice_status: string;
+    balance_due: number;
+    total: number;
+    send_via: string;
+    subscription_id: string;
+  };
+}
+
+/** Payment history entry in invoice details */
+export interface PaymentHistoryEntry {
+  payment_number: string;
+  amount: number;
+  method: string;
+  status: string;
+  payment_date: string;
+  transaction_ref: string;
+}
+
+/** Response from GET /gym/membership/{id}/invoice */
+export interface MembershipInvoiceResponse {
+  success: boolean;
+  data: {
+    subscription_id: string;
+    invoice_number: string;
+    invoice_type: string;
+    subtotal: number;
+    tax_breakdown: InvoiceTaxBreakdown & {
+      tax_type: string;
+      taxable_amount: number;
+      cgst_rate: number;
+      sgst_rate: number;
+      igst_rate: number;
+      is_inter_state: boolean;
+    };
+    total: number;
+    amount_paid: number;
+    balance_due: number;
+    currency: string;
+    status: string;
+    issue_date: string;
+    due_date: string;
+    payment_terms: string;
+    payment_history: PaymentHistoryEntry[];
+    member: {
+      member_id: string;
+      member_name: string;
+    };
+    plan: {
+      plan_code: string;
+      plan_name: string;
+      billing_cycle: string;
+    };
+  };
+}
+

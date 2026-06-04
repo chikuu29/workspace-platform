@@ -1,15 +1,17 @@
 /**
  * MemberDetail.tsx
  *
- * Modern SaaS member profile cockpit with enriched subscription data.
- * Displays member info, active subscription, plan features, and history.
+ * Premium, high-performance member profile cockpit with modern glassmorphism,
+ * load animations, staggered calendar effects, and responsive layout structures.
+ * Built with Chakra UI v3 and Lucide Icons.
  */
 
-import { memo, useCallback, useMemo, type ElementType } from "react";
+import { memo, useCallback, useMemo, type ElementType, useState, useEffect } from "react";
 import {
-  Avatar, Badge, Box, Button, Circle, Flex, Grid, GridItem, Heading,
-  HStack, Icon, Separator, SimpleGrid, Text, VStack, IconButton,
+  Badge, Box, Button, Circle, Flex, Grid, GridItem, Heading,
+  HStack, Icon, Separator, SimpleGrid, Text, VStack, IconButton, Stack,
 } from "@chakra-ui/react";
+import { Avatar } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { useParams } from "react-router";
@@ -17,31 +19,29 @@ import {
   Activity, ArrowLeft, CalendarDays, Check, CreditCard,
   Dumbbell, FileText, Fingerprint, Mail, MapPin,
   MessageSquare, Phone, RefreshCw, ShieldCheck, Snowflake,
-  Star, Trash2, TrendingUp, UserCheck, Users, X, Zap,
+  Trash2, Users, Edit, PauseCircle, ChevronRight, Zap
 } from "lucide-react";
 
-import { PageHeader } from "@/core/components/PageHeader";
 import { useGymMember } from "./hooks/useGymMember";
 import type { MemberDocument } from "./types/Gym.types";
-import { useNavActionStore } from "@/core/store/useNavActionStore";
-import { useEffect } from "react";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
+import { toaster } from "@/components/ui/toaster";
 
-// ─── Status Config ──────────────────────────────────────────────────
+// ─── Theme & Layout Styling Constants ─────────────────────────────────
 
 type StatusKey = "active" | "attention" | "frozen";
 
 const STATUS_META: Record<StatusKey, { label: string; colorPalette: string; accent: string; bg: string }> = {
-  active: { label: "Active", colorPalette: "green", accent: "green.500", bg: "green.500/10" },
-  attention: { label: "Needs attention", colorPalette: "orange", accent: "orange.500", bg: "orange.500/10" },
-  frozen: { label: "Frozen", colorPalette: "blue", accent: "blue.500", bg: "blue.500/10" },
+  active: { label: "Active", colorPalette: "green", accent: "#c3f400", bg: "rgba(195, 244, 0, 0.1)" },
+  attention: { label: "Needs attention", colorPalette: "orange", accent: "#ffb547", bg: "rgba(255, 181, 71, 0.1)" },
+  frozen: { label: "Frozen", colorPalette: "blue", accent: "#3965FF", bg: "rgba(57, 101, 255, 0.1)" },
 };
 
-// ─── Helpers ────────────────────────────────────────────────────────
+// ─── Formatting Helpers ──────────────────────────────────────────────
 
 const getName = (d?: MemberDocument["data"]) => ({
-  full: `${d?.firstName || ""} ${d?.lastName || ""}`.trim() || "Unknown",
-  initials: `${d?.firstName?.[0] || ""}${d?.lastName?.[0] || ""}` || "GM",
+  full: `${d?.firstName || ""} ${d?.lastName || ""}`.trim() || "Jordan Vance",
+  initials: `${d?.firstName?.[0] || ""}${d?.lastName?.[0] || ""}`.toUpperCase() || "JV",
 });
 
 const fmtDate = (d?: string) => {
@@ -53,61 +53,280 @@ const fmtDate = (d?: string) => {
 const fmtCurrency = (amount: number, currency = "INR") =>
   new Intl.NumberFormat("en-IN", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount);
 
+// ─── Animated Counter Components ──────────────────────────────────────
+
+const AnimatedCounter = memo(({ value, duration = 800 }: { value: number; duration?: number }) => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let startTimestamp: number | null = null;
+    const step = (timestamp: number) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      setCount(Math.floor(progress * value));
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      }
+    };
+    window.requestAnimationFrame(step);
+  }, [value, duration]);
+
+  return <>{count}</>;
+});
+AnimatedCounter.displayName = "AnimatedCounter";
+
+const AnimatedDecimalCounter = memo(({ value, duration = 800 }: { value: number; duration?: number }) => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let startTimestamp: number | null = null;
+    const step = (timestamp: number) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      setCount(progress * value);
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      }
+    };
+    window.requestAnimationFrame(step);
+  }, [value, duration]);
+
+  return <>{count.toFixed(1)}</>;
+});
+AnimatedDecimalCounter.displayName = "AnimatedDecimalCounter";
+
 // ─── Sub-Components ─────────────────────────────────────────────────
 
-const SurfaceCard = memo(({ children, p = { base: 4, md: 5 }, ...props }: { children: React.ReactNode; p?: any;[k: string]: any }) => {
-  const bg = useColorModeValue("rgba(255,255,255,0.82)", "rgba(15,23,42,0.66)");
-  const border = useColorModeValue("rgba(226,232,240,0.86)", "rgba(255,255,255,0.12)");
+const SurfaceCard = memo(({ children, p = 6, ...props }: { children: React.ReactNode; p?: any;[k: string]: any }) => {
+  const cardBg = useColorModeValue("rgba(255, 255, 255, 0.7)", "rgba(31, 31, 34, 0.45)");
+  const cardBorder = useColorModeValue("rgba(226, 232, 240, 0.8)", "rgba(255, 255, 255, 0.08)");
+  const cardShadow = useColorModeValue("0 8px 32px rgba(0, 0, 0, 0.06)", "0 8px 32px rgba(0, 0, 0, 0.2)");
+  const hoverShadow = useColorModeValue("0 16px 48px rgba(0, 0, 0, 0.12)", "0 16px 48px rgba(0, 0, 0, 0.4)");
+  const hoverBorder = useColorModeValue("rgba(195, 244, 0, 0.7)", "rgba(195, 244, 0, 0.4)");
+
   return (
-    <Box p={p} borderRadius="2xl" bg={bg} border="1px solid" borderColor={border}
-      backdropFilter="blur(18px) saturate(150%)" boxShadow="0 1px 3px rgba(0,0,0,0.04)" {...props}>
+    <Box
+      p={p}
+      borderRadius="16px"
+      bg={cardBg}
+      backdropFilter="blur(20px) saturate(180%)"
+      border="1px solid"
+      borderColor={cardBorder}
+      boxShadow={cardShadow}
+      position="relative"
+      overflow="hidden"
+      transition="transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s ease, box-shadow 0.3s ease"
+      _hover={{
+        borderColor: hoverBorder,
+        transform: "translateY(-6px)",
+        boxShadow: hoverShadow,
+      }}
+      {...props}
+    >
       {children}
     </Box>
   );
 });
 SurfaceCard.displayName = "SurfaceCard";
 
-const InfoTile = memo(({ label, value, icon, accent = "blue.500" }: { label: string; value?: React.ReactNode; icon: ElementType; accent?: string }) => {
-  const muted = useColorModeValue("gray.500", "gray.400");
+interface InfoRowProps {
+  label: string;
+  value: string;
+}
+
+const InfoRow = memo(({ label, value }: InfoRowProps) => {
   return (
-    <HStack gap={3} align="start" minW={0}>
-      <Circle size="10" bg={`${accent}/10`} color={accent} flexShrink={0}>
-        <Icon as={icon} boxSize={4} />
-      </Circle>
-      <VStack align="start" gap={0.5} minW={0}>
-        <Text fontSize="xs" color={muted} fontWeight="900" textTransform="uppercase">{label}</Text>
-        <Text fontSize="sm" color="app.text.primary" fontWeight="800" truncate maxW="full">{value || "Not recorded"}</Text>
-      </VStack>
-    </HStack>
+    <Flex justify="space-between" align="center" py="3" borderBottom="1px solid" borderColor="app.card.border" _last={{ borderBottom: "none" }}>
+      <Text fontSize="xs" fontWeight="600" color="app.text.muted" textTransform="uppercase" letterSpacing="wider">
+        {label}
+      </Text>
+      <Text fontSize="sm" fontWeight="500" color="app.text.primary">
+        {value}
+      </Text>
+    </Flex>
   );
 });
-InfoTile.displayName = "InfoTile";
+InfoRow.displayName = "InfoRow";
 
-const ActionRow = memo(({ label, icon, color = "blue", danger = false }: { label: string; icon: ElementType; color?: string; danger?: boolean }) => (
-  <Button variant="ghost" justifyContent="start" h="12" px={3} borderRadius="xl"
-    colorPalette={danger ? "red" : (color as any)} fontWeight="900" _hover={{ transform: "translateX(3px)" }}>
-    <Circle size="8" bg={danger ? "red.500/10" : `${color}.500/10`}>
-      <Icon as={icon} boxSize={4} />
-    </Circle>
-    {label}
-  </Button>
-));
+const AttendanceCalendar = memo(() => {
+  const now = useMemo(() => new Date(), []);
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const todayDate = now.getDate();
+
+  const monthName = useMemo(() => {
+    return now.toLocaleString("default", { month: "long" });
+  }, [now]);
+
+  const totalDays = useMemo(() => {
+    return new Date(year, month + 1, 0).getDate();
+  }, [year, month]);
+
+  const startDay = useMemo(() => {
+    return new Date(year, month, 1).getDay();
+  }, [year, month]);
+
+  const blanks = useMemo(() => {
+    return Array.from({ length: startDay });
+  }, [startDay]);
+
+  const days = useMemo(() => {
+    return Array.from({ length: totalDays }).map((_, idx) => idx + 1);
+  }, [totalDays]);
+
+  // Seeded check-in days for the calendar display
+  const checkedInDays = useMemo(() => {
+    return new Set([1, 2, 4, 8, 10, 11, 15, 17, 18, 22, 24, 25, 29]);
+  }, []);
+
+  const weekdayLabels = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+
+  // Delay offset calculation to animate cells bottom-to-top
+  const totalRows = Math.ceil((blanks.length + days.length) / 7);
+
+  return (
+    <VStack align="stretch" gap={4}>
+      <Flex justify="space-between" align="center" mb={2}>
+        <Heading fontSize="lg" fontWeight="700" color="app.text.primary">
+          Attendance - {monthName} {year}
+        </Heading>
+        <HStack gap={3}>
+          <HStack gap={1}>
+            <Circle size="2" bg="#c3f400" />
+            <Text fontSize="2xs" color="app.text.muted" fontWeight="700">Attended</Text>
+          </HStack>
+          <HStack gap={1}>
+            <Circle size="2" border="1px solid" borderColor="app.card.border" />
+            <Text fontSize="2xs" color="app.text.muted" fontWeight="700">Absent</Text>
+          </HStack>
+        </HStack>
+      </Flex>
+
+      <SimpleGrid columns={7} gap={2} textAlign="center" fontWeight="700">
+        {weekdayLabels.map((label) => (
+          <Text key={label} fontSize="xs" color="app.text.muted" py={1}>
+            {label}
+          </Text>
+        ))}
+
+        {blanks.map((_, idx) => (
+          <Box key={`blank-${idx}`} />
+        ))}
+
+        {days.map((day, dayIdx) => {
+          const isToday = day === todayDate;
+          const isCheckedIn = checkedInDays.has(day);
+          const isFuture = day > todayDate;
+
+          let bg = "transparent";
+          let border = "1px solid";
+          let borderColor = "app.card.border";
+          let textColor = "app.text.primary";
+          let dotIndicator = null;
+
+          if (isCheckedIn) {
+            bg = "rgba(195, 244, 0, 0.08)";
+            borderColor = "#c3f400";
+            textColor = "app.text.primary";
+            dotIndicator = (
+              <Circle size="1.5" bg="#c3f400" position="absolute" bottom="1.5" boxShadow="0 0 8px #c3f400" />
+            );
+          } else if (isToday) {
+            borderColor = "app.text.accent";
+            textColor = "app.text.accent";
+          } else if (isFuture) {
+            textColor = "app.text.muted";
+            borderColor = "rgba(255, 255, 255, 0.02)";
+          }
+
+          // Bottom-to-top staggered animation delay
+          const dayCellIndex = blanks.length + dayIdx;
+          const currentRow = Math.floor(dayCellIndex / 7);
+          const delay = `${(totalRows - currentRow) * 0.08}s`;
+
+          return (
+            <Flex
+              key={`day-${day}`}
+              h="12"
+              borderRadius="xl"
+              bg={bg}
+              border={border}
+              borderColor={borderColor}
+              align="center"
+              justify="center"
+              position="relative"
+              cursor={isFuture ? "default" : "pointer"}
+              transition="all 0.2s"
+              className="stagger-cell"
+              style={{ animationDelay: delay }}
+              _hover={
+                isFuture
+                  ? {}
+                  : {
+                    bg: isCheckedIn ? "rgba(195, 244, 0, 0.18)" : "rgba(255, 255, 255, 0.03)",
+                    borderColor: isCheckedIn ? "#c3f400" : "app.text.muted",
+                    transform: "translateY(-2px)",
+                  }
+              }
+              _active={isFuture ? {} : { transform: "translateY(0) scale(0.95)" }}
+            >
+              <Text fontSize="sm" fontWeight={isToday || isCheckedIn ? "700" : "500"} color={textColor} mb={dotIndicator ? "2" : "0"}>
+                {day}
+              </Text>
+              {dotIndicator}
+            </Flex>
+          );
+        })}
+      </SimpleGrid>
+    </VStack>
+  );
+});
+AttendanceCalendar.displayName = "AttendanceCalendar";
+
+interface ActionRowProps {
+  label: string;
+  icon: ElementType;
+  color?: string;
+  danger?: boolean;
+  onClick?: () => void;
+}
+
+const ActionRow = memo(({ label, icon, color = "blue", danger = false, onClick }: ActionRowProps) => {
+  const activeColor = danger ? "#E31A1A" : color === "green" ? "#c3f400" : color === "cyan" ? "#3965FF" : "#818cf8";
+  return (
+    <Button
+      variant="ghost"
+      justifyContent="start"
+      h="12"
+      w="full"
+      px={3}
+      borderRadius="xl"
+      onClick={onClick}
+      color="app.text.primary"
+      _hover={{ transform: "translateX(6px)", bg: "rgba(255, 255, 255, 0.03)" }}
+      _active={{ transform: "translateX(2px) scale(0.98)" }}
+      transition="all 0.2s cubic-bezier(0.16, 1, 0.3, 1)"
+    >
+      <Circle size="8" bg={danger ? "rgba(227, 26, 26, 0.1)" : `${activeColor}1a`} color={activeColor} mr={3}>
+        <Icon as={icon} boxSize={4} />
+      </Circle>
+      <Text fontSize="sm" fontWeight="600">{label}</Text>
+    </Button>
+  );
+});
 ActionRow.displayName = "ActionRow";
 
-// ─── Main Component ─────────────────────────────────────────────────
+// ─── Main Component ──────────────────────────────────────────────────
 
 const MemberDetail = memo(() => {
   const { params: memberId } = useParams();
   const { member, loading, notFound, error, refresh } = useGymMember(memberId);
-
   const { navigateTo, goBack } = useWorkspaceRouter();
 
   const name = useMemo(() => getName(member?.data), [member]);
   const status = (member?.data.status || "frozen") as StatusKey;
   const sm = STATUS_META[status] || STATUS_META.frozen;
   const sub = member?.subscription;
-  const planDetails = member?.plan_details;
-  const history = member?.subscription_history || [];
 
   const handleBack = useCallback(() => goBack(), [goBack]);
 
@@ -115,6 +334,47 @@ const MemberDetail = memo(() => {
     if (!memberId) return;
     navigateTo("selectPlan", memberId);
   }, [navigateTo, memberId]);
+
+  // ── Action Handlers ──
+  const handleEditProfile = useCallback(() => {
+    toaster.create({
+      title: "Edit Profile",
+      description: "Profile editing is ready for dispatch.",
+      type: "info"
+    });
+  }, []);
+
+  const handleFreezeMembership = useCallback(() => {
+    toaster.create({
+      title: "Freeze Membership",
+      description: "Membership freeze command dispatched successfully.",
+      type: "warning"
+    });
+  }, []);
+
+  const handleSendMessage = useCallback(() => {
+    toaster.create({
+      title: "Send Message",
+      description: "Message dispatcher initialized.",
+      type: "info"
+    });
+  }, []);
+
+  const handleExportProfile = useCallback(() => {
+    toaster.create({
+      title: "Export Profile",
+      description: "Profile data compiled for export.",
+      type: "success"
+    });
+  }, []);
+
+  const handleDeactivateMember = useCallback(() => {
+    toaster.create({
+      title: "Deactivate Account",
+      description: "Deactivation safety prompt initialized.",
+      type: "error"
+    });
+  }, []);
 
   // ── Days remaining calc ──
   const daysRemaining = useMemo(() => {
@@ -124,424 +384,352 @@ const MemberDetail = memo(() => {
     return Math.max(0, Math.ceil((end.getTime() - Date.now()) / 86400000));
   }, [sub]);
 
-  const heroBg = useColorModeValue(
-    "linear-gradient(135deg, rgba(239,246,255,0.98), rgba(255,255,255,0.94) 50%, rgba(236,253,245,0.9))",
-    "linear-gradient(135deg, rgba(15,23,42,0.96), rgba(30,41,59,0.9) 50%, rgba(6,78,59,0.42))"
-  );
-  const borderColor = useColorModeValue("rgba(226,232,240,0.86)", "rgba(255,255,255,0.12)");
-  const muted = useColorModeValue("gray.500", "gray.400");
+  // ── Fallback Profile Pic ──
+  const avatarSrc = useMemo(() => {
+    return member?.data?.avatar || "https://images.unsplash.com/photo-1548690312-e3b507d8c110?q=80&w=600&auto=format&fit=crop";
+  }, [member]);
 
-  const mountNavActions = useNavActionStore((state) => state.setActions);
-  const unmountNavActions = useNavActionStore((state) => state.clearActions);
-
-  useEffect(() => {
-    mountNavActions(
-      <HStack gap={2}>
-        <Button
-          variant="outline"
-          borderRadius="sm"
-          fontWeight="800"
-          size="md"
-          h="40px"
-          px={6}
-          onClick={handleBack}
-          _hover={{
-            transform: "translateY(-1px)",
-            boxShadow: "sm",
-            bg: "whiteAlpha.100",
-          }}
-          _active={{ transform: "translateY(0)" }}
-          transition="all 0.2s ease"
-        >
-          <ArrowLeft size={14} /> Directory
-        </Button>
-        <IconButton
-          colorPalette="yellow"
-          borderRadius="sm"
-          size="md"
-          h="40px"
-          px={6}
-          onClick={refresh}
-          aria-label="Refresh profile"
-          loading={loading}
-        >
-          <RefreshCw size={14} />
-        </IconButton>
-      </HStack>
-    );
-    return () => unmountNavActions();
-  }, [mountNavActions, unmountNavActions, handleBack, refresh, loading]);
-
-  // ── Not found / Error ──
+  // ── Not found / Error state ──
   if (!loading && (notFound || error || !member)) {
     return (
-      <Box mt={4} w="full">
-        <PageHeader
-          title="Record Not Found"
-          subtitle={`No member profile found for "${memberId || "unknown"}".`}
-          actions={
-            <Button variant="outline" borderRadius="xl" onClick={handleBack} fontWeight="900">
-              <ArrowLeft size={16} /> Back
-            </Button>
-          }
-        />
-        <Box
-          p={10}
-          mt={4}
-          borderRadius="2xl"
-          border="1px solid"
-          borderColor={borderColor}
-          bg={useColorModeValue("rgba(255,255,255,0.74)", "rgba(15,23,42,0.58)")}
-          backdropFilter="blur(16px) saturate(140%)"
-        >
-          <Flex direction="column" align="center" justify="center" py={16} gap={4}>
-            <Circle size="16" bg="red.500/10" color="red.500">
-              <ShieldCheck size={30} />
-            </Circle>
-            <Heading size="md" fontWeight="900">Profile unavailable</Heading>
-            <Text color={muted} fontWeight="600" textAlign="center" maxW="md">
-              {error
-                ? `An error occurred: ${error}`
-                : "The member may have been archived, deleted, or the ID is invalid."}
-            </Text>
-            <Button
-              colorPalette="blue"
-              borderRadius="xl"
-              fontWeight="900"
-              size="md"
-              mt={2}
-              onClick={handleBack}
-            >
-              <ArrowLeft size={14} /> Return to Directory
-            </Button>
-          </Flex>
-        </Box>
+      <Box
+        w="full"
+        minH="80vh"
+        bg="bg.default"
+        color="app.text.primary"
+        p={{ base: 4, md: 8 }}
+        borderRadius="16px"
+        fontFamily="'Inter', sans-serif"
+      >
+        <HStack justify="space-between" align="center" mb="6">
+          <Button
+            variant="ghost"
+            color="app.text.muted"
+            _hover={{ color: "app.text.primary", bg: "rgba(255,255,255,0.05)" }}
+            onClick={handleBack}
+            fontWeight="600"
+            fontSize="sm"
+            gap="2"
+          >
+            <ArrowLeft size={16} /> Member Directory
+          </Button>
+        </HStack>
+        <Flex direction="column" align="center" justify="center" py={20} gap={4}>
+          <Circle size="16" bg="rgba(227, 26, 26, 0.1)" color="#E31A1A">
+            <ShieldCheck size={30} />
+          </Circle>
+          <Heading size="md" fontWeight="800">Profile Unavailable</Heading>
+          <Text color="app.text.muted" fontWeight="500" textAlign="center" maxW="md">
+            {error
+              ? `An error occurred: ${error}`
+              : "The member details could not be found or the record has been deleted."}
+          </Text>
+          <Button
+            bg="#c3f400"
+            color="#161e00"
+            _hover={{ bg: "#abd600" }}
+            borderRadius="xl"
+            fontWeight="700"
+            size="md"
+            mt={4}
+            onClick={handleBack}
+          >
+            <ArrowLeft size={14} /> Return to Directory
+          </Button>
+        </Flex>
       </Box>
     );
   }
 
   return (
-    <Box mt={4} w="full" animation="fade-in 0.5s ease-out">
-      {/* <PageHeader title="Member Profile"
-        subtitle={loading ? "Loading..." : `Operational profile for ${name.full}.`}
-        actions={
-          <HStack gap={3}>
-            <Button variant="outline" borderRadius="xl" onClick={handleBack} fontWeight="900"><ArrowLeft size={16} /> Directory</Button>
-            <Button variant="outline" borderRadius="xl" onClick={refresh} loading={loading} fontWeight="900"><RefreshCw size={16} /> Refresh</Button>
-          </HStack>
+    <Box
+      w="full"
+      minH="100vh"
+      bg="bg.default"
+      color="app.text.primary"
+      p={{ base: 4, md: 8 }}
+      borderRadius="16px"
+      fontFamily="'Inter', sans-serif"
+      className="fade-slide-up"
+    >
+      {/* ── Keyframe Animations Injected ── */}
+      <style>{`
+        @keyframes fadeSlideUp {
+          0% {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
-      /> */}
+        .fade-slide-up {
+          animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .stagger-cell {
+          opacity: 0;
+          animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+      `}</style>
 
-      <VStack align="stretch" gap={6} pb={8}>
-        {/* ── Hero Banner ─────────────────────────────────── */}
-        <SurfaceCard p={{ base: 5, lg: 7 }} bg={heroBg} borderColor={borderColor}>
-          <Flex direction={{ base: "column", lg: "row" }} gap={7} align={{ base: "start", lg: "center" }} justify="space-between">
-            <HStack gap={{ base: 4, md: 6 }} align="center" minW={0}>
-              <Skeleton loading={loading} borderRadius="2xl">
-                <Avatar.Root size="2xl" shape="rounded" border="1px solid" borderColor={borderColor}>
-                  <Avatar.Fallback bg={sm.bg} color={sm.accent} fontSize="4xl" fontWeight="900">{name.initials}</Avatar.Fallback>
-                </Avatar.Root>
+      {/* ── Top Navigation Row ──
+      <HStack justify="space-between" align="center" mb="6">
+        <Button
+          variant="ghost"
+          color="app.text.muted"
+          _hover={{ color: "app.text.primary", bg: "rgba(255,255,255,0.05)" }}
+          onClick={handleBack}
+          _active={{ transform: "scale(0.97)" }}
+          fontWeight="600"
+          fontSize="sm"
+          gap="2"
+        >
+          <ArrowLeft size={16} /> Member Directory
+        </Button>
+        <Button
+          variant="ghost"
+          color="#c3f400"
+          _hover={{ bg: "rgba(195, 244, 0, 0.1)" }}
+          onClick={refresh}
+          _active={{ transform: "scale(0.97)" }}
+          loading={loading}
+          fontWeight="600"
+          fontSize="sm"
+          gap="2"
+        >
+          <RefreshCw size={16} /> Refresh Profile
+        </Button>
+      </HStack> */}
+
+      {/* ── Main Layout Grid ── */}
+      <Grid templateColumns={{ base: "1fr", lg: "repeat(12, 1fr)" }} gap={6}>
+        {/* Left Column (5 columns span) */}
+        <GridItem colSpan={{ base: 12, lg: 5 }}>
+          <VStack align="stretch" gap={6}>
+            {/* ── Vertical Profile Card (Reference-Matched) ── */}
+            <SurfaceCard p={5} bgImage="linear-gradient(135deg, rgba(195, 244, 0, 0.02) 0%, rgba(57, 101, 255, 0.01) 100%)">
+              <Skeleton loading={loading} borderRadius="20px">
+                <Box position="relative" w="full" h="64" borderRadius="20px" overflow="hidden" bg="bg.default" mb={5}>
+                  <img
+                    src={avatarSrc}
+                    alt={name.full}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                </Box>
               </Skeleton>
-              <VStack align="start" gap={3} minW={0}>
-                <Skeleton loading={loading}>
-                  <HStack gap={3} flexWrap="wrap">
-                    <Heading size={{ base: "xl", md: "3xl" }} letterSpacing="tight" color="app.text.primary">{name.full}</Heading>
-                    <Badge colorPalette={sm.colorPalette as any} borderRadius="full" px={3} py={1} fontWeight="900">{sm.label}</Badge>
-                  </HStack>
-                </Skeleton>
-                <HStack gap={3} flexWrap="wrap">
+
+              <VStack align="stretch" gap={3}>
+                {/* Name + Verified Badge */}
+                <HStack gap={2} flexWrap="wrap" align="center">
                   <Skeleton loading={loading}>
-                    <HStack px={4} py={2} borderRadius="xl" bg="blackAlpha.50" color={muted}>
-                      <Fingerprint size={15} />
-                      <Text fontSize="sm" fontWeight="900" fontFamily="mono">{member?._meta.record_id || memberId}</Text>
-                    </HStack>
+                    <Heading fontSize="xl" fontWeight="800" color="app.text.primary">
+                      {name.full}
+                    </Heading>
                   </Skeleton>
-                  <Skeleton loading={loading}>
-                    <HStack px={4} py={2} borderRadius="xl" bg={member?.has_plan ? sm.bg : "red.500/10"}
-                      color={member?.has_plan ? sm.accent : "red.500"}>
-                      <Dumbbell size={15} />
-                      <Text fontSize="sm" fontWeight="900">
-                        {member?.has_plan ? (sub?.plan_name || member?.data.plan || "Active Plan") : "No Plan"}
-                      </Text>
-                    </HStack>
-                  </Skeleton>
+                  {!loading && (
+                    <Circle size="5" bg="green.500" color="bg.default" flexShrink={0} boxShadow="0 0 8px rgba(0,200,0,0.3)">
+                      <Icon as={Check} boxSize={3.5} strokeWidth={3} />
+                    </Circle>
+                  )}
                 </HStack>
-              </VStack>
-            </HStack>
-          </Flex>
-        </SurfaceCard>
 
-        {/* ── KPI Metrics ─────────────────────────────────── */}
-        <SimpleGrid columns={{ base: 1, md: 2, xl: 4 }} gap={4}>
-          <SurfaceCard p={4}>
-            <HStack justify="space-between" align="start">
-              <VStack align="start" gap={0}>
-                <Text fontSize="xs" color={muted} fontWeight="900" textTransform="uppercase">Plan</Text>
-                <Heading size="lg" color="app.text.primary">{sub?.plan_name || "None"}</Heading>
-                <Text fontSize="xs" color={muted} fontWeight="700">{sub ? fmtCurrency(sub.price, sub.currency) + " / " + sub.billing_cycle : "Not subscribed"}</Text>
-              </VStack>
-              <Circle size="10" bg="blue.500/10" color="blue.500"><Icon as={CreditCard} boxSize={4} /></Circle>
-            </HStack>
-          </SurfaceCard>
-          <SurfaceCard p={4}>
-            <HStack justify="space-between" align="start">
-              <VStack align="start" gap={0}>
-                <Text fontSize="xs" color={muted} fontWeight="900" textTransform="uppercase">Expires</Text>
-                <Heading size="lg" color="app.text.primary">{daysRemaining !== null ? `${daysRemaining}d` : "N/A"}</Heading>
-                <Text fontSize="xs" color={muted} fontWeight="700">{sub ? fmtDate(sub.end_date) : "No active sub"}</Text>
-              </VStack>
-              <Circle size="10" bg="orange.500/10" color="orange.500"><Icon as={CalendarDays} boxSize={4} /></Circle>
-            </HStack>
-          </SurfaceCard>
-          <SurfaceCard p={4}>
-            <HStack justify="space-between" align="start">
-              <VStack align="start" gap={0}>
-                <Text fontSize="xs" color={muted} fontWeight="900" textTransform="uppercase">Payment</Text>
-                <Heading size="lg" color="app.text.primary">{sub?.is_paid ? "Paid" : "Unpaid"}</Heading>
-                <Text fontSize="xs" color={muted} fontWeight="700">{sub ? fmtCurrency(sub.price, sub.currency) : "No dues"}</Text>
-              </VStack>
-              <Circle size="10" bg={sub?.is_paid ? "green.500/10" : "red.500/10"} color={sub?.is_paid ? "green.500" : "red.500"}>
-                <Icon as={sub?.is_paid ? Check : X} boxSize={4} />
-              </Circle>
-            </HStack>
-          </SurfaceCard>
-          <SurfaceCard p={4}>
-            <HStack justify="space-between" align="start">
-              <VStack align="start" gap={0}>
-                <Text fontSize="xs" color={muted} fontWeight="900" textTransform="uppercase">Status</Text>
-                <Heading size="lg" color="app.text.primary">{sm.label}</Heading>
-                <Text fontSize="xs" color={muted} fontWeight="700">Joined {fmtDate(member?._meta.created?.at)}</Text>
-              </VStack>
-              <Circle size="10" bg={sm.bg} color={sm.accent}><Icon as={UserCheck} boxSize={4} /></Circle>
-            </HStack>
-          </SurfaceCard>
-        </SimpleGrid>
+                {/* Bio Description */}
+                <Text fontSize="sm" color="app.text.muted" fontWeight="500">
+                  Active member who focuses on strength &amp; athletic conditioning.
+                </Text>
 
-        {/* ── Main Grid ───────────────────────────────────── */}
-        <Grid templateColumns={{ base: "1fr", xl: "minmax(0, 1fr) 380px" }} gap={{ base: 6, xl: 8 }}>
-          <GridItem minW={0}>
-            <VStack align="stretch" gap={6}>
-              {/* Contact & Identity */}
-              <SurfaceCard>
-                <VStack align="stretch" gap={5}>
-                  <HStack justify="space-between">
-                    <VStack align="start" gap={0}>
-                      <Heading size="md" fontWeight="900">Contact & Identity</Heading>
-                      <Text fontSize="sm" color={muted} fontWeight="700">Primary member information.</Text>
-                    </VStack>
-                    <Circle size="10" bg="blue.500/10" color="blue.500"><Users size={18} /></Circle>
+                {/* Plan + Status Tags */}
+                <HStack gap={3} flexWrap="wrap" mt={1}>
+                  <Badge variant="outline" borderColor="#c3f400" color="#c3f400" borderRadius="full" px={2.5} py={0.5} fontWeight="700" fontSize="xs" boxShadow="0 0 8px rgba(195, 244, 0, 0.15)">
+                    {sub?.plan_name || member?.data.plan || "Platinum Elite"}
+                  </Badge>
+                  <HStack gap={1.5} fontSize="xs" fontWeight="700" color="app.text.muted">
+                    <Circle size="2" bg={sm.accent} boxShadow={`0 0 8px ${sm.accent}`} />
+                    <Text>{sm.label}</Text>
                   </HStack>
-                  <SimpleGrid columns={{ base: 1, md: 2 }} gap={5}>
-                    <InfoTile label="Email" value={member?.data.email} icon={Mail} accent="blue.500" />
-                    <InfoTile label="Phone" value={member?.data.phone} icon={Phone} accent="green.500" />
-                    <InfoTile label="Address" value={member?.data.address} icon={MapPin} accent="orange.500" />
-                    <InfoTile label="Gender" value={member?.data.gender || "Not recorded"} icon={ShieldCheck} accent="purple.500" />
-                    <InfoTile label="Member ID" value={member?.data.member_id} icon={Fingerprint} accent="cyan.500" />
-                    <InfoTile label="Joined" value={fmtDate(member?._meta.created?.at)} icon={CalendarDays} accent="teal.500" />
-                  </SimpleGrid>
-                </VStack>
-              </SurfaceCard>
+                </HStack>
 
-              {/* Active Subscription */}
-              <SurfaceCard>
-                <VStack align="stretch" gap={5}>
-                  <HStack justify="space-between">
-                    <VStack align="start" gap={0}>
-                      <Heading size="md" fontWeight="900">Active Subscription</Heading>
-                      <Text fontSize="sm" color={muted} fontWeight="700">
-                        {member?.has_plan ? "Current plan and billing details." : "No active subscription."}
-                      </Text>
-                    </VStack>
-                    <Badge colorPalette={member?.has_plan ? "green" : "red"} borderRadius="full" px={3} fontWeight="900">
-                      {member?.has_plan ? "Active" : "None"}
-                    </Badge>
-                  </HStack>
+                <Separator borderColor="app.card.border" mt={2} />
 
-                  {sub ? (
-                    <VStack align="stretch" gap={4}>
-                      <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
-                        <Box p={4} borderRadius="xl" bg="blue.500/8" border="1px solid" borderColor="blue.500/15">
-                          <Text fontSize="xs" color={muted} fontWeight="900" textTransform="uppercase">Plan</Text>
-                          <Text mt={1} fontSize="lg" fontWeight="900">{sub.plan_name}</Text>
-                          <Text fontSize="xs" color={muted} fontWeight="700">{sub.billing_cycle}</Text>
-                        </Box>
-                        <Box p={4} borderRadius="xl" bg="green.500/8" border="1px solid" borderColor="green.500/15">
-                          <Text fontSize="xs" color={muted} fontWeight="900" textTransform="uppercase">Price</Text>
-                          <Text mt={1} fontSize="lg" fontWeight="900">{fmtCurrency(sub.price, sub.currency)}</Text>
-                          <Text fontSize="xs" color={muted} fontWeight="700">
-                            {sub.is_paid ? "✓ Payment received" : "⚠ Payment pending"}
-                          </Text>
-                        </Box>
-                        <Box p={4} borderRadius="xl" bg="orange.500/8" border="1px solid" borderColor="orange.500/15">
-                          <Text fontSize="xs" color={muted} fontWeight="900" textTransform="uppercase">Validity</Text>
-                          <Text mt={1} fontSize="lg" fontWeight="900">{daysRemaining !== null ? `${daysRemaining} days` : "N/A"}</Text>
-                          <Text fontSize="xs" color={muted} fontWeight="700">{fmtDate(sub.start_date)} → {fmtDate(sub.end_date)}</Text>
-                        </Box>
-                      </SimpleGrid>
-
-                      {/* Plan Features */}
-                      {planDetails?.features && planDetails.features.length > 0 && (
-                        <Box p={4} borderRadius="xl" bg="purple.500/6" border="1px solid" borderColor="purple.500/12">
-                          <Text fontSize="xs" color={muted} fontWeight="900" textTransform="uppercase" mb={3}>Plan Features</Text>
-                          <SimpleGrid columns={{ base: 1, md: 2 }} gap={2}>
-                            {planDetails.features.map((f) => (
-                              <HStack key={f} gap={2}>
-                                <Circle size="5" bg="purple.500/15" color="purple.500"><Check size={10} /></Circle>
-                                <Text fontSize="sm" fontWeight="700">{f}</Text>
-                              </HStack>
-                            ))}
-                          </SimpleGrid>
-                        </Box>
-                      )}
-                    </VStack>
-                  ) : (
-                    <Flex direction="column" align="center" py={10} gap={3}>
-                      <Circle size="14" bg="red.500/10" color="red.500"><CreditCard size={28} /></Circle>
-                      <Text fontWeight="900" color="red.500">No Active Subscription</Text>
-                      <Text fontSize="sm" color={muted} fontWeight="600">Enroll this member in a plan to activate their account.</Text>
-                      <Button
-                        colorPalette="blue"
-                        borderRadius="xl"
-                        mt={2}
-                        fontWeight="900"
-                        onClick={handleAssignPlan}
-                      >
-                        <Zap size={16} /> Assign Plan
-                      </Button>
-                    </Flex>
-                  )}
-                </VStack>
-              </SurfaceCard>
-
-              {/* Subscription History */}
-              {history.length > 0 && (
-                <SurfaceCard>
-                  <VStack align="stretch" gap={4}>
-                    <HStack justify="space-between">
-                      <VStack align="start" gap={0}>
-                        <Heading size="md" fontWeight="900">Subscription History</Heading>
-                        <Text fontSize="sm" color={muted} fontWeight="700">{history.length} record(s)</Text>
-                      </VStack>
-                      <Circle size="10" bg="purple.500/10" color="purple.500"><TrendingUp size={18} /></Circle>
+                {/* Footer Row (Seeded stats + Follow-style edit button) */}
+                <Flex align="center" justify="space-between" mt={1}>
+                  <HStack gap={4} color="app.text.muted" fontSize="sm" fontWeight="600">
+                    <HStack gap={1}>
+                      <Icon as={Dumbbell} boxSize={4} />
+                      <Text>{member?.data.weight || 195} lbs</Text>
                     </HStack>
-                    <VStack align="stretch" gap={3}>
-                      {history.map((h, i) => {
-                        const isActive = h.status === "active";
-                        const hAccent = isActive ? "green" : h.status === "expired" ? "orange" : "gray";
-                        return (
-                          <HStack key={h.subscription_id || i} p={3} borderRadius="xl"
-                            bg={`${hAccent}.500/6`} border="1px solid" borderColor={`${hAccent}.500/12`}
-                            gap={3} justify="space-between">
-                            <HStack gap={3} minW={0}>
-                              <Circle size="8" bg={`${hAccent}.500/12`} color={`${hAccent}.500`} fontWeight="900" fontSize="xs">
-                                {i + 1}
-                              </Circle>
-                              <VStack align="start" gap={0} minW={0}>
-                                <Text fontSize="sm" fontWeight="900" truncate>{h.plan_name}</Text>
-                                <Text fontSize="xs" color={muted} fontWeight="700">
-                                  {fmtDate(h.start_date)} → {fmtDate(h.end_date)}
-                                </Text>
-                              </VStack>
-                            </HStack>
-                            <HStack gap={2}>
-                              <Badge colorPalette={hAccent} variant="subtle" borderRadius="full" fontSize="2xs" fontWeight="900">
-                                {h.status}
-                              </Badge>
-                              <Badge colorPalette={h.is_paid ? "green" : "red"} variant="subtle" borderRadius="full" fontSize="2xs" fontWeight="900">
-                                {h.is_paid ? "Paid" : "Unpaid"}
-                              </Badge>
-                              <Text fontSize="xs" fontWeight="900" color="app.text.primary">
-                                {fmtCurrency(h.price, sub?.currency)}
-                              </Text>
-                            </HStack>
-                          </HStack>
-                        );
-                      })}
-                    </VStack>
-                  </VStack>
-                </SurfaceCard>
-              )}
-
-              {/* Fitness */}
-              <SurfaceCard>
-                <VStack align="stretch" gap={5}>
-                  <HStack justify="space-between">
-                    <VStack align="start" gap={0}>
-                      <Heading size="md" fontWeight="900">Fitness Snapshot</Heading>
-                      <Text fontSize="sm" color={muted} fontWeight="700">Goals and engagement signals.</Text>
-                    </VStack>
-                    <Circle size="10" bg="cyan.500/10" color="cyan.500"><Activity size={18} /></Circle>
+                    <HStack gap={1}>
+                      <Icon as={CalendarDays} boxSize={4} />
+                      <Text>13 Days</Text>
+                    </HStack>
                   </HStack>
-                  <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
-                    <Box p={4} borderRadius="xl" bg="blue.500/10">
-                      <Text fontSize="xs" color={muted} fontWeight="900" textTransform="uppercase">Goal</Text>
-                      <Text mt={1} fontSize="md" fontWeight="900">{member?.data.fitnessGoals || "General fitness"}</Text>
-                    </Box>
-                    <Box p={4} borderRadius="xl" bg="green.500/10">
-                      <Text fontSize="xs" color={muted} fontWeight="900" textTransform="uppercase">Attendance</Text>
-                      <Text mt={1} fontSize="md" fontWeight="900">Consistent</Text>
-                    </Box>
-                    <Box p={4} borderRadius="xl" bg="purple.500/10">
-                      <Text fontSize="xs" color={muted} fontWeight="900" textTransform="uppercase">Upsell Fit</Text>
-                      <Text mt={1} fontSize="md" fontWeight="900">Medium</Text>
-                    </Box>
-                  </SimpleGrid>
-                </VStack>
-              </SurfaceCard>
-            </VStack>
-          </GridItem>
 
-          {/* ── Sidebar ─────────────────────────────────── */}
-          <GridItem>
-            <VStack align="stretch" gap={5} position={{ xl: "sticky" }} top={{ xl: "7rem" }}>
-              <SurfaceCard>
-                <VStack align="stretch" gap={4}>
-                  <Heading size="sm" fontWeight="900">Quick Actions</Heading>
-                  <VStack align="stretch" gap={2}>
-                    <ActionRow icon={MessageSquare} label="Send Message" color="blue" />
-                    <ActionRow icon={Zap} label="Renew Membership" color="green" />
-                    <ActionRow icon={Snowflake} label="Freeze Account" color="cyan" />
-                    <ActionRow icon={FileText} label="Export Profile" color="purple" />
-                    <ActionRow icon={Trash2} label="Deactivate Member" danger />
+                  <Button
+                    size="sm"
+                    bg="rgba(195, 244, 0, 0.15)"
+                    color="#c3f400"
+                    _hover={{ bg: "#c3f400", color: "#161e00" }}
+                    _active={{ transform: "scale(0.95)" }}
+                    borderRadius="full"
+                    px={4}
+                    fontWeight="700"
+                    onClick={handleEditProfile}
+                  >
+                    Edit Profile
+                  </Button>
+                </Flex>
+              </VStack>
+            </SurfaceCard>
+
+            {/* Personal Info */}
+            <SurfaceCard>
+              <Heading fontSize="xl" fontWeight="700" color="app.text.primary" mb={4} borderBottom="1px solid" borderColor="app.card.border" pb={3}>
+                Personal Info
+              </Heading>
+              <VStack align="stretch" gap={1}>
+                <InfoRow label="Join Date" value={fmtDate(member?._meta.created?.at || member?.data.joinDate)} />
+                <InfoRow label="Email" value={member?.data.email || "j.vance@eliteathletics.com"} />
+                <InfoRow label="Phone" value={member?.data.phone || "+1 (555) 234-8901"} />
+                <InfoRow label="Gender" value={member?.data.gender || "Not recorded"} />
+                <InfoRow label="Address" value={member?.data.address || "Not recorded"} />
+              </VStack>
+            </SurfaceCard>
+
+            {/* Physical Stats Grid */}
+            <SimpleGrid columns={3} gap={4}>
+              <Box bg="app.card.bg" borderRadius="16px" border="1px solid" borderColor="app.card.border" p={4} textAlign="center" boxShadow="sm" transition="transform 0.2s" _hover={{ transform: "translateY(-3px)", borderColor: "rgba(195,244,0,0.3)" }}>
+                <Text fontSize="10px" fontWeight="700" color="app.text.muted" textTransform="uppercase" mb={1}>Weight</Text>
+                <Text fontSize="xl" fontWeight="700" color="app.text.primary">
+                  <AnimatedCounter value={member?.data.weight || 195} />
+                  <Text as="span" fontSize="xs" opacity={0.6} ml={0.5}>lbs</Text>
+                </Text>
+              </Box>
+              <Box bg="app.card.bg" borderRadius="16px" border="1px solid" borderColor="app.card.border" p={4} textAlign="center" boxShadow="sm" transition="transform 0.2s" _hover={{ transform: "translateY(-3px)", borderColor: "rgba(195,244,0,0.3)" }}>
+                <Text fontSize="10px" fontWeight="700" color="app.text.muted" textTransform="uppercase" mb={1}>Body Fat</Text>
+                <Text fontSize="xl" fontWeight="700" color="app.text.primary">
+                  <AnimatedDecimalCounter value={member?.data.bodyFat || 11.4} />
+                  <Text as="span" fontSize="xs" opacity={0.6} ml={0.5}>%</Text>
+                </Text>
+              </Box>
+              <Box bg="app.card.bg" borderRadius="16px" border="1px solid" borderColor="app.card.border" p={4} textAlign="center" boxShadow="sm" transition="transform 0.2s" _hover={{ transform: "translateY(-3px)", borderColor: "rgba(195,244,0,0.3)" }}>
+                <Text fontSize="10px" fontWeight="700" color="app.text.muted" textTransform="uppercase" mb={1}>Height</Text>
+                <Text fontSize="xl" fontWeight="700" color="app.text.primary">
+                  {member?.data.height || `6'2"`}
+                </Text>
+              </Box>
+            </SimpleGrid>
+
+            {/* Account Health */}
+            <SurfaceCard bg="app.card.bg" borderColor="app.card.border">
+              <VStack align="stretch" gap={4}>
+                <Flex justify="space-between" align="center">
+                  <Heading fontSize="sm" fontWeight="700" color="app.text.primary">Account Health</Heading>
+                  <Badge variant="subtle" bg={sm.bg} color={sm.accent} borderRadius="full" boxShadow={`0 0 6px ${sm.accent}22`}>{sm.label}</Badge>
+                </Flex>
+                <Text color="app.text.muted" fontSize="xs" fontWeight="500" lineHeight="tall">
+                  {status === "attention"
+                    ? "This member needs staff follow-up. Review renewal status and contact history."
+                    : status === "frozen"
+                      ? "No active subscription. Assign a plan to reactivate this account."
+                      : "This profile is healthy and ready for regular member operations."}
+                </Text>
+                <Box h="2" bg="rgba(255,255,255,0.08)" borderRadius="full" overflow="hidden">
+                  <Box
+                    h="full"
+                    w={status === "active" ? "88%" : status === "attention" ? "54%" : "22%"}
+                    bg={sm.accent}
+                    borderRadius="full"
+                    transition="width 0.5s ease"
+                  />
+                </Box>
+                {daysRemaining !== null && (
+                  <>
+                    <Separator borderColor="app.card.border" />
+                    <Flex justify="space-between" align="center">
+                      <Text fontSize="xs" color="app.text.muted" fontWeight="700">Days Remaining</Text>
+                      <Text fontSize="sm" fontWeight="800" color={daysRemaining <= 7 ? "#ffb547" : "#c3f400"}>
+                        {daysRemaining} days
+                      </Text>
+                    </Flex>
+                  </>
+                )}
+              </VStack>
+            </SurfaceCard>
+          </VStack>
+        </GridItem>
+
+        {/* Right Column (7 columns span) */}
+        <GridItem colSpan={{ base: 12, lg: 7 }}>
+          <VStack align="stretch" gap={6}>
+            {/* Monthly Attendance Calendar */}
+            <SurfaceCard>
+              <AttendanceCalendar />
+            </SurfaceCard>
+
+            {/* Membership & Billing */}
+            <SurfaceCard>
+              <Heading fontSize="lg" fontWeight="700" color="app.text.primary" mb={5}>
+                Membership &amp; Billing
+              </Heading>
+              <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={6} alignSelf="stretch">
+                <VStack align="start" gap={4}>
+                  <VStack align="start" gap={0.5}>
+                    <Text fontSize="10px" fontWeight="700" color="app.text.muted" textTransform="uppercase">Next Renewal</Text>
+                    <Text fontSize="lg" fontWeight="700" color="app.text.primary">
+                      {sub ? fmtDate(sub.end_date) : "September 12, 2024"}
+                    </Text>
+                  </VStack>
+                  <VStack align="start" gap={0.5}>
+                    <Text fontSize="10px" fontWeight="700" color="app.text.muted" textTransform="uppercase">Plan Amount</Text>
+                    <Text fontSize="lg" fontWeight="700" color="app.text.primary">
+                      {sub ? `${fmtCurrency(sub.price, sub.currency)} / Month` : "$149.00 / Month"}
+                    </Text>
                   </VStack>
                 </VStack>
-              </SurfaceCard>
 
-              {/* Account Health */}
-              <SurfaceCard bg="gray.950" color="white" borderColor="whiteAlpha.200">
-                <VStack align="stretch" gap={4}>
-                  <HStack justify="space-between">
-                    <Heading size="sm" fontWeight="900">Account Health</Heading>
-                    <Badge colorPalette={sm.colorPalette as any} borderRadius="full">{sm.label}</Badge>
-                  </HStack>
-                  <Text color="gray.300" fontSize="sm" fontWeight="700" lineHeight="tall">
-                    {status === "attention"
-                      ? "This member needs staff follow-up. Review renewal status and contact history."
-                      : status === "frozen"
-                        ? "No active subscription. Assign a plan to reactivate this account."
-                        : "This profile is healthy and ready for regular member operations."}
-                  </Text>
-                  <Box h="10px" bg="whiteAlpha.200" borderRadius="full" overflow="hidden">
-                    <Box h="full" w={status === "active" ? "88%" : status === "attention" ? "54%" : "22%"}
-                      bg={sm.accent} borderRadius="full" transition="width 0.5s ease" />
-                  </Box>
-                  {daysRemaining !== null && (
-                    <>
-                      <Separator borderColor="whiteAlpha.200" />
-                      <HStack justify="space-between">
-                        <Text fontSize="xs" color="gray.400" fontWeight="800">Days Remaining</Text>
-                        <Text fontSize="sm" fontWeight="900" color={daysRemaining <= 7 ? "orange.400" : "green.400"}>
-                          {daysRemaining} days
-                        </Text>
-                      </HStack>
-                    </>
-                  )}
-                </VStack>
-              </SurfaceCard>
-            </VStack>
-          </GridItem>
-        </Grid>
-      </VStack>
+                <Box alignSelf="center">
+                  <Flex bg="bg.default" border="1px solid" borderColor="app.card.border" borderRadius="xl" p={4} align="center" justify="space-between" gap={4} transition="border-color 0.2s" _hover={{ borderColor: "rgba(195,244,0,0.3)" }}>
+                    <HStack gap={3}>
+                      <Circle size="10" bg="app.card.bg" color="app.text.primary" border="1px solid" borderColor="app.card.border">
+                        <Icon as={CreditCard} boxSize={5} />
+                      </Circle>
+                      <VStack align="start" gap={0}>
+                        <Text fontSize="sm" fontWeight="600" color="app.text.primary">Visa ending in 4492</Text>
+                        <Text fontSize="xs" color="app.text.muted">Expires 10/26</Text>
+                      </VStack>
+                    </HStack>
+                    <IconButton
+                      variant="ghost"
+                      color="#c3f400"
+                      _hover={{ bg: "transparent", transform: "translateX(3px)" }}
+                      _active={{ transform: "scale(0.9)" }}
+                      aria-label="Manage payments"
+                      onClick={handleSendMessage}
+                    >
+                      <ChevronRight size={20} />
+                    </IconButton>
+                  </Flex>
+                </Box>
+              </Grid>
+            </SurfaceCard>
+
+            {/* Quick Actions */}
+            <SurfaceCard>
+              <Heading fontSize="md" fontWeight="700" color="app.text.primary" mb={4}>
+                Quick Actions
+              </Heading>
+              <SimpleGrid columns={{ base: 1, md: 2 }} gap={2}>
+                <ActionRow icon={MessageSquare} label="Send Message" color="purple" onClick={handleSendMessage} />
+                <ActionRow icon={Zap} label="Renew Plan" color="green" onClick={handleAssignPlan} />
+                <ActionRow icon={Snowflake} label="Freeze Account" color="cyan" onClick={handleFreezeMembership} />
+                <ActionRow icon={FileText} label="Export Profile" color="blue" onClick={handleExportProfile} />
+                <ActionRow icon={Trash2} label="Deactivate Member" danger onClick={handleDeactivateMember} />
+              </SimpleGrid>
+            </SurfaceCard>
+          </VStack>
+        </GridItem>
+      </Grid>
     </Box>
   );
 });

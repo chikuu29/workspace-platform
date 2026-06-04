@@ -51,8 +51,7 @@ const PanelSideBar = () => {
       boxShadow={shadow}
       transition="width 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
       w={isCollapsed ? "78px" : "260px"}
-      // bg="bg.default"
-      bg={"app.card.bg"}
+      bg="app.sidebar.bg"
       borderRight="1px solid"
       borderColor={borderColor}
       flexShrink={0}

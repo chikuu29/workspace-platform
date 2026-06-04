@@ -19,6 +19,7 @@ const WorkspaceLayout = () => {
       <Flex h="100vh" flexDirection="column">
         <Navbar />
         <Flex flex="1" overflow="hidden">
+
           <PanelSideBar />
           {/* Main Content */}
           <Box flex="1" overflowY="auto" position="relative" zIndex={0} >

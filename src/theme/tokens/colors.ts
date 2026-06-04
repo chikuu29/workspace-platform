@@ -154,6 +154,12 @@ export const semanticTokens = {
                 _dark: "#818cf8",
             },
         },
+        "app.sidebar.bg": {
+            value: {
+                _light: "#f7f7f7",
+                _dark: "colors.navy.900",
+            }
+        },
 
         "app.navbar.border": {
             value: {

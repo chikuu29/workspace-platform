@@ -107,7 +107,7 @@ export const semanticTokens = {
         },
         bg: {
             default: {
-                value: { _light: "#f7f7f7", _dark: "colors.navy.900" }
+                value: { _light: "#f5f5f5", _dark: "colors.navy.900" }
             }
         },
 

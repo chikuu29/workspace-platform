@@ -2,7 +2,7 @@
  * SelectMembershipPlan.tsx
  *
  * Step 2 in the gym membership sales flow.
- * Route: /:org/workspace/app/myGym/selectMembershipPlan/:memberId
+ * Route: /:org/workspace/app/gym/selectMembershipPlan/:memberId
  *
  * Purpose:
  *   - Display all active membership plan cards

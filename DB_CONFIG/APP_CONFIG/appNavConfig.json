@@ -29,13 +29,13 @@
             },
             {
                 "id": "MY_GYM",
-                "app_slug": "myGym",
+                "app_slug": "gym",
                 "required_permissions": [
-                    "MYGYM.VIEW.READ"
+                    "gym.VIEW.READ"
                 ],
                 "hidden": false,
                 "name": "Gym Management",
-                "target": "/workspace/app/myGym/home",
+                "target": "/workspace/app/gym/home",
                 "actions": {
                     "onClick": ""
                 },
@@ -126,7 +126,7 @@
                 ]
             },
             "myApps": {},
-            "myGym": {
+            "gym": {
                 "SHOW_SIDE_NAV_MENU": true,
                 "SHOW_TOP_NAV_MENU": false,
                 "MENU": [
@@ -134,7 +134,7 @@
                         "label": "Home",
                         "icon": "House",
                         "iconColor": "blue.400",
-                        "path": "/app/myGym/home",
+                        "path": "/app/gym/home",
                         "isMaster": true
                     },
                     {
@@ -146,17 +146,17 @@
                             {
                                 "label": "List Members",
                                 "icon": "List",
-                                "path": "/app/myGym/members"
+                                "path": "/app/gym/members"
                             },
                             {
                                 "label": "Add Member",
                                 "icon": "UserPlus",
-                                "path": "/app/myGym/AddMember"
+                                "path": "/app/gym/AddMember"
                             },
                             {
                                 "label": "Member Check-In",
                                 "icon": "UserCheck",
-                                "path": "/app/myGym/MemberCheckIn"
+                                "path": "/app/gym/MemberCheckIn"
                             }
                         ]
                     },
@@ -169,17 +169,17 @@
                             {
                                 "label": "List Trainers",
                                 "icon": "ClipboardList",
-                                "path": "/app/myGym/trainers"
+                                "path": "/app/gym/trainers"
                             },
                             {
                                 "label": "Add Trainer",
                                 "icon": "UserPlus",
-                                "path": "/app/myGym/AddTrainer"
+                                "path": "/app/gym/AddTrainer"
                             },
                             {
                                 "label": "Manage Schedules",
                                 "icon": "CalendarDays",
-                                "path": "/app/myGym/trainerSchedules"
+                                "path": "/app/gym/trainerSchedules"
                             }
                         ]
                     },
@@ -192,17 +192,17 @@
                             {
                                 "label": "List Classes",
                                 "icon": "LayoutList",
-                                "path": "/app/myGym/listClasses"
+                                "path": "/app/gym/listClasses"
                             },
                             {
                                 "label": "Add Class",
                                 "icon": "CalendarPlus",
-                                "path": "/app/myGym/addClass"
+                                "path": "/app/gym/addClass"
                             },
                             {
                                 "label": "Class Bookings",
                                 "icon": "Bookmark",
-                                "path": "/app/myGym/classBookings"
+                                "path": "/app/gym/classBookings"
                             }
                         ]
                     },
@@ -215,17 +215,17 @@
                             {
                                 "label": "Revenue Report",
                                 "icon": "DollarSign",
-                                "path": "/app/myGym/revenueReport"
+                                "path": "/app/gym/revenueReport"
                             },
                             {
                                 "label": "Attendance Report",
                                 "icon": "Clock",
-                                "path": "/app/myGym/attendanceReport"
+                                "path": "/app/gym/attendanceReport"
                             },
                             {
                                 "label": "Performance Report",
                                 "icon": "TrendingUp",
-                                "path": "/app/myGym/performanceReport"
+                                "path": "/app/gym/performanceReport"
                             }
                         ]
                     },
@@ -238,12 +238,12 @@
                             {
                                 "label": "Subscription Plans",
                                 "icon": "Layers",
-                                "path": "/app/myGym/Subscription"
+                                "path": "/app/gym/Subscription"
                             },
                             {
                                 "label": "Payment History",
                                 "icon": "Receipt",
-                                "path": "/app/myGym/PaymentsHistory"
+                                "path": "/app/gym/PaymentsHistory"
                             }
                         ]
                     }

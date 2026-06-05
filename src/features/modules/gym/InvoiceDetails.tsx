@@ -2,7 +2,7 @@
  * InvoiceDetails.tsx
  *
  * Step 4 in the gym membership sales flow.
- * Route: /:org/workspace/app/myGym/invoiceView/:invoiceNumber
+ * Route: /:org/workspace/app/gym/invoiceView/:invoiceNumber
  *
  * Purpose:
  *   - Display the generated invoice with full details (server-computed tax)

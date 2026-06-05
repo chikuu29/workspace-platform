@@ -2,7 +2,7 @@
  * ReviewOrder.tsx
  *
  * Step 3 in the gym membership sales flow.
- * Route: /:org/workspace/app/myGym/reviewOrder/:memberId?planCode=GYM_PRO
+ * Route: /:org/workspace/app/gym/reviewOrder/:memberId?planCode=GYM_PRO
  *
  * Purpose:
  *   - Pure frontend preview — shows what WILL be purchased

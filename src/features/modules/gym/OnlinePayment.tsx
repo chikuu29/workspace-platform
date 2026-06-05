@@ -2,7 +2,7 @@
  * OnlinePayment.tsx
  *
  * Step 6B in the gym membership sales flow.
- * Route: /:org/workspace/app/myGym/onlinePayment/:invoiceNumber?method=upi|card
+ * Route: /:org/workspace/app/gym/onlinePayment/:invoiceNumber?method=upi|card
  *
  * Purpose:
  *   - Capture UPI transaction reference OR card details

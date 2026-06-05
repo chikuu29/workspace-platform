@@ -2,7 +2,7 @@
     "id": "1",
     "pageName": "AddMember",
     "route": "AddMember",
-    "appName": "myGym",
+    "appName": "gym",
     "appMeta": {
         "appName": "Gym",
         "viewName": "AddMember",
@@ -41,7 +41,7 @@
                 "errorMessage": "Registration failed. Please check the details and try again.",
                 "laterActions": {
                     "type": "NAVIGATION",
-                    "path": "/app/myGym/SelectPlan?member_id={{member_id}}"
+                    "path": "/app/gym/SelectPlan?member_id={{member_id}}"
                 }
             }
         },

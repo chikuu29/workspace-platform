@@ -2,7 +2,7 @@
  * CashPayment.tsx
  *
  * Step 6A in the gym membership sales flow.
- * Route: /:org/workspace/app/myGym/cashPayment/:invoiceNumber
+ * Route: /:org/workspace/app/gym/cashPayment/:invoiceNumber
  *
  * Purpose:
  *   - Capture cash payment details (amount received, notes)
@@ -369,15 +369,15 @@ const CashPayment = memo(() => {
                   isShort
                     ? "red.500"
                     : isExact
-                    ? "green.500"
-                    : borderCol
+                      ? "green.500"
+                      : borderCol
                 }
                 bg={
                   isShort
                     ? "red.500/05"
                     : isExact
-                    ? "green.500/05"
-                    : "transparent"
+                      ? "green.500/05"
+                      : "transparent"
                 }
                 _focus={{
                   borderColor: isShort ? "red.500" : "green.500",

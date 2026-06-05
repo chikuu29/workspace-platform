@@ -146,7 +146,7 @@ const getAppGradient = (seed: string): string => {
 /**
  * Extracts the app prefix from a permission code.
  * e.g. "SYSTEM_ADMINISTRATOR.PERMISSION.READ" → "SYSTEM_ADMINISTRATOR"
- *      "MYGYM.MEMBER.ADD" → "MYGYM"
+ *      "gym.MEMBER.ADD" → "gym"
  *      "APP_B2B54E.TEST.READ" → "APP_B2B54E"
  */
 const getAppPrefix = (code: string): string => {
@@ -1066,11 +1066,11 @@ const PolicyManagementView = memo(() => {
     const q = permSearchQuery.toLowerCase().trim();
     const filtered = q
       ? permissions.filter(
-          (p) =>
-            p.name.toLowerCase().includes(q) ||
-            p.code.toLowerCase().includes(q) ||
-            getAppPrefix(p.code).toLowerCase().includes(q),
-        )
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          p.code.toLowerCase().includes(q) ||
+          getAppPrefix(p.code).toLowerCase().includes(q),
+      )
       : permissions;
     return groupPermissionsByApp(filtered);
   }, [permissions, permSearchQuery]);

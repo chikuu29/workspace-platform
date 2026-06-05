@@ -2,7 +2,7 @@
     "id": "1",
     "pageName": "AddMember",
     "route": "AddMember",
-    "appName": "myGym",
+    "appName": "gym",
     "appMeta": {
         "appName": "Gym",
         "viewName": "AddMember",

@@ -2,7 +2,7 @@
  * PaymentLinkPage.tsx
  *
  * Step 6C in the gym membership sales flow.
- * Route: /:org/workspace/app/myGym/paymentLink/:invoiceNumber
+ * Route: /:org/workspace/app/gym/paymentLink/:invoiceNumber
  *
  * Purpose:
  *   - Send payment link via Email, SMS, or Both

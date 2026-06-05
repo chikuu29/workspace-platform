@@ -5,7 +5,7 @@
   "id": "3",
   "pageName": "GymDashboard",
   "route": "GymDashboard",
-  "appName": "myGym",
+  "appName": "gym",
   "appMeta": {
     "appName": "Gym",
     "viewName": "GymDashboard",

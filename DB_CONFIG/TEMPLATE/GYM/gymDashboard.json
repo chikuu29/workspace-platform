@@ -2,7 +2,7 @@
   "id": "3",
   "pageName": "gymHomePage",
   "route": "gymHomePage",
-  "appName": "myGym",
+  "appName": "gym",
   "active": true,
   "appMeta": {
     "appName": "Gym",

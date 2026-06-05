@@ -25,13 +25,13 @@ const PLATFORM_ROUTES = new Set(["myApps", "profile", "settings"]);
  *  - Duplicate "workspace/" prefix is de-duplicated
  *  - Platform-level views (myApps, profile, settings) bypass org scoping
  *
- * @param path - Relative path segment (e.g. "app/myGym/members")
+ * @param path - Relative path segment (e.g. "app/gym/members")
  * @param organizationName - Current organization slug from route params
  * @returns Fully qualified absolute path
  *
  * @example
- * buildWorkspacePath("app/myGym/members", "acme")
- * // => "/acme/workspace/app/myGym/members"
+ * buildWorkspacePath("app/gym/members", "acme")
+ * // => "/acme/workspace/app/gym/members"
  *
  * buildWorkspacePath("myApps", "acme")
  * // => "/myApps"
@@ -74,14 +74,14 @@ export const buildWorkspacePath = (
  * @returns Fully qualified absolute path
  *
  * @example
- * buildAppViewPath("acme", "myGym", "myGym", "members")
- * // => "/acme/workspace/app/myGym/members"
+ * buildAppViewPath("acme", "gym", "gym", "members")
+ * // => "/acme/workspace/app/gym/members"
  *
- * buildAppViewPath("acme", undefined, "myGym", "members")
- * // => "/acme/workspace/members?app=myGym"
+ * buildAppViewPath("acme", undefined, "gym", "members")
+ * // => "/acme/workspace/members?app=gym"
  *
- * buildAppViewPath("acme", "myGym", "myGym", "selectPlan", "abc123")
- * // => "/acme/workspace/app/myGym/selectPlan/abc123"
+ * buildAppViewPath("acme", "gym", "gym", "selectPlan", "abc123")
+ * // => "/acme/workspace/app/gym/selectPlan/abc123"
  */
 export const buildAppViewPath = (
   organizationName: string,

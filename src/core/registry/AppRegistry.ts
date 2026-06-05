@@ -102,7 +102,7 @@ const registry: RegistryConfig = {
             component: () => import("@/features/modules/system/PolicyManagementView")
         },
     },
-    myGym: {
+    gym: {
         layout: () => import("@/theme/layouts/workspace"),
         home: () => import("@/features/modules/gym/GymView"),
         // Member management

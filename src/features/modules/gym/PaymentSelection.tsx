@@ -2,7 +2,7 @@
  * PaymentSelection.tsx
  *
  * Step 5 in the gym membership sales flow.
- * Route: /:org/workspace/app/myGym/paymentSelect/:invoiceNumber
+ * Route: /:org/workspace/app/gym/paymentSelect/:invoiceNumber
  *
  * Purpose:
  *   - Display 4 payment method cards: Cash, UPI, Card, Payment Link

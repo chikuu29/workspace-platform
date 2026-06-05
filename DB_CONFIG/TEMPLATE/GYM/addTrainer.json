@@ -2,7 +2,7 @@
     "id": "2",
     "pageName": "AddTrainer",
     "route": "AddTrainer",
-    "appName": "myGym",
+    "appName": "gym",
     "appMeta": {
         "appName": "Gym",
         "viewName": "AddTrainer",
@@ -41,7 +41,7 @@
                 "errorMessage": "Registration failed. Please check the details and try again.",
                 "laterActions": {
                     "type": "NAVIGATION",
-                    "path": "/app/myGym/TrainerProfile?trainer_id={{trainer_id}}"
+                    "path": "/app/gym/TrainerProfile?trainer_id={{trainer_id}}"
                 }
             }
         },

@@ -593,8 +593,11 @@ const MemberDetail = memo(() => {
 
   const handleAssignPlan = useCallback(() => {
     if (!memberId) return;
-    navigateTo("selectPlan", memberId);
+    // Navigate to the new multi-step sales flow (invoice-first architecture).
+    // The old selectPlan single-page wizard is replaced by this route.
+    navigateTo("selectMembershipPlan", memberId);
   }, [navigateTo, memberId]);
+
 
   // ── Action Handlers ──
   const handleEditProfile = useCallback(() => {

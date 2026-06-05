@@ -29,7 +29,17 @@ import type {
   SendPaymentLinkPayload,
   SendPaymentLinkResponse,
   MembershipInvoiceResponse,
+  // ── New invoice-first flow types ──
+  CreateInvoicePayload,
+  CreateInvoiceResponse,
+  GymInvoiceResponse,
+  PayInvoicePayload,
+  PayInvoiceResponse,
+  SendInvoiceLinkPayload,
+  SendInvoiceLinkResponse,
+  CancelInvoiceResponse,
 } from "../types/Gym.types";
+
 
 export const GymApiService = {
   // ── Dashboard ───────────────────────────────────────────────────────
@@ -217,4 +227,67 @@ export const GymApiService = {
       isPrivateApi: true,
     }).pipe(map((res: any) => res as { success: boolean; message: string }));
   },
+
+  // ── Invoice-First Membership Sales Flow ─────────────────────────────
+  // Subscription is NEVER written until payment is confirmed via payGymInvoice.
+
+  /**
+   * Creates a billing invoice for a member+plan combination.
+   * No subscription record is created — invoice_number is the state carrier.
+   */
+  createMembershipInvoice: (payload: CreateInvoicePayload) => {
+    return POSTAPI({
+      path: "/v1/gym/membership/create-invoice",
+      data: payload,
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as CreateInvoiceResponse));
+  },
+
+  /**
+   * Fetch a gym invoice with full payment history and member/plan context.
+   * Used by the InvoiceDetails page.
+   */
+  getGymInvoice: (invoiceNumber: string) => {
+    return GETAPI({
+      path: `/v1/gym/invoices/${invoiceNumber}`,
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as GymInvoiceResponse));
+  },
+
+  /**
+   * Pay an invoice — atomically creates subscription + activates member.
+   * This is the single write boundary where the subscription is created.
+   */
+  payGymInvoice: (invoiceNumber: string, payload: PayInvoicePayload) => {
+    return POSTAPI({
+      path: `/v1/gym/invoices/${invoiceNumber}/pay`,
+      data: payload,
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as PayInvoiceResponse));
+  },
+
+  /**
+   * Send a payment link for a gym invoice via email/SMS/both.
+   * Subscription is NOT created here — created when customer pays via link.
+   */
+  sendGymInvoiceLink: (invoiceNumber: string, payload?: SendInvoiceLinkPayload) => {
+    return POSTAPI({
+      path: `/v1/gym/invoices/${invoiceNumber}/send-link`,
+      data: payload || {},
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as SendInvoiceLinkResponse));
+  },
+
+  /**
+   * Cancel an unpaid gym invoice (draft or sent status only).
+   * Safe to call — no subscription exists yet.
+   */
+  cancelGymInvoice: (invoiceNumber: string) => {
+    return POSTAPI({
+      path: `/v1/gym/invoices/${invoiceNumber}/cancel`,
+      data: {},
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as CancelInvoiceResponse));
+  },
 };
+

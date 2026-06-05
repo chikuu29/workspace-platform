@@ -441,3 +441,138 @@ export interface MembershipInvoiceResponse {
   };
 }
 
+
+// ─── Invoice-First Membership Sales Flow (New Architecture) ────────────────
+// Subscription is NEVER created until payment is confirmed.
+// The invoice_number is the state carrier for steps 4-7.
+
+/** Payload for POST /gym/membership/create-invoice */
+export interface CreateInvoicePayload {
+  member_id: string;
+  plan_code: string;
+  start_date?: string;
+  notes?: string;
+}
+
+/** Response from POST /gym/membership/create-invoice */
+export interface CreateInvoiceResponse {
+  success: boolean;
+  message: string;
+  data: {
+    invoice_number: string;
+    member_id: string;
+    member_name: string;
+    plan_name: string;
+    plan_code: string;
+    billing_cycle: string;
+    start_date: string;
+    end_date: string;
+    subtotal: number;
+    tax: number;
+    total: number;
+    balance_due: number;
+    status: string;
+    issue_date: string;
+    due_date: string;
+  };
+}
+
+/** Single payment entry on an invoice */
+export interface InvoicePaymentEntry {
+  payment_number: string;
+  amount: number;
+  method: string;
+  status: string;
+  payment_date: string;
+  transaction_ref: string;
+}
+
+/** Response from GET /gym/invoices/:invoice_number */
+export interface GymInvoiceResponse {
+  success: boolean;
+  data: {
+    invoice_number: string;
+    status: string;
+    subtotal: number;
+    tax_amount: number;
+    total: number;
+    amount_paid: number;
+    balance_due: number;
+    currency: string;
+    issue_date: string;
+    due_date: string;
+    payment_terms: string;
+    customer_ref: {
+      ref_id: string;
+      name: string;
+      email: string;
+      phone: string;
+    };
+    source_ref: Record<string, string>;
+    payment_history: InvoicePaymentEntry[];
+    // Flattened from source_ref for UI convenience
+    member_id: string;
+    plan_code: string;
+    plan_name: string;
+    billing_cycle: string;
+    start_date: string;
+    end_date: string;
+  };
+}
+
+/** Payload for POST /gym/invoices/:invoice_number/pay */
+export interface PayInvoicePayload {
+  payment_method: "cash" | "upi" | "card" | "net_banking" | "bank_transfer";
+  transaction_ref?: string;
+  notes?: string;
+}
+
+/** Response from POST /gym/invoices/:invoice_number/pay */
+export interface PayInvoiceResponse {
+  success: boolean;
+  message: string;
+  data: {
+    payment_number: string;
+    payment_method: string;
+    amount_paid: number;
+    invoice_number: string;
+    invoice_status: string;
+    balance_due: number;
+    is_fully_paid: boolean;
+    subscription_id: string;
+    subscription_status: "active";
+    member_id: string;
+    plan_name: string;
+    start_date: string;
+    end_date: string;
+  };
+}
+
+/** Payload for POST /gym/invoices/:invoice_number/send-link */
+export interface SendInvoiceLinkPayload {
+  send_via?: "email" | "sms" | "both";
+}
+
+/** Response from POST /gym/invoices/:invoice_number/send-link */
+export interface SendInvoiceLinkResponse {
+  success: boolean;
+  message: string;
+  data: {
+    payment_link_url: string;
+    invoice_number: string;
+    invoice_status: string;
+    balance_due: number;
+    total: number;
+    send_via: string;
+  };
+}
+
+/** Response from POST /gym/invoices/:invoice_number/cancel */
+export interface CancelInvoiceResponse {
+  success: boolean;
+  message: string;
+  data: {
+    invoice_number: string;
+    status: "cancelled";
+  };
+}

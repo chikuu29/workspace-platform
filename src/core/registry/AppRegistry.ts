@@ -107,14 +107,31 @@ const registry: RegistryConfig = {
         home: () => import("@/features/modules/gym/GymView"),
         // Member management
         members: () => import("@/features/modules/gym/ViewMember"),
+        membersList: () => import("@/features/modules/gym/ViewMember"),
         memberDetails: () => import("@/features/modules/gym/MemberDetail"),
         MemberCheckIn: () => import("@/features/modules/gym/MemberCheckIn"),
         // Billing & Subscriptions
         Subscription: () => import("@/features/modules/gym/Subscription"),
         GymSubscriptionPlans: () => import("@/features/modules/gym/GymSubscriptionPlans"),
         AddSubscriptionPlan: () => import("@/features/modules/gym/AddSubscriptionPlan"),
+        // Legacy single-page wizard (kept for backwards compat)
         selectPlan: () => import("@/features/modules/gym/SelectPlan"),
         PaymentsHistory: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.PaymentsHistory })),
+        // ── New Multi-Step Sales Flow (Invoice-First Architecture) ────
+        // Step 2: Plan selection — no API call, carries planCode via query param
+        selectMembershipPlan: () => import("@/features/modules/gym/SelectMembershipPlan"),
+        // Step 3: Order preview — fetches member+plan, computes estimated total
+        reviewOrder: () => import("@/features/modules/gym/ReviewOrder"),
+        // Step 4: Invoice details — server-computed tax, Pay Now / Send Link / Cancel
+        invoiceView: () => import("@/features/modules/gym/InvoiceDetails"),
+        // Step 5: Payment method selection — routes to cash/online/link pages
+        paymentSelect: () => import("@/features/modules/gym/PaymentSelection"),
+        // Step 6A: Cash payment with change calculator
+        cashPayment: () => import("@/features/modules/gym/CashPayment"),
+        // Step 6B: UPI / Card payment with transaction ref capture
+        onlinePayment: () => import("@/features/modules/gym/OnlinePayment"),
+        // Step 6C: Payment link dispatch via email or SMS
+        paymentLink: () => import("@/features/modules/gym/PaymentLinkPage"),
         // Trainers
         trainers: () => import("@/features/modules/gym/TrainersStaff"),
         TrainerProfile: () => import("@/features/modules/gym/TrainerProfile"),
@@ -128,6 +145,7 @@ const registry: RegistryConfig = {
         attendanceReport: () => import("@/features/modules/gym/AttendanceReport"),
         performanceReport: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.PerformanceReport })),
     },
+
     myHostel: {
         layout: () => import("@/theme/layouts/workspace"),
         // Portfolio overview — shows all buildings in a grid

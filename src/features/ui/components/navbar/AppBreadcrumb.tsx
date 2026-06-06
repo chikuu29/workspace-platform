@@ -1,6 +1,6 @@
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { useNavActionStore } from "@/core/store/useNavActionStore";
-import { Box, Breadcrumb, Flex, HStack, Text } from "@chakra-ui/react";
+import { Box, Breadcrumb, Circle, Flex, HStack, Text } from "@chakra-ui/react";
 import React, { forwardRef, useEffect, useState } from "react";
 import {
   ArrowLeft,
@@ -126,21 +126,42 @@ const AppBreadcrumb = forwardRef((_props, _ref) => {
           {config.length > 1 && (
             <HStack gap={2} align="center" flexShrink={0}>
               <HStack
-                gap={{ base: "1", md: "1.5" }}
-                px={{ base: "2", md: "2.5" }}
-                py="1.5"
-                rounded="lg"
-                transition="all 0.2s"
+                role="group"
+                gap={1.5}
+                pl="1.5"
+                pr={{ base: "1.5", sm: "3.5" }}
+                py="1"
+                rounded="full"
+                border="1px solid"
+                borderColor={useColorModeValue("blue.600", "blue.500")}
+                bg={useColorModeValue("blue.600", "blue.500")}
+                boxShadow={useColorModeValue("0 2px 8px rgba(49, 130, 206, 0.25)", "none")}
+                transition="all 0.25s cubic-bezier(0.16, 1, 0.3, 1)"
                 cursor="pointer"
                 onClick={goBack}
-                _hover={{ bg: hoverBg, transform: "translateY(-1px)" }}
-                color={inactiveColor}
+                _hover={{
+                  bg: useColorModeValue("blue.700", "blue.600"),
+                  borderColor: useColorModeValue("blue.700", "blue.600"),
+                  boxShadow: useColorModeValue("0 4px 15px rgba(49, 130, 206, 0.45)", "0 4px 20px rgba(49, 130, 206, 0.35)"),
+                  transform: "translateY(-1px)",
+                }}
+                _active={{ transform: "scale(0.97)" }}
+                color="white"
               >
-                <ArrowLeft size={13} />
+                <Circle
+                  size={5}
+                  bg={useColorModeValue("rgba(255, 255, 255, 0.18)", "rgba(255, 255, 255, 0.15)")}
+                  color="white"
+                  transition="transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)"
+                  _groupHover={{ transform: "translateX(-2px)" }}
+                >
+                  <ArrowLeft size={10} strokeWidth={3} />
+                </Circle>
                 <Text
-                  fontWeight="600"
-                  fontSize={{ base: "10px", md: "xs" }}
-                  letterSpacing="tight"
+                  fontWeight="850"
+                  fontSize={{ base: "9px", md: "10px" }}
+                  letterSpacing="wider"
+                  textTransform="uppercase"
                   display={{ base: "none", sm: "block" }}
                 >
                   Back

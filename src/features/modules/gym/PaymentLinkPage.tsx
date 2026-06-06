@@ -25,10 +25,9 @@ import {
   VStack,
   Badge,
   Separator,
-  Alert,
-  AlertDescription,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
+import { Alert } from "@/components/ui/alert";
 import { useParams, useNavigate } from "react-router";
 import {
   ArrowLeft,
@@ -122,6 +121,10 @@ const PaymentLinkPage = memo(() => {
   const invoiceNumber = rawInvoiceNumber ? decodeURIComponent(rawInvoiceNumber) : undefined;
   const navigate = useNavigate();
   const { organizationName, appCode } = useWorkspaceRouter();
+
+  const handleGoBack = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
 
   const { invoice, loading } = useInvoiceDetails(invoiceNumber);
   const [channel, setChannel] = useState<"email" | "sms">("email");
@@ -268,11 +271,8 @@ const PaymentLinkPage = memo(() => {
           {/* Success state */}
           {sentResult ? (
             <VStack gap={4} align="stretch">
-              <Alert status="success" borderRadius="2xl">
-                <AlertDescription fontWeight="600">
-                  Payment link dispatched via <strong>{sentResult.sendVia}</strong>.
-                  Membership will activate automatically when the customer pays.
-                </AlertDescription>
+              <Alert status="success" borderRadius="2xl" title="Link Dispatched">
+                Payment link dispatched via <strong>{sentResult.sendVia}</strong>. Membership will activate automatically when the customer pays.
               </Alert>
 
               {/* Link display */}
@@ -365,7 +365,7 @@ const PaymentLinkPage = memo(() => {
                 fontSize="xs"
                 fontWeight="600"
                 color={muted}
-                onClick={() => navigate(-1)}
+                onClick={handleGoBack}
                 _hover={{ color: "app.text.primary" }}
               >
                 <ArrowLeft size={13} />

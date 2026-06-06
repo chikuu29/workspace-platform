@@ -13,8 +13,6 @@
 
 import { memo, useState, useCallback, useMemo, useRef, useEffect } from "react";
 import {
-  Alert,
-  AlertDescription,
   Badge,
   Box,
   Button,
@@ -183,6 +181,10 @@ const OnlinePayment = memo(() => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { organizationName, appCode } = useWorkspaceRouter();
+
+  const handleGoBack = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
 
   const method = (searchParams.get("method") || "upi") as "upi" | "card";
   const isUPI = method === "upi";
@@ -403,7 +405,7 @@ const OnlinePayment = memo(() => {
                 fontSize="sm"
                 bg={gradient}
                 color="white"
-                isDisabled={!transactionRef.trim()}
+                disabled={!transactionRef.trim()}
                 loading={isProcessing}
                 loadingText="Processing..."
                 onClick={handleConfirm}
@@ -428,7 +430,7 @@ const OnlinePayment = memo(() => {
                 fontSize="xs"
                 fontWeight="600"
                 color={muted}
-                onClick={() => navigate(-1)}
+                onClick={handleGoBack}
                 _hover={{ color: "app.text.primary" }}
               >
                 <ArrowLeft size={13} />

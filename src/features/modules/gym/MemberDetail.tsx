@@ -39,8 +39,8 @@ import {
 // ─── Brand Design Tokens ──────────────────────────────────────────────────────
 
 const BRAND_GRADIENT = "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)";
-const BRAND_HEX      = "#7551FF";
-const BRAND_ALT      = "#422AFB";
+const BRAND_HEX = "#7551FF";
+const BRAND_ALT = "#422AFB";
 
 type StatusKey = "active" | "attention" | "frozen";
 
@@ -50,23 +50,23 @@ const STATUS_META: Record<StatusKey, {
   bg: string;
   gradient: string;
 }> = {
-  active:    { label: "Active",          hex: "#01B574", bg: "rgba(1,181,116,0.12)",  gradient: "linear-gradient(135deg,#01B574,#00875A)" },
+  active: { label: "Active", hex: "#01B574", bg: "rgba(1,181,116,0.12)", gradient: "linear-gradient(135deg,#01B574,#00875A)" },
   attention: { label: "Needs Attention", hex: "#FFB547", bg: "rgba(255,181,71,0.12)", gradient: "linear-gradient(135deg,#FFB547,#E67E00)" },
-  frozen:    { label: "Frozen",          hex: "#3965FF", bg: "rgba(57,101,255,0.12)", gradient: "linear-gradient(135deg,#3965FF,#002DFF)" },
+  frozen: { label: "Frozen", hex: "#3965FF", bg: "rgba(57,101,255,0.12)", gradient: "linear-gradient(135deg,#3965FF,#002DFF)" },
 };
 
 /** Human-readable billing cycle labels matching SelectMembershipPlan */
 const BILLING_LABEL: Record<string, string> = {
-  monthly:       "month",
-  quarterly:     "quarter",
-  yearly:        "year",
+  monthly: "month",
+  quarterly: "quarter",
+  yearly: "year",
   "half-yearly": "6 months",
 };
 
 // ─── Formatters ───────────────────────────────────────────────────────────────
 
 const getName = (d?: MemberDocument["data"]) => ({
-  full:     `${d?.firstName || ""} ${d?.lastName || ""}`.trim() || "Unknown Member",
+  full: `${d?.firstName || ""} ${d?.lastName || ""}`.trim() || "Unknown Member",
   initials: `${d?.firstName?.[0] || ""}${d?.lastName?.[0] || ""}`.toUpperCase() || "?",
 });
 
@@ -126,7 +126,7 @@ interface GlassCardProps {
 }
 
 const GlassCard = memo(({ children, p = 6, hover = true, ...props }: GlassCardProps) => {
-  const bg     = useColorModeValue("rgba(255,255,255,0.82)", "rgba(18,22,40,0.72)");
+  const bg = useColorModeValue("rgba(255,255,255,0.82)", "rgba(18,22,40,0.72)");
   const border = useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.07)");
   const shadow = useColorModeValue("0 8px 32px rgba(0,0,0,0.06)", "0 8px 32px rgba(0,0,0,0.22)");
 
@@ -216,7 +216,7 @@ interface StatBoxProps {
 }
 
 const StatBox = memo(({ label, value, unit, gradient }: StatBoxProps) => {
-  const bg     = useColorModeValue("rgba(255,255,255,0.7)", "rgba(18,22,40,0.6)");
+  const bg = useColorModeValue("rgba(255,255,255,0.7)", "rgba(18,22,40,0.6)");
   const border = useColorModeValue("rgba(226,232,240,0.7)", "rgba(255,255,255,0.07)");
   return (
     <Box
@@ -254,22 +254,22 @@ StatBox.displayName = "StatBox";
 // ─── AttendanceCalendar ───────────────────────────────────────────────────────
 
 const AttendanceCalendar = memo(() => {
-  const now       = useMemo(() => new Date(), []);
-  const year      = now.getFullYear();
-  const month     = now.getMonth();
+  const now = useMemo(() => new Date(), []);
+  const year = now.getFullYear();
+  const month = now.getMonth();
   const todayDate = now.getDate();
 
-  const monthName  = useMemo(() => now.toLocaleString("default", { month: "long" }), [now]);
-  const totalDays  = useMemo(() => new Date(year, month + 1, 0).getDate(), [year, month]);
-  const startDay   = useMemo(() => new Date(year, month, 1).getDay(), [year, month]);
-  const blanks     = useMemo(() => Array.from({ length: startDay }), [startDay]);
-  const days       = useMemo(() => Array.from({ length: totalDays }).map((_, i) => i + 1), [totalDays]);
-  const checkedIn  = useMemo(() => new Set([1, 2, 4, 8, 10, 11, 15, 17, 18, 22, 24, 25, 29]), []);
-  const totalRows  = Math.ceil((blanks.length + days.length) / 7);
+  const monthName = useMemo(() => now.toLocaleString("default", { month: "long" }), [now]);
+  const totalDays = useMemo(() => new Date(year, month + 1, 0).getDate(), [year, month]);
+  const startDay = useMemo(() => new Date(year, month, 1).getDay(), [year, month]);
+  const blanks = useMemo(() => Array.from({ length: startDay }), [startDay]);
+  const days = useMemo(() => Array.from({ length: totalDays }).map((_, i) => i + 1), [totalDays]);
+  const checkedIn = useMemo(() => new Set([1, 2, 4, 8, 10, 11, 15, 17, 18, 22, 24, 25, 29]), []);
+  const totalRows = Math.ceil((blanks.length + days.length) / 7);
   const weekLabels = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
-  const bgCell  = useColorModeValue("rgba(226,232,240,0.3)", "rgba(255,255,255,0.03)");
-  const border  = useColorModeValue("rgba(226,232,240,0.6)", "rgba(255,255,255,0.06)");
+  const bgCell = useColorModeValue("rgba(226,232,240,0.3)", "rgba(255,255,255,0.03)");
+  const border = useColorModeValue("rgba(226,232,240,0.6)", "rgba(255,255,255,0.06)");
 
   return (
     <VStack align="stretch" gap={4}>
@@ -298,10 +298,10 @@ const AttendanceCalendar = memo(() => {
         ))}
         {blanks.map((_, i) => <Box key={`b-${i}`} />)}
         {days.map((day, dayIdx) => {
-          const isToday    = day === todayDate;
-          const isChecked  = checkedIn.has(day);
-          const isFuture   = day > todayDate;
-          const rowDelay   = `${(totalRows - Math.floor((blanks.length + dayIdx) / 7)) * 0.07}s`;
+          const isToday = day === todayDate;
+          const isChecked = checkedIn.has(day);
+          const isFuture = day > todayDate;
+          const rowDelay = `${(totalRows - Math.floor((blanks.length + dayIdx) / 7)) * 0.07}s`;
 
           return (
             <Flex
@@ -319,9 +319,9 @@ const AttendanceCalendar = memo(() => {
               border="1px solid"
               borderColor={
                 isChecked ? "#01B57460"
-                : isToday ? `${BRAND_HEX}50`
-                : isFuture ? "transparent"
-                : border
+                  : isToday ? `${BRAND_HEX}50`
+                    : isFuture ? "transparent"
+                      : border
               }
               _hover={isFuture ? {} : {
                 transform: "translateY(-2px)",
@@ -334,9 +334,9 @@ const AttendanceCalendar = memo(() => {
                 fontWeight={isToday || isChecked ? "800" : "500"}
                 color={
                   isChecked ? "#01B574"
-                  : isToday ? BRAND_HEX
-                  : isFuture ? "app.text.muted"
-                  : "app.text.primary"
+                    : isToday ? BRAND_HEX
+                      : isFuture ? "app.text.muted"
+                        : "app.text.primary"
                 }
                 mb={isChecked ? "2" : "0"}
               >
@@ -428,7 +428,7 @@ interface PaymentHistoryRowProps {
 }
 
 const PaymentHistoryRow = memo(({ payment, currency = "INR", onViewDetails }: PaymentHistoryRowProps) => {
-  const bg     = useColorModeValue("rgba(255,255,255,0.5)", "rgba(255,255,255,0.02)");
+  const bg = useColorModeValue("rgba(255,255,255,0.5)", "rgba(255,255,255,0.02)");
   const border = useColorModeValue("rgba(226,232,240,0.7)", "rgba(255,255,255,0.06)");
   const isActive = payment.status === "active";
   const statusPalette = isActive ? "green" : payment.status === "expired" ? "gray" : "orange";
@@ -594,11 +594,11 @@ const PaymentDetailsModal = memo(({ payment, currency = "INR", onClose }: Paymen
             {/* Invoice rows */}
             <VStack align="stretch" gap={0}>
               {[
-                { label: "Invoice Number",  value: invoiceNum },
-                { label: "Plan Name",       value: display.plan_name },
-                { label: "Transaction ID",  value: display.subscription_id || "N/A" },
+                { label: "Invoice Number", value: invoiceNum },
+                { label: "Plan Name", value: display.plan_name },
+                { label: "Transaction ID", value: display.subscription_id || "N/A" },
                 { label: "Coverage Period", value: `${fmtDate(display.start_date)} – ${fmtDate(display.end_date)}` },
-                { label: "Payment Method",  value: "Visa •••• 4492" },
+                { label: "Payment Method", value: "Visa •••• 4492" },
               ].map(({ label, value }, idx) => {
                 const border = useColorModeValue("rgba(226,232,240,0.5)", "rgba(255,255,255,0.05)");
                 return (
@@ -686,14 +686,14 @@ type EditTab = (typeof EDIT_TABS)[number];
 
 const EditMemberModal = memo(({ open, member, onClose, onSuccess }: EditMemberModalProps) => {
   const [activeTab, setActiveTab] = useState<EditTab>("Personal Details");
-  const [saving, setSaving]       = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  const overlayBg    = useColorModeValue("rgba(0,0,0,0.45)", "rgba(0,0,0,0.7)");
-  const dialogBg     = useColorModeValue("rgba(255,255,255,0.97)", "rgba(14,18,36,0.97)");
-  const borderColor  = useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.08)");
-  const inputBg      = useColorModeValue("rgba(248,250,252,0.9)", "rgba(255,255,255,0.04)");
-  const labelColor   = useColorModeValue("gray.600", "gray.400");
-  const muted        = useColorModeValue("gray.500", "gray.400");
+  const overlayBg = useColorModeValue("rgba(0,0,0,0.45)", "rgba(0,0,0,0.7)");
+  const dialogBg = useColorModeValue("rgba(255,255,255,0.97)", "rgba(14,18,36,0.97)");
+  const borderColor = useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.08)");
+  const inputBg = useColorModeValue("rgba(248,250,252,0.9)", "rgba(255,255,255,0.04)");
+  const labelColor = useColorModeValue("gray.600", "gray.400");
+  const muted = useColorModeValue("gray.500", "gray.400");
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<EditFormValues>();
 
@@ -701,12 +701,12 @@ const EditMemberModal = memo(({ open, member, onClose, onSuccess }: EditMemberMo
   useEffect(() => {
     if (open && member?.data) {
       reset({
-        firstName:    member.data.firstName    || "",
-        lastName:     member.data.lastName     || "",
-        email:        member.data.email        || "",
-        phone:        member.data.phone        || "",
-        gender:       member.data.gender       || "",
-        address:      member.data.address      || "",
+        firstName: member.data.firstName || "",
+        lastName: member.data.lastName || "",
+        email: member.data.email || "",
+        phone: member.data.phone || "",
+        gender: member.data.gender || "",
+        address: member.data.address || "",
         fitnessGoals: member.data.fitnessGoals || "",
       });
       setActiveTab("Personal Details");
@@ -755,9 +755,9 @@ const EditMemberModal = memo(({ open, member, onClose, onSuccess }: EditMemberMo
 
   // Pre-compute values needed inside map callbacks (hooks can't be called inside callbacks)
   const genderBorder = useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.08)");
-  const tabBarBg     = useColorModeValue("gray.100", "rgba(255,255,255,0.04)");
+  const tabBarBg = useColorModeValue("gray.100", "rgba(255,255,255,0.04)");
   const closeHoverBg = useColorModeValue("gray.100", "rgba(255,255,255,0.05)");
-  const statusBoxBg  = useColorModeValue("rgba(248,250,252,0.6)", "rgba(255,255,255,0.02)");
+  const statusBoxBg = useColorModeValue("rgba(248,250,252,0.6)", "rgba(255,255,255,0.02)");
   const cancelHoverBg = useColorModeValue("gray.50", "rgba(255,255,255,0.04)");
 
   // NOTE: intentionally NO early return here — all hooks must run unconditionally
@@ -1007,8 +1007,8 @@ const EditMemberModal = memo(({ open, member, onClose, onSuccess }: EditMemberMo
                 {/* Read-only info rows */}
                 <VStack align="stretch" gap={0}>
                   {[
-                    { label: "Member ID",  value: member?.data?.member_id  || "—" },
-                    { label: "Joined",     value: fmtDate(member?._meta?.created?.at) },
+                    { label: "Member ID", value: member?.data?.member_id || "—" },
+                    { label: "Joined", value: fmtDate(member?._meta?.created?.at) },
                     { label: "Current Plan", value: member?.subscription?.plan_name || "No plan" },
                   ].map(({ label, value }, idx) => (
                     <Box key={label}>
@@ -1098,22 +1098,22 @@ const MemberDetail = memo(() => {
   const [selectedPayment, setSelectedPayment] = useState<any | null>(null);
   const [editOpen, setEditOpen] = useState(false);
 
-  const name    = useMemo(() => getName(member?.data), [member]);
-  const status  = (member?.data.status || "frozen") as StatusKey;
-  const sm      = STATUS_META[status] ?? STATUS_META.frozen;
-  const sub     = member?.subscription;
+  const name = useMemo(() => getName(member?.data), [member]);
+  const status = (member?.data.status || "frozen") as StatusKey;
+  const sm = STATUS_META[status] ?? STATUS_META.frozen;
+  const sub = member?.subscription;
   const history = useMemo(() => member?.subscription_history || [], [member]);
 
-  const pageBg  = useColorModeValue("rgba(248,250,252,1)", "bg.default");
-  const muted   = useColorModeValue("gray.500", "gray.400");
+  const pageBg = useColorModeValue("rgba(248,250,252,1)", "bg.default");
+  const muted = useColorModeValue("gray.500", "gray.400");
 
-  const toggleHistory             = useCallback(() => setShowHistory(p => !p), []);
-  const handleViewPaymentDetails  = useCallback((p: any) => setSelectedPayment(p), []);
+  const toggleHistory = useCallback(() => setShowHistory(p => !p), []);
+  const handleViewPaymentDetails = useCallback((p: any) => setSelectedPayment(p), []);
   const handleClosePaymentDetails = useCallback(() => setSelectedPayment(null), []);
-  const handleBack                = useCallback(() => goBack(), [goBack]);
+  const handleBack = useCallback(() => goBack(), [goBack]);
   // Must be declared BEFORE the useEffect below that closes over it
-  const handleEditProfile         = useCallback(() => setEditOpen(true), []);
-  const handleCloseEdit           = useCallback(() => setEditOpen(false), []);
+  const handleEditProfile = useCallback(() => setEditOpen(true), []);
+  const handleCloseEdit = useCallback(() => setEditOpen(false), []);
 
   const { setActions, clearActions } = useNavActionStore();
 
@@ -1359,7 +1359,7 @@ const MemberDetail = memo(() => {
                   />
                   <StatBox
                     label="Body Fat"
-                    value={<AnimatedDecimalCounter value={member?.data.bodyFat || 11.4} />}
+                    value={<AnimatedDecimalCounter value={member?.data?.bodyFat || 11.4} />}
                     unit="%"
                     gradient={sm.gradient}
                   />
@@ -1397,11 +1397,11 @@ const MemberDetail = memo(() => {
             <GlassCard>
               <SectionHeading>Personal Info</SectionHeading>
               <VStack align="stretch" gap={0}>
-                <InfoRow icon={CalendarDays} label="Join Date"  value={fmtDate(member?._meta.created?.at || member?.data.joinDate)} iconColor={BRAND_HEX} />
-                <InfoRow icon={Mail}         label="Email"      value={member?.data.email || "Not recorded"} iconColor="#06B6D4" />
-                <InfoRow icon={Phone}        label="Phone"      value={member?.data.phone || "Not recorded"} iconColor="#01B574" />
-                <InfoRow icon={User}         label="Gender"     value={member?.data.gender || "Not recorded"} iconColor="#FFB547" />
-                <InfoRow icon={MapPin}       label="Address"    value={member?.data.address || "Not recorded"} iconColor="#EE5D50" />
+                <InfoRow icon={CalendarDays} label="Join Date" value={fmtDate(member?._meta.created?.at || member?.data.joinDate)} iconColor={BRAND_HEX} />
+                <InfoRow icon={Mail} label="Email" value={member?.data.email || "Not recorded"} iconColor="#06B6D4" />
+                <InfoRow icon={Phone} label="Phone" value={member?.data.phone || "Not recorded"} iconColor="#01B574" />
+                <InfoRow icon={User} label="Gender" value={member?.data.gender || "Not recorded"} iconColor="#FFB547" />
+                <InfoRow icon={MapPin} label="Address" value={member?.data.address || "Not recorded"} iconColor="#EE5D50" />
               </VStack>
             </GlassCard>
 
@@ -1437,8 +1437,8 @@ const MemberDetail = memo(() => {
                   {status === "attention"
                     ? "This member needs staff follow-up. Review renewal status and contact history."
                     : status === "frozen"
-                    ? "No active subscription. Assign a plan to reactivate this account."
-                    : "This profile is healthy and ready for regular member operations."}
+                      ? "No active subscription. Assign a plan to reactivate this account."
+                      : "This profile is healthy and ready for regular member operations."}
                 </Text>
 
                 {daysRemaining !== null && (
@@ -1547,9 +1547,9 @@ const MemberDetail = memo(() => {
                   {/* Date details */}
                   <SimpleGrid columns={3} gap={3}>
                     {[
-                      { label: "Start Date",  value: fmtDate(sub.start_date),  icon: CalendarDays, color: BRAND_HEX },
-                      { label: "End Date",    value: fmtDate(sub.end_date),    icon: CalendarDays, color: daysRemaining !== null && daysRemaining <= 7 ? "#FFB547" : "#01B574" },
-                      { label: "Days Left",   value: daysRemaining !== null ? `${daysRemaining}d` : "N/A", icon: Clock, color: daysRemaining !== null && daysRemaining <= 7 ? "#FFB547" : BRAND_HEX },
+                      { label: "Start Date", value: fmtDate(sub.start_date), icon: CalendarDays, color: BRAND_HEX },
+                      { label: "End Date", value: fmtDate(sub.end_date), icon: CalendarDays, color: daysRemaining !== null && daysRemaining <= 7 ? "#FFB547" : "#01B574" },
+                      { label: "Days Left", value: daysRemaining !== null ? `${daysRemaining}d` : "N/A", icon: Clock, color: daysRemaining !== null && daysRemaining <= 7 ? "#FFB547" : BRAND_HEX },
                     ].map(({ label, value, icon: RowIcon, color }) => {
                       const cellBg = useColorModeValue("rgba(248,250,252,0.9)", "rgba(255,255,255,0.03)");
                       const cellBorder = useColorModeValue("rgba(226,232,240,0.6)", "rgba(255,255,255,0.06)");
@@ -1700,11 +1700,11 @@ const MemberDetail = memo(() => {
             <GlassCard>
               <SectionHeading>Quick Actions</SectionHeading>
               <SimpleGrid columns={{ base: 1, md: 2 }} gap={2}>
-                <QuickAction icon={MessageSquare} label="Send Message"     gradient={BRAND_GRADIENT}                                        accentHex={BRAND_HEX}  onClick={handleMessage}    />
-                <QuickAction icon={Zap}           label="Assign / Renew"   gradient={BRAND_GRADIENT}                                        accentHex={BRAND_ALT}  onClick={handleAssignPlan} />
-                <QuickAction icon={Snowflake}     label="Freeze Account"   gradient="linear-gradient(135deg,#3965FF,#002DFF)"               accentHex="#3965FF"   onClick={handleFreeze}     />
-                <QuickAction icon={FileText}      label="Export Profile"   gradient="linear-gradient(135deg,#06B6D4,#0891B2)"               accentHex="#06B6D4"   onClick={handleExport}     />
-                <QuickAction icon={Trash2}        label="Deactivate Member" gradient="linear-gradient(135deg,#EE5D50,#C52A1D)" accentHex="#EE5D50" danger onClick={handleDeactivate} />
+                <QuickAction icon={MessageSquare} label="Send Message" gradient={BRAND_GRADIENT} accentHex={BRAND_HEX} onClick={handleMessage} />
+                <QuickAction icon={Zap} label="Assign / Renew" gradient={BRAND_GRADIENT} accentHex={BRAND_ALT} onClick={handleAssignPlan} />
+                <QuickAction icon={Snowflake} label="Freeze Account" gradient="linear-gradient(135deg,#3965FF,#002DFF)" accentHex="#3965FF" onClick={handleFreeze} />
+                <QuickAction icon={FileText} label="Export Profile" gradient="linear-gradient(135deg,#06B6D4,#0891B2)" accentHex="#06B6D4" onClick={handleExport} />
+                <QuickAction icon={Trash2} label="Deactivate Member" gradient="linear-gradient(135deg,#EE5D50,#C52A1D)" accentHex="#EE5D50" danger onClick={handleDeactivate} />
               </SimpleGrid>
             </GlassCard>
           </VStack>

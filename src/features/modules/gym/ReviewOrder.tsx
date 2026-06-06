@@ -392,7 +392,11 @@ const ReviewOrder = memo(() => {
     );
   }, [navigate, organizationName, appCode, memberId]);
 
-
+  const handleGoBack = useCallback(() => {
+    navigate(
+      `/${organizationName}/workspace/app/${appCode}/selectMembershipPlan/${memberId}`
+    );
+  }, [navigate, organizationName, appCode, memberId]);
 
   const handleGenerateInvoice = useCallback(() => {
     const effectiveMemberId = member?.data?.member_id || memberId;
@@ -403,26 +407,27 @@ const ReviewOrder = memo(() => {
 
     setIsGenerating(true);
 
-    const sub = GymApiService.createMembershipInvoice({
+    const sub = GymApiService.createMembershipOrder({
       member_id: effectiveMemberId,
       plan_code: planCode,
       start_date: startDate,
     }).subscribe({
-      next: (res) => {
+      next: (orderRes) => {
         setIsGenerating(false);
-        if (res.success) {
+        if (orderRes.success) {
+          const orderNumber = orderRes.data.order_number;
           toaster.create({
-            title: "Invoice Generated",
-            description: `Invoice ${res.data.invoice_number} created. Review and collect payment.`,
+            title: "Order Placed",
+            description: `Order ${orderNumber} created. Proceed to confirm.`,
             type: "success",
           });
           navigate(
-            `/${organizationName}/workspace/app/${appCode}/invoiceView/${encodeURIComponent(res.data.invoice_number)}`
+            `/${organizationName}/workspace/app/${appCode}/orderView/${encodeURIComponent(orderNumber)}`
           );
         } else {
           toaster.create({
-            title: "Invoice Creation Failed",
-            description: (res as any).message ?? "An error occurred.",
+            title: "Order Creation Failed",
+            description: (orderRes as any).message ?? "An error occurred.",
             type: "error",
           });
         }
@@ -431,7 +436,7 @@ const ReviewOrder = memo(() => {
         setIsGenerating(false);
         toaster.create({
           title: "Error",
-          description: err?.response?.data?.message || err?.message || "Failed to generate invoice.",
+          description: err?.response?.data?.message || err?.message || "Failed to place order.",
           type: "error",
         });
       },
@@ -541,7 +546,6 @@ const ReviewOrder = memo(() => {
       bg={pageBg}
       fontFamily="'Inter', sans-serif"
       position="relative"
-      pb={8}
     >
       {/* ── Keyframe Animations ── */}
       <style>{`
@@ -575,7 +579,7 @@ const ReviewOrder = memo(() => {
 
       {/* ── Ambient Background Orbs ── */}
       <Box
-        position="fixed"
+        position="absolute"
         top="-100px"
         right="-100px"
         w="500px"
@@ -587,7 +591,7 @@ const ReviewOrder = memo(() => {
         zIndex={0}
       />
       <Box
-        position="fixed"
+        position="absolute"
         bottom="-80px"
         left="-80px"
         w="400px"
@@ -600,33 +604,7 @@ const ReviewOrder = memo(() => {
       />
 
       {/* ── Page Content ── */}
-      <Box maxW="1400px" mx="auto" px={{ base: 4, md: 8 }} py={8} position="relative" zIndex={1}>
-
-        {/* ── Page Header ── */}
-        <Flex justify="space-between" align="start" mb={8} flexWrap="wrap" gap={4}>
-          <VStack align="start" gap={1}>
-            <HStack gap={2}>
-              <Box
-                w={1}
-                h={6}
-                style={verticalBarBg}
-                borderRadius="full"
-              />
-              <Heading
-                fontSize={{ base: "xl", md: "2xl" }}
-                fontWeight="950"
-                letterSpacing="tight"
-                color="app.text.primary"
-              >
-                Review Order
-              </Heading>
-            </HStack>
-            <Text fontSize="sm" color="app.text.muted" fontWeight="500" pl={3}>
-              Verify the membership details before generating the invoice
-            </Text>
-          </VStack>
-
-        </Flex>
+      <Box maxW="1400px" mx="auto" position="relative" zIndex={1}>
 
         {/* ── Member Context Bar ── */}
         {!memberLoading && member ? (
@@ -787,7 +765,7 @@ const ReviewOrder = memo(() => {
 
                 {/* Actions */}
                 <VStack gap={3} mt={2}>
-                  {/* Primary CTA: Generate Invoice */}
+                  {/* Primary CTA: Place Order */}
                   <Button
                     w="full"
                     h="52px"
@@ -804,7 +782,7 @@ const ReviewOrder = memo(() => {
                   >
                     <HStack gap={2}>
                       {generateInvoiceIcon}
-                      <Text>Generate Invoice</Text>
+                      <Text>{isGenerating ? "Placing Order..." : "Place Order"}</Text>
                     </HStack>
                   </Button>
 

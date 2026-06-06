@@ -66,8 +66,8 @@ const ModeButton = memo<ModeButtonProps>(
 
     return (
       <Box
-        as="button"
-        type="button"
+        role="button"
+        tabIndex={0}
         onClick={onClick}
         w="full"
         p={5}
@@ -157,8 +157,8 @@ const SubMethodButton = memo<SubMethodButtonProps>(
 
     return (
       <Box
-        as="button"
-        type="button"
+        role="button"
+        tabIndex={0}
         onClick={onClick}
         p={4}
         borderRadius="xl"

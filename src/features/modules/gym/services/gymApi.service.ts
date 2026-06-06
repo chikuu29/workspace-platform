@@ -29,9 +29,11 @@ import type {
   SendPaymentLinkPayload,
   SendPaymentLinkResponse,
   MembershipInvoiceResponse,
-  // ── New invoice-first flow types ──
-  CreateInvoicePayload,
-  CreateInvoiceResponse,
+  // ── New order-first flow types ──
+  CreateOrderPayload,
+  CreateOrderResponse,
+  ConfirmOrderResponse,
+  GetOrderResponse,
   GymInvoiceResponse,
   PayInvoicePayload,
   PayInvoiceResponse,
@@ -228,19 +230,40 @@ export const GymApiService = {
     }).pipe(map((res: any) => res as { success: boolean; message: string }));
   },
 
-  // ── Invoice-First Membership Sales Flow ─────────────────────────────
+  // ── Order-First Membership Sales Flow ────────────────────────────────
   // Subscription is NEVER written until payment is confirmed via payGymInvoice.
 
   /**
-   * Creates a billing invoice for a member+plan combination.
-   * No subscription record is created — invoice_number is the state carrier.
+   * Creates a billing order for a member+plan combination.
+   * No subscription record is created — order_number is the state carrier.
    */
-  createMembershipInvoice: (payload: CreateInvoicePayload) => {
+  createMembershipOrder: (payload: CreateOrderPayload) => {
     return POSTAPI({
-      path: "/v1/gym/membership/create-invoice",
+      path: "/v1/gym/membership/create-order",
       data: payload,
       isPrivateApi: true,
-    }).pipe(map((res: any) => res as CreateInvoiceResponse));
+    }).pipe(map((res: any) => res as CreateOrderResponse));
+  },
+
+  /**
+   * Confirms a membership order and generates the linked invoice.
+   */
+  confirmMembershipOrder: (orderNumber: string) => {
+    return POSTAPI({
+      path: `/v1/gym/orders/${encodeURIComponent(orderNumber)}/confirm`,
+      data: {},
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as ConfirmOrderResponse));
+  },
+
+  /**
+   * Fetches membership order details.
+   */
+  getMembershipOrder: (orderNumber: string) => {
+    return GETAPI({
+      path: `/v1/gym/orders/${encodeURIComponent(orderNumber)}`,
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as GetOrderResponse));
   },
 
   /**

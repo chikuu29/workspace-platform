@@ -122,6 +122,8 @@ const registry: RegistryConfig = {
         selectMembershipPlan: () => import("@/features/modules/gym/SelectMembershipPlan"),
         // Step 3: Order preview — fetches member+plan, computes estimated total
         reviewOrder: () => import("@/features/modules/gym/ReviewOrder"),
+        // Step 3.5: Order view — shows order details + "Confirm & Generate Invoice" button
+        orderView: () => import("@/features/modules/gym/OrderView"),
         // Step 4: Invoice details — server-computed tax, Pay Now / Send Link / Cancel
         invoiceView: () => import("@/features/modules/gym/InvoiceDetails"),
         // Step 5: Payment method selection — routes to cash/online/link pages

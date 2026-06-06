@@ -30,11 +30,9 @@ import {
   Text,
   VStack,
   Table,
-  Alert,
-  AlertTitle,
-  AlertDescription,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
+import { Alert } from "@/components/ui/alert";
 import { useParams, useNavigate } from "react-router";
 import {
   ArrowLeft,
@@ -54,10 +52,41 @@ import {
 import { toaster } from "@/components/ui/toaster";
 import { PageLayout } from "@/core/components/PageLayout";
 import { useInvoiceDetails } from "./hooks/useInvoiceDetails";
+import { useGymPlan } from "./hooks/useGymPlan";
 import { GymApiService } from "./services/gymApi.service";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 
 // ─── Helpers ────────────────────────────────────────────────────────
+
+const HERO_GRADIENT: Record<string, string> = {
+  brand: "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)",
+  blue: "linear-gradient(135deg, #3965FF 0%, #002DFF 100%)",
+  green: "linear-gradient(135deg, #01B574 0%, #00875A 100%)",
+  orange: "linear-gradient(135deg, #FFB547 0%, #E67E00 100%)",
+  red: "linear-gradient(135deg, #EE5D50 0%, #C52A1D 100%)",
+  purple: "linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%)",
+  pink: "linear-gradient(135deg, #EC4899 0%, #D946EF 100%)",
+  cyan: "linear-gradient(135deg, #06B6D4 0%, #0891B2 100%)",
+  emerald: "linear-gradient(135deg, #10B981 0%, #059669 100%)",
+};
+
+const ACCENT_HEX: Record<string, string> = {
+  brand: "#7551FF",
+  blue: "#3965FF",
+  green: "#01B574",
+  orange: "#FFB547",
+  red: "#EE5D50",
+  purple: "#8B5CF6",
+  pink: "#EC4899",
+  cyan: "#06B6D4",
+  emerald: "#10B981",
+};
+
+const getGradient = (accent?: string): string =>
+  HERO_GRADIENT[accent?.toLowerCase() ?? "brand"] ?? HERO_GRADIENT.brand;
+
+const getAccentHex = (accent?: string): string =>
+  ACCENT_HEX[accent?.toLowerCase() ?? "brand"] ?? ACCENT_HEX.brand;
 
 const formatINR = (amount: number) =>
   new Intl.NumberFormat("en-IN", {
@@ -120,6 +149,59 @@ const FieldRow = memo(({ label, value, mono, bold }: FieldRowProps) => {
 });
 FieldRow.displayName = "FieldRow";
 
+// ─── Section Card Wrapper ───────────────────────────────────────────
+
+interface SectionCardProps {
+  title: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+  accentHex: string;
+}
+
+const SectionCard = memo(({ title, icon, children, accentHex }: SectionCardProps) => {
+  const cardBg = useColorModeValue("rgba(255, 255, 255, 0.82)", "rgba(18, 22, 40, 0.75)");
+  const borderCol = useColorModeValue("rgba(226, 232, 240, 0.8)", "rgba(255, 255, 255, 0.07)");
+  const headerBg = useColorModeValue("rgba(255,255,255,0.4)", "rgba(255,255,255,0.02)");
+
+  const iconCircleStyle = useMemo(() => ({
+    background: `${accentHex}18`,
+    color: accentHex
+  }), [accentHex]);
+
+  return (
+    <Box
+      bg={cardBg}
+      backdropFilter="blur(24px) saturate(200%)"
+      border="1px solid"
+      borderColor={borderCol}
+      borderRadius="24px"
+      overflow="hidden"
+      boxShadow={useColorModeValue("0 4px 20px rgba(0,0,0,0.02)", "0 4px 20px rgba(0,0,0,0.15)")}
+    >
+      <Flex
+        px={6}
+        py={4}
+        gap={3.5}
+        align="center"
+        borderBottom="1px solid"
+        borderColor={borderCol}
+        bg={headerBg}
+      >
+        <Circle size={8} style={iconCircleStyle}>
+          {icon}
+        </Circle>
+        <Text fontSize="sm" fontWeight="900" color="app.text.primary" letterSpacing="tight">
+          {title}
+        </Text>
+      </Flex>
+      <Box px={6} py={4}>
+        {children}
+      </Box>
+    </Box>
+  );
+});
+SectionCard.displayName = "SectionCard";
+
 // ═══════════════════════════════════════════════════════════════════
 //  MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════
@@ -131,12 +213,43 @@ const InvoiceDetails = memo(() => {
   const { organizationName, appCode } = useWorkspaceRouter();
 
   const { invoice, loading, error, refetch } = useInvoiceDetails(invoiceNumber);
+  const { plan } = useGymPlan(invoice?.plan_code);
+
+  const planData = plan?.data;
+  const accent = planData?.accent_color || "brand";
+  const gradient = useMemo(() => getGradient(accent), [accent]);
+  const accentHex = useMemo(() => getAccentHex(accent), [accent]);
+
+  const payBtnStyle = useMemo(() => ({
+    background: gradient,
+    color: "white",
+    boxShadow: `0 8px 24px -6px ${accentHex}60`
+  }), [gradient, accentHex]);
+
+  const payBtnHover = useMemo(() => ({
+    transform: "translateY(-2px)",
+    boxShadow: `0 14px 32px -8px ${accentHex}70`
+  }), [accentHex]);
+
+  const handleGoBack = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
+
+  const handleViewOrder = useCallback(() => {
+    if (!invoice?.order_number) return;
+    navigate(
+      `/${organizationName}/workspace/app/${appCode}/orderView/${encodeURIComponent(
+        invoice.order_number
+      )}`
+    );
+  }, [navigate, organizationName, appCode, invoice?.order_number]);
+
   const [isCancelling, setIsCancelling] = useState(false);
   const [isSendingLink, setIsSendingLink] = useState(false);
 
   const muted = useColorModeValue("gray.500", "gray.400");
-  const cardBg = useColorModeValue("rgba(255,255,255,0.8)", "rgba(11, 20, 55, 0.55)");
-  const borderCol = useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.08)");
+  const cardBg = useColorModeValue("rgba(255,255,255,0.82)", "rgba(18, 22, 40, 0.75)");
+  const borderCol = useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.07)");
   const tableBorderColor = useColorModeValue("gray.100", "whiteAlpha.80");
 
   const isPaid = invoice?.status === "paid";
@@ -219,15 +332,14 @@ const InvoiceDetails = memo(() => {
   if (error) {
     return (
       <PageLayout title="Invoice Not Found" subtitle="">
-        <Alert status="error" borderRadius="2xl">
-          <AlertTitle>Invoice Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
+        <Alert status="error" borderRadius="2xl" title="Invoice Error">
+          {error}
         </Alert>
         <Button
           mt={4}
           variant="outline"
           borderRadius="xl"
-          onClick={() => navigate(-1)}
+          onClick={handleGoBack}
           fontWeight="700"
         >
           <ArrowLeft size={14} />
@@ -256,27 +368,60 @@ const InvoiceDetails = memo(() => {
 
   return (
     <PageLayout
-      title="Invoice"
-      subtitle={invoice?.invoice_number || ""}
+      title="Invoice Details"
+      subtitle={
+        <HStack gap={2.5} mt={1}>
+          {invoice?.billing_cycle && (
+            <Badge colorPalette={accent} variant="subtle" borderRadius="md" fontSize="9px" fontWeight="950" px={2} py={0.5}>
+              {invoice.billing_cycle.toUpperCase()} PLAN
+            </Badge>
+          )}
+          <Text fontSize="xs" fontWeight="800" color="app.text.muted" fontFamily="mono">
+            #{invoice?.invoice_number}
+          </Text>
+        </HStack>
+      }
+      icon={ReceiptText}
+      position="relative"
     >
-      {/* Breadcrumb */}
-      <HStack gap={2} mb={6} color={muted} fontSize="xs" fontWeight="700">
-        <Text>Select Plan</Text>
-        <ArrowRight size={12} />
-        <Text>Review Order</Text>
-        <ArrowRight size={12} />
-        <Text color="brand.500">Invoice</Text>
-        <ArrowRight size={12} />
-        <Text>Payment</Text>
+      {/* Ambient background orbs */}
+      <Box position="absolute" top="-100px" right="-100px" w="500px" h="500px" borderRadius="full" bg={`${accentHex}0a`} filter="blur(120px)" pointerEvents="none" zIndex={0} />
+      <Box position="absolute" bottom="-80px" left="-80px" w="400px" h="400px" borderRadius="full" bg="rgba(57,101,255,0.06)" filter="blur(100px)" pointerEvents="none" zIndex={0} />
+
+      {/* Breadcrumbs steps */}
+      <HStack
+        gap={2.5}
+        mb={8}
+        p={1.5}
+        px={4}
+        borderRadius="full"
+        bg={useColorModeValue("rgba(255,255,255,0.5)", "rgba(255,255,255,0.03)")}
+        border="1px solid"
+        borderColor={useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.06)")}
+        backdropFilter="blur(10px)"
+        w="fit-content"
+        fontSize="11px"
+        fontWeight="800"
+        letterSpacing="wider"
+        textTransform="uppercase"
+        color={muted}
+        position="relative"
+        zIndex={1}
+      >
+
+        <Text opacity={0.6}>Select Plan</Text>
+        <ArrowRight size={10} />
+        <Text opacity={0.6}>Review Order</Text>
+        <ArrowRight size={10} />
+        <Text color={accentHex}>Invoice</Text>
+        <ArrowRight size={10} />
+        <Text opacity={0.6}>Payment</Text>
       </HStack>
 
       {/* Cancelled banner */}
       {isCancelled && (
-        <Alert status="warning" borderRadius="2xl" mb={6}>
-          <AlertTitle>Invoice Cancelled</AlertTitle>
-          <AlertDescription>
-            This invoice was cancelled. No membership has been created. Go back to start a new enrollment.
-          </AlertDescription>
+        <Alert status="warning" borderRadius="2xl" mb={6} title="Invoice Cancelled">
+          This invoice was cancelled. No membership has been created. Go back to start a new enrollment.
         </Alert>
       )}
 
@@ -286,78 +431,73 @@ const InvoiceDetails = memo(() => {
         <VStack gap={5} align="stretch">
 
           {/* Invoice Header Card */}
-          <Box bg={cardBg} backdropFilter="blur(20px)" border="1px solid" borderColor={borderCol} borderRadius="2xl" overflow="hidden">
-            {/* Color bar */}
-            <Box h="4px" bg="linear-gradient(90deg, #7551FF 0%, #422AFB 50%, #3965FF 100%)" />
-            <Box p={6}>
-              <Flex justify="space-between" align="start" flexWrap="wrap" gap={4}>
-                <VStack align="start" gap={2}>
-                  <HStack gap={3}>
-                    <Circle size={10} bg="brand.500/10" color="brand.500">
-                      <ReceiptText size={18} />
-                    </Circle>
-                    <VStack align="start" gap={0}>
-                      <Text fontSize="xs" color={muted} fontWeight="700" textTransform="uppercase" letterSpacing="wider">
-                        Invoice Number
-                      </Text>
-                      <Text fontSize="xl" fontWeight="950" color="app.text.primary" fontFamily="mono">
-                        {invoice?.invoice_number}
-                      </Text>
-                    </VStack>
-                  </HStack>
-                </VStack>
-                <VStack align="end" gap={2}>
-                  <Badge
-                    colorPalette={statusColor}
-                    variant="solid"
-                    borderRadius="full"
-                    px={3}
-                    py={1}
-                    fontSize="xs"
-                    fontWeight="900"
-                    letterSpacing="wider"
-                  >
-                    {invoice?.status?.toUpperCase()}
-                  </Badge>
-                  <Text fontSize="xs" color={muted} fontWeight="600">
-                    Issued: {fmtDate(invoice?.issue_date)}
-                  </Text>
-                  <Text fontSize="xs" color={muted} fontWeight="600">
-                    Due: {fmtDate(invoice?.due_date)}
-                  </Text>
-                </VStack>
+          <Box bg={cardBg} backdropFilter="blur(24px) saturate(200%)" border="1px solid" borderColor={borderCol} borderRadius="24px" overflow="hidden" boxShadow={useColorModeValue("0 10px 30px rgba(0,0,0,0.03)", "0 10px 30px rgba(0,0,0,0.25)")}>
+            {/* Header with plan-specific gradient */}
+            <Box px={6} py={4.5} bg={gradient} color="white">
+              <Flex justify="space-between" align="center">
+                <HStack gap={3}>
+                  <Circle size={8} bg="whiteAlpha.200" color="white">
+                    <ReceiptText size={16} />
+                  </Circle>
+                  <VStack align="start" gap={0}>
+                    <Text fontSize="9px" color="whiteAlpha.700" fontWeight="900" textTransform="uppercase" letterSpacing="wider">
+                      Invoice Number
+                    </Text>
+                    <Text fontSize="md" fontWeight="950" color="white" fontFamily="mono" letterSpacing="tight">
+                      {invoice?.invoice_number}
+                    </Text>
+                  </VStack>
+                </HStack>
+                <Badge
+                  bg="whiteAlpha.200"
+                  color="white"
+                  borderRadius="full"
+                  px={3.5}
+                  py={1}
+                  fontSize="10px"
+                  fontWeight="950"
+                  letterSpacing="wider"
+                  border="1px solid"
+                  borderColor="whiteAlpha.300"
+                >
+                  {invoice?.status?.toUpperCase()}
+                </Badge>
               </Flex>
+            </Box>
+            <Box p={6}>
+              <Grid templateColumns={{ base: "1fr", sm: "1fr 1fr" }} gap={6}>
+                <VStack align="start" gap={1}>
+                  <Text fontSize="10px" color={muted} fontWeight="800" textTransform="uppercase" letterSpacing="wider">
+                    Issue Date
+                  </Text>
+                  <Text fontSize="sm" fontWeight="700" color="app.text.primary">
+                    {fmtDate(invoice?.issue_date)}
+                  </Text>
+                </VStack>
+                <VStack align="start" gap={1}>
+                  <Text fontSize="10px" color={muted} fontWeight="800" textTransform="uppercase" letterSpacing="wider">
+                    Due Date
+                  </Text>
+                  <Text fontSize="sm" fontWeight="700" color="app.text.primary">
+                    {fmtDate(invoice?.due_date)}
+                  </Text>
+                </VStack>
+              </Grid>
             </Box>
           </Box>
 
           {/* Parties — Bill From / Bill To */}
           <Grid templateColumns={{ base: "1fr", sm: "1fr 1fr" }} gap={4}>
-            <Box bg={cardBg} backdropFilter="blur(20px)" border="1px solid" borderColor={borderCol} borderRadius="2xl" p={5}>
-              <HStack gap={2} mb={3}>
-                <Circle size={6} bg="purple.500/10" color="purple.500">
-                  <Building size={12} />
-                </Circle>
-                <Text fontSize="xs" fontWeight="900" textTransform="uppercase" letterSpacing="wider" color={muted}>
-                  Bill From
-                </Text>
-              </HStack>
+            <SectionCard title="Bill From" icon={<Building size={14} />} accentHex="#8B5CF6">
               <Text fontSize="sm" fontWeight="800" color="app.text.primary">
                 Your Gym Organization
               </Text>
               <Text fontSize="xs" color={muted} fontWeight="500" mt={1}>
                 Tax Invoiced by your registered entity
               </Text>
-            </Box>
+            </SectionCard>
 
-            <Box bg={cardBg} backdropFilter="blur(20px)" border="1px solid" borderColor={borderCol} borderRadius="2xl" p={5}>
-              <HStack gap={2} mb={3}>
-                <Circle size={6} bg="blue.500/10" color="blue.500">
-                  <User size={12} />
-                </Circle>
-                <Text fontSize="xs" fontWeight="900" textTransform="uppercase" letterSpacing="wider" color={muted}>
-                  Bill To
-                </Text>
-              </HStack>
+            <SectionCard title="Bill To" icon={<User size={14} />} accentHex="#3965FF">
               <Text fontSize="sm" fontWeight="800" color="app.text.primary">
                 {invoice?.customer_ref.name || invoice?.member_id}
               </Text>
@@ -371,23 +511,12 @@ const InvoiceDetails = memo(() => {
                   {invoice.customer_ref.phone}
                 </Text>
               )}
-            </Box>
+            </SectionCard>
           </Grid>
 
           {/* Line Items Table */}
-          <Box bg={cardBg} backdropFilter="blur(20px)" border="1px solid" borderColor={borderCol} borderRadius="2xl" overflow="hidden">
-            <Box px={6} py={4} borderBottom="1px solid" borderColor={borderCol} bg={useColorModeValue("rgba(249,250,251,0.8)", "rgba(255,255,255,0.02)")}>
-              <HStack gap={2}>
-                <Circle size={7} bg="brand.500/10" color="brand.500">
-                  <FileText size={12} />
-                </Circle>
-                <Text fontSize="sm" fontWeight="900" color="app.text.primary" letterSpacing="tight">
-                  Line Items
-                </Text>
-              </HStack>
-            </Box>
-
-            <Box overflowX="auto">
+          <SectionCard title="Line Items" icon={<FileText size={14} />} accentHex={accentHex}>
+            <Box overflowX="auto" mx={-6} mt={-3} mb={-3}>
               <Table.Root size="sm">
                 <Table.Header>
                   <Table.Row bg={useColorModeValue("gray.50", "rgba(255,255,255,0.02)")}>
@@ -413,7 +542,7 @@ const InvoiceDetails = memo(() => {
                           {invoice?.plan_name || "Gym Membership"}{" "}
                           {invoice?.billing_cycle && (
                             <Badge
-                              colorPalette="brand"
+                              colorPalette={accent}
                               variant="subtle"
                               fontSize="9px"
                               fontWeight="900"
@@ -451,7 +580,7 @@ const InvoiceDetails = memo(() => {
             </Box>
 
             {/* Totals */}
-            <Box px={6} py={4} borderTop="1px solid" borderColor={borderCol}>
+            <Box pt={4} mt={3} borderTop="1px solid" borderColor={borderCol}>
               <VStack align="stretch" gap={0} maxW="250px" ml="auto">
                 <FieldRow label="Subtotal" value={formatINR(invoice?.subtotal ?? 0)} />
                 <FieldRow label="Tax (GST)" value={formatINR(invoice?.tax_amount ?? 0)} />
@@ -463,35 +592,32 @@ const InvoiceDetails = memo(() => {
                   <Text fontSize="xs" fontWeight="900" color={muted} textTransform="uppercase" letterSpacing="wider">
                     Balance Due
                   </Text>
-                  <Text fontSize="2xl" fontWeight="950" color={canPay ? "brand.500" : "green.500"} letterSpacing="tight">
+                  <Text fontSize="2xl" fontWeight="950" color={canPay ? accentHex : "green.500"} letterSpacing="tight">
                     {formatINR(invoice?.balance_due ?? 0)}
                   </Text>
                 </Flex>
               </VStack>
             </Box>
-          </Box>
+          </SectionCard>
         </VStack>
 
         {/* ── Right: Action Panel ── */}
         <Box position={{ base: "static", lg: "sticky" }} top="24px">
           <VStack gap={4} align="stretch">
             {/* Quick Summary */}
-            <Box bg={cardBg} backdropFilter="blur(20px)" border="1px solid" borderColor={borderCol} borderRadius="2xl" p={5}>
-              <Text fontSize="xs" fontWeight="900" textTransform="uppercase" letterSpacing="wider" color={muted} mb={3}>
-                Quick Summary
-              </Text>
+            <SectionCard title="Quick Summary" icon={<FileText size={14} />} accentHex={accentHex}>
               <FieldRow label="Plan" value={invoice?.plan_name || invoice?.plan_code || "—"} />
               <FieldRow label="Member" value={invoice?.customer_ref.name || invoice?.member_id || "—"} />
               <FieldRow label="Period" value={invoice?.start_date ? `${fmtDate(invoice.start_date)} – ${fmtDate(invoice.end_date)}` : "—"} />
+              {invoice?.order_number && (
+                <FieldRow label="Order Number" value={invoice.order_number} mono />
+              )}
               <FieldRow label="Total" value={formatINR(invoice?.total ?? 0)} bold />
-            </Box>
+            </SectionCard>
 
             {/* Actions */}
-            <Box bg={cardBg} backdropFilter="blur(20px)" border="1px solid" borderColor={borderCol} borderRadius="2xl" p={5}>
-              <Text fontSize="xs" fontWeight="900" textTransform="uppercase" letterSpacing="wider" color={muted} mb={4}>
-                Actions
-              </Text>
-              <VStack gap={3} align="stretch">
+            <SectionCard title="Actions" icon={<CreditCard size={14} />} accentHex={accentHex}>
+              <VStack gap={3} align="stretch" mt={1}>
                 {canPay && (
                   <Button
                     w="full"
@@ -500,13 +626,9 @@ const InvoiceDetails = memo(() => {
                     fontWeight="900"
                     fontSize="sm"
                     letterSpacing="wide"
-                    bg="linear-gradient(135deg, #7551FF 0%, #422AFB 100%)"
-                    color="white"
+                    style={payBtnStyle}
+                    _hover={payBtnHover}
                     onClick={handlePayNow}
-                    _hover={{
-                      transform: "translateY(-2px)",
-                      boxShadow: "0 15px 30px -10px var(--chakra-colors-brand-500)",
-                    }}
                     transition="all 0.3s"
                   >
                     <CreditCard size={16} />
@@ -521,7 +643,7 @@ const InvoiceDetails = memo(() => {
                     borderRadius="xl"
                     colorPalette="green"
                     variant="solid"
-                    isDisabled
+                    disabled
                   >
                     <CheckCircle size={16} />
                     <Text ml={2}>Paid — Membership Active</Text>
@@ -555,12 +677,29 @@ const InvoiceDetails = memo(() => {
                   fontSize="xs"
                   fontWeight="600"
                   color={muted}
-                  onClick={() => navigate(-1)}
+                  onClick={handleGoBack}
                   _hover={{ color: "app.text.primary", bg: "rgba(255,255,255,0.03)" }}
                 >
                   <ArrowLeft size={13} />
                   <Text ml={1}>Back to Review</Text>
                 </Button>
+
+                {invoice?.order_number && (
+                  <Button
+                    w="full"
+                    h="38px"
+                    variant="outline"
+                    borderRadius="xl"
+                    fontSize="xs"
+                    fontWeight="600"
+                    borderColor={borderCol}
+                    onClick={handleViewOrder}
+                    _hover={{ bg: "rgba(255,255,255,0.03)", borderColor: accentHex }}
+                  >
+                    <FileText size={13} />
+                    <Text ml={2}>View Originating Order</Text>
+                  </Button>
+                )}
 
                 {canPay && (
                   <>
@@ -584,7 +723,7 @@ const InvoiceDetails = memo(() => {
                   </>
                 )}
               </VStack>
-            </Box>
+            </SectionCard>
 
             {/* Info note */}
             {!isPaid && !isCancelled && (

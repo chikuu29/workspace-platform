@@ -14,9 +14,6 @@
 
 import { memo, useState, useCallback, useMemo, useRef, useEffect } from "react";
 import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
   Box,
   Button,
   Circle,
@@ -32,6 +29,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
+import { Alert } from "@/components/ui/alert";
 import { useParams, useNavigate } from "react-router";
 import {
   ArrowLeft,
@@ -188,6 +186,17 @@ const CashPayment = memo(() => {
   const invoiceNumber = rawInvoiceNumber ? decodeURIComponent(rawInvoiceNumber) : undefined;
   const navigate = useNavigate();
   const { organizationName, appCode } = useWorkspaceRouter();
+
+  const handleGoBack = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
+
+  const handleSelectQuickAmount = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    const amt = e.currentTarget.getAttribute("data-amount");
+    if (amt) {
+      setAmountReceived(amt);
+    }
+  }, []);
 
   const { invoice, loading } = useInvoiceDetails(invoiceNumber);
 
@@ -389,10 +398,8 @@ const CashPayment = memo(() => {
             </Box>
 
             {isShort && receivedNum > 0 && (
-              <Alert status="error" borderRadius="xl" mt={3} py={3}>
-                <AlertDescription fontSize="xs">
-                  ₹{(balanceDue - receivedNum).toLocaleString("en-IN")} short. Please collect the full amount.
-                </AlertDescription>
+              <Alert status="error" borderRadius="xl" mt={3} title="Payment Insufficient">
+                ₹{(balanceDue - receivedNum).toLocaleString("en-IN")} short. Please collect the full amount.
               </Alert>
             )}
 
@@ -409,7 +416,8 @@ const CashPayment = memo(() => {
                     colorPalette="green"
                     borderRadius="lg"
                     fontWeight="700"
-                    onClick={() => setAmountReceived(amount.toString())}
+                    data-amount={amount.toString()}
+                    onClick={handleSelectQuickAmount}
                   >
                     ₹{amount.toLocaleString("en-IN")}
                   </Button>
@@ -513,7 +521,7 @@ const CashPayment = memo(() => {
                 fontSize="sm"
                 bg="linear-gradient(135deg, #01B574 0%, #00875A 100%)"
                 color="white"
-                isDisabled={!isExact || isProcessing}
+                disabled={!isExact || isProcessing}
                 loading={isProcessing}
                 loadingText="Processing..."
                 onClick={handleConfirm}
@@ -539,7 +547,7 @@ const CashPayment = memo(() => {
                 fontSize="xs"
                 fontWeight="600"
                 color={muted}
-                onClick={() => navigate(-1)}
+                onClick={handleGoBack}
                 _hover={{ color: "app.text.primary" }}
               >
                 <ArrowLeft size={13} />

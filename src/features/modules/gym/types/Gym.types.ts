@@ -442,24 +442,23 @@ export interface MembershipInvoiceResponse {
 }
 
 
-// ─── Invoice-First Membership Sales Flow (New Architecture) ────────────────
-// Subscription is NEVER created until payment is confirmed.
-// The invoice_number is the state carrier for steps 4-7.
+// ─── Order-First Membership Sales Flow (New Architecture) ──────────────────
+// Lifecycle: Create Order → Confirm Order (auto-creates Invoice) → Pay Invoice → Membership Active
 
-/** Payload for POST /gym/membership/create-invoice */
-export interface CreateInvoicePayload {
+/** Payload for POST /gym/membership/create-order */
+export interface CreateOrderPayload {
   member_id: string;
   plan_code: string;
   start_date?: string;
   notes?: string;
 }
 
-/** Response from POST /gym/membership/create-invoice */
-export interface CreateInvoiceResponse {
+/** Response from POST /gym/membership/create-order */
+export interface CreateOrderResponse {
   success: boolean;
   message: string;
   data: {
-    invoice_number: string;
+    order_number: string;
     member_id: string;
     member_name: string;
     plan_name: string;
@@ -468,14 +467,76 @@ export interface CreateInvoiceResponse {
     start_date: string;
     end_date: string;
     subtotal: number;
-    tax: number;
+    tax_amount: number;
     total: number;
-    balance_due: number;
     status: string;
-    issue_date: string;
-    due_date: string;
   };
 }
+
+/** Response from POST /gym/orders/{order_number}/confirm */
+export interface ConfirmOrderResponse {
+  success: boolean;
+  message: string;
+  data: {
+    order_number: string;
+    order_status: string;
+    invoice_number: string;
+    invoice_status: string;
+    member_id: string;
+    plan_code: string;
+    billing_cycle: string;
+    start_date: string;
+    end_date: string;
+    subtotal: number;
+    tax_amount: number;
+    total: number;
+  };
+}
+
+/** Single line item on a billing order */
+export interface OrderLineItem {
+  description: string;
+  quantity: number;
+  unit_price: number;
+  tax_amount: number;
+  taxable_amount: number;
+  line_total: number;
+  source_item_code: string;
+  hsn_sac_code: string;
+  service_period_start: string;
+  service_period_end: string;
+}
+
+/** Customer reference on a billing order */
+export interface OrderCustomerRef {
+  ref_type: string;
+  ref_id: string;
+  name: string;
+  email: string;
+  phone: string;
+}
+
+/** Response from GET /gym/orders/{order_number} */
+export interface GetOrderResponse {
+  success: boolean;
+  data: {
+    order_number: string;
+    status: string;
+    customer_ref: OrderCustomerRef;
+    line_items: OrderLineItem[];
+    subtotal: number;
+    tax_amount: number;
+    total: number;
+    currency: string;
+    invoice_ref: string;
+    member_id: string;
+    plan_code: string;
+    billing_cycle: string;
+    start_date: string;
+    end_date: string;
+  };
+}
+
 
 /** Single payment entry on an invoice */
 export interface InvoicePaymentEntry {
@@ -511,6 +572,7 @@ export interface GymInvoiceResponse {
     source_ref: Record<string, string>;
     payment_history: InvoicePaymentEntry[];
     // Flattened from source_ref for UI convenience
+    order_number: string;
     member_id: string;
     plan_code: string;
     plan_name: string;

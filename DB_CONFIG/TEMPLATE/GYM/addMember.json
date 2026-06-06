@@ -35,7 +35,7 @@
             },
             "submit": {
                 "type": "API_CALL",
-                "url": "gym/addMember",
+                "url": "gym/members",
                 "method": "POST",
                 "successMessage": "Membership registration successful!",
                 "errorMessage": "Registration failed. Please check the details and try again.",

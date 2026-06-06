@@ -108,7 +108,7 @@ const registry: RegistryConfig = {
         // Member management
         members: () => import("@/features/modules/gym/ViewMember"),
         membersList: () => import("@/features/modules/gym/ViewMember"),
-        memberDetails: () => import("@/features/modules/gym/MemberDetail"),
+        member: () => import("@/features/modules/gym/MemberDetail"),
         MemberCheckIn: () => import("@/features/modules/gym/MemberCheckIn"),
         // Billing & Subscriptions
         Subscription: () => import("@/features/modules/gym/Subscription"),

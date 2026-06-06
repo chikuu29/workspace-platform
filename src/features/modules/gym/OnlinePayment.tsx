@@ -268,7 +268,7 @@ const OnlinePayment = memo(() => {
   const handleDone = useCallback(() => {
     const memberId = success?.memberId;
     if (memberId) {
-      navigate(`/${organizationName}/workspace/app/${appCode}/memberDetails/${memberId}`);
+      navigate(`/${organizationName}/workspace/app/${appCode}/member/${memberId}`);
     } else {
       navigate(`/${organizationName}/workspace/app/${appCode}/membersList`);
     }

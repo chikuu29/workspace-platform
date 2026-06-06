@@ -1,18 +1,16 @@
 /**
  * SelectMembershipPlan.tsx
  *
- * Step 2 in the gym membership sales flow.
+ * Step 2 in the gym membership sales flow — premium redesign.
  * Route: /:org/workspace/app/gym/selectMembershipPlan/:memberId
  *
- * Purpose:
- *   - Display all active membership plan cards
- *   - Search and filter plans
- *   - Select a plan (local state only — no API call)
- *   - "Continue" navigates to ReviewOrder with planCode as query param
+ * Design: Glassmorphism cards with gradient hero headers, animated
+ *         selection ring, feature-icon lists, sticky comparison bar,
+ *         and staggered entrance animations.
  *
  * Architecture note:
- *   NO backend call is made on "Continue". The plan selection is
- *   carried forward via URL query param (?planCode=GYM_PRO).
+ *   NO backend call is made on "Continue". Plan selection is carried
+ *   forward via URL query param (?planCode=GYM_PRO).
  *   The invoice is only created on the ReviewOrder page.
  */
 
@@ -26,37 +24,44 @@ import {
   HStack,
   Heading,
   Input,
+  Separator,
   SimpleGrid,
-  Skeleton,
   Text,
   VStack,
-  Icon,
-  Separator,
 } from "@chakra-ui/react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { useParams, useNavigate } from "react-router";
 import {
   ArrowLeft,
   ArrowRight,
+  Award,
   Check,
+  CheckCircle2,
   Crown,
+  Dumbbell,
+  Flame,
   Search,
+  Shield,
   Sparkles,
+  Star,
+  TrendingUp,
+  Users,
   X,
+  Zap,
 } from "lucide-react";
 import { toaster } from "@/components/ui/toaster";
-import { Card } from "@/core/components/Card";
-import { PageLayout } from "@/core/components/PageLayout";
 import { useGymMember } from "./hooks/useGymMember";
 import { useSubscriptionPlans } from "./hooks/useSubscriptionPlans";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 import type { SubscriptionPlanDocument } from "./types/Gym.types";
 
-// ─── Constants ──────────────────────────────────────────────────────
+// ─── Design Constants ─────────────────────────────────────────────────────────
 
 const CURRENCY_SYMBOL = "₹";
 
-const GRADIENT_MAP: Record<string, string> = {
+/** Hero gradient per accent color — used for the card's top banner */
+const HERO_GRADIENT: Record<string, string> = {
   brand: "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)",
   blue: "linear-gradient(135deg, #3965FF 0%, #002DFF 100%)",
   green: "linear-gradient(135deg, #01B574 0%, #00875A 100%)",
@@ -68,33 +73,78 @@ const GRADIENT_MAP: Record<string, string> = {
   emerald: "linear-gradient(135deg, #10B981 0%, #059669 100%)",
 };
 
-const getGradient = (accent?: string) => {
-  const key = accent?.toLowerCase() || "brand";
-  return GRADIENT_MAP[key] || GRADIENT_MAP.brand;
+/** Solid accent hex for glows, rings, etc. */
+const ACCENT_HEX: Record<string, string> = {
+  brand: "#7551FF",
+  blue: "#3965FF",
+  green: "#01B574",
+  orange: "#FFB547",
+  red: "#EE5D50",
+  purple: "#8B5CF6",
+  pink: "#EC4899",
+  cyan: "#06B6D4",
+  emerald: "#10B981",
 };
 
-const BILLING_CYCLE_LABEL: Record<string, string> = {
-  monthly: "mo",
-  quarterly: "qtr",
-  yearly: "yr",
-  "half-yearly": "6mo",
+const BILLING_LABEL: Record<string, string> = {
+  monthly: "month",
+  quarterly: "quarter",
+  yearly: "year",
+  "half-yearly": "6 months",
 };
 
-// ─── Feature Item ────────────────────────────────────────────────────
+/**
+ * Picks a badge label for a plan based on simple heuristics.
+ * "Most Popular" for mid-price, "Best Value" for yearly/high-price.
+ */
+const getBadgeLabel = (
+  plan: SubscriptionPlanDocument,
+  allPlans: SubscriptionPlanDocument[]
+): string | null => {
+  const prices = allPlans.map((p) => p.data.price).sort((a, b) => a - b);
+  const rank = prices.indexOf(plan.data.price);
+  const mid = Math.floor(prices.length / 2);
+  if (plan.data.billing_cycle === "yearly") return "Best Value";
+  if (rank === mid && allPlans.length >= 3) return "Most Popular";
+  if (rank === prices.length - 1) return "Premium";
+  return null;
+};
+
+const getGradient = (accent?: string): string =>
+  HERO_GRADIENT[accent?.toLowerCase() ?? "brand"] ?? HERO_GRADIENT.brand;
+
+const getAccentHex = (accent?: string): string =>
+  ACCENT_HEX[accent?.toLowerCase() ?? "brand"] ?? ACCENT_HEX.brand;
+
+// ─── Feature Icons ────────────────────────────────────────────────────────────
+
+const FEATURE_ICONS = [Dumbbell, Zap, Shield, Users, Star, Award, TrendingUp, Flame];
+const getFeatureIcon = (index: number) => FEATURE_ICONS[index % FEATURE_ICONS.length];
+
+// ─── FeatureItem ─────────────────────────────────────────────────────────────
 
 interface FeatureItemProps {
   text: string;
-  accent: string;
+  accentHex: string;
+  index: number;
+  animationDelay: string;
 }
 
-const FeatureItem = memo(({ text, accent }: FeatureItemProps) => {
-  const accentColor = useMemo(() => `${accent}.500`, [accent]);
-  const bgAccent = useMemo(() => `${accent}.500/10`, [accent]);
-
+const FeatureItem = memo(({ text, accentHex, index, animationDelay }: FeatureItemProps) => {
+  const FeatureIcon = getFeatureIcon(index);
   return (
-    <HStack gap={2.5} align="start">
-      <Circle size={5} bg={bgAccent} color={accentColor} mt="1px" flexShrink={0}>
-        <Check size={10} strokeWidth={3} />
+    <HStack
+      gap={3}
+      align="center"
+      className="feature-slide-in"
+      style={{ animationDelay }}
+    >
+      <Circle
+        size={6}
+        flexShrink={0}
+        style={{ background: `${accentHex}22`, color: accentHex }}
+      >
+        <FeatureIcon size={11} strokeWidth={2.5} />
       </Circle>
       <Text fontSize="xs" fontWeight="600" color="app.text.primary" lineHeight="shorter">
         {text}
@@ -104,269 +154,844 @@ const FeatureItem = memo(({ text, accent }: FeatureItemProps) => {
 });
 FeatureItem.displayName = "FeatureItem";
 
-// ─── Plan Card ───────────────────────────────────────────────────────
+// ─── PlanCard ────────────────────────────────────────────────────────────────
 
 interface PlanCardProps {
   plan: SubscriptionPlanDocument;
   isSelected: boolean;
+  badgeLabel: string | null;
   onSelect: (plan: SubscriptionPlanDocument) => void;
+  animationDelay: string;
 }
 
-const PlanCard = memo(({ plan, isSelected, onSelect }: PlanCardProps) => {
-  const muted = useColorModeValue("gray.500", "gray.400");
-  const cardBg = useColorModeValue("rgba(255, 255, 255, 0.75)", "rgba(11, 20, 55, 0.45)");
-  const borderColor = useColorModeValue("rgba(226, 232, 240, 0.8)", "rgba(255, 255, 255, 0.08)");
+const PlanCard = memo(({ plan, isSelected, badgeLabel, onSelect, animationDelay }: PlanCardProps) => {
+  const cardBg = useColorModeValue("rgba(255,255,255,0.82)", "rgba(18, 22, 40, 0.75)");
+  const mutedText = useColorModeValue("gray.500", "gray.400");
+  const borderFallback = useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.07)");
 
   const planData = plan.data;
   const accent = planData.accent_color || "brand";
   const gradient = useMemo(() => getGradient(accent), [accent]);
-  const billingLabel = BILLING_CYCLE_LABEL[planData.billing_cycle] ?? planData.billing_cycle;
+  const accentHex = useMemo(() => getAccentHex(accent), [accent]);
+  const billingLabel = BILLING_LABEL[planData.billing_cycle] ?? planData.billing_cycle;
+  const isPro = planData.code.toLowerCase().includes("pro");
 
   const handleClick = useCallback(() => onSelect(plan), [plan, onSelect]);
 
   return (
     <Box
       position="relative"
-      p="1.5px"
-      borderRadius="3xl"
-      bg={isSelected ? gradient : "transparent"}
-      boxShadow={isSelected ? `0 15px 35px -10px var(--chakra-colors-${accent}-500)` : "none"}
-      transition="all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
-      transform={isSelected ? "scale(1.025)" : "scale(1)"}
-      _hover={{ transform: isSelected ? "scale(1.03)" : "translateY(-6px)" }}
+      borderRadius="28px"
+      className="plan-card-enter"
+      style={{ animationDelay }}
+      /* Selection ring — 2-px gradient border via pseudo-box */
+      _before={{
+        content: '""',
+        position: "absolute",
+        inset: "-2px",
+        borderRadius: "30px",
+        background: isSelected ? gradient : "transparent",
+        zIndex: 0,
+        transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+        opacity: isSelected ? 1 : 0,
+      }}
+      boxShadow={isSelected ? `0 20px 60px -15px ${accentHex}55` : "none"}
+      transition="box-shadow 0.4s ease"
     >
-      <Card
-        p={0}
-        bg={cardBg}
-        backdropFilter="blur(24px) saturate(190%)"
-        border="1px solid"
-        borderColor={isSelected ? "whiteAlpha.400" : borderColor}
-        borderRadius="3xl"
-        cursor="pointer"
+      <Box
+        position="relative"
+        zIndex={1}
+        borderRadius="26px"
         overflow="hidden"
-        gap={0}
-        h="full"
+        bg={cardBg}
+        backdropFilter="blur(28px) saturate(200%)"
+        border="1px solid"
+        borderColor={isSelected ? `${accentHex}50` : borderFallback}
+        cursor="pointer"
         onClick={handleClick}
-        transition="all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
-        boxShadow="none"
+        h="full"
+        transition="transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s"
+        transform={isSelected ? "scale(1.02)" : "scale(1)"}
+        _hover={{ transform: isSelected ? "scale(1.03)" : "translateY(-8px)" }}
+        _active={{ transform: "scale(0.98)" }}
       >
-        {/* Selected glow bar */}
-        {isSelected && <Box h="4px" bg={gradient} w="full" />}
+        {/* ── Hero Gradient Header ── */}
+        <Box
+          position="relative"
+          h="120px"
+          bg={gradient}
+          overflow="hidden"
+        >
+          {/* Decorative orbs */}
+          <Box
+            position="absolute"
+            top="-20px"
+            right="-20px"
+            w="100px"
+            h="100px"
+            borderRadius="full"
+            bg="whiteAlpha.200"
+          />
+          <Box
+            position="absolute"
+            bottom="-30px"
+            left="-10px"
+            w="80px"
+            h="80px"
+            borderRadius="full"
+            bg="whiteAlpha.100"
+          />
 
-        <VStack align="stretch" gap={5} p={6}>
-          {/* Header */}
-          <Flex justify="space-between" align="start">
-            <VStack align="start" gap={1} flex={1} minW={0}>
-              <HStack gap={2} flexWrap="wrap">
-                <Text
-                  fontSize="lg"
-                  fontWeight="900"
-                  color="app.text.primary"
-                  letterSpacing="tight"
-                  truncate
-                >
-                  {planData.name}
+          {/* Badge (Most Popular / Best Value / Premium) */}
+          {badgeLabel && (
+            <Box
+              position="absolute"
+              top={3}
+              right={3}
+              bg="whiteAlpha.300"
+              backdropFilter="blur(12px)"
+              borderRadius="full"
+              px={2.5}
+              py={1}
+              border="1px solid"
+              borderColor="whiteAlpha.400"
+            >
+              <HStack gap={1}>
+                <Crown size={10} color="white" strokeWidth={2.5} />
+                <Text fontSize="9px" fontWeight="900" color="white" letterSpacing="wider">
+                  {badgeLabel.toUpperCase()}
                 </Text>
-                {planData.code.toLowerCase().includes("pro") && (
-                  <Icon color={`${accent}.500`} size="sm">
-                    <Sparkles />
-                  </Icon>
-                )}
               </HStack>
-              <Text fontSize="xs" color={muted} fontWeight="500" lineClamp={2} minH="32px">
-                {planData.description || `Premium access for fitness seekers`}
+            </Box>
+          )}
+
+          {/* Pro badge */}
+          {isPro && (
+            <Box position="absolute" top={3} left={3}>
+              <HStack gap={1}>
+                <Sparkles size={12} color="rgba(255,255,255,0.9)" />
+                <Text fontSize="10px" fontWeight="800" color="whiteAlpha.900">PRO</Text>
+              </HStack>
+            </Box>
+          )}
+
+          {/* Plan name inside header */}
+          <VStack
+            position="absolute"
+            bottom={4}
+            left={5}
+            align="start"
+            gap={0}
+          >
+            <Text
+              fontSize="xl"
+              fontWeight="900"
+              color="white"
+              letterSpacing="tight"
+              lineHeight="1"
+              textShadow="0 2px 8px rgba(0,0,0,0.3)"
+            >
+              {planData.name}
+            </Text>
+            <Text fontSize="10px" color="whiteAlpha.800" fontWeight="600" mt={0.5}>
+              {planData.code}
+            </Text>
+          </VStack>
+
+          {/* Selection checkmark circle */}
+          <Circle
+            position="absolute"
+            bottom={4}
+            right={4}
+            size={8}
+            bg={isSelected ? "white" : "whiteAlpha.200"}
+            border="2px solid"
+            borderColor={isSelected ? "white" : "whiteAlpha.500"}
+            transition="all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
+            boxShadow={isSelected ? `0 0 20px ${accentHex}80` : "none"}
+          >
+            {isSelected ? (
+              <CheckCircle2 size={16} color={accentHex} strokeWidth={2.5} />
+            ) : (
+              <Box w="8px" h="8px" borderRadius="full" bg="whiteAlpha.600" />
+            )}
+          </Circle>
+        </Box>
+
+        {/* ── Card Body ── */}
+        <VStack align="stretch" gap={5} p={5}>
+
+          {/* Pricing block */}
+          <Flex justify="space-between" align="end">
+            <VStack align="start" gap={0.5}>
+              <HStack align="baseline" gap={0.5}>
+                <Text fontSize="xs" fontWeight="700" color={mutedText} mt={1}>
+                  {CURRENCY_SYMBOL}
+                </Text>
+                <Text
+                  fontSize="3xl"
+                  fontWeight="950"
+                  color="app.text.primary"
+                  lineHeight="1"
+                  letterSpacing="tight"
+                >
+                  {planData.price.toLocaleString("en-IN")}
+                </Text>
+              </HStack>
+              <Text fontSize="10px" fontWeight="600" color={mutedText}>
+                per {billingLabel}
               </Text>
             </VStack>
 
-            <Circle
-              size={8}
-              bg={isSelected ? `${accent}.500` : "transparent"}
-              color={isSelected ? "white" : muted}
-              border="2px solid"
-              borderColor={isSelected ? `${accent}.500` : borderColor}
-              boxShadow={isSelected ? `0 0 15px var(--chakra-colors-${accent}-500)` : "none"}
-              ml={3}
-              flexShrink={0}
-              transition="all 0.3s"
-            >
-              {isSelected && <Check size={14} strokeWidth={3} />}
-            </Circle>
-          </Flex>
-
-          {/* Pricing */}
-          <VStack align="start" gap={1}>
-            <HStack align="baseline" gap={1}>
-              <Text
-                fontSize="3xl"
-                fontWeight="950"
-                color="app.text.primary"
-                lineHeight="1"
-                letterSpacing="tight"
-              >
-                {CURRENCY_SYMBOL}{planData.price.toLocaleString("en-IN")}
-              </Text>
-              <Text fontSize="xs" color={muted} fontWeight="700" textTransform="uppercase">
-                /{billingLabel}
-              </Text>
-            </HStack>
             <Badge
-              variant="subtle"
-              colorPalette={accent}
-              borderRadius="md"
-              px={2}
+              borderRadius="lg"
+              px={2.5}
+              py={1}
               fontSize="9px"
               fontWeight="900"
               letterSpacing="wider"
+              style={{
+                background: `${accentHex}18`,
+                color: accentHex,
+                border: `1px solid ${accentHex}35`,
+              }}
             >
               {planData.billing_cycle.toUpperCase()}
             </Badge>
-          </VStack>
+          </Flex>
+
+          {/* Description */}
+          {planData.description && (
+            <Text
+              fontSize="xs"
+              color={mutedText}
+              fontWeight="500"
+              lineHeight="tall"
+              lineClamp={2}
+            >
+              {planData.description}
+            </Text>
+          )}
 
           <Separator opacity={0.06} />
 
           {/* Features */}
-          <VStack align="stretch" gap={2.5} minH="80px">
-            {planData.features.slice(0, 5).map((f) => (
-              <FeatureItem key={f} text={f} accent={accent} />
+          <VStack align="stretch" gap={2.5} minH="100px">
+            <Text fontSize="9px" fontWeight="800" color={mutedText} letterSpacing="wider" textTransform="uppercase">
+              Includes
+            </Text>
+            {planData.features.slice(0, 5).map((feature, idx) => (
+              <FeatureItem
+                key={feature}
+                text={feature}
+                accentHex={accentHex}
+                index={idx}
+                animationDelay={`${idx * 0.06}s`}
+              />
             ))}
+            {planData.features.length > 5 && (
+              <Text fontSize="10px" color={mutedText} fontWeight="700" pl={9}>
+                +{planData.features.length - 5} more benefits
+              </Text>
+            )}
           </VStack>
 
-          {/* CTA */}
+          {/* CTA Button */}
           <Button
             w="full"
             size="lg"
-            h="48px"
+            h="46px"
             borderRadius="2xl"
             fontWeight="900"
             fontSize="xs"
             letterSpacing="widest"
             textTransform="uppercase"
-            colorPalette={accent}
-            variant={isSelected ? "solid" : "outline"}
-            bg={isSelected ? gradient : "transparent"}
-            borderColor={isSelected ? "transparent" : `${accent}.500/35`}
-            color={isSelected ? "white" : `${accent}.500`}
-            _hover={{
-              transform: "translateY(-3px)",
-              boxShadow: isSelected
-                ? `0 12px 25px -8px var(--chakra-colors-${accent}-500)`
-                : `0 8px 15px -5px var(--chakra-colors-${accent}-500)`,
+            onClick={handleClick}
+            style={isSelected ? {
+              background: gradient,
+              color: "white",
+              boxShadow: `0 8px 24px -6px ${accentHex}60`,
+            } : {
+              background: `${accentHex}12`,
+              color: accentHex,
+              border: `1px solid ${accentHex}30`,
             }}
-            _active={{ transform: "translateY(-1px)" }}
-            transition="all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
+            _hover={{
+              transform: "translateY(-2px)",
+              boxShadow: `0 12px 30px -8px ${accentHex}60`,
+            }}
+            _active={{ transform: "translateY(0) scale(0.98)" }}
+            transition="all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
           >
             <HStack gap={2}>
               <Text>{isSelected ? "Selected" : "Choose Plan"}</Text>
-              {isSelected ? <Check size={13} strokeWidth={3} /> : <ArrowRight size={13} />}
+              {isSelected
+                ? <Check size={13} strokeWidth={3} />
+                : <ArrowRight size={13} />
+              }
             </HStack>
           </Button>
         </VStack>
-      </Card>
+      </Box>
     </Box>
   );
 });
 PlanCard.displayName = "PlanCard";
 
-// ─── Empty State ─────────────────────────────────────────────────────
+// ─── PlanCardSkeleton ─────────────────────────────────────────────────────────
+
+const PlanCardSkeleton = memo(() => (
+  <Box borderRadius="28px" overflow="hidden">
+    <Skeleton height="120px" borderRadius="0" />
+    <VStack align="stretch" gap={4} p={5}>
+      <Skeleton height="40px" borderRadius="lg" />
+      <Skeleton height="16px" borderRadius="md" />
+      <Skeleton height="16px" borderRadius="md" width="80%" />
+      <VStack gap={2} align="stretch">
+        {[1, 2, 3, 4].map((i) => (
+          <Skeleton key={i} height="20px" borderRadius="md" />
+        ))}
+      </VStack>
+      <Skeleton height="46px" borderRadius="2xl" />
+    </VStack>
+  </Box>
+));
+PlanCardSkeleton.displayName = "PlanCardSkeleton";
+
+// ─── EmptyPlansState ──────────────────────────────────────────────────────────
 
 const EmptyPlansState = memo(() => {
-  const muted = useColorModeValue("gray.500", "gray.400");
   const { navigateTo } = useWorkspaceRouter();
   const handleCreate = useCallback(() => navigateTo("AddSubscriptionPlan"), [navigateTo]);
+  const cardBg = useColorModeValue("rgba(255,255,255,0.8)", "rgba(18,22,40,0.6)");
 
   return (
-    <Card
-      p={12}
-      borderRadius="3xl"
-      bg={useColorModeValue("white", "rgba(11, 20, 55, 0.45)")}
-      backdropFilter="blur(20px)"
+    <Box
+      p={16}
+      borderRadius="28px"
+      bg={cardBg}
+      backdropFilter="blur(24px)"
       border="1px solid"
-      borderColor={useColorModeValue("gray.100", "whiteAlpha.100")}
+      borderColor={useColorModeValue("rgba(226,232,240,0.6)", "rgba(255,255,255,0.07)")}
+      textAlign="center"
     >
-      <VStack gap={6} textAlign="center" maxW="md" mx="auto">
-        <Circle size={20} bg="brand.500/10" color="brand.500">
-          <Crown size={32} />
-        </Circle>
+      <VStack gap={6} maxW="sm" mx="auto">
+        <Box position="relative">
+          <Circle size={20} bg="rgba(117,81,255,0.12)" color="#7551FF">
+            <Crown size={32} />
+          </Circle>
+          <Circle
+            size={8}
+            bg="linear-gradient(135deg, #7551FF, #422AFB)"
+            color="white"
+            position="absolute"
+            bottom={-1}
+            right={-1}
+            border="3px solid"
+            borderColor={useColorModeValue("white", "rgba(18,22,40,0.9)")}
+          >
+            <Sparkles size={14} />
+          </Circle>
+        </Box>
         <VStack gap={2}>
           <Heading size="lg" fontWeight="950" letterSpacing="tight">
             No Active Plans
           </Heading>
-          <Text fontSize="sm" color={muted} fontWeight="500">
-            Create your first subscription plan template to start selling memberships.
+          <Text fontSize="sm" color="app.text.muted" fontWeight="500" lineHeight="tall">
+            Create your first subscription plan template to start selling memberships to your members.
           </Text>
         </VStack>
         <Button
-          colorPalette="brand"
-          borderRadius="2xl"
-          size="xl"
           h="52px"
           px={10}
+          borderRadius="2xl"
           fontSize="sm"
           fontWeight="900"
-          onClick={handleCreate}
           bg="linear-gradient(135deg, #7551FF 0%, #422AFB 100%)"
-          _hover={{ transform: "translateY(-3px)", boxShadow: "0 15px 30px -10px var(--chakra-colors-brand-500)" }}
+          color="white"
+          onClick={handleCreate}
+          _hover={{
+            transform: "translateY(-3px)",
+            boxShadow: "0 15px 30px -10px rgba(117,81,255,0.6)",
+          }}
+          _active={{ transform: "translateY(-1px)" }}
           transition="all 0.3s"
         >
           Create Your First Plan
         </Button>
       </VStack>
-    </Card>
+    </Box>
   );
 });
 EmptyPlansState.displayName = "EmptyPlansState";
 
-// ═══════════════════════════════════════════════════════════════════
-//  MAIN COMPONENT
-// ═══════════════════════════════════════════════════════════════════
+// ─── MemberContextBar ─────────────────────────────────────────────────────────
+
+interface MemberContextBarProps {
+  memberName: string;
+  memberId: string | undefined;
+  email?: string;
+  phone?: string;
+  currentPlan?: string;
+  memberStatus?: string;
+}
+
+const MemberContextBar = memo(({
+  memberName, memberId, email, phone, currentPlan, memberStatus
+}: MemberContextBarProps) => {
+  const cardBg = useColorModeValue("rgba(255,255,255,0.85)", "rgba(18,22,40,0.65)");
+  const border = useColorModeValue("rgba(226,232,240,0.7)", "rgba(255,255,255,0.08)");
+  const muted = useColorModeValue("gray.500", "gray.400");
+
+  const statusColor = memberStatus === "active" ? "#c3f400"
+    : memberStatus === "attention" ? "#FFB547"
+      : "#3965FF";
+
+  return (
+    <Box
+      p={{ base: 4, md: 5 }}
+      borderRadius="20px"
+      bg={cardBg}
+      backdropFilter="blur(24px) saturate(180%)"
+      border="1px solid"
+      borderColor={border}
+      boxShadow={useColorModeValue("0 4px 24px rgba(0,0,0,0.06)", "0 4px 24px rgba(0,0,0,0.25)")}
+      mb={6}
+    >
+      <Flex justify="space-between" align="center" flexWrap="wrap" gap={4}>
+        {/* Left — Member identity */}
+        <HStack gap={4}>
+          {/* Avatar with status ring */}
+          <Box position="relative">
+            <Circle
+              size={12}
+              bg="linear-gradient(135deg, #7551FF22, #422AFB22)"
+              border="2px solid"
+              borderColor={`${statusColor}55`}
+              color="#7551FF"
+              fontWeight="900"
+              fontSize="lg"
+            >
+              {memberName.slice(0, 1).toUpperCase()}
+            </Circle>
+            <Circle
+              size={3}
+              bg={statusColor}
+              position="absolute"
+              bottom={0}
+              right={0}
+              border="2px solid"
+              borderColor={useColorModeValue("white", "rgba(18,22,40,0.9)")}
+              boxShadow={`0 0 8px ${statusColor}80`}
+            />
+          </Box>
+
+          <VStack align="start" gap={0.5}>
+            <HStack gap={2}>
+              <Text fontSize="sm" fontWeight="900" color="app.text.primary">
+                {memberName}
+              </Text>
+              {currentPlan && (
+                <Badge
+                  fontSize="9px"
+                  fontWeight="900"
+                  px={2}
+                  py={0.5}
+                  borderRadius="full"
+                  bg="rgba(117,81,255,0.15)"
+                  color="#7551FF"
+                  border="1px solid rgba(117,81,255,0.25)"
+                >
+                  {currentPlan}
+                </Badge>
+              )}
+            </HStack>
+            <Text fontSize="10px" color={muted} fontWeight="600" fontFamily="mono">
+              {memberId}
+            </Text>
+          </VStack>
+        </HStack>
+
+        {/* Right — Contact info pills */}
+        <HStack gap={3} flexWrap="wrap">
+          {email && (
+            <Box
+              px={3}
+              py={1.5}
+              borderRadius="full"
+              bg={useColorModeValue("gray.50", "rgba(255,255,255,0.04)")}
+              border="1px solid"
+              borderColor={border}
+            >
+              <VStack align="start" gap={0}>
+                <Text fontSize="8px" color={muted} fontWeight="800" letterSpacing="wider">EMAIL</Text>
+                <Text fontSize="xs" fontWeight="700" color="app.text.primary">{email}</Text>
+              </VStack>
+            </Box>
+          )}
+          {phone && (
+            <Box
+              px={3}
+              py={1.5}
+              borderRadius="full"
+              bg={useColorModeValue("gray.50", "rgba(255,255,255,0.04)")}
+              border="1px solid"
+              borderColor={border}
+            >
+              <VStack align="start" gap={0}>
+                <Text fontSize="8px" color={muted} fontWeight="800" letterSpacing="wider">PHONE</Text>
+                <Text fontSize="xs" fontWeight="700" color="app.text.primary">{phone}</Text>
+              </VStack>
+            </Box>
+          )}
+        </HStack>
+      </Flex>
+    </Box>
+  );
+});
+MemberContextBar.displayName = "MemberContextBar";
+
+// ─── FloatingActionCard ───────────────────────────────────────────────────────
+// Replaces the full-width fixed footer bar. Appears as a compact card
+// anchored to the bottom-right corner only when a plan is selected.
+// Does NOT overlap the app shell footer.
+
+interface FloatingActionCardProps {
+  plan: SubscriptionPlanDocument | null;
+  onContinue: () => void;
+}
+
+const FloatingActionCard = memo(({ plan, onContinue }: FloatingActionCardProps) => {
+  const cardBg = useColorModeValue(
+    "rgba(255,255,255,0.96)",
+    "rgba(16,20,44,0.96)"
+  );
+  const border = useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.10)");
+  const muted = useColorModeValue("gray.500", "gray.400");
+
+  const gradient = plan ? getGradient(plan.data.accent_color) : "";
+  const accentHex = plan ? getAccentHex(plan.data.accent_color) : "#7551FF";
+
+  // Only render when a plan is chosen — slides up from below
+  if (!plan) return null;
+
+  return (
+    <Box
+      position="fixed"
+      bottom={6}
+      right={6}
+      zIndex={99}
+      w={{ base: "calc(100vw - 48px)", sm: "360px" }}
+      className="float-card-enter"
+      pointerEvents="all"
+    >
+      <Box
+        p={5}
+        borderRadius="24px"
+        bg={cardBg}
+        backdropFilter="blur(28px) saturate(200%)"
+        border="1px solid"
+        borderColor={border}
+        boxShadow={`0 24px 60px -12px ${accentHex}40, 0 8px 24px rgba(0,0,0,0.18)`}
+        overflow="hidden"
+        position="relative"
+      >
+        {/* Gradient accent strip at top */}
+        <Box
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          h="3px"
+          bg={gradient}
+          borderTopRadius="24px"
+        />
+
+        <VStack align="stretch" gap={4} pt={1}>
+          {/* Plan identity */}
+          <HStack gap={3}>
+            <Circle
+              size={10}
+              flexShrink={0}
+              style={{ background: gradient }}
+              color="white"
+              boxShadow={`0 4px 14px ${accentHex}50`}
+            >
+              <Check size={16} strokeWidth={3} />
+            </Circle>
+
+            <VStack align="start" gap={0} flex={1} minW={0}>
+              <HStack gap={2}>
+                <Text fontSize="sm" fontWeight="900" color="app.text.primary" truncate>
+                  {plan.data.name}
+                </Text>
+                <Badge
+                  fontSize="8px"
+                  fontWeight="900"
+                  px={1.5}
+                  py={0.5}
+                  borderRadius="full"
+                  style={{
+                    background: `${accentHex}18`,
+                    color: accentHex,
+                    border: `1px solid ${accentHex}30`,
+                  }}
+                >
+                  SELECTED
+                </Badge>
+              </HStack>
+              <Text fontSize="xs" color={muted} fontWeight="600">
+                {CURRENCY_SYMBOL}{plan.data.price.toLocaleString("en-IN")}
+                {" / "}{BILLING_LABEL[plan.data.billing_cycle] ?? plan.data.billing_cycle}
+              </Text>
+            </VStack>
+          </HStack>
+
+          {/* Quick feature summary */}
+          <Box
+            px={3}
+            py={2.5}
+            borderRadius="xl"
+            bg={`${accentHex}0a`}
+            border="1px solid"
+            borderColor={`${accentHex}18`}
+          >
+            <HStack gap={2} flexWrap="wrap">
+              {plan.data.features.slice(0, 3).map((f) => (
+                <HStack key={f} gap={1}>
+                  <CheckCircle2 size={10} color={accentHex} strokeWidth={2.5} />
+                  <Text fontSize="10px" fontWeight="600" color={muted}>{f}</Text>
+                </HStack>
+              ))}
+              {plan.data.features.length > 3 && (
+                <Text fontSize="10px" fontWeight="700" color={muted}>
+                  +{plan.data.features.length - 3} more
+                </Text>
+              )}
+            </HStack>
+          </Box>
+
+          {/* CTA */}
+          <Button
+            w="full"
+            h="46px"
+            borderRadius="xl"
+            fontWeight="900"
+            fontSize="sm"
+            letterSpacing="wide"
+            onClick={onContinue}
+            style={{ background: gradient, color: "white" }}
+            boxShadow={`0 8px 24px -6px ${accentHex}55`}
+            _hover={{
+              transform: "translateY(-2px)",
+              boxShadow: `0 14px 32px -8px ${accentHex}65`,
+            }}
+            _active={{ transform: "translateY(0) scale(0.98)" }}
+            transition="all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
+          >
+            <HStack gap={2}>
+              <Text>Continue to Review</Text>
+              <ArrowRight size={15} />
+            </HStack>
+          </Button>
+        </VStack>
+      </Box>
+    </Box>
+  );
+});
+FloatingActionCard.displayName = "FloatingActionCard";
+
+// ─── SearchBar ────────────────────────────────────────────────────────────────
+
+interface SearchBarProps {
+  value: string;
+  onChange: (value: string) => void;
+  onClear: () => void;
+  totalCount: number;
+  filteredCount: number;
+}
+
+const SearchBar = memo(({ value, onChange, onClear, totalCount, filteredCount }: SearchBarProps) => {
+  const inputBg = useColorModeValue("rgba(255,255,255,0.9)", "rgba(18,22,40,0.65)");
+  const border = useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.08)");
+  const muted = useColorModeValue("gray.400", "gray.500");
+
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value),
+    [onChange]
+  );
+
+  return (
+    <Flex justify="space-between" align="center" flexWrap="wrap" gap={4} mb={6}>
+      <VStack align="start" gap={0.5}>
+        <Heading size="md" fontWeight="950" letterSpacing="tight" color="app.text.primary">
+          Available Plans
+        </Heading>
+        <Text fontSize="xs" color={muted} fontWeight="500">
+          {filteredCount} of {totalCount} plans · Select one to continue
+        </Text>
+      </VStack>
+
+      {/* Search input */}
+      <Box position="relative" w={{ base: "full", md: "300px" }}>
+        <Box
+          position="absolute"
+          left={3.5}
+          top="50%"
+          transform="translateY(-50%)"
+          color={muted}
+          zIndex={1}
+          pointerEvents="none"
+        >
+          <Search size={14} />
+        </Box>
+        <Input
+          placeholder="Search by name, code, cycle..."
+          value={value}
+          onChange={handleChange}
+          pl={10}
+          pr={value ? 10 : 4}
+          h="40px"
+          fontSize="sm"
+          fontWeight="500"
+          borderRadius="xl"
+          border="1px solid"
+          borderColor={border}
+          bg={inputBg}
+          backdropFilter="blur(12px)"
+          _placeholder={{ color: muted, fontWeight: "500" }}
+          _focus={{
+            borderColor: "#7551FF",
+            boxShadow: "0 0 0 3px rgba(117,81,255,0.15)",
+            outline: "none",
+          }}
+          transition="border-color 0.2s, box-shadow 0.2s"
+        />
+        {value && (
+          <Box
+            position="absolute"
+            right={3.5}
+            top="50%"
+            transform="translateY(-50%)"
+            cursor="pointer"
+            color={muted}
+            onClick={onClear}
+            _hover={{ color: "app.text.primary" }}
+            zIndex={1}
+          >
+            <X size={13} />
+          </Box>
+        )}
+      </Box>
+    </Flex>
+  );
+});
+SearchBar.displayName = "SearchBar";
+
+// ─── BillingCycleFilter ───────────────────────────────────────────────────────
+
+type BillingFilter = "all" | "monthly" | "quarterly" | "yearly";
+
+interface BillingFilterProps {
+  active: BillingFilter;
+  onChange: (v: BillingFilter) => void;
+}
+
+const FILTER_OPTIONS: { label: string; value: BillingFilter }[] = [
+  { label: "All", value: "all" },
+  { label: "Monthly", value: "monthly" },
+  { label: "Quarterly", value: "quarterly" },
+  { label: "Yearly", value: "yearly" },
+];
+
+const BillingCycleFilter = memo(({ active, onChange }: BillingFilterProps) => {
+  const border = useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.08)");
+  const trackBg = useColorModeValue("rgba(226,232,240,0.5)", "rgba(255,255,255,0.04)");
+
+  return (
+    <HStack
+      gap={1}
+      bg={trackBg}
+      p={1}
+      borderRadius="xl"
+      border="1px solid"
+      borderColor={border}
+      flexWrap="wrap"
+      mb={6}
+    >
+      {FILTER_OPTIONS.map((opt) => {
+        const isActive = active === opt.value;
+        return (
+          <Button
+            key={opt.value}
+            size="xs"
+            h="32px"
+            px={4}
+            borderRadius="lg"
+            fontWeight="700"
+            fontSize="xs"
+            onClick={() => onChange(opt.value)}
+            bg={isActive ? "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)" : "transparent"}
+            color={isActive ? "white" : "app.text.muted"}
+            _hover={isActive ? {} : { bg: useColorModeValue("gray.100", "rgba(255,255,255,0.06)"), color: "app.text.primary" }}
+            transition="all 0.2s"
+            boxShadow={isActive ? "0 4px 12px rgba(117,81,255,0.4)" : "none"}
+          >
+            {opt.label}
+          </Button>
+        );
+      })}
+    </HStack>
+  );
+});
+BillingCycleFilter.displayName = "BillingCycleFilter";
+
+// ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 
 const SelectMembershipPlan = memo(() => {
   const { params: memberId } = useParams();
   const navigate = useNavigate();
-  const { buildPath, organizationName, appCode } = useWorkspaceRouter();
+  const { organizationName, appCode } = useWorkspaceRouter();
 
   const { member, loading: memberLoading } = useGymMember(memberId);
   const { plans, loading: plansLoading } = useSubscriptionPlans({ activeOnly: true });
 
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlanDocument | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [billingFilter, setBillingFilter] = useState<BillingFilter>("all");
 
-  const muted = useColorModeValue("gray.500", "gray.400");
-  const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
+  const pageBg = useColorModeValue("rgba(248,250,252,1)", "bg.default");
+  const accentOrb = useColorModeValue("rgba(117,81,255,0.06)", "rgba(117,81,255,0.09)");
 
-  // Derived member display name
+  // Derived member display values
   const memberName = useMemo(() => {
     const d = member?.data;
     return `${d?.firstName || ""} ${d?.lastName || ""}`.trim() || memberId || "Member";
   }, [member, memberId]);
 
-  // Filter plans by search query
+  // Apply search + billing-cycle filter
   const filteredPlans = useMemo(() => {
-    if (!searchQuery.trim()) return plans;
-    const q = searchQuery.toLowerCase();
-    return plans.filter(
-      (p) =>
-        p.data.name.toLowerCase().includes(q) ||
-        p.data.code.toLowerCase().includes(q) ||
-        p.data.billing_cycle.toLowerCase().includes(q) ||
-        p.data.description?.toLowerCase().includes(q)
-    );
-  }, [plans, searchQuery]);
+    let result = plans;
+    if (billingFilter !== "all") {
+      result = result.filter((p) => p.data.billing_cycle === billingFilter);
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(
+        (p) =>
+          p.data.name.toLowerCase().includes(q) ||
+          p.data.code.toLowerCase().includes(q) ||
+          p.data.billing_cycle.toLowerCase().includes(q) ||
+          p.data.description?.toLowerCase().includes(q)
+      );
+    }
+    return result;
+  }, [plans, searchQuery, billingFilter]);
 
-  const handleSelectPlan = useCallback((plan: SubscriptionPlanDocument) => {
-    setSelectedPlan(plan);
-  }, []);
+  const handleSelectPlan = useCallback((plan: SubscriptionPlanDocument) => setSelectedPlan(plan), []);
+  const handleBack = useCallback(() => navigate(-1), [navigate]);
+  const handleClearSearch = useCallback(() => setSearchQuery(""), []);
 
-  const handleBack = useCallback(() => {
-    navigate(-1);
-  }, [navigate]);
-
-  const handleClearSearch = useCallback(() => {
-    setSearchQuery("");
-  }, []);
-
-  // Navigate to ReviewOrder, passing planCode as a query parameter.
-  // No API call is made here — invoice is created on the next page.
   const handleContinue = useCallback(() => {
     if (!selectedPlan) {
       toaster.create({
@@ -376,304 +1001,239 @@ const SelectMembershipPlan = memo(() => {
       });
       return;
     }
-
     const reviewPath = `/${organizationName}/workspace/app/${appCode}/reviewOrder/${memberId}?planCode=${selectedPlan.data.code}`;
     navigate(reviewPath);
   }, [selectedPlan, memberId, organizationName, appCode, navigate]);
 
   return (
-    <PageLayout
-      title="Select Membership Plan"
-      subtitle={memberLoading ? "Loading..." : `Choose a plan for ${memberName}`}
+    <Box
+      w="full"
+      minH="100vh"
+      bg={pageBg}
+      fontFamily="'Inter', sans-serif"
+      position="relative"
+      pb={8}
     >
-      {/* Ambient background */}
+      {/* ── Keyframe Animations ── */}
+      <style>{`
+        @keyframes planCardEnter {
+          0%  { opacity: 0; transform: translateY(24px) scale(0.96); }
+          100%{ opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .plan-card-enter {
+          opacity: 0;
+          animation: planCardEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes featureSlideIn {
+          0%  { opacity: 0; transform: translateX(-8px); }
+          100%{ opacity: 1; transform: translateX(0); }
+        }
+        .feature-slide-in {
+          opacity: 0;
+          animation: featureSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes floatCardEnter {
+          0%  { opacity: 0; transform: translateY(32px) scale(0.94); }
+          60% { transform: translateY(-6px) scale(1.01); }
+          100%{ opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .float-card-enter {
+          animation: floatCardEnter 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+      `}</style>
+
+      {/* ── Ambient Background Orbs ── */}
       <Box
-        position="absolute"
-        top="-80px"
-        right="-80px"
+        position="fixed"
+        top="-100px"
+        right="-100px"
+        w="500px"
+        h="500px"
+        borderRadius="full"
+        bg="rgba(117,81,255,0.08)"
+        filter="blur(120px)"
+        pointerEvents="none"
+        zIndex={0}
+      />
+      <Box
+        position="fixed"
+        bottom="-80px"
+        left="-80px"
         w="400px"
         h="400px"
-        bg="brand.500"
-        filter="blur(140px)"
-        opacity={0.08}
-        zIndex={0}
+        borderRadius="full"
+        bg="rgba(57,101,255,0.06)"
+        filter="blur(100px)"
         pointerEvents="none"
+        zIndex={0}
       />
 
-      {/* Member context bar */}
-      {!memberLoading && member && (
-        <Card
-          p={4}
-          borderRadius="2xl"
-          bg="app.card.bg"
-          borderColor="app.card.border"
-          backdropFilter="blur(20px)"
-          mb={6}
-          zIndex={1}
-          position="relative"
-        >
-          <Flex justify="space-between" align="center" flexWrap="wrap" gap={3}>
-            <HStack gap={3}>
-              <Circle
-                size={9}
-                bg="brand.500/10"
-                color="brand.500"
-                border="1px solid"
-                borderColor="brand.500/25"
+      {/* ── Page Content ── */}
+      <Box maxW="1400px" mx="auto" px={{ base: 4, md: 8 }} py={8} position="relative" zIndex={1}>
+
+        {/* ── Page Header ── */}
+        <Flex justify="space-between" align="start" mb={8} flexWrap="wrap" gap={4}>
+          <VStack align="start" gap={1}>
+            <HStack gap={2}>
+              <Box
+                w={1}
+                h={6}
+                bg="linear-gradient(180deg, #7551FF, #422AFB)"
+                borderRadius="full"
+              />
+              <Heading
+                fontSize={{ base: "xl", md: "2xl" }}
+                fontWeight="950"
+                letterSpacing="tight"
+                color="app.text.primary"
               >
-                <Icon>
-                  <Check size={16} />
-                </Icon>
-              </Circle>
-              <VStack align="start" gap={0}>
-                <Text fontSize="sm" fontWeight="900" color="app.text.primary">
-                  {memberName}
-                </Text>
-                <Text fontSize="10px" color={muted} fontWeight="600">
-                  ID: {member?.data?.member_id || memberId}
-                </Text>
-              </VStack>
+                Select Membership Plan
+              </Heading>
             </HStack>
-            <HStack gap={4}>
-              <VStack align="start" gap={0}>
-                <Text fontSize="8px" color={muted} fontWeight="800" letterSpacing="wider">
-                  EMAIL
-                </Text>
-                <Text fontSize="xs" fontWeight="700" color="app.text.primary">
-                  {member?.data?.email || "N/A"}
-                </Text>
-              </VStack>
-              <VStack align="start" gap={0}>
-                <Text fontSize="8px" color={muted} fontWeight="800" letterSpacing="wider">
-                  PHONE
-                </Text>
-                <Text fontSize="xs" fontWeight="700" color="app.text.primary">
-                  {member?.data?.phone || "N/A"}
-                </Text>
-              </VStack>
-            </HStack>
-          </Flex>
-        </Card>
-      )}
-
-      {/* Header row */}
-      <Flex
-        justify="space-between"
-        align="center"
-        flexWrap="wrap"
-        gap={4}
-        mb={6}
-        zIndex={1}
-        position="relative"
-      >
-        <VStack align="start" gap={1}>
-          <Heading size="md" fontWeight="950" letterSpacing="tight" color="app.text.primary">
-            Available Plans
-          </Heading>
-          {!plansLoading && plans.length > 0 && (
-            <Text fontSize="xs" color={muted} fontWeight="500">
-              {filteredPlans.length} of {plans.length} plans shown
+            <Text fontSize="sm" color="app.text.muted" fontWeight="500" pl={3}>
+              {memberLoading
+                ? "Loading member details..."
+                : `Choose the right plan for ${memberName}`}
             </Text>
-          )}
-        </VStack>
+          </VStack>
 
-        {/* Search */}
-        <Box position="relative" w={{ base: "full", md: "280px" }}>
-          <Box
-            position="absolute"
-            left={3}
-            top="50%"
-            transform="translateY(-50%)"
-            color={muted}
-            zIndex={1}
-            pointerEvents="none"
-          >
-            <Search size={14} />
-          </Box>
-          <Input
-            placeholder="Search plans..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            pl={9}
-            pr={searchQuery ? 9 : 4}
-            h="38px"
-            fontSize="sm"
+          {/* Back button — always accessible, no footer dependency */}
+          <Button
+            variant="outline"
             borderRadius="xl"
-            border="1px solid"
-            borderColor={borderColor}
-            bg={useColorModeValue("white", "rgba(11, 20, 55, 0.4)")}
-            _focus={{ borderColor: "brand.500", boxShadow: "0 0 0 1px var(--chakra-colors-brand-500)" }}
-          />
-          {searchQuery && (
-            <Box
-              position="absolute"
-              right={3}
-              top="50%"
-              transform="translateY(-50%)"
-              cursor="pointer"
-              color={muted}
-              onClick={handleClearSearch}
-              _hover={{ color: "app.text.primary" }}
-            >
-              <X size={13} />
-            </Box>
-          )}
-        </Box>
-      </Flex>
+            onClick={handleBack}
+            fontWeight="700"
+            fontSize="sm"
+            h="40px"
+            px={5}
+            borderColor={useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.08)")}
+            color="app.text.primary"
+            _hover={{ bg: useColorModeValue("gray.50", "rgba(255,255,255,0.04)") }}
+            _active={{ transform: "scale(0.97)" }}
+          >
+            <HStack gap={2}>
+              <ArrowLeft size={14} />
+              <Text>Back</Text>
+            </HStack>
+          </Button>
+        </Flex>
 
-      {/* Plan grid */}
-      <Box zIndex={1} position="relative" pb={32}>
+        {/* ── Member Context Bar ── */}
+        {!memberLoading && member ? (
+          <MemberContextBar
+            memberName={memberName}
+            memberId={member.data.member_id || memberId}
+            email={member.data.email}
+            phone={member.data.phone}
+            currentPlan={member.data.plan}
+            memberStatus={member.data.status}
+          />
+        ) : memberLoading ? (
+          <Skeleton height="76px" borderRadius="20px" mb={6} />
+        ) : null}
+
+        {/* ── Billing Filter Tabs ── */}
+        {!plansLoading && plans.length > 0 && (
+          <BillingCycleFilter active={billingFilter} onChange={setBillingFilter} />
+        )}
+
+        {/* ── Search + Count Row ── */}
+        {!plansLoading && plans.length > 0 && (
+          <SearchBar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            onClear={handleClearSearch}
+            totalCount={plans.length}
+            filteredCount={filteredPlans.length}
+          />
+        )}
+
+        {/* ── Plan Grid ── */}
         {plansLoading ? (
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3, xl: 4 }} gap={6}>
             {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} height="380px" borderRadius="3xl" />
+              <PlanCardSkeleton key={i} />
             ))}
           </SimpleGrid>
         ) : filteredPlans.length === 0 ? (
-          searchQuery ? (
-            <Card
-              p={12}
-              borderRadius="3xl"
+          searchQuery || billingFilter !== "all" ? (
+            /* No search / filter results */
+            <Box
+              p={14}
+              borderRadius="28px"
+              bg={useColorModeValue("rgba(255,255,255,0.8)", "rgba(18,22,40,0.6)")}
+              backdropFilter="blur(24px)"
+              border="1px solid"
+              borderColor={useColorModeValue("rgba(226,232,240,0.6)", "rgba(255,255,255,0.07)")}
               textAlign="center"
-              bg={useColorModeValue("white", "rgba(11, 20, 55, 0.45)")}
             >
-              <VStack gap={4}>
-                <Circle size={16} bg="gray.500/10" color={muted}>
+              <VStack gap={5} maxW="sm" mx="auto">
+                <Circle size={18} bg="rgba(107,114,128,0.1)" color="gray.400">
                   <Search size={28} />
                 </Circle>
                 <VStack gap={1}>
-                  <Text fontWeight="800" color="app.text.primary">
-                    No plans match "{searchQuery}"
+                  <Text fontWeight="800" color="app.text.primary" fontSize="md">
+                    No matching plans
                   </Text>
-                  <Text fontSize="sm" color={muted}>
-                    Try a different keyword or clear the search.
+                  <Text fontSize="sm" color="app.text.muted">
+                    {searchQuery
+                      ? `No plans match "${searchQuery}".`
+                      : `No ${billingFilter} plans available.`}
                   </Text>
                 </VStack>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  borderRadius="xl"
-                  onClick={handleClearSearch}
-                >
-                  Clear Search
-                </Button>
+                <HStack gap={3}>
+                  {searchQuery && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      borderRadius="xl"
+                      onClick={handleClearSearch}
+                      fontWeight="700"
+                    >
+                      Clear Search
+                    </Button>
+                  )}
+                  {billingFilter !== "all" && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      borderRadius="xl"
+                      onClick={() => setBillingFilter("all")}
+                      fontWeight="700"
+                    >
+                      Show All
+                    </Button>
+                  )}
+                </HStack>
               </VStack>
-            </Card>
+            </Box>
           ) : (
             <EmptyPlansState />
           )
         ) : (
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 3, xl: 4 }} gap={6}>
-            {filteredPlans.map((plan) => (
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3, xl: 4 }} gap={6} alignItems="stretch">
+            {filteredPlans.map((plan, idx) => (
               <PlanCard
                 key={plan._id}
                 plan={plan}
                 isSelected={selectedPlan?._id === plan._id}
+                badgeLabel={getBadgeLabel(plan, filteredPlans)}
                 onSelect={handleSelectPlan}
+                animationDelay={`${idx * 0.07}s`}
               />
             ))}
           </SimpleGrid>
         )}
       </Box>
 
-      {/* Sticky action bar */}
-      <Box
-        position="fixed"
-        bottom={0}
-        left={0}
-        right={0}
-        zIndex={100}
-        p={4}
-        bg={useColorModeValue(
-          "rgba(255, 255, 255, 0.85)",
-          "rgba(10, 14, 40, 0.90)"
-        )}
-        backdropFilter="blur(20px)"
-        borderTop="1px solid"
-        borderColor={borderColor}
-      >
-        <Flex
-          maxW="1400px"
-          mx="auto"
-          justify="space-between"
-          align="center"
-          gap={4}
-          flexWrap="wrap"
-        >
-          {/* Selected summary */}
-          <HStack gap={4}>
-            {selectedPlan ? (
-              <>
-                <Circle
-                  size={9}
-                  bg={getGradient(selectedPlan.data.accent_color)}
-                  color="white"
-                >
-                  <Check size={15} strokeWidth={3} />
-                </Circle>
-                <VStack align="start" gap={0}>
-                  <Text fontSize="sm" fontWeight="900" color="app.text.primary">
-                    {selectedPlan.data.name}
-                  </Text>
-                  <Text fontSize="xs" color={muted} fontWeight="600">
-                    ₹{selectedPlan.data.price.toLocaleString("en-IN")} /{" "}
-                    {selectedPlan.data.billing_cycle}
-                  </Text>
-                </VStack>
-              </>
-            ) : (
-              <Text fontSize="sm" color={muted} fontWeight="600">
-                No plan selected — choose one above
-              </Text>
-            )}
-          </HStack>
-
-          {/* Actions */}
-          <HStack gap={3}>
-            <Button
-              variant="outline"
-              borderRadius="xl"
-              onClick={handleBack}
-              fontWeight="700"
-              fontSize="sm"
-              h="44px"
-              px={6}
-              borderColor={borderColor}
-              _hover={{ bg: "rgba(255,255,255,0.05)" }}
-            >
-              <ArrowLeft size={16} />
-              <Text ml={2}>Back</Text>
-            </Button>
-
-            <Button
-              h="44px"
-              px={8}
-              borderRadius="xl"
-              fontWeight="900"
-              fontSize="sm"
-              letterSpacing="wide"
-              bg="linear-gradient(135deg, #7551FF 0%, #422AFB 100%)"
-              color="white"
-              isDisabled={!selectedPlan}
-              onClick={handleContinue}
-              _hover={{
-                transform: selectedPlan ? "translateY(-2px)" : "none",
-                boxShadow: selectedPlan
-                  ? "0 12px 25px -8px var(--chakra-colors-brand-500)"
-                  : "none",
-              }}
-              _disabled={{ opacity: 0.45, cursor: "not-allowed" }}
-              transition="all 0.3s"
-            >
-              <Text mr={2}>Continue</Text>
-              <ArrowRight size={16} />
-            </Button>
-          </HStack>
-        </Flex>
-      </Box>
-    </PageLayout>
+      {/* ── Floating Action Card (bottom-right, only when plan selected) ── */}
+      <FloatingActionCard
+        plan={selectedPlan}
+        onContinue={handleContinue}
+      />
+    </Box>
   );
 });
-SelectMembershipPlan.displayName = "SelectMembershipPlan";
 
+SelectMembershipPlan.displayName = "SelectMembershipPlan";
 export default SelectMembershipPlan;

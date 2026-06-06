@@ -591,7 +591,7 @@ const ViewMember = memo(() => {
                         <MemberTile
                           key={member._id}
                           member={member}
-                          onClick={(id) => navigateTo(`memberDetails/${id}`)}
+                          onClick={(id) => navigateTo(`member/${id}`)}
                         />
                       ))}
                     </SimpleGrid>
@@ -642,7 +642,7 @@ const ViewMember = memo(() => {
                               >
                                 <MemberTableRow
                                   member={member}
-                                  onClick={(id) => navigateTo(`memberDetails/${id}`)}
+                                  onClick={(id) => navigateTo(`member/${id}`)}
                                 />
                               </Box>
                             );

@@ -270,7 +270,7 @@ const CashPayment = memo(() => {
   const handleDone = useCallback(() => {
     if (success?.memberId) {
       navigate(
-        `/${organizationName}/workspace/app/${appCode}/memberDetails/${success.memberId}`
+        `/${organizationName}/workspace/app/${appCode}/member/${success.memberId}`
       );
     } else {
       navigate(`/${organizationName}/workspace/app/${appCode}/membersList`);

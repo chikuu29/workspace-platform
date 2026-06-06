@@ -26,7 +26,7 @@ const AppFooter = () => {
       py={{ base: "6", md: "0" }}
       minH={{ base: "auto", md: "14" }}
       position="relative"
-      zIndex="sticky"
+    // zIndex="sticky"
     >
       <Flex
         h={{ base: "auto", md: "14" }}
@@ -45,15 +45,15 @@ const AppFooter = () => {
               SYSTEM<Text as="span" color={accentColor}>™</Text>
             </Text>
           </HStack>
-          
+
           <Box h="3px" w="3px" bg={borderColor} rounded="full" display={{ base: "none", md: "block" }} />
-          
+
           <Text letterSpacing="wide" display={{ base: "none", md: "block" }}>
             © {currentYear} All Rights Reserved
           </Text>
-          
+
           <Box h="3px" w="3px" bg={borderColor} rounded="full" display={{ base: "none", md: "block" }} />
-          
+
           <HStack gap="1" display={{ base: "none", lg: "flex" }} opacity="0.8">
             <Text>Crafted with</Text>
             <Icon as={Heart} color="red.400" boxSize="3" />
@@ -62,13 +62,13 @@ const AppFooter = () => {
         </HStack>
 
         {/* Middle Side: Status Indicator (Floating Glass Pill) */}
-        <HStack 
-          gap="2.5" 
-          bg={useColorModeValue("green.50/80", "rgba(34, 197, 94, 0.05)")} 
-          px="4" 
-          py="1.5" 
-          rounded="full" 
-          border="1px solid" 
+        <HStack
+          gap="2.5"
+          bg={useColorModeValue("green.50/80", "rgba(34, 197, 94, 0.05)")}
+          px="4"
+          py="1.5"
+          rounded="full"
+          border="1px solid"
           borderColor={useColorModeValue("green.100", "rgba(34, 197, 94, 0.2)")}
           boxShadow="sm"
           transition="all 0.3s ease"
@@ -76,11 +76,11 @@ const AppFooter = () => {
         >
           <Box position="relative" display="flex" alignItems="center" justifyContent="center">
             <Circle size="2" bg="green.500" />
-            <Circle 
-              size="2" 
-              bg="green.500" 
-              position="absolute" 
-              animation="ping 2s cubic-bezier(0, 0, 0.2, 1) infinite" 
+            <Circle
+              size="2"
+              bg="green.500"
+              position="absolute"
+              animation="ping 2s cubic-bezier(0, 0, 0.2, 1) infinite"
               opacity="0.75"
             />
           </Box>
@@ -104,15 +104,15 @@ const AppFooter = () => {
               </Link>
             ))}
           </HStack>
-          
-          <HStack 
-            gap="2" 
-            color={useColorModeValue("blue.600", "blue.400")} 
+
+          <HStack
+            gap="2"
+            color={useColorModeValue("blue.600", "blue.400")}
             bg={useColorModeValue("blue.50", "blue.500/10")}
             px="3"
             py="1"
             rounded="lg"
-            cursor="pointer" 
+            cursor="pointer"
             transition="all 0.2s"
             _hover={{ filter: "brightness(1.1)", transform: "translateY(-1px)" }}
           >
@@ -121,12 +121,12 @@ const AppFooter = () => {
           </HStack>
         </HStack>
       </Flex>
-      
+
       {/* Mobile-only Copyright */}
       <Box display={{ base: "block", md: "none" }} textAlign="center" pt="4" pb="2" borderTop="1px solid" borderColor={borderColor}>
-          <Text color={textColor} fontSize="10px" letterSpacing="wide">
-            © {currentYear} SYSTEM™ · All Rights Reserved
-          </Text>
+        <Text color={textColor} fontSize="10px" letterSpacing="wide">
+          © {currentYear} SYSTEM™ · All Rights Reserved
+        </Text>
       </Box>
     </Box>
   );

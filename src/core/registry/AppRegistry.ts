@@ -114,8 +114,7 @@ const registry: RegistryConfig = {
         Subscription: () => import("@/features/modules/gym/Subscription"),
         GymSubscriptionPlans: () => import("@/features/modules/gym/GymSubscriptionPlans"),
         AddSubscriptionPlan: () => import("@/features/modules/gym/AddSubscriptionPlan"),
-        // Legacy single-page wizard (kept for backwards compat)
-        selectPlan: () => import("@/features/modules/gym/SelectPlan"),
+
         PaymentsHistory: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.PaymentsHistory })),
         // ── New Multi-Step Sales Flow (Invoice-First Architecture) ────
         // Step 2: Plan selection — no API call, carries planCode via query param

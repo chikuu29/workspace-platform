@@ -309,7 +309,7 @@ const GymView = memo(() => {
   const handleSchedule = useCallback(() => navigateTo("listClasses"), [navigateTo]);
 
   const handleMemberClick = useCallback(
-    (recordId: string) => navigateTo(`members/${recordId}`),
+    (recordId: string) => navigateTo(`member/${recordId}`),
     [navigateTo],
   );
 

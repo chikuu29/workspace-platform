@@ -31,7 +31,7 @@
                 "id": "MY_GYM",
                 "app_slug": "gym",
                 "required_permissions": [
-                    "gym.VIEW.READ"
+                    "GYM.VIEW.READ"
                 ],
                 "hidden": false,
                 "name": "Gym Management",

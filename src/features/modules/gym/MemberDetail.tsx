@@ -1122,7 +1122,7 @@ const MemberDetail = memo(() => {
         {/* ════ LEFT COLUMN ════ */}
         <GridItem colSpan={{ base: 12, lg: 4 }}>
           <VStack align="stretch" gap={5}>
-            
+
             {/* Personal Info */}
             <GlassCard>
               <SectionHeading>Personal Info</SectionHeading>

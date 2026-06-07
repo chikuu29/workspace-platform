@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import type { MemberDocument } from "../types/Gym.types";
 
-// ── Status theme map (shared with MemberTile) ────────────────────────
+// ── Status theme map (shared with MemberProfile) ────────────────────────
 const STATUS_THEME = {
   active: { label: "Active", colorPalette: "green", accent: "green.400" },
   attention: { label: "Attention", colorPalette: "orange", accent: "orange.400" },

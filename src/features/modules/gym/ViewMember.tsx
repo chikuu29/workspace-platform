@@ -42,16 +42,34 @@ import {
   Sparkles,
   UserCheck,
   Users,
+  Dumbbell,
+  CreditCard,
+  Zap,
+  User,
+  Snowflake,
 } from "lucide-react";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { motion } from "framer-motion";
 
 import { PageHeader } from "@/core/components/PageHeader";
 import { useGymMembers } from "./hooks/useGymMembers";
 import { MemberDocument } from "./types/Gym.types";
 import { useNavActionStore } from "@/core/store/useNavActionStore";
 import { useEffect } from "react";
+import { toaster } from "@/components/ui/toaster";
 import MemberTableRow from "./components/MemberTableRow";
 import Pagination, { PAGE_SIZES, type PageSize } from "./components/Pagination";
+
+const BRAND_HEX = "#422AFB";
+const BRAND_ALT = "#7551FF";
+const BRAND_GRADIENT = "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)";
+
+const BILLING_LABEL: Record<string, string> = {
+  monthly: "month",
+  quarterly: "quarter",
+  yearly: "year",
+  "half-yearly": "6 months",
+};
 
 type ViewMode = "card" | "table";
 
@@ -179,7 +197,71 @@ const FilterButton = memo(({
 ));
 FilterButton.displayName = "FilterButton";
 
-const MemberTile = memo(({
+const getAvatarColorScheme = (name?: string) => {
+  const colors = [
+    { bg: "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)", color: "#FFFFFF", shadow: "rgba(117, 81, 255, 0.4)" }, // Indigo
+    { bg: "linear-gradient(135deg, #01B574 0%, #00875A 100%)", color: "#FFFFFF", shadow: "rgba(1, 181, 116, 0.4)" }, // Emerald
+    { bg: "linear-gradient(135deg, #FFB547 0%, #FF8F00 100%)", color: "#FFFFFF", shadow: "rgba(255, 181, 71, 0.4)" }, // Amber
+    { bg: "linear-gradient(135deg, #3965FF 0%, #0037FF 100%)", color: "#FFFFFF", shadow: "rgba(57, 101, 255, 0.4)" }, // Neon Blue
+    { bg: "linear-gradient(135deg, #EC4899 0%, #D01C78 100%)", color: "#FFFFFF", shadow: "rgba(236, 72, 153, 0.4)" }, // Magenta
+    { bg: "linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)", color: "#FFFFFF", shadow: "rgba(139, 92, 246, 0.4)" }, // Violet
+    { bg: "linear-gradient(135deg, #06B6D4 0%, #0891B2 100%)", color: "#FFFFFF", shadow: "rgba(6, 182, 212, 0.4)" }, // Cyan
+  ];
+  if (!name) return colors[0];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash) % colors.length;
+  return colors[index];
+};
+
+const CardFloatingParticles = memo(() => {
+  const particles = useMemo(() => {
+    return Array.from({ length: 6 }).map((_, i) => ({
+      id: i,
+      size: Math.random() * 4 + 3,
+      xStart: Math.random() * 100,
+      yStart: Math.random() * 100,
+      duration: Math.random() * 8 + 12,
+      delay: Math.random() * -6,
+    }));
+  }, []);
+
+  const particleColor = useColorModeValue("rgba(117, 81, 255, 0.05)", "rgba(117, 81, 255, 0.12)");
+
+  return (
+    <Box position="absolute" inset={0} overflow="hidden" pointerEvents="none" zIndex={0}>
+      {particles.map((p) => (
+        <motion.div
+          key={p.id}
+          style={{
+            position: "absolute",
+            width: p.size,
+            height: p.size,
+            borderRadius: "50%",
+            background: particleColor,
+            left: `${p.xStart}%`,
+            top: `${p.yStart}%`,
+          }}
+          animate={{
+            y: ["0px", "-40px", "0px"],
+            opacity: [0.3, 0.7, 0.3],
+          }}
+          transition={{
+            duration: p.duration,
+            repeat: Infinity,
+            delay: p.delay,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
+    </Box>
+  );
+});
+CardFloatingParticles.displayName = "CardFloatingParticles";
+
+const MemberProfile = memo(({
   member,
   onClick,
 }: {
@@ -191,162 +273,270 @@ const MemberTile = memo(({
   const contact = getMemberContact(data);
   const status = data.status || "active";
   const statusTheme = statusStyles[status] || statusStyles.active;
-  const cardBg = useColorModeValue("rgba(255,255,255,0.86)", "rgba(15,23,42,0.7)");
-  const cardBorder = useColorModeValue("rgba(226,232,240,0.78)", "rgba(255,255,255,0.12)");
+  const avatarStyle = useMemo(() => getAvatarColorScheme(name.full), [name.full]);
+  const sub = member.subscription;
+
+  const cardBorder = useColorModeValue("rgba(226, 232, 240, 0.78)", "rgba(255, 255, 255, 0.08)");
+  const sectionBg = useColorModeValue("rgba(0, 0, 0, 0.02)", "rgba(255, 255, 255, 0.02)");
+  const cardBg = useColorModeValue(
+    "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 244, 255, 0.88) 100%)",
+    "linear-gradient(135deg, rgba(26, 22, 55, 0.45) 0%, rgba(14, 18, 36, 0.75) 100%)"
+  );
+  const shadow = useColorModeValue("0 10px 30px rgba(0, 0, 0, 0.04)", "0 8px 32px rgba(0, 0, 0, 0.22)");
+  const hoverShadow = useColorModeValue("0 20px 48px rgba(0, 0, 0, 0.08)", `0 16px 48px ${avatarStyle.shadow}`);
+  const outlineBorder = useColorModeValue("rgba(0,0,0,0.06)", "rgba(255,255,255,0.06)");
   const muted = useColorModeValue("gray.500", "gray.400");
 
+  const handleClick = useCallback(() => {
+    onClick(_meta.record_id);
+  }, [onClick, _meta.record_id]);
+
+  const handleRenew = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    toaster.create({ title: "Renew Plan", description: `Navigating to renewals for ${name.full}...`, type: "success" });
+    onClick(_meta.record_id);
+  }, [onClick, _meta.record_id, name.full]);
+
+  const handleUpgrade = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    toaster.create({ title: "Upgrade Plan", description: `Navigating to plan template selection for ${name.full}...`, type: "info" });
+    onClick(_meta.record_id);
+  }, [onClick, _meta.record_id, name.full]);
+
+  const handleFreeze = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    toaster.create({ title: "Freeze Membership", description: `Membership freeze request dispatched for ${name.full}.`, type: "warning" });
+  }, [name.full]);
+
+  const bannerGradient = useMemo(() => {
+    if (status === "active") {
+      return "linear-gradient(135deg, #0A0C16 0%, #15102a 60%, #422afb 100%)";
+    }
+    if (status === "frozen") {
+      return "linear-gradient(135deg, #0A0C16 0%, #0c182f 60%, #3965ff 100%)";
+    }
+    return "linear-gradient(135deg, #0A0C16 0%, #20130a 60%, #ffb547 100%)";
+  }, [status]);
+
+  const fmtCurrency = useCallback((amount: number, currency = "INR") =>
+    new Intl.NumberFormat("en-IN", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount),
+    []);
+
   return (
-    <Box
-      role="group"
-      p={5}
-      borderRadius="2xl"
-      bg={"app.card.bg"}
-      border="1px solid"
-      borderColor={cardBorder}
-      boxShadow="0 18px 44px -34px rgba(15, 23, 42, 0.72)"
-      backdropFilter="blur(18px) saturate(150%)"
-      position="relative"
-      overflow="hidden"
-      cursor="pointer"
-      transition="all 0.24s cubic-bezier(0.4, 0, 0.2, 1)"
-      onClick={() => onClick(_meta.record_id)}
-      _before={{
-        content: '""',
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        h: "3px",
-        bg: statusTheme.accent,
-      }}
-      _hover={{
-        transform: "translateY(-5px)",
-        borderColor: statusTheme.accent,
-        boxShadow: "0 26px 56px -34px rgba(37, 99, 235, 0.72)",
-      }}
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: "easeOut" }}
+      whileHover={{ y: -6 }}
+      style={{ width: "100%" }}
     >
-      <VStack align="stretch" gap={4}>
-        <Flex justify="space-between" align="start" gap={3}>
-          <HStack gap={3} minW={0}>
-            <Avatar.Root size="lg" shape="rounded" border="1px solid" borderColor={cardBorder}>
-              <Avatar.Fallback bg={statusTheme.bg} color={statusTheme.accent} fontWeight="900">
-                {name.initials}
-              </Avatar.Fallback>
-            </Avatar.Root>
-            <VStack align="start" gap={0.5} minW={0}>
-              <Text fontSize="md" fontWeight="900" color="app.text.primary" truncate>
-                {name.full}
-              </Text>
-              <Text fontSize="xs" color={muted} fontWeight="700" fontFamily="mono" truncate>
+      <Box
+        p={0}
+        borderRadius="24px"
+        bg={cardBg}
+        border="1px solid"
+        borderColor={cardBorder}
+        boxShadow={shadow}
+        backdropFilter="blur(20px) saturate(180%)"
+        position="relative"
+        overflow="hidden"
+        cursor="pointer"
+        transition="border-color 0.25s, box-shadow 0.3s"
+        onClick={handleClick}
+        _hover={{
+          borderColor: statusTheme.accent,
+          boxShadow: hoverShadow,
+        }}
+      >
+        {/* Floating Ambient Particles Inside Card */}
+        <CardFloatingParticles />
+
+        {/* 1. Full-width cover banner */}
+        <Box h="110px" bg={bannerGradient} position="relative" zIndex={0}>
+          <Box
+            position="absolute"
+            inset={0}
+            borderBottom="1px solid"
+            borderColor="rgba(255,255,255,0.08)"
+            bg="linear-gradient(to bottom, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.4) 100%)"
+          />
+        </Box>
+
+        {/* 2. Glassmorphism profile container */}
+        <VStack align="center" gap={3} pt={0} pb={5} px={4.5} w="full" position="relative" zIndex={1} mt="-40px">
+          {/* Overlapping Avatar */}
+          <Circle
+            size="80px"
+            bg={useColorModeValue("white", "rgba(18,22,40,1)")}
+            p="3px"
+            boxShadow={`0 0 15px ${statusTheme.accent}33`}
+            border="2px solid"
+            borderColor={statusTheme.accent}
+          >
+            <Circle
+              size="100%"
+              bg={`linear-gradient(135deg, ${statusTheme.accent}20, ${statusTheme.accent}05)`}
+              color={statusTheme.accent}
+              fontWeight="950"
+              fontSize="xl"
+              style={{ textShadow: `0 0 8px ${statusTheme.accent}25` }}
+            >
+              {name.initials}
+            </Circle>
+          </Circle>
+
+          {/* Centered Identity details */}
+          <VStack align="center" gap={1} textAlign="center" w="full">
+            <Heading fontSize="sm" fontWeight="950" color="app.text.primary" letterSpacing="tight" lineHeight="1.2">
+              {name.full}
+            </Heading>
+            <HStack gap={2} justify="center" flexWrap="wrap">
+              <Text fontSize="10px" fontFamily="mono" fontWeight="700" color="app.text.muted" bg={sectionBg} px={1.5} py={0.2} borderRadius="md">
                 {data?.member_id}
               </Text>
-            </VStack>
-          </HStack>
-          <Badge
-            colorPalette={statusTheme.colorPalette}
-            variant="subtle"
-            borderRadius="full"
-            px={3}
-            py={1}
-            fontSize="10px"
-            fontWeight="900"
-          >
-            {statusTheme.label}
-          </Badge>
-        </Flex>
-
-        <SimpleGrid columns={1} gap={2}>
-          <HStack gap={2.5} color={muted} minW={0}>
-            <Icon as={Mail} boxSize={3.5} />
-            <Text fontSize="sm" fontWeight="700" truncate>
-              {contact.email}
-            </Text>
-          </HStack>
-          <HStack gap={2.5} color={muted}>
-            <Icon as={Phone} boxSize={3.5} />
-            <Text fontSize="sm" fontWeight="700">
-              {contact.phone}
-            </Text>
-          </HStack>
-          <HStack gap={2.5} color={muted}>
-            <Icon as={CalendarDays} boxSize={3.5} />
-            <Text fontSize="sm" fontWeight="700">
-              Joined {formatDate(_meta.created?.at)}
-            </Text>
-          </HStack>
-        </SimpleGrid>
-
-        <Separator opacity={0.35} />
-
-        <HStack justify="space-between" gap={3}>
-          {member.has_plan === false ? (
-            <HStack
-              flex={1} p={2.5} borderRadius="xl"
-              bg="red.500/8" border="1px solid" borderColor="red.500/15"
-              gap={2.5}
-            >
-              <Circle size="7" bg="red.500/15" color="red.500">
-                <Activity size={12} />
-              </Circle>
-              <VStack align="start" gap={0} minW={0}>
-                <Text fontSize="xs" fontWeight="900" color="red.500">
-                  No Plan Assigned
-                </Text>
-                <Text fontSize="2xs" color={muted} fontWeight="700">
-                  Enroll in a subscription
-                </Text>
-              </VStack>
+              <Badge
+                fontSize="9px"
+                fontWeight="900"
+                px={2.5}
+                py={0.5}
+                borderRadius="full"
+                bg={`${statusTheme.accent}15`}
+                color={statusTheme.accent}
+                border={`1px solid ${statusTheme.accent}30`}
+              >
+                {statusTheme.label.toUpperCase()}
+              </Badge>
+              {sub?.plan_name && (
+                <Badge
+                  fontSize="9px"
+                  fontWeight="900"
+                  px={2.5}
+                  py={0.5}
+                  borderRadius="full"
+                  bg={`${BRAND_HEX}15`}
+                  color={useColorModeValue(BRAND_HEX, "#9c8cff")}
+                  border={`1px solid ${BRAND_HEX}30`}
+                >
+                  {sub.plan_name.toUpperCase()}
+                </Badge>
+              )}
             </HStack>
-          ) : (
-            <HStack
-              flex={1} p={2.5} borderRadius="xl"
-              bg={statusTheme.bg} border="1px solid" borderColor={statusTheme.border}
-              gap={2.5} minW={0}
+          </VStack>
+
+          {/* Quick Action buttons (Renew, Upgrade, Freeze) */}
+          <HStack gap={2} mt={1} w="full" justify="center">
+            <Button
+              size="xs"
+              h="26px"
+              borderRadius="full"
+              fontWeight="900"
+              fontSize="9px"
+              style={{ background: BRAND_GRADIENT, color: "white" }}
+              boxShadow={`0 3px 8px ${BRAND_HEX}30`}
+              onClick={handleRenew}
             >
-              <Circle size="7" bg={statusTheme.bg} color={statusTheme.accent}>
-                <CalendarDays size={12} />
-              </Circle>
-              <VStack align="start" gap={0} flex={1} minW={0}>
-                <Text fontSize="xs" fontWeight="900" color="app.text.primary" truncate>
-                  {member.subscription?.plan_name || data.plan || "Standard Plan"}
-                </Text>
-                {member.subscription && (
-                  <Text fontSize="2xs" color={muted} fontWeight="700">
-                    {new Intl.NumberFormat(undefined, {
-                      style: "currency",
-                      currency: member.subscription.currency || "USD",
-                      maximumFractionDigits: 0,
-                    }).format(member.subscription.price)}
-                    {" / "}
-                    {member.subscription.billing_cycle}
-                    {member.subscription.is_paid
-                      ? " · ✓ Paid"
-                      : " · Unpaid"}
-                    {" · Exp "}
-                    {formatDate(member.subscription.end_date)}
+              Renew
+            </Button>
+            <Button
+              size="xs"
+              h="26px"
+              borderRadius="full"
+              fontWeight="900"
+              fontSize="9px"
+              variant="outline"
+              borderColor={outlineBorder}
+              color="app.text.primary"
+              onClick={handleUpgrade}
+              _hover={{ borderColor: BRAND_HEX }}
+            >
+              Upgrade
+            </Button>
+            <Button
+              size="xs"
+              h="26px"
+              borderRadius="full"
+              fontWeight="900"
+              fontSize="9px"
+              variant="outline"
+              borderColor={outlineBorder}
+              color="app.text.primary"
+              onClick={handleFreeze}
+              _hover={{ borderColor: "#3965FF" }}
+            >
+              Freeze
+            </Button>
+          </HStack>
+
+          {/* ════ INFORMATION SECTIONS ════ */}
+          <VStack w="full" gap={2} mt={2} align="stretch">
+
+            {/* Section 1: Personal Information & Membership Details */}
+            <Box p={3} borderRadius="xl" border="1px solid" borderColor={outlineBorder} bg={sectionBg}>
+              <Text fontSize="9px" fontWeight="900" color={muted} letterSpacing="wider" textTransform="uppercase" mb={1.5}>
+                Info & Membership
+              </Text>
+              <VStack align="stretch" gap={1}>
+                <Flex justify="space-between">
+                  <Text fontSize="10px" fontWeight="800" color="app.text.muted">EMAIL</Text>
+                  <Text fontSize="10px" fontWeight="600" color="app.text.primary" truncate maxW="130px">{contact.email}</Text>
+                </Flex>
+                <Flex justify="space-between">
+                  <Text fontSize="10px" fontWeight="800" color="app.text.muted">PHONE</Text>
+                  <Text fontSize="10px" fontWeight="600" color="app.text.primary">{contact.phone}</Text>
+                </Flex>
+                <Flex justify="space-between">
+                  <Text fontSize="10px" fontWeight="800" color="app.text.muted">EXPIRATION</Text>
+                  <Text fontSize="10px" fontWeight="600" color="app.text.primary">{formatDate(sub?.end_date)}</Text>
+                </Flex>
+              </VStack>
+            </Box>
+
+            {/* Section 2: Payment Summary */}
+            <Box p={3} borderRadius="xl" border="1px solid" borderColor={outlineBorder} bg={sectionBg}>
+              <HStack justify="space-between" align="center">
+                <VStack align="start" gap={0.5}>
+                  <Text fontSize="8px" fontWeight="800" color="app.text.muted" textTransform="uppercase">PLAN COST</Text>
+                  <Text fontSize="10px" fontWeight="900" color="app.text.primary">
+                    {fmtCurrency(sub?.price || 1500)}
+                    <Text as="span" fontSize="8px" fontWeight="700" color="app.text.muted">
+                      / {BILLING_LABEL[sub?.billing_cycle || "monthly"] || "mo"}
+                    </Text>
                   </Text>
-                )}
-              </VStack>
-            </HStack>
-          )}
-          <Circle
-            size="9"
-            bg={statusTheme.bg}
-            color={statusTheme.accent}
-            transition="all 0.2s"
-            _groupHover={{ transform: "translateX(2px)" }}
-          >
-            <ArrowRight size={16} />
-          </Circle>
-        </HStack>
-      </VStack>
-    </Box>
+                </VStack>
+                <Badge colorPalette={status === "active" ? "green" : "orange"} variant="subtle" fontSize="8px" fontWeight="900">
+                  {status === "active" ? "PAID" : "AWAITING"}
+                </Badge>
+              </HStack>
+            </Box>
+
+          </VStack>
+        </VStack>
+      </Box>
+    </motion.div>
   );
 });
-MemberTile.displayName = "MemberTile";
+MemberProfile.displayName = "MemberProfile";
 
 const ViewMember = memo(() => {
   const { navigateTo } = useWorkspaceRouter();
+
+  const handleMemberClick = useCallback(
+    (id: string) => {
+      navigateTo(`member/${id}`);
+    },
+    [navigateTo],
+  );
+
+  const renderMemberCard = useCallback(
+    (member: MemberDocument) => (
+      <MemberProfile
+        key={member._id}
+        member={member}
+        onClick={handleMemberClick}
+      />
+    ),
+    [handleMemberClick],
+  );
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<MemberFilter>("all");
@@ -453,6 +643,18 @@ const ViewMember = memo(() => {
   const handlePageChange = useCallback((p: number) => setCurrentPage(p), []);
   const handlePageSizeChange = useCallback((s: PageSize) => setPageSize(s), []);
 
+  const handleFilterAll = useCallback(() => setActiveFilter("all"), []);
+  const handleFilterActive = useCallback(() => setActiveFilter("active"), []);
+  const handleFilterAttention = useCallback(() => setActiveFilter("attention"), []);
+  const handleFilterFrozen = useCallback(() => setActiveFilter("frozen"), []);
+
+  const filterBarBg = useColorModeValue(
+    "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 244, 255, 0.88) 100%)",
+    "linear-gradient(135deg, rgba(26, 22, 55, 0.45) 0%, rgba(14, 18, 36, 0.75) 100%)"
+  );
+  const filterBarShadow = useColorModeValue("0 10px 30px rgba(0, 0, 0, 0.04)", "0 8px 32px rgba(0, 0, 0, 0.22)");
+  const cardBorder = useColorModeValue("rgba(226, 232, 240, 0.78)", "rgba(255, 255, 255, 0.08)");
+
   const membersRequiringAttention = useMemo(
     () => members.filter((member) => member.data.status === "attention").slice(0, 5),
     [members]
@@ -469,7 +671,7 @@ const ViewMember = memo(() => {
 
   return (
     <Box mt={4} animation="fade-in 0.5s ease-out" w="full">
-      <Box
+      {/* <Box
         p={{ base: 5, lg: 7 }}
         mb="3"
         borderRadius="2xl"
@@ -502,7 +704,7 @@ const ViewMember = memo(() => {
             <StatTile label="Frozen" value={metrics.frozen} caption="Paused accounts" icon={Sparkles} accent="cyan.500" />
           </SimpleGrid>
         </Grid>
-      </Box>
+      </Box> */}
       <PageHeader
         title="Member Directory"
         subtitle={`${total} registered members across plans, renewals, and attendance workflows.`}
@@ -525,41 +727,65 @@ const ViewMember = memo(() => {
                 direction={{ base: "column", md: "row" }}
                 gap={4}
                 p={4}
-                borderRadius="2xl"
-                bg={"app.card.bg"}
+                borderRadius="24px"
+                bg={filterBarBg}
                 border="1px solid"
-                borderColor={borderColor}
+                borderColor={cardBorder}
+                boxShadow={filterBarShadow}
+                backdropFilter="blur(20px) saturate(180%)"
               >
-                <HStack gap={2}>
-                  <Circle size="9" bg="blue.500/10" color="blue.500">
+                <HStack gap={3}>
+                  <Circle size="10" bg={BRAND_GRADIENT} color="white" style={{ boxShadow: `0 4px 12px ${BRAND_HEX}45` }}>
                     <Filter size={16} />
                   </Circle>
                   <VStack align="start" gap={0}>
-                    <Text fontWeight="900" color="app.text.primary">
-                      Directory
+                    <Text fontWeight="950" color="app.text.primary" fontSize="sm" letterSpacing="tight">
+                      Member Directory
                     </Text>
-                    <Text fontSize="xs" color={muted} fontWeight="700">
+                    <Text fontSize="11px" color={muted} fontWeight="700">
                       Showing {filteredMembers.length} matching records
                     </Text>
                   </VStack>
                 </HStack>
 
-                <HStack gap={2} flexWrap="wrap">
-                  <FilterButton label="All" active={activeFilter === "all"} onClick={() => setActiveFilter("all")} />
-                  <FilterButton label="Active" active={activeFilter === "active"} onClick={() => setActiveFilter("active")} />
-                  <FilterButton label="Attention" active={activeFilter === "attention"} onClick={() => setActiveFilter("attention")} />
-                  <FilterButton label="Frozen" active={activeFilter === "frozen"} onClick={() => setActiveFilter("frozen")} />
+                <HStack gap={2.5} flexWrap="wrap" w={{ base: "full", md: "auto" }} justify={{ base: "space-between", md: "end" }}>
+                  {/* Segmented Filter Buttons */}
+                  <HStack
+                    gap={1}
+                    p={1}
+                    borderRadius="xl"
+                    bg={useColorModeValue("rgba(0,0,0,0.025)", "rgba(255,255,255,0.02)")}
+                    border="1px solid"
+                    borderColor={useColorModeValue("rgba(0,0,0,0.04)", "rgba(255,255,255,0.04)")}
+                  >
+                    <FilterButton label="All" active={activeFilter === "all"} onClick={handleFilterAll} />
+                    <FilterButton label="Active" active={activeFilter === "active"} onClick={handleFilterActive} />
+                    <FilterButton label="Attention" active={activeFilter === "attention"} onClick={handleFilterAttention} />
+                    <FilterButton label="Frozen" active={activeFilter === "frozen"} onClick={handleFilterFrozen} />
+                  </HStack>
 
-                  <Separator orientation="vertical" h="24px" mx={1} opacity={0.3} />
+                  <Separator orientation="vertical" h="20px" opacity={0.3} display={{ base: "none", sm: "block" }} />
 
-                  {/* View toggle */}
-                  <HStack gap={0.5} p={1} borderRadius="xl" bg={useColorModeValue("blackAlpha.50", "whiteAlpha.50")}>
+                  {/* Segmented View Mode Toggle */}
+                  <HStack
+                    gap={0.5}
+                    p={1}
+                    borderRadius="xl"
+                    bg={useColorModeValue("rgba(0,0,0,0.025)", "rgba(255,255,255,0.02)")}
+                    border="1px solid"
+                    borderColor={useColorModeValue("rgba(0,0,0,0.04)", "rgba(255,255,255,0.04)")}
+                  >
                     <IconButton
                       aria-label="Card view"
                       size="xs"
-                      variant={viewMode === "card" ? "solid" : "ghost"}
-                      colorPalette={viewMode === "card" ? "blue" : "gray"}
+                      h="30px"
+                      w="30px"
                       borderRadius="lg"
+                      bg={viewMode === "card" ? BRAND_GRADIENT : "transparent"}
+                      color={viewMode === "card" ? "white" : "app.text.muted"}
+                      boxShadow={viewMode === "card" ? `0 4px 10px ${BRAND_HEX}35` : undefined}
+                      variant={viewMode === "card" ? undefined : "ghost"}
+                      _hover={viewMode === "card" ? {} : { bg: useColorModeValue("rgba(0,0,0,0.03)", "rgba(255,255,255,0.04)") }}
                       onClick={handleViewCard}
                     >
                       <LayoutGrid size={14} />
@@ -567,9 +793,14 @@ const ViewMember = memo(() => {
                     <IconButton
                       aria-label="Table view"
                       size="xs"
-                      variant={viewMode === "table" ? "solid" : "ghost"}
-                      colorPalette={viewMode === "table" ? "blue" : "gray"}
+                      h="30px"
+                      w="30px"
                       borderRadius="lg"
+                      bg={viewMode === "table" ? BRAND_GRADIENT : "transparent"}
+                      color={viewMode === "table" ? "white" : "app.text.muted"}
+                      boxShadow={viewMode === "table" ? `0 4px 10px ${BRAND_HEX}35` : undefined}
+                      variant={viewMode === "table" ? undefined : "ghost"}
+                      _hover={viewMode === "table" ? {} : { bg: useColorModeValue("rgba(0,0,0,0.03)", "rgba(255,255,255,0.04)") }}
                       onClick={handleViewTable}
                     >
                       <List size={14} />
@@ -580,7 +811,7 @@ const ViewMember = memo(() => {
 
               {/* ── Content: Card or Table ── */}
               {loading ? (
-                <SimpleGrid columns={{ base: 1, md: 2, "2xl": 3 }} gap={4}>
+                <SimpleGrid columns={{ base: 1, sm: 2, "2xl": 3 }} gap={{ base: 3, md: 4 }}>
                   {[1, 2, 3, 4, 5, 6].map((item) => (
                     <Skeleton key={item} height={viewMode === "card" ? "238px" : "56px"} borderRadius="2xl" />
                   ))}
@@ -589,14 +820,8 @@ const ViewMember = memo(() => {
                 <>
                   {viewMode === "card" ? (
                     /* ── Card View (paginated) ── */
-                    <SimpleGrid columns={{ base: 1, md: 2, "2xl": 3 }} gap={4}>
-                      {paginatedMembers.map((member) => (
-                        <MemberTile
-                          key={member._id}
-                          member={member}
-                          onClick={(id) => navigateTo(`member/${id}`)}
-                        />
-                      ))}
+                    <SimpleGrid columns={{ base: 1, sm: 2, "2xl": 3 }} gap={{ base: 3, md: 4 }}>
+                      {paginatedMembers.map(renderMemberCard)}
                     </SimpleGrid>
                   ) : (
                     /* ── Table View (virtual scroll) ── */

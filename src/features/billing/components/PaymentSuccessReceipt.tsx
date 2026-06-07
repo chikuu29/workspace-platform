@@ -33,7 +33,10 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { BRAND_GRADIENT, BRAND_HEX, BRAND_ALT } from "@/theme/tokens/colors";
+
+const BRAND_HEX = "#422AFB";
+const BRAND_ALT = "#7551FF";
+const BRAND_GRADIENT = "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)";
 import {
   CheckCircle2,
   Printer,

@@ -36,7 +36,9 @@ import {
   DialogFooter, DialogTitle, DialogBody, DialogCloseTrigger,
 } from "@/components/ui/dialog";
 
-import { BRAND_GRADIENT, BRAND_HEX, BRAND_ALT } from "@/theme/tokens/colors";
+const BRAND_HEX = "#422AFB";
+const BRAND_ALT = "#7551FF";
+const BRAND_GRADIENT = "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)";
 
 type StatusKey = "active" | "attention" | "frozen";
 

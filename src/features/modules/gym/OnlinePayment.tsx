@@ -45,7 +45,8 @@ import { GymApiService } from "./services/gymApi.service";
 import type { PayInvoicePayload } from "./types/Gym.types";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 
-import { BRAND_GRADIENT, BRAND_HEX } from "@/theme/tokens/colors";
+const BRAND_HEX = "#422AFB";
+const BRAND_GRADIENT = "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)";
 
 // ─── Helpers ─────────────────────────────────────────────────────────
 

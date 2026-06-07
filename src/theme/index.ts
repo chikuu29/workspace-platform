@@ -1,13 +1,11 @@
 import { createSystem, defaultConfig } from "@chakra-ui/react"
 import { colors, semanticTokens as colorSemanticTokens } from "./tokens/colors"
-import { gradients, semanticTokens as gradientSemanticTokens } from "./tokens/gradients"
 import { recipes } from "./recipes"
 
 export const system = createSystem(defaultConfig, {
     theme: {
         tokens: {
             colors,
-            gradients,
             fonts: {
                 body: { value: "Inter, sans-serif" },
                 heading: { value: "Inter, sans-serif" },
@@ -15,8 +13,7 @@ export const system = createSystem(defaultConfig, {
             }
         },
         semanticTokens: {
-            ...colorSemanticTokens,
-            ...gradientSemanticTokens,
+            ...colorSemanticTokens
         },
         recipes,
 

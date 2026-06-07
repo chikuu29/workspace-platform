@@ -11,7 +11,8 @@ import {
 } from "../../components/ui/combobox";
 import { GETAPI, APIService } from "@/app/api";
 import { ruleEngine } from "../engine/logicEngine";
-import { BRAND_HEX, BRAND_ALT } from "@/theme/tokens/colors";
+const BRAND_HEX = "#422AFB";
+const BRAND_ALT = "#7551FF";
 
 interface SELECTFIELD {
     name: string;

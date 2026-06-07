@@ -54,8 +54,11 @@ import { toaster } from "@/components/ui/toaster";
 import { useGymMember } from "./hooks/useGymMember";
 import { useSubscriptionPlans } from "./hooks/useSubscriptionPlans";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
-import { BRAND_GRADIENT, BRAND_HEX, BRAND_ALT } from "@/theme/tokens/colors";
 import type { SubscriptionPlanDocument } from "./types/Gym.types";
+
+const BRAND_HEX = "#422AFB";
+const BRAND_ALT = "#7551FF";
+const BRAND_GRADIENT = "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)";
 
 // ─── Design Constants ─────────────────────────────────────────────────────────
 
@@ -63,7 +66,7 @@ const CURRENCY_SYMBOL = "₹";
 
 /** Hero gradient per accent color — used for the card's top banner */
 const HERO_GRADIENT: Record<string, string> = {
-  brand: BRAND_GRADIENT,
+  brand: "g_blue",
   blue: "linear-gradient(135deg, #3965FF 0%, #002DFF 100%)",
   green: "linear-gradient(135deg, #01B574 0%, #00875A 100%)",
   orange: "linear-gradient(135deg, #FFB547 0%, #E67E00 100%)",
@@ -478,12 +481,12 @@ const EmptyPlansState = memo(() => {
     >
       <VStack gap={6} maxW="sm" mx="auto">
         <Box position="relative">
-          <Circle size={20} bg={`${BRAND_HEX}1f`} color={BRAND_HEX}>
-            <Crown size={32} />
+          <Circle size={20} bg="g_blue">
+            <Crown size={32} color='white' />
           </Circle>
           <Circle
             size={8}
-            bg={BRAND_GRADIENT}
+            bg="g_blue"
             color="white"
             position="absolute"
             bottom={-1}
@@ -508,12 +511,12 @@ const EmptyPlansState = memo(() => {
           borderRadius="2xl"
           fontSize="sm"
           fontWeight="900"
-          bg={BRAND_GRADIENT}
+          bg={"g_blue"}
           color="white"
           onClick={handleCreate}
           _hover={{
             transform: "translateY(-3px)",
-            boxShadow: `0 15px 30px -10px ${BRAND_HEX}99`,
+
           }}
           _active={{ transform: "translateY(-1px)" }}
           transition="all 0.3s"
@@ -566,10 +569,10 @@ const MemberContextBar = memo(({
           <Box position="relative">
             <Circle
               size={12}
-              bg={`linear-gradient(135deg, ${BRAND_HEX}22, ${BRAND_ALT}22)`}
+              bg="g_blue"
               border="2px solid"
               borderColor={`${statusColor}55`}
-              color={BRAND_HEX}
+              color="white"
               fontWeight="900"
               fontSize="lg"
             >
@@ -599,9 +602,9 @@ const MemberContextBar = memo(({
                   px={2}
                   py={0.5}
                   borderRadius="full"
-                  bg={`${BRAND_HEX}26`}
-                  color={BRAND_HEX}
-                  border={`1px solid ${BRAND_HEX}40`}
+                  bg={`g_blue26`}
+                  color="g_blue"
+                  border={`1px solid g_blue40`}
                 >
                   {currentPlan}
                 </Badge>
@@ -693,7 +696,8 @@ const FloatingActionCard = memo(({ plan, onContinue }: FloatingActionCardProps) 
         backdropFilter="blur(28px) saturate(200%)"
         border="1px solid"
         borderColor={border}
-        boxShadow={`0 24px 60px -12px ${accentHex}40, 0 8px 24px rgba(0,0,0,0.18)`}
+        // boxShadow={`0 24px 60px -12px ${accentHex}40, 0 8px 24px rgba(0,0,0,0.18)`}
+        boxShadow="xl"
         overflow="hidden"
         position="relative"
       >
@@ -932,11 +936,11 @@ const BillingCycleFilter = memo(({ active, onChange }: BillingFilterProps) => {
             fontWeight="700"
             fontSize="xs"
             onClick={() => onChange(opt.value)}
-            bg={isActive ? BRAND_GRADIENT : "transparent"}
+            bg={isActive ? "g_blue" : "transparent"}
             color={isActive ? "white" : "app.text.muted"}
             _hover={isActive ? {} : { bg: useColorModeValue("gray.100", "rgba(255,255,255,0.06)"), color: "app.text.primary" }}
             transition="all 0.2s"
-            boxShadow={isActive ? `0 4px 12px ${BRAND_HEX}66` : "none"}
+            boxShadow={isActive ? `0 4px 12px g_blue66` : "none"}
           >
             {opt.label}
           </Button>
@@ -962,7 +966,7 @@ const SelectMembershipPlan = memo(() => {
   const [billingFilter, setBillingFilter] = useState<BillingFilter>("all");
 
   const pageBg = useColorModeValue("rgba(248,250,252,1)", "bg.default");
-  const accentOrb = useColorModeValue(`${BRAND_HEX}0f`, `${BRAND_HEX}17`);
+  const accentOrb = useColorModeValue(`g_blue0f`, `g_blue17`);
 
   // Derived member display values
   const memberName = useMemo(() => {
@@ -1051,7 +1055,7 @@ const SelectMembershipPlan = memo(() => {
         w="500px"
         h="500px"
         borderRadius="full"
-        bg={`${BRAND_HEX}14`}
+        bg={`g_blue14`}
         filter="blur(120px)"
         pointerEvents="none"
         zIndex={0}
@@ -1079,7 +1083,7 @@ const SelectMembershipPlan = memo(() => {
               <Box
                 w={1}
                 h={6}
-                bg={`linear-gradient(180deg, ${BRAND_HEX}, ${BRAND_ALT})`}
+                bg={`linear-gradient(180deg, g_blue, g_blue)`}
                 borderRadius="full"
               />
               <Heading

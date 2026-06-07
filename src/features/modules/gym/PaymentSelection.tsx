@@ -39,7 +39,8 @@ import { PageLayout } from "@/core/components/PageLayout";
 import { useInvoiceDetails } from "./hooks/useInvoiceDetails";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 
-import { BRAND_GRADIENT, BRAND_HEX } from "@/theme/tokens/colors";
+const BRAND_HEX = "#422AFB";
+const BRAND_GRADIENT = "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)";
 
 // ─── Payment Method Card ─────────────────────────────────────────────
 

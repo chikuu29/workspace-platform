@@ -1,6 +1,3 @@
-export const BRAND_HEX = "#7551FF";
-export const BRAND_ALT = "#422AFB";
-export const BRAND_GRADIENT = "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)";
 
 export const colors = {
 
@@ -92,7 +89,15 @@ export const colors = {
         800: { value: "#212121" },
         900: { value: "#171717" },
         950: { value: "#0d0d0d" },
-    }
+    },
+    g_blue: { value: "linear-gradient(135deg, #3965FF 0%, #002DFF 100%)" },
+    g_green: { value: "linear-gradient(135deg, #01B574 0%, #00875A 100%)" },
+    g_orange: { value: "linear-gradient(135deg, #FFB547 0%, #E67E00 100%)" },
+    g_red: { value: "linear-gradient(135deg, #EE5D50 0%, #C52A1D 100%)" },
+    g_purple: { value: "linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%)" },
+    g_pink: { value: "linear-gradient(135deg, #EC4899 0%, #D946EF 100%)" },
+    g_cyan: { value: "linear-gradient(135deg, #06B6D4 0%, #0891B2 100%)" },
+    g_emerald: { value: "linear-gradient(135deg, #10B981 0%, #059669 100%)" },
 
 }
 
@@ -273,24 +278,6 @@ export const semanticTokens = {
             value: {
                 _light: "rgba(148,163,184,0.4)",
                 _dark: "rgba(255,255,255,0.08)",
-            },
-        },
-        "app.brand.gradient": {
-            value: {
-                _light: "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)",
-                _dark: "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)",
-            },
-        },
-        "app.brand.hex": {
-            value: {
-                _light: "#7551FF",
-                _dark: "#7551FF",
-            },
-        },
-        "app.brand.alt": {
-            value: {
-                _light: "#422AFB",
-                _dark: "#422AFB",
             },
         }
 

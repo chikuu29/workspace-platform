@@ -228,7 +228,7 @@ const AddSubscriptionPlan = memo(() => {
 
     // ── Navigation ──
     const handleBack = useCallback(() => {
-        navigateTo("GymSubscriptionPlans");
+        navigateTo("subscriptions");
     }, [navigateTo]);
 
     // ── Feature management ──

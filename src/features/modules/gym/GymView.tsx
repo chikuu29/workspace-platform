@@ -110,7 +110,7 @@ const QUICK_ACTIONS: QuickActionDef[] = [
     description: "Manage membership tiers",
     icon: CreditCard,
     accentColor: "teal.500",
-    view: "GymSubscriptionPlans",
+    view: "subscriptions",
   },
   {
     id: "trainers",

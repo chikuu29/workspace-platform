@@ -111,8 +111,8 @@ const registry: RegistryConfig = {
         member: () => import("@/features/modules/gym/MemberDetail"),
         MemberCheckIn: () => import("@/features/modules/gym/MemberCheckIn"),
         // Billing & Subscriptions
-        Subscription: () => import("@/features/modules/gym/Subscription"),
-        GymSubscriptionPlans: () => import("@/features/modules/gym/GymSubscriptionPlans"),
+        // Subscription: () => import("@/features/modules/gym/Subscription"),
+        subscriptions: () => import("@/features/modules/gym/SubscriptionsPlan"),
         AddSubscriptionPlan: () => import("@/features/modules/gym/AddSubscriptionPlan"),
 
         PaymentsHistory: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.PaymentsHistory })),

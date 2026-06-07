@@ -444,7 +444,6 @@ const ReviewOrder = memo(() => {
         });
       },
     });
-
     return () => sub.unsubscribe();
   }, [member, memberId, planCode, startDate, navigate, organizationName, appCode]);
 

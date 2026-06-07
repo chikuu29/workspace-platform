@@ -28,10 +28,12 @@ import { useOrderDetails } from "./hooks/useOrderDetails";
 import { GymApiService } from "./services/gymApi.service";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 
-import { BRAND_GRADIENT, BRAND_HEX } from "@/theme/tokens/colors";
+
+
+// ─── Design Constants ─────────────────────────────────────────────────────────
 
 const HERO_GRADIENT: Record<string, string> = {
-  brand: BRAND_GRADIENT,
+  brand: "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)",
   blue: "linear-gradient(135deg, #3965FF 0%, #002DFF 100%)",
   green: "linear-gradient(135deg, #01B574 0%, #00875A 100%)",
   orange: "linear-gradient(135deg, #FFB547 0%, #E67E00 100%)",
@@ -43,7 +45,7 @@ const HERO_GRADIENT: Record<string, string> = {
 };
 
 const ACCENT_HEX: Record<string, string> = {
-  brand: BRAND_HEX,
+  brand: "#422AFB",
   blue: "#3965FF",
   green: "#01B574",
   orange: "#FFB547",
@@ -53,6 +55,7 @@ const ACCENT_HEX: Record<string, string> = {
   cyan: "#06B6D4",
   emerald: "#10B981",
 };
+
 
 const getGradient = (accent?: string): string =>
   HERO_GRADIENT[accent?.toLowerCase() ?? "brand"] ?? HERO_GRADIENT.brand;

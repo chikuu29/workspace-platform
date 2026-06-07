@@ -1,5 +1,5 @@
 /**
- * GymSubscriptionPlans.tsx
+ * subscriptions.tsx
  *
  * Premium plan management page — glassmorphic cards, edit drawer, delete.
  * Fetches plans via useSubscriptionPlans hook.
@@ -145,7 +145,7 @@ PlanCard.displayName = "PlanCard";
 
 // ─── Main Component ─────────────────────────────────────────────────
 
-const GymSubscriptionPlans = memo(() => {
+const Subscriptions = memo(() => {
   const { plans, loading: isLoading, refetch } = useSubscriptionPlans();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlanDocument | null>(null);
@@ -469,5 +469,5 @@ const GymSubscriptionPlans = memo(() => {
   );
 });
 
-GymSubscriptionPlans.displayName = "GymSubscriptionPlans";
-export default GymSubscriptionPlans;
+Subscriptions.displayName = "Subscriptions";
+export default Subscriptions;

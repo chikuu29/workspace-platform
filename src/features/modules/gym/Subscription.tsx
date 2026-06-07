@@ -246,7 +246,7 @@ const Subscription = () => {
     }, [navigateTo]);
 
     const handleManagePlans = useCallback(() => {
-        navigateTo("GymSubscriptionPlans");
+        navigateTo("subscriptions");
     }, [navigateTo]);
 
     const mountNavActions = useNavActionStore((state) => state.setActions);

@@ -61,6 +61,8 @@ const HandleDynamicView = () => {
   }
 
   const uniqueKey = `${appName}-${view || "home"}-${params || "base"}-${refreshKey}`;
+  console.log("=== uniqueKey === ", uniqueKey);
+
   const { component: Component, permissions, requireAll } = resolution;
 
   const content = (

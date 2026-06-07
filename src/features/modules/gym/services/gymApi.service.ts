@@ -72,6 +72,59 @@ export const GymApiService = {
     }).pipe(map((res: any) => res.data as MemberDocument));
   },
 
+  /** Fetches a member's active subscription membership. */
+  getMemberMembership: (identifier: string) => {
+    return GETAPI({
+      path: `/v1/gym/members/${identifier}/membership`,
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res.data));
+  },
+
+  /** Fetches paginated orders for a member. */
+  getMemberOrders: (identifier: string, page: number = 1, limit: number = 10) => {
+    return GETAPI({
+      path: `/v1/gym/members/${identifier}/orders`,
+      params: { page, limit },
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as { success: boolean; message: string; data: any[]; pagination: any }));
+  },
+
+  /** Fetches paginated invoices for a member. */
+  getMemberInvoices: (identifier: string, page: number = 1, limit: number = 10) => {
+    return GETAPI({
+      path: `/v1/gym/members/${identifier}/invoices`,
+      params: { page, limit },
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as { success: boolean; message: string; data: any[]; pagination: any }));
+  },
+
+  /** Fetches paginated payments for a member. */
+  getMemberPayments: (identifier: string, page: number = 1, limit: number = 10) => {
+    return GETAPI({
+      path: `/v1/gym/members/${identifier}/payments`,
+      params: { page, limit },
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as { success: boolean; message: string; data: any[]; pagination: any }));
+  },
+
+  /** Fetches paginated attendance records for a member. */
+  getMemberAttendance: (identifier: string, page: number = 1, limit: number = 10) => {
+    return GETAPI({
+      path: `/v1/gym/members/${identifier}/attendance`,
+      params: { page, limit },
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as { success: boolean; message: string; data: any[]; pagination: any }));
+  },
+
+  /** Fetches paginated activity timeline for a member. */
+  getMemberTimeline: (identifier: string, page: number = 1, limit: number = 10) => {
+    return GETAPI({
+      path: `/v1/gym/members/${identifier}/timeline`,
+      params: { page, limit },
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as { success: boolean; message: string; data: any[]; pagination: any }));
+  },
+
   // ── Subscription Plans ──────────────────────────────────────────────
 
   /** Fetches the paginated list of subscription plans. */

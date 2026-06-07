@@ -30,11 +30,13 @@ import { useGymMember } from "./hooks/useGymMember";
 import type { MemberDocument } from "./types/Gym.types";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 import { toaster } from "@/components/ui/toaster";
+import { MemberMembershipAndBilling } from "./components/MemberMembershipAndBilling";
 import { useNavActionStore } from "@/core/store/useNavActionStore";
 import {
   DialogRoot, DialogBackdrop, DialogContent, DialogHeader,
   DialogFooter, DialogTitle, DialogBody, DialogCloseTrigger,
 } from "@/components/ui/dialog";
+
 
 const BRAND_HEX = "#422AFB";
 const BRAND_ALT = "#7551FF";
@@ -210,10 +212,10 @@ interface StatBoxProps {
   label: string;
   value: React.ReactNode;
   unit?: string;
-  gradient: string;
+  color: string;
 }
 
-const StatBox = memo(({ label, value, unit, gradient }: StatBoxProps) => {
+const StatBox = memo(({ label, value, unit, color }: StatBoxProps) => {
   const bg = useColorModeValue("rgba(255,255,255,0.7)", "rgba(18,22,40,0.6)");
   const border = useColorModeValue("rgba(226,232,240,0.7)", "rgba(255,255,255,0.07)");
   return (
@@ -236,7 +238,7 @@ const StatBox = memo(({ label, value, unit, gradient }: StatBoxProps) => {
           fontSize="2xl"
           fontWeight="900"
           letterSpacing="tight"
-          style={{ background: gradient, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
+          color={color}
         >
           {value}
         </Text>
@@ -409,253 +411,7 @@ const QuickAction = memo(({ label, icon, gradient, accentHex, danger = false, on
 });
 QuickAction.displayName = "QuickAction";
 
-// ─── PaymentHistoryRow ────────────────────────────────────────────────────────
 
-interface PaymentHistoryRowProps {
-  payment: {
-    subscription_id: string;
-    plan_name: string;
-    status: string;
-    start_date: string;
-    end_date: string;
-    price: number;
-    is_paid: boolean;
-  };
-  currency?: string;
-  onViewDetails: (p: any) => void;
-}
-
-const PaymentHistoryRow = memo(({ payment, currency = "INR", onViewDetails }: PaymentHistoryRowProps) => {
-  const bg = useColorModeValue("rgba(255,255,255,0.5)", "rgba(255,255,255,0.02)");
-  const border = useColorModeValue("rgba(226,232,240,0.7)", "rgba(255,255,255,0.06)");
-  const isActive = payment.status === "active";
-  const statusPalette = isActive ? "green" : payment.status === "expired" ? "gray" : "orange";
-
-  const handleClick = useCallback(() => onViewDetails(payment), [payment, onViewDetails]);
-
-  return (
-    <Flex
-      p={3.5}
-      borderRadius="xl"
-      bg={bg}
-      border="1px solid"
-      borderColor={border}
-      align="center"
-      justify="space-between"
-      gap={4}
-      cursor="pointer"
-      onClick={handleClick}
-      transition="all 0.2s cubic-bezier(0.175,0.885,0.32,1.275)"
-      _hover={{ borderColor: `${BRAND_HEX}35`, transform: "translateY(-2px)", bg: `${BRAND_HEX}06` }}
-      _active={{ transform: "translateY(0) scale(0.99)" }}
-    >
-      <VStack align="start" gap={0.5} minW={0}>
-        <Text fontSize="sm" fontWeight="700" color="app.text.primary" truncate>{payment.plan_name}</Text>
-        <Text fontSize="xs" color="app.text.muted">
-          {fmtDate(payment.start_date)} → {fmtDate(payment.end_date)}
-        </Text>
-      </VStack>
-      <HStack gap={2} flexShrink={0}>
-        <Badge colorPalette={statusPalette} variant="subtle" size="xs" borderRadius="full">{payment.status}</Badge>
-        <Badge colorPalette={payment.is_paid ? "green" : "red"} variant="subtle" size="xs" borderRadius="full">
-          {payment.is_paid ? "Paid" : "Unpaid"}
-        </Badge>
-        <Text fontSize="xs" fontWeight="800" color="app.text.primary">
-          {fmtCurrency(payment.price, currency)}
-        </Text>
-        <ChevronRight size={14} color={BRAND_HEX} />
-      </HStack>
-    </Flex>
-  );
-});
-PaymentHistoryRow.displayName = "PaymentHistoryRow";
-
-// ─── PaymentDetailsModal ──────────────────────────────────────────────────────
-
-interface PaymentDetailsModalProps {
-  payment: any | null;
-  currency?: string;
-  onClose: () => void;
-}
-
-const PaymentDetailsModal = memo(({ payment, currency = "INR", onClose }: PaymentDetailsModalProps) => {
-  const [cached, setCached] = useState<any | null>(null);
-
-  useEffect(() => {
-    if (payment) setCached(payment);
-  }, [payment]);
-
-  const handleOpenChange = useCallback((e: { open: boolean }) => {
-    if (!e.open) onClose();
-  }, [onClose]);
-
-  const display = payment || cached;
-  if (!display) return null;
-
-  const isActive = display.status === "active";
-  const statusPalette = isActive ? "green" : display.status === "expired" ? "gray" : "orange";
-  const invoiceNum = `INV-${display.start_date ? new Date(display.start_date).getFullYear() : 2026}-${display.subscription_id?.substring(0, 5).toUpperCase() || "XXXXX"}`;
-
-  const handleDownload = useCallback(() => {
-    toaster.create({ title: "Invoice Downloaded", description: "PDF generated and downloaded.", type: "success" });
-  }, []);
-
-  const handleEmail = useCallback(() => {
-    toaster.create({ title: "Invoice Emailed", description: "Receipt sent successfully.", type: "success" });
-  }, []);
-
-  return (
-    <DialogRoot open={!!payment} onOpenChange={handleOpenChange} size="md" placement="center">
-      <DialogBackdrop bg="blackAlpha.700" backdropFilter="blur(10px)" />
-      <DialogContent
-        bg={useColorModeValue("rgba(255,255,255,0.96)", "rgba(16,20,44,0.96)")}
-        backdropFilter="blur(28px)"
-        borderColor={useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.10)")}
-        borderRadius="24px"
-        boxShadow="0 32px 64px rgba(0,0,0,0.35)"
-        overflow="hidden"
-      >
-        {/* Gradient accent strip */}
-        <Box h="3px" bg={BRAND_GRADIENT} />
-
-        <DialogHeader
-          borderBottomWidth="1px"
-          borderColor={useColorModeValue("rgba(226,232,240,0.6)", "rgba(255,255,255,0.07)")}
-          p={5}
-        >
-          <HStack gap={3}>
-            <Circle size={8} style={{ background: BRAND_GRADIENT }} color="white">
-              <CreditCard size={14} />
-            </Circle>
-            <DialogTitle fontSize="md" fontWeight="900" color="app.text.primary">
-              Invoice Details
-            </DialogTitle>
-          </HStack>
-          <DialogCloseTrigger
-            color="app.text.muted"
-            _hover={{ color: "app.text.primary", bg: useColorModeValue("gray.100", "rgba(255,255,255,0.05)") }}
-            borderRadius="lg"
-          />
-        </DialogHeader>
-
-        <DialogBody p={6}>
-          <VStack align="stretch" gap={5}>
-            {/* Amount hero */}
-            <Box
-              p={5}
-              borderRadius="18px"
-              textAlign="center"
-              style={{ background: `${BRAND_GRADIENT}` }}
-              position="relative"
-              overflow="hidden"
-            >
-              <Box
-                position="absolute" top="-20px" right="-20px"
-                w="80px" h="80px" borderRadius="full" bg="whiteAlpha.200"
-              />
-              <Text fontSize="10px" fontWeight="800" color="whiteAlpha.800" letterSpacing="wider" mb={1}>
-                AMOUNT
-              </Text>
-              <Heading fontSize="3xl" fontWeight="950" color="white" letterSpacing="tight" mb={2}>
-                {fmtCurrency(display.price, currency)}
-              </Heading>
-              <HStack justify="center" gap={2}>
-                <Badge
-                  bg="whiteAlpha.300"
-                  color="white"
-                  px={2.5}
-                  py={0.5}
-                  borderRadius="full"
-                  fontSize="10px"
-                  fontWeight="800"
-                  border="1px solid"
-                  borderColor="whiteAlpha.400"
-                >
-                  {display.status.toUpperCase()}
-                </Badge>
-                <Badge
-                  bg="whiteAlpha.300"
-                  color="white"
-                  px={2.5}
-                  py={0.5}
-                  borderRadius="full"
-                  fontSize="10px"
-                  fontWeight="800"
-                  border="1px solid"
-                  borderColor="whiteAlpha.400"
-                >
-                  {display.is_paid ? "PAID" : "UNPAID"}
-                </Badge>
-              </HStack>
-            </Box>
-
-            {/* Invoice rows */}
-            <VStack align="stretch" gap={0}>
-              {[
-                { label: "Invoice Number", value: invoiceNum },
-                { label: "Plan Name", value: display.plan_name },
-                { label: "Transaction ID", value: display.subscription_id || "N/A" },
-                { label: "Coverage Period", value: `${fmtDate(display.start_date)} – ${fmtDate(display.end_date)}` },
-                { label: "Payment Method", value: "Visa •••• 4492" },
-              ].map(({ label, value }, idx) => {
-                const border = useColorModeValue("rgba(226,232,240,0.5)", "rgba(255,255,255,0.05)");
-                return (
-                  <Box key={label}>
-                    {idx > 0 && <Separator borderColor={border} />}
-                    <Flex justify="space-between" align="center" py={3}>
-                      <Text fontSize="10px" fontWeight="800" color="app.text.muted" letterSpacing="wider">{label.toUpperCase()}</Text>
-                      <Text fontSize="xs" fontWeight="700" color="app.text.primary" fontFamily={label === "Transaction ID" ? "mono" : undefined}>
-                        {value}
-                      </Text>
-                    </Flex>
-                  </Box>
-                );
-              })}
-            </VStack>
-          </VStack>
-        </DialogBody>
-
-        <DialogFooter
-          borderTopWidth="1px"
-          borderColor={useColorModeValue("rgba(226,232,240,0.6)", "rgba(255,255,255,0.07)")}
-          p={5}
-        >
-          <HStack w="full" gap={3} justify="space-between">
-            <Button
-              variant="outline"
-              size="sm"
-              h="40px"
-              px={5}
-              borderRadius="xl"
-              fontWeight="700"
-              borderColor={useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.10)")}
-              color="app.text.primary"
-              onClick={handleEmail}
-              _hover={{ bg: useColorModeValue("gray.50", "rgba(255,255,255,0.04)") }}
-            >
-              Email Receipt
-            </Button>
-            <Button
-              size="sm"
-              h="40px"
-              px={6}
-              borderRadius="xl"
-              fontWeight="900"
-              style={{ background: BRAND_GRADIENT, color: "white" }}
-              boxShadow={`0 6px 18px ${BRAND_HEX}66`}
-              onClick={handleDownload}
-              _hover={{ transform: "translateY(-1px)", boxShadow: `0 10px 24px ${BRAND_HEX}80` }}
-              _active={{ transform: "translateY(0) scale(0.98)" }}
-            >
-              Download PDF
-            </Button>
-          </HStack>
-        </DialogFooter>
-      </DialogContent>
-    </DialogRoot>
-  );
-});
-PaymentDetailsModal.displayName = "PaymentDetailsModal";
 
 // ─── EditMemberModal ──────────────────────────────────────────────────────────
 // Pre-populated dialog replicating the addMember.json field schema.
@@ -1092,22 +848,15 @@ const MemberDetail = memo(() => {
   const { member, loading, notFound, error, refresh } = useGymMember(memberId);
   const { navigateTo, goBack } = useWorkspaceRouter();
 
-  const [showHistory, setShowHistory] = useState(false);
-  const [selectedPayment, setSelectedPayment] = useState<any | null>(null);
   const [editOpen, setEditOpen] = useState(false);
 
   const name = useMemo(() => getName(member?.data), [member]);
   const status = (member?.data.status || "frozen") as StatusKey;
   const sm = STATUS_META[status] ?? STATUS_META.frozen;
   const sub = member?.subscription;
-  const history = useMemo(() => member?.subscription_history || [], [member]);
 
   const pageBg = useColorModeValue("rgba(248,250,252,1)", "bg.default");
   const muted = useColorModeValue("gray.500", "gray.400");
-
-  const toggleHistory = useCallback(() => setShowHistory(p => !p), []);
-  const handleViewPaymentDetails = useCallback((p: any) => setSelectedPayment(p), []);
-  const handleClosePaymentDetails = useCallback(() => setSelectedPayment(null), []);
   const handleBack = useCallback(() => goBack(), [goBack]);
   // Must be declared BEFORE the useEffect below that closes over it
   const handleEditProfile = useCallback(() => setEditOpen(true), []);
@@ -1169,22 +918,13 @@ const MemberDetail = memo(() => {
     navigateTo("plans", memberId);
   }, [navigateTo, memberId]);
 
-  const handleViewCurrentSub = useCallback(() => {
-    if (sub) {
-      handleViewPaymentDetails(sub);
-    } else {
-      handleViewPaymentDetails({
-        subscription_id: member?.data.subscription_id || "SUB-PREVIEW",
-        plan_name: member?.data.plan || "No Plan",
-        status: "active",
-        start_date: member?._meta.created?.at || new Date().toISOString(),
-        end_date: new Date(Date.now() + 30 * 86400000).toISOString(),
-        price: 0,
-        currency: "INR",
-        is_paid: false,
-      });
-    }
-  }, [sub, member, handleViewPaymentDetails]);
+  const handleViewInvoice = useCallback((invoiceNumber: string) => {
+    navigateTo("invoiceView", encodeURIComponent(invoiceNumber));
+  }, [navigateTo]);
+
+  const handleViewOrder = useCallback((orderNumber: string) => {
+    navigateTo("orderView", encodeURIComponent(orderNumber));
+  }, [navigateTo]);
 
   const handleFreeze = useCallback(() => {
     toaster.create({ title: "Freeze Membership", description: "Freeze command dispatched.", type: "warning" });
@@ -1245,18 +985,18 @@ const MemberDetail = memo(() => {
       w="full"
       bg={pageBg}
       fontFamily="'Inter', sans-serif"
-      position="relative"
-      className="fade-slide-up"
+    // position="relative"
+    // className="fade-slide-up"
     >
       {/* ── Keyframes ── */}
-      <style>{`
+      {/* <style>{`
         @keyframes fadeSlideUp {
           0%  { opacity:0; transform:translateY(20px); }
           100%{ opacity:1; transform:translateY(0); }
         }
         .fade-slide-up { animation: fadeSlideUp 0.5s cubic-bezier(0.16,1,0.3,1) forwards; }
         .stagger-cell  { opacity:0; animation: fadeSlideUp 0.5s cubic-bezier(0.16,1,0.3,1) forwards; }
-      `}</style>
+      `}</style> */}
 
       {/* ── Ambient orbs ── */}
       <Box
@@ -1353,18 +1093,18 @@ const MemberDetail = memo(() => {
                     label="Weight"
                     value={<AnimatedCounter value={member?.data.weight || 195} />}
                     unit="lbs"
-                    gradient={BRAND_GRADIENT}
+                    color="blue"
                   />
                   <StatBox
                     label="Body Fat"
                     value={<AnimatedDecimalCounter value={member?.data?.bodyFat || 11.4} />}
                     unit="%"
-                    gradient={sm.gradient}
+                    color="green"
                   />
                   <StatBox
                     label="Height"
                     value={member?.data.height || `6'2"`}
-                    gradient="linear-gradient(135deg,#06B6D4,#0891B2)"
+                    color="red"
                   />
                 </SimpleGrid>
 
@@ -1476,221 +1216,13 @@ const MemberDetail = memo(() => {
 
             {/* Membership & Billing — plan-aware */}
             <GlassCard>
-              <Flex justify="space-between" align="center" mb={5}>
-                <SectionHeading>Membership & Billing</SectionHeading>
-                {history.length > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    h="32px"
-                    px={3}
-                    borderRadius="lg"
-                    fontWeight="700"
-                    fontSize="xs"
-                    style={{ color: BRAND_HEX }}
-                    _hover={{ bg: `${BRAND_HEX}0d` }}
-                    onClick={toggleHistory}
-                  >
-                    {showHistory ? "Hide History" : "View History"}
-                  </Button>
-                )}
-              </Flex>
-
-              {sub ? (
-                /* ── Active plan exists: show full details ── */
-                <VStack align="stretch" gap={4}>
-                  {/* Plan hero strip */}
-                  <Box
-                    p={5}
-                    borderRadius="18px"
-                    position="relative"
-                    overflow="hidden"
-                    style={{ background: BRAND_GRADIENT }}
-                  >
-                    <Box position="absolute" top="-20px" right="-20px" w="100px" h="100px" borderRadius="full" bg="whiteAlpha.200" />
-                    <Box position="absolute" bottom="-30px" left="-10px" w="70px" h="70px" borderRadius="full" bg="whiteAlpha.100" />
-
-                    <Flex justify="space-between" align="start" position="relative">
-                      <VStack align="start" gap={1}>
-                        <Text fontSize="9px" fontWeight="900" color="whiteAlpha.700" letterSpacing="wider">CURRENT PLAN</Text>
-                        <Text fontSize="xl" fontWeight="950" color="white" letterSpacing="tight">{sub.plan_name}</Text>
-                        <HStack gap={2} mt={0.5}>
-                          <Badge bg="whiteAlpha.300" color="white" px={2} py={0.5} borderRadius="full" fontSize="9px" fontWeight="900" border="1px solid" borderColor="whiteAlpha.400">
-                            {sub.billing_cycle?.toUpperCase() ?? "MONTHLY"}
-                          </Badge>
-                          <Badge
-                            bg={sub.is_paid ? "rgba(1,181,116,0.3)" : "rgba(255,181,71,0.3)"}
-                            color="white"
-                            px={2} py={0.5} borderRadius="full" fontSize="9px" fontWeight="900"
-                            border="1px solid"
-                            borderColor={sub.is_paid ? "rgba(1,181,116,0.5)" : "rgba(255,181,71,0.5)"}
-                          >
-                            {sub.is_paid ? "PAID" : "UNPAID"}
-                          </Badge>
-                        </HStack>
-                      </VStack>
-
-                      <VStack align="end" gap={0.5}>
-                        <Text fontSize="9px" fontWeight="900" color="whiteAlpha.700" letterSpacing="wider">AMOUNT</Text>
-                        <Text fontSize="2xl" fontWeight="950" color="white" letterSpacing="tight">
-                          {fmtCurrency(sub.price, sub.currency)}
-                        </Text>
-                        <Text fontSize="10px" color="whiteAlpha.700" fontWeight="600">
-                          per {BILLING_LABEL[sub.billing_cycle] ?? sub.billing_cycle}
-                        </Text>
-                      </VStack>
-                    </Flex>
-                  </Box>
-
-                  {/* Date details */}
-                  <SimpleGrid columns={3} gap={3}>
-                    {[
-                      { label: "Start Date", value: fmtDate(sub.start_date), icon: CalendarDays, color: BRAND_HEX },
-                      { label: "End Date", value: fmtDate(sub.end_date), icon: CalendarDays, color: daysRemaining !== null && daysRemaining <= 7 ? "#FFB547" : "#01B574" },
-                      { label: "Days Left", value: daysRemaining !== null ? `${daysRemaining}d` : "N/A", icon: Clock, color: daysRemaining !== null && daysRemaining <= 7 ? "#FFB547" : BRAND_HEX },
-                    ].map(({ label, value, icon: RowIcon, color }) => {
-                      const cellBg = useColorModeValue("rgba(248,250,252,0.9)", "rgba(255,255,255,0.03)");
-                      const cellBorder = useColorModeValue("rgba(226,232,240,0.6)", "rgba(255,255,255,0.06)");
-                      return (
-                        <Box key={label} p={3} borderRadius="14px" bg={cellBg} border="1px solid" borderColor={cellBorder}>
-                          <Text fontSize="9px" fontWeight="800" color="app.text.muted" textTransform="uppercase" letterSpacing="wider" mb={1}>
-                            {label}
-                          </Text>
-                          <HStack gap={1.5}>
-                            <RowIcon size={12} color={color} />
-                            <Text fontSize="sm" fontWeight="800" color="app.text.primary">{value}</Text>
-                          </HStack>
-                        </Box>
-                      );
-                    })}
-                  </SimpleGrid>
-
-                  {/* Payment method row */}
-                  <Flex
-                    p={4}
-                    borderRadius="16px"
-                    border="1px solid"
-                    borderColor={useColorModeValue("rgba(226,232,240,0.6)", "rgba(255,255,255,0.06)")}
-                    bg={useColorModeValue("rgba(248,250,252,0.8)", "rgba(255,255,255,0.02)")}
-                    align="center"
-                    justify="space-between"
-                    gap={4}
-                    cursor="pointer"
-                    onClick={handleViewCurrentSub}
-                    transition="all 0.2s cubic-bezier(0.175,0.885,0.32,1.275)"
-                    _hover={{ borderColor: `${BRAND_HEX}35`, transform: "translateY(-2px)", bg: `${BRAND_HEX}06` }}
-                    _active={{ transform: "scale(0.99)" }}
-                  >
-                    <HStack gap={3}>
-                      <Circle size={10} style={{ background: `${BRAND_HEX}15`, color: BRAND_HEX }}>
-                        <CreditCard size={16} />
-                      </Circle>
-                      <VStack align="start" gap={0}>
-                        <Text fontSize="sm" fontWeight="700" color="app.text.primary">Visa •••• 4492</Text>
-                        <Text fontSize="xs" color={muted}>Expires 10/26</Text>
-                      </VStack>
-                    </HStack>
-                    <HStack gap={2}>
-                      <Text fontSize="xs" fontWeight="700" style={{ color: BRAND_HEX }}>View Invoice</Text>
-                      <ChevronRight size={14} color={BRAND_HEX} />
-                    </HStack>
-                  </Flex>
-
-                  {/* Renew CTA */}
-                  <Button
-                    w="full"
-                    h="42px"
-                    borderRadius="xl"
-                    fontWeight="900"
-                    fontSize="sm"
-                    style={{ background: BRAND_GRADIENT, color: "white" }}
-                    boxShadow={`0 6px 18px ${BRAND_HEX}59`}
-                    onClick={handleAssignPlan}
-                    _hover={{ transform: "translateY(-2px)", boxShadow: `0 12px 28px ${BRAND_HEX}80` }}
-                    _active={{ transform: "scale(0.98)" }}
-                    transition="all 0.25s cubic-bezier(0.175,0.885,0.32,1.275)"
-                  >
-                    <HStack gap={2}>
-                      <Zap size={14} />
-                      <Text>Renew / Change Plan</Text>
-                    </HStack>
-                  </Button>
-                </VStack>
-              ) : (
-                /* ── No active plan: assign prompt ── */
-                <VStack align="stretch" gap={4}>
-                  {/* Empty state visual */}
-                  <Box
-                    p={8}
-                    borderRadius="18px"
-                    textAlign="center"
-                    border="2px dashed"
-                    borderColor={useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.08)")}
-                    bg={useColorModeValue("rgba(248,250,252,0.5)", "rgba(255,255,255,0.02)")}
-                  >
-                    <VStack gap={4}>
-                      <Circle size={16} style={{ background: `${BRAND_HEX}12` }} color={BRAND_HEX}>
-                        <Sparkles size={24} />
-                      </Circle>
-                      <VStack gap={1}>
-                        <Text fontSize="md" fontWeight="900" color="app.text.primary">
-                          No Active Membership
-                        </Text>
-                        <Text fontSize="sm" color={muted} fontWeight="500" maxW="xs" mx="auto">
-                          This member doesn't have an active plan. Assign a membership plan to activate their account.
-                        </Text>
-                      </VStack>
-                      <Button
-                        h="46px"
-                        px={8}
-                        borderRadius="xl"
-                        fontWeight="900"
-                        fontSize="sm"
-                        style={{ background: BRAND_GRADIENT, color: "white" }}
-                        boxShadow={`0 8px 24px ${BRAND_HEX}66`}
-                        onClick={handleAssignPlan}
-                        _hover={{ transform: "translateY(-2px)", boxShadow: `0 14px 32px ${BRAND_HEX}8c` }}
-                        _active={{ transform: "scale(0.98)" }}
-                        transition="all 0.25s cubic-bezier(0.175,0.885,0.32,1.275)"
-                      >
-                        <HStack gap={2}>
-                          <Zap size={15} />
-                          <Text>Assign Membership Plan</Text>
-                        </HStack>
-                      </Button>
-                    </VStack>
-                  </Box>
-                </VStack>
-              )}
-
-              {/* Payment History */}
-              {showHistory && (
-                <VStack
-                  align="stretch" gap={3} mt={5} pt={5}
-                  borderTop="1px solid"
-                  borderColor={useColorModeValue("rgba(226,232,240,0.6)", "rgba(255,255,255,0.06)")}
-                  className="fade-slide-up"
-                >
-                  <HStack justify="space-between">
-                    <Text fontSize="xs" fontWeight="800" color="app.text.primary" letterSpacing="wide" textTransform="uppercase">
-                      Payment History
-                    </Text>
-                    <Badge px={2} py={0.5} borderRadius="full" fontSize="10px" fontWeight="800"
-                      style={{ background: `${BRAND_HEX}15`, color: BRAND_HEX, border: `1px solid ${BRAND_HEX}25` }}>
-                      {history.length} records
-                    </Badge>
-                  </HStack>
-                  <VStack align="stretch" gap={2}>
-                    {history.map((h, idx) => (
-                      <PaymentHistoryRow
-                        key={h.subscription_id || idx}
-                        payment={h}
-                        currency={sub?.currency}
-                        onViewDetails={handleViewPaymentDetails}
-                      />
-                    ))}
-                  </VStack>
-                </VStack>
+              {memberId && (
+                <MemberMembershipAndBilling
+                  memberId={memberId}
+                  onAssignPlan={handleAssignPlan}
+                  onViewInvoice={handleViewInvoice}
+                  onViewOrder={handleViewOrder}
+                />
               )}
             </GlassCard>
 
@@ -1709,11 +1241,7 @@ const MemberDetail = memo(() => {
         </GridItem>
       </Grid>
 
-      <PaymentDetailsModal
-        payment={selectedPayment}
-        currency={sub?.currency}
-        onClose={handleClosePaymentDetails}
-      />
+
 
       {/* ── Edit Member Dialog ── */}
       <EditMemberModal

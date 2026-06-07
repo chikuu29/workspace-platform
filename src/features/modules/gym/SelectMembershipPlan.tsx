@@ -54,6 +54,7 @@ import { toaster } from "@/components/ui/toaster";
 import { useGymMember } from "./hooks/useGymMember";
 import { useSubscriptionPlans } from "./hooks/useSubscriptionPlans";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
+import { BRAND_GRADIENT, BRAND_HEX, BRAND_ALT } from "@/theme/tokens/colors";
 import type { SubscriptionPlanDocument } from "./types/Gym.types";
 
 // ─── Design Constants ─────────────────────────────────────────────────────────
@@ -62,7 +63,7 @@ const CURRENCY_SYMBOL = "₹";
 
 /** Hero gradient per accent color — used for the card's top banner */
 const HERO_GRADIENT: Record<string, string> = {
-  brand: "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)",
+  brand: BRAND_GRADIENT,
   blue: "linear-gradient(135deg, #3965FF 0%, #002DFF 100%)",
   green: "linear-gradient(135deg, #01B574 0%, #00875A 100%)",
   orange: "linear-gradient(135deg, #FFB547 0%, #E67E00 100%)",
@@ -75,7 +76,7 @@ const HERO_GRADIENT: Record<string, string> = {
 
 /** Solid accent hex for glows, rings, etc. */
 const ACCENT_HEX: Record<string, string> = {
-  brand: "#7551FF",
+  brand: BRAND_HEX,
   blue: "#3965FF",
   green: "#01B574",
   orange: "#FFB547",
@@ -477,12 +478,12 @@ const EmptyPlansState = memo(() => {
     >
       <VStack gap={6} maxW="sm" mx="auto">
         <Box position="relative">
-          <Circle size={20} bg="rgba(117,81,255,0.12)" color="#7551FF">
+          <Circle size={20} bg={`${BRAND_HEX}1f`} color={BRAND_HEX}>
             <Crown size={32} />
           </Circle>
           <Circle
             size={8}
-            bg="linear-gradient(135deg, #7551FF, #422AFB)"
+            bg={BRAND_GRADIENT}
             color="white"
             position="absolute"
             bottom={-1}
@@ -507,12 +508,12 @@ const EmptyPlansState = memo(() => {
           borderRadius="2xl"
           fontSize="sm"
           fontWeight="900"
-          bg="linear-gradient(135deg, #7551FF 0%, #422AFB 100%)"
+          bg={BRAND_GRADIENT}
           color="white"
           onClick={handleCreate}
           _hover={{
             transform: "translateY(-3px)",
-            boxShadow: "0 15px 30px -10px rgba(117,81,255,0.6)",
+            boxShadow: `0 15px 30px -10px ${BRAND_HEX}99`,
           }}
           _active={{ transform: "translateY(-1px)" }}
           transition="all 0.3s"
@@ -565,10 +566,10 @@ const MemberContextBar = memo(({
           <Box position="relative">
             <Circle
               size={12}
-              bg="linear-gradient(135deg, #7551FF22, #422AFB22)"
+              bg={`linear-gradient(135deg, ${BRAND_HEX}22, ${BRAND_ALT}22)`}
               border="2px solid"
               borderColor={`${statusColor}55`}
-              color="#7551FF"
+              color={BRAND_HEX}
               fontWeight="900"
               fontSize="lg"
             >
@@ -598,9 +599,9 @@ const MemberContextBar = memo(({
                   px={2}
                   py={0.5}
                   borderRadius="full"
-                  bg="rgba(117,81,255,0.15)"
-                  color="#7551FF"
-                  border="1px solid rgba(117,81,255,0.25)"
+                  bg={`${BRAND_HEX}26`}
+                  color={BRAND_HEX}
+                  border={`1px solid ${BRAND_HEX}40`}
                 >
                   {currentPlan}
                 </Badge>
@@ -670,7 +671,7 @@ const FloatingActionCard = memo(({ plan, onContinue }: FloatingActionCardProps) 
   const muted = useColorModeValue("gray.500", "gray.400");
 
   const gradient = plan ? getGradient(plan.data.accent_color) : "";
-  const accentHex = plan ? getAccentHex(plan.data.accent_color) : "#7551FF";
+  const accentHex = plan ? getAccentHex(plan.data.accent_color) : BRAND_HEX;
 
   // Only render when a plan is chosen — slides up from below
   if (!plan) return null;
@@ -861,8 +862,8 @@ const SearchBar = memo(({ value, onChange, onClear, totalCount, filteredCount }:
           backdropFilter="blur(12px)"
           _placeholder={{ color: muted, fontWeight: "500" }}
           _focus={{
-            borderColor: "#7551FF",
-            boxShadow: "0 0 0 3px rgba(117,81,255,0.15)",
+            borderColor: BRAND_HEX,
+            boxShadow: `0 0 0 3px ${BRAND_HEX}26`,
             outline: "none",
           }}
           transition="border-color 0.2s, box-shadow 0.2s"
@@ -931,11 +932,11 @@ const BillingCycleFilter = memo(({ active, onChange }: BillingFilterProps) => {
             fontWeight="700"
             fontSize="xs"
             onClick={() => onChange(opt.value)}
-            bg={isActive ? "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)" : "transparent"}
+            bg={isActive ? BRAND_GRADIENT : "transparent"}
             color={isActive ? "white" : "app.text.muted"}
             _hover={isActive ? {} : { bg: useColorModeValue("gray.100", "rgba(255,255,255,0.06)"), color: "app.text.primary" }}
             transition="all 0.2s"
-            boxShadow={isActive ? "0 4px 12px rgba(117,81,255,0.4)" : "none"}
+            boxShadow={isActive ? `0 4px 12px ${BRAND_HEX}66` : "none"}
           >
             {opt.label}
           </Button>
@@ -961,7 +962,7 @@ const SelectMembershipPlan = memo(() => {
   const [billingFilter, setBillingFilter] = useState<BillingFilter>("all");
 
   const pageBg = useColorModeValue("rgba(248,250,252,1)", "bg.default");
-  const accentOrb = useColorModeValue("rgba(117,81,255,0.06)", "rgba(117,81,255,0.09)");
+  const accentOrb = useColorModeValue(`${BRAND_HEX}0f`, `${BRAND_HEX}17`);
 
   // Derived member display values
   const memberName = useMemo(() => {
@@ -1050,7 +1051,7 @@ const SelectMembershipPlan = memo(() => {
         w="500px"
         h="500px"
         borderRadius="full"
-        bg="rgba(117,81,255,0.08)"
+        bg={`${BRAND_HEX}14`}
         filter="blur(120px)"
         pointerEvents="none"
         zIndex={0}
@@ -1078,7 +1079,7 @@ const SelectMembershipPlan = memo(() => {
               <Box
                 w={1}
                 h={6}
-                bg="linear-gradient(180deg, #7551FF, #422AFB)"
+                bg={`linear-gradient(180deg, ${BRAND_HEX}, ${BRAND_ALT})`}
                 borderRadius="full"
               />
               <Heading

@@ -39,6 +39,8 @@ import { PageLayout } from "@/core/components/PageLayout";
 import { useInvoiceDetails } from "./hooks/useInvoiceDetails";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 
+import { BRAND_GRADIENT, BRAND_HEX } from "@/theme/tokens/colors";
+
 // ─── Payment Method Card ─────────────────────────────────────────────
 
 interface PaymentMethodProps {
@@ -233,8 +235,8 @@ const PaymentSelection = memo(() => {
             icon={<QrCode size={22} />}
             title="UPI / QR Code"
             subtitle="Google Pay, PhonePe, Paytm or any UPI app"
-            gradient="linear-gradient(135deg, #7551FF 0%, #422AFB 100%)"
-            glowColor="#7551FF"
+            gradient={BRAND_GRADIENT}
+            glowColor={BRAND_HEX}
             onClick={handleUPI}
           />
 

@@ -33,6 +33,7 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
+import { BRAND_GRADIENT, BRAND_HEX, BRAND_ALT } from "@/theme/tokens/colors";
 import {
   CheckCircle2,
   Printer,
@@ -158,7 +159,7 @@ const PaymentSuccessReceipt = memo<PaymentSuccessReceiptProps>(
                   key={i}
                   size={16}
                   color={
-                    ["#7551FF", "#01B574", "#FFB547", "#E53E3E", "#3182CE", "#D69E2E"][i]
+                    [BRAND_HEX, "#01B574", "#FFB547", "#E53E3E", "#3182CE", "#D69E2E"][i]
                   }
                   style={{
                     animation: `confetti-fall ${1.5 + i * 0.3}s ease-out forwards`,
@@ -389,10 +390,10 @@ const PaymentSuccessReceipt = memo<PaymentSuccessReceiptProps>(
               letterSpacing="widest"
               textTransform="uppercase"
               onClick={onBackToDirectory}
-              bg="linear-gradient(135deg, #7551FF 0%, #422AFB 100%)"
+              bg={BRAND_GRADIENT}
               _hover={{
                 transform: "translateY(-2px)",
-                boxShadow: "0 10px 20px -5px rgba(66,42,251,0.3)",
+                boxShadow: `0 10px 20px -5px ${BRAND_ALT}4D`,
               }}
               transition="all 0.25s"
             >

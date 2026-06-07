@@ -52,6 +52,7 @@ import type {
     InvoiceTaxBreakdown,
 } from "./types/Gym.types";
 import confetti from "canvas-confetti";
+import { BRAND_GRADIENT, BRAND_HEX, BRAND_ALT } from "@/theme/tokens/colors";
 
 // ── Shared Billing Components ────────────────────────────────────────
 import {
@@ -78,7 +79,7 @@ const formatINR = (amount: number) =>
 // ─── Gradient Mappings ──────────────────────────────────────────────
 
 const GRADIENT_MAP: Record<string, string> = {
-    brand: "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)",
+    brand: BRAND_GRADIENT,
     blue: "linear-gradient(135deg, #3965FF 0%, #002DFF 100%)",
     green: "linear-gradient(135deg, #01B574 0%, #00875A 100%)",
     orange: "linear-gradient(135deg, #FFB547 0%, #E67E00 100%)",
@@ -300,7 +301,7 @@ const EmptyPlansState = memo(() => {
                     fontWeight="900"
                     letterSpacing="wider"
                     onClick={handleCreatePlan}
-                    bg="linear-gradient(135deg, #7551FF 0%, #422AFB 100%)"
+                    bg={BRAND_GRADIENT}
                     _hover={{ transform: "translateY(-3px)", boxShadow: "0 15px 30px -10px var(--chakra-colors-brand-500)" }}
                     transition="all 0.3s"
                 >
@@ -360,7 +361,7 @@ const StepTracker = memo(({ currentStep }: StepTrackerProps) => {
                         fontSize="xs"
                         border="1px solid"
                         borderColor={isCompleted ? "green.500" : isActive ? "transparent" : "whiteAlpha.100"}
-                        boxShadow={isActive ? "0 0 15px rgba(117,81,255,0.5)" : "none"}
+                        boxShadow={isActive ? `0 0 15px ${BRAND_HEX}80` : "none"}
                         transition="all 0.3s"
                     >
                         {isCompleted ? <Check size={14} strokeWidth={3} /> : idx + 1}
@@ -446,7 +447,7 @@ const SelectPlan = memo(() => {
                 particleCount: 125,
                 spread: 75,
                 origin: { y: 0.65 },
-                colors: ["#7551FF", "#422AFB", "#01B574", "#FFB547"],
+                colors: [BRAND_HEX, BRAND_ALT, "#01B574", "#FFB547"],
             });
             const t = setTimeout(() => {
                 confetti({ particleCount: 85, spread: 110, origin: { y: 0.75 } });
@@ -685,7 +686,7 @@ const SelectPlan = memo(() => {
                             borderRadius="2xl"
                             fontWeight="900"
                             onClick={handleBack}
-                            bg="linear-gradient(135deg, #7551FF 0%, #422AFB 100%)"
+                            bg={BRAND_GRADIENT}
                             _hover={{ transform: "translateY(-2px)" }}
                         >
                             <ArrowLeft size={18} /> Back to Directory
@@ -845,7 +846,7 @@ const SelectPlan = memo(() => {
                                     textTransform="uppercase"
                                     onClick={handleProceedToPayment}
                                     disabled={!selectedPlan || isSubmitting}
-                                    bg="linear-gradient(135deg, #7551FF 0%, #422AFB 100%)"
+                                    bg={BRAND_GRADIENT}
                                     _hover={{
                                         transform: "translateY(-3px)",
                                         boxShadow: "0 12px 25px -8px var(--chakra-colors-brand-500)",
@@ -975,7 +976,7 @@ const SelectPlan = memo(() => {
                                     textTransform="uppercase"
                                     onClick={handleCollectPayment}
                                     disabled={isSubmitting}
-                                    bg="linear-gradient(135deg, #7551FF 0%, #422AFB 100%)"
+                                    bg={BRAND_GRADIENT}
                                     _hover={{
                                         transform: "translateY(-3px)",
                                         boxShadow: "0 12px 25px -8px var(--chakra-colors-brand-500)",

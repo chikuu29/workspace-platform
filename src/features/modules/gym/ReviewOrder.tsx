@@ -41,11 +41,12 @@ import { useGymMember } from "./hooks/useGymMember";
 import { useGymPlan } from "./hooks/useGymPlan";
 import { GymApiService } from "./services/gymApi.service";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
+import { BRAND_GRADIENT, BRAND_HEX, BRAND_ALT } from "@/theme/tokens/colors";
 
 // ─── Design Constants ─────────────────────────────────────────────────────────
 
 const HERO_GRADIENT: Record<string, string> = {
-  brand: "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)",
+  brand: BRAND_GRADIENT,
   blue: "linear-gradient(135deg, #3965FF 0%, #002DFF 100%)",
   green: "linear-gradient(135deg, #01B574 0%, #00875A 100%)",
   orange: "linear-gradient(135deg, #FFB547 0%, #E67E00 100%)",
@@ -57,7 +58,7 @@ const HERO_GRADIENT: Record<string, string> = {
 };
 
 const ACCENT_HEX: Record<string, string> = {
-  brand: "#7551FF",
+  brand: BRAND_HEX,
   blue: "#3965FF",
   green: "#01B574",
   orange: "#FFB547",
@@ -226,10 +227,10 @@ const MemberContextBar = memo(({
           <Box position="relative">
             <Circle
               size={12}
-              bg="linear-gradient(135deg, #7551FF22, #422AFB22)"
+              bg={`linear-gradient(135deg, ${BRAND_HEX}22, ${BRAND_ALT}22)`}
               border="2px solid"
               borderColor={`${statusColor}55`}
-              color="#7551FF"
+              color={BRAND_HEX}
               fontWeight="900"
               fontSize="lg"
             >
@@ -259,9 +260,9 @@ const MemberContextBar = memo(({
                   px={2}
                   py={0.5}
                   borderRadius="full"
-                  bg="rgba(117,81,255,0.15)"
-                  color="#7551FF"
-                  border="1px solid rgba(117,81,255,0.25)"
+                  bg={`${BRAND_HEX}26`}
+                  color={BRAND_HEX}
+                  border={`1px solid ${BRAND_HEX}40`}
                 >
                   {currentPlan}
                 </Badge>

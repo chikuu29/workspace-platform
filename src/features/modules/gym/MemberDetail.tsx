@@ -36,11 +36,7 @@ import {
   DialogFooter, DialogTitle, DialogBody, DialogCloseTrigger,
 } from "@/components/ui/dialog";
 
-// ─── Brand Design Tokens ──────────────────────────────────────────────────────
-
-const BRAND_GRADIENT = "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)";
-const BRAND_HEX = "#7551FF";
-const BRAND_ALT = "#422AFB";
+import { BRAND_GRADIENT, BRAND_HEX, BRAND_ALT } from "@/theme/tokens/colors";
 
 type StatusKey = "active" | "attention" | "frozen";
 
@@ -644,9 +640,9 @@ const PaymentDetailsModal = memo(({ payment, currency = "INR", onClose }: Paymen
               borderRadius="xl"
               fontWeight="900"
               style={{ background: BRAND_GRADIENT, color: "white" }}
-              boxShadow="0 6px 18px rgba(117,81,255,0.4)"
+              boxShadow={`0 6px 18px ${BRAND_HEX}66`}
               onClick={handleDownload}
-              _hover={{ transform: "translateY(-1px)", boxShadow: "0 10px 24px rgba(117,81,255,0.5)" }}
+              _hover={{ transform: "translateY(-1px)", boxShadow: `0 10px 24px ${BRAND_HEX}80` }}
               _active={{ transform: "translateY(0) scale(0.98)" }}
             >
               Download PDF
@@ -825,7 +821,7 @@ const EditMemberModal = memo(({ open, member, onClose, onSuccess }: EditMemberMo
                   style={isActive ? { background: BRAND_GRADIENT, color: "white" } : {}}
                   variant={isActive ? undefined : "ghost"}
                   color={isActive ? "white" : "app.text.muted"}
-                  boxShadow={isActive ? "0 4px 12px rgba(117,81,255,0.35)" : undefined}
+                  boxShadow={isActive ? `0 4px 12px ${BRAND_HEX}59` : undefined}
                   transition="all 0.2s"
                 >
                   {tab}
@@ -1070,9 +1066,9 @@ const EditMemberModal = memo(({ open, member, onClose, onSuccess }: EditMemberMo
                 borderRadius="xl"
                 fontWeight="900"
                 style={{ background: BRAND_GRADIENT, color: "white" }}
-                boxShadow="0 6px 18px rgba(117,81,255,0.4)"
+                boxShadow={`0 6px 18px ${BRAND_HEX}66`}
                 loading={saving}
-                _hover={{ transform: "translateY(-1px)", boxShadow: "0 10px 24px rgba(117,81,255,0.5)" }}
+                _hover={{ transform: "translateY(-1px)", boxShadow: `0 10px 24px ${BRAND_HEX}80` }}
                 _active={{ transform: "scale(0.98)" }}
                 transition="all 0.25s cubic-bezier(0.175,0.885,0.32,1.275)"
               >
@@ -1129,7 +1125,7 @@ const MemberDetail = memo(() => {
           size="sm"
           h="34px"
           px={4}
-          borderRadius="xl"
+          borderRadius="md"
           fontWeight="700"
           borderColor="rgba(226,232,240,0.8)"
           color="app.text.primary"
@@ -1146,13 +1142,13 @@ const MemberDetail = memo(() => {
           size="sm"
           h="34px"
           px={4}
-          borderRadius="xl"
+          borderRadius="md"
           fontWeight="700"
           style={{ background: BRAND_GRADIENT, color: "white" }}
-          boxShadow="0 4px 14px rgba(117,81,255,0.35)"
+          boxShadow={`0 4px 14px ${BRAND_HEX}59`}
           onClick={() => refresh()}
           loading={loading}
-          _hover={{ transform: "translateY(-1px)", boxShadow: "0 8px 20px rgba(117,81,255,0.5)" }}
+          _hover={{ transform: "translateY(-1px)", boxShadow: `0 8px 20px ${BRAND_HEX}80` }}
           _active={{ transform: "scale(0.97)" }}
         >
           <HStack gap={1.5}>
@@ -1230,9 +1226,9 @@ const MemberDetail = memo(() => {
           <Button
             h="44px" px={7} borderRadius="xl" fontWeight="900"
             style={{ background: BRAND_GRADIENT, color: "white" }}
-            boxShadow="0 8px 24px rgba(117,81,255,0.4)"
+            boxShadow={`0 8px 24px ${BRAND_HEX}66`}
             onClick={handleBack}
-            _hover={{ transform: "translateY(-2px)", boxShadow: "0 14px 32px rgba(117,81,255,0.5)" }}
+            _hover={{ transform: "translateY(-2px)", boxShadow: `0 14px 32px ${BRAND_HEX}80` }}
             _active={{ transform: "scale(0.98)" }}
           >
             Return to Directory
@@ -1264,7 +1260,7 @@ const MemberDetail = memo(() => {
       <Box
         position="fixed" top="-80px" right="-80px"
         w="400px" h="400px" borderRadius="full"
-        bg="rgba(117,81,255,0.07)" filter="blur(110px)"
+        bg={`${BRAND_HEX}12`} filter="blur(110px)"
         pointerEvents="none" zIndex={0}
       />
 
@@ -1379,9 +1375,9 @@ const MemberDetail = memo(() => {
                   fontSize="sm"
                   letterSpacing="wide"
                   style={{ background: BRAND_GRADIENT, color: "white" }}
-                  boxShadow="0 6px 18px rgba(117,81,255,0.4)"
+                  boxShadow={`0 6px 18px ${BRAND_HEX}66`}
                   onClick={handleAssignPlan}
-                  _hover={{ transform: "translateY(-2px)", boxShadow: "0 12px 28px rgba(117,81,255,0.5)" }}
+                  _hover={{ transform: "translateY(-2px)", boxShadow: `0 12px 28px ${BRAND_HEX}80` }}
                   _active={{ transform: "scale(0.98)" }}
                   transition="all 0.25s cubic-bezier(0.175,0.885,0.32,1.275)"
                 >
@@ -1606,9 +1602,9 @@ const MemberDetail = memo(() => {
                     fontWeight="900"
                     fontSize="sm"
                     style={{ background: BRAND_GRADIENT, color: "white" }}
-                    boxShadow="0 6px 18px rgba(117,81,255,0.35)"
+                    boxShadow={`0 6px 18px ${BRAND_HEX}59`}
                     onClick={handleAssignPlan}
-                    _hover={{ transform: "translateY(-2px)", boxShadow: "0 12px 28px rgba(117,81,255,0.5)" }}
+                    _hover={{ transform: "translateY(-2px)", boxShadow: `0 12px 28px ${BRAND_HEX}80` }}
                     _active={{ transform: "scale(0.98)" }}
                     transition="all 0.25s cubic-bezier(0.175,0.885,0.32,1.275)"
                   >
@@ -1649,9 +1645,9 @@ const MemberDetail = memo(() => {
                         fontWeight="900"
                         fontSize="sm"
                         style={{ background: BRAND_GRADIENT, color: "white" }}
-                        boxShadow="0 8px 24px rgba(117,81,255,0.4)"
+                        boxShadow={`0 8px 24px ${BRAND_HEX}66`}
                         onClick={handleAssignPlan}
-                        _hover={{ transform: "translateY(-2px)", boxShadow: "0 14px 32px rgba(117,81,255,0.55)" }}
+                        _hover={{ transform: "translateY(-2px)", boxShadow: `0 14px 32px ${BRAND_HEX}8c` }}
                         _active={{ transform: "scale(0.98)" }}
                         transition="all 0.25s cubic-bezier(0.175,0.885,0.32,1.275)"
                       >

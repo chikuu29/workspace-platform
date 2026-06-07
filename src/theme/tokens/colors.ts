@@ -1,3 +1,7 @@
+export const BRAND_HEX = "#7551FF";
+export const BRAND_ALT = "#422AFB";
+export const BRAND_GRADIENT = "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)";
+
 export const colors = {
 
 
@@ -186,25 +190,7 @@ export const semanticTokens = {
                 _dark: "rgba(255,255,255,0.08)",
             },
         },
-        // // ── Text ─────────────────────────────────────────────
-        // "app.text.primary": {
-        //     value: {
-        //         _light: "#0f172a",
-        //         _dark: "#f1f5f9",
-        //     },
-        // },
-        // "app.text.muted": {
-        //     value: {
-        //         _light: "#64748b",
-        //         _dark: "#94a3b8",
-        //     },
-        // },
-        // "app.text.accent": {
-        //     value: {
-        //         _light: "#6366f1",
-        //         _dark: "#818cf8",
-        //     },
-        // },
+
         // ── Divider ──────────────────────────────────────────
         "app.divider": {
             value: {
@@ -220,19 +206,7 @@ export const semanticTokens = {
                 _dark: "rgba(15, 23, 42, 0.97)",
             },
         },
-        // ── Auth card surface ─────────────────────────────────
-        // "auth.card.bg": {
-        //     value: {
-        //         _light: "rgba(255,255,255,0.95)",
-        //         _dark: "rgba(255,255,255,0.04)",
-        //     },
-        // },
-        // "auth.card.border": {
-        //     value: {
-        //         _light: "rgba(99,102,241,0.15)",
-        //         _dark: "rgba(255,255,255,0.08)",
-        //     },
-        // },
+
         // ── Input fields ──────────────────────────────────────
         "auth.input.bg": {
             value: {
@@ -299,6 +273,24 @@ export const semanticTokens = {
             value: {
                 _light: "rgba(148,163,184,0.4)",
                 _dark: "rgba(255,255,255,0.08)",
+            },
+        },
+        "app.brand.gradient": {
+            value: {
+                _light: "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)",
+                _dark: "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)",
+            },
+        },
+        "app.brand.hex": {
+            value: {
+                _light: "#7551FF",
+                _dark: "#7551FF",
+            },
+        },
+        "app.brand.alt": {
+            value: {
+                _light: "#422AFB",
+                _dark: "#422AFB",
             },
         }
 

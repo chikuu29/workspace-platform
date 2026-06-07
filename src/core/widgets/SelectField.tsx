@@ -11,6 +11,7 @@ import {
 } from "../../components/ui/combobox";
 import { GETAPI, APIService } from "@/app/api";
 import { ruleEngine } from "../engine/logicEngine";
+import { BRAND_HEX, BRAND_ALT } from "@/theme/tokens/colors";
 
 interface SELECTFIELD {
     name: string;
@@ -93,9 +94,9 @@ const SelectField = ({
         }), [options]
     );
 
-    const bgHover = useColorModeValue("rgba(66, 42, 251, 0.06)", "rgba(117, 81, 255, 0.15)");
+    const bgHover = useColorModeValue(`${BRAND_ALT}10`, `${BRAND_HEX}26`);
     const colorHover = useColorModeValue("brand.500", "brand.200");
-    const bgSelected = useColorModeValue("rgba(66, 42, 251, 0.1)", "rgba(117, 81, 255, 0.2)");
+    const bgSelected = useColorModeValue(`${BRAND_ALT}1A`, `${BRAND_HEX}33`);
     const colorSelected = useColorModeValue("brand.500", "brand.100");
 
     if (hidden || !methods) return null;

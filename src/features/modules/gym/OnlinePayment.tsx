@@ -45,6 +45,8 @@ import { GymApiService } from "./services/gymApi.service";
 import type { PayInvoicePayload } from "./types/Gym.types";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 
+import { BRAND_GRADIENT, BRAND_HEX } from "@/theme/tokens/colors";
+
 // ─── Helpers ─────────────────────────────────────────────────────────
 
 const formatINR = (amount: number) =>
@@ -72,9 +74,9 @@ const SuccessScreen = memo(
     const methodLabel = method === "upi" ? "UPI" : "Card";
     const gradient =
       method === "upi"
-        ? "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)"
+        ? BRAND_GRADIENT
         : "linear-gradient(135deg, #3965FF 0%, #002DFF 100%)";
-    const glow = method === "upi" ? "#7551FF" : "#3965FF";
+    const glow = method === "upi" ? BRAND_HEX : "#3965FF";
 
     return (
       <VStack gap={8} maxW="480px" mx="auto" textAlign="center">
@@ -209,9 +211,9 @@ const OnlinePayment = memo(() => {
   const borderCol = useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.08)");
 
   const gradient = isUPI
-    ? "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)"
+    ? BRAND_GRADIENT
     : "linear-gradient(135deg, #3965FF 0%, #002DFF 100%)";
-  const glowColor = isUPI ? "#7551FF" : "#3965FF";
+  const glowColor = isUPI ? BRAND_HEX : "#3965FF";
   const MethodIcon = isUPI ? QrCode : CreditCard;
 
   useEffect(() => {

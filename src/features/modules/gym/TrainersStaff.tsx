@@ -351,6 +351,9 @@ const TrainersStaff = memo(() => {
         onSearchChange={setSearchQuery}
         searchValue={searchQuery}
         searchPlaceholder="Search by name, specialty, or ID..."
+        icon={Dumbbell}
+        badge="Team Management"
+        accentColor="purple"
       />
 
       <VStack align="stretch" gap={6} pb={8}>

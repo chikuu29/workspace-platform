@@ -1,8 +1,8 @@
 /**
- * SelectMembershipPlan.tsx
+ * Plans.tsx
  *
  * Step 2 in the gym membership sales flow — premium redesign.
- * Route: /:org/workspace/app/gym/selectMembershipPlan/:memberId
+ * Route: /:org/workspace/app/gym/Plans/:memberId
  *
  * Design: Glassmorphism cards with gradient hero headers, animated
  *         selection ring, feature-icon lists, sticky comparison bar,
@@ -51,6 +51,7 @@ import {
   Zap,
 } from "lucide-react";
 import { toaster } from "@/components/ui/toaster";
+import { PageHeader } from "@/core/components/PageHeader";
 import { useGymMember } from "./hooks/useGymMember";
 import { useSubscriptionPlans } from "./hooks/useSubscriptionPlans";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
@@ -953,7 +954,7 @@ BillingCycleFilter.displayName = "BillingCycleFilter";
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 
-const SelectMembershipPlan = memo(() => {
+const Plans = memo(() => {
   const { params: memberId } = useParams();
   const navigate = useNavigate();
   const { organizationName, appCode } = useWorkspaceRouter();
@@ -1077,51 +1078,17 @@ const SelectMembershipPlan = memo(() => {
       <Box maxW="1400px" mx="auto" px={{ base: 4, md: 8 }} py={8} position="relative" zIndex={1}>
 
         {/* ── Page Header ── */}
-        <Flex justify="space-between" align="start" mb={8} flexWrap="wrap" gap={4}>
-          <VStack align="start" gap={1}>
-            <HStack gap={2}>
-              <Box
-                w={1}
-                h={6}
-                bg={`linear-gradient(180deg, g_blue, g_blue)`}
-                borderRadius="full"
-              />
-              <Heading
-                fontSize={{ base: "xl", md: "2xl" }}
-                fontWeight="950"
-                letterSpacing="tight"
-                color="app.text.primary"
-              >
-                Select Membership Plan
-              </Heading>
-            </HStack>
-            <Text fontSize="sm" color="app.text.muted" fontWeight="500" pl={3}>
-              {memberLoading
-                ? "Loading member details..."
-                : `Choose the right plan for ${memberName}`}
-            </Text>
-          </VStack>
-
-          {/* Back button — always accessible, no footer dependency */}
-          <Button
-            variant="outline"
-            borderRadius="xl"
-            onClick={handleBack}
-            fontWeight="700"
-            fontSize="sm"
-            h="40px"
-            px={5}
-            borderColor={useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.08)")}
-            color="app.text.primary"
-            _hover={{ bg: useColorModeValue("gray.50", "rgba(255,255,255,0.04)") }}
-            _active={{ transform: "scale(0.97)" }}
-          >
-            <HStack gap={2}>
-              <ArrowLeft size={14} />
-              <Text>Back</Text>
-            </HStack>
-          </Button>
-        </Flex>
+        <PageHeader
+          title="Select Membership Plan"
+          subtitle={
+            memberLoading
+              ? "Loading member details..."
+              : `Choose the right plan for ${memberName}`
+          }
+          icon={Crown}
+          badge="Plan Selection"
+          accentColor="blue"
+        />
 
         {/* ── Member Context Bar ── */}
         {!memberLoading && member ? (
@@ -1240,5 +1207,5 @@ const SelectMembershipPlan = memo(() => {
   );
 });
 
-SelectMembershipPlan.displayName = "SelectMembershipPlan";
-export default SelectMembershipPlan;
+Plans.displayName = "Plans";
+export default Plans;

@@ -375,21 +375,11 @@ const AddSubscriptionPlan = memo(() => {
 
             {/* ═══════════════ PAGE HEADER ═══════════════ */}
             <PageHeader
-                title={
-                    <HStack gap={3} align="center">
-                        <IconButton
-                            variant="ghost"
-                            borderRadius="full"
-                            size="sm"
-                            onClick={handleBack}
-                            aria-label="Go back"
-                        >
-                            <ArrowLeft size={18} />
-                        </IconButton>
-                        <Text>New Subscription Plan</Text>
-                    </HStack>
-                }
+                title="New Subscription Plan"
                 subtitle="Design a membership tier for your gym community"
+                icon={Rocket}
+                badge="Plan Builder"
+                accentColor="blue"
             />
 
             {/* ═══════════════ CONTENT: Form + Preview ═══════════════ */}

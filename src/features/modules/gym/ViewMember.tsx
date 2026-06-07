@@ -509,6 +509,9 @@ const ViewMember = memo(() => {
         onSearchChange={setSearchQuery}
         searchValue={searchQuery}
         searchPlaceholder="Search members, email, phone or ID..."
+        icon={Users}
+        badge="Member Ops"
+        accentColor="blue"
       />
       <VStack align="stretch" gap={6} pb={8}>
 

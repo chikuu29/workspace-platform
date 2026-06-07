@@ -254,7 +254,7 @@ const GymView = memo(() => {
         >
           <Icon as={Users} />
           <Text fontSize={{ base: "10px", sm: "xs", md: "sm" }} ml={1}>
-            Directory
+            Members
           </Text>
         </Button>
 
@@ -263,6 +263,7 @@ const GymView = memo(() => {
           colorPalette="blue"
           borderRadius="sm"
           fontWeight="800"
+          bg="g_blue"
           size="md"
           h={{ base: "36px", md: "40px" }}
           px={{ base: 1.5, md: 6 }}
@@ -349,25 +350,11 @@ const GymView = memo(() => {
     <Box w="full" animation="fade-in 0.4s ease-out">
       {/* ── Page Header ──────────────────────────────────────────── */}
       <PageHeader
-        title={
-          <HStack gap={4}>
-            <Flex
-              align="center"
-              justify="center"
-              w="48px"
-              h="48px"
-              bg="linear-gradient(135deg, #3182ce, #6366f1)"
-              borderRadius="xl"
-              color="white"
-              boxShadow="0 8px 16px rgba(49, 130, 206, 0.25)"
-              flexShrink={0}
-            >
-              <Zap size={24} fill="white" />
-            </Flex>
-            <Text>Operational Intelligence</Text>
-          </HStack>
-        }
-        subtitle="Real-time control center for memberships, high-frequency gym workflows, and floor density analytics."
+        title="Grow and Manage Your Gym"
+        subtitle="Simplify memberships, payments, attendance tracking, and daily operations."
+        icon={Zap}
+        badge="Live Gym Ops"
+        accentColor="blue"
       />
 
       <VStack align="stretch" gap={6} pb={8}>

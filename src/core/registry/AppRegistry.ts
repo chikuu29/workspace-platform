@@ -119,7 +119,7 @@ const registry: RegistryConfig = {
         PaymentsHistory: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.PaymentsHistory })),
         // ── New Multi-Step Sales Flow (Invoice-First Architecture) ────
         // Step 2: Plan selection — no API call, carries planCode via query param
-        selectMembershipPlan: () => import("@/features/modules/gym/SelectMembershipPlan"),
+        plans: () => import("@/features/modules/gym/Plans"),
         // Step 3: Order preview — fetches member+plan, computes estimated total
         reviewOrder: () => import("@/features/modules/gym/ReviewOrder"),
         // Step 3.5: Order view — shows order details + "Confirm & Generate Invoice" button

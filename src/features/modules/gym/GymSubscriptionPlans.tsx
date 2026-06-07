@@ -293,6 +293,9 @@ const GymSubscriptionPlans = memo(() => {
         <PageHeader
           title="Subscription Plans"
           subtitle={`${metrics.total} plans configured — ${metrics.active} active`}
+          icon={CreditCard}
+          badge="Plan Management"
+          accentColor="blue"
         />
 
         <VStack align="stretch" gap={6} pb={8}>

@@ -129,6 +129,9 @@ const AttendanceReport = memo(() => {
       <PageHeader
         title="Attendance Report"
         subtitle="Tracking visit frequency and member engagement levels."
+        icon={Activity}
+        badge="Attendance Intel"
+        accentColor="blue"
       />
 
       <VStack align="stretch" gap={6} pb={8}>

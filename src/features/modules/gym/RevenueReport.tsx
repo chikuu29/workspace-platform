@@ -147,211 +147,177 @@ const RevenueReport = memo(() => {
 
   return (
     <Box mt={4} animation="fade-in 0.5s ease-out" w="full">
-      {/* ── Hero Stats ──────────────────────────────── */}
-      <Box p={{ base: 5, lg: 7 }} borderRadius="2xl" bg={heroBg} border="1px solid"
-        borderColor={borderColor} boxShadow={useColorModeValue("0 4px 12px rgba(0, 0, 0, 0.05)", "0 1px 3px rgba(0,0,0,0.04)")} mb="3">
-        <Grid templateColumns={{ base: "1fr", xl: "1.1fr 1.6fr" }} gap={6} alignItems="stretch">
-          <VStack align="start" justify="space-between" gap={6}>
-            <VStack align="start" gap={3}>
-              <Badge colorPalette="green" variant="subtle" borderRadius="full" px={3} py={1} fontWeight="900">
-                Financial Intelligence
-              </Badge>
-              <Heading size={{ base: "xl", md: "2xl" }} letterSpacing="tight" color="app.text.primary">
-                Revenue at a glance.
-              </Heading>
-              <Text color={muted} fontSize="sm" maxW="560px" fontWeight="600">
-                Track MRR, plan-level revenue distribution, and collection health across your gym's subscription base.
-              </Text>
-            </VStack>
-            {derived.topPlan && (
-              <HStack px={4} py={2} borderRadius="xl" bg="green.500/10" border="1px solid" borderColor="green.500/15">
-                <ArrowUpRight size={16} color="var(--chakra-colors-green-500)" />
-                <Text fontSize="sm" fontWeight="900" color="green.500">
-                  Top plan: {derived.topPlan.plan_name} — {fmtCurrency(derived.topPlan.revenue)}
-                </Text>
-              </HStack>
-            )}
-          </VStack>
-          <SimpleGrid columns={{ base: 1, md: 2, xl: 4 }} gap={4}>
-            <Skeleton loading={loading} borderRadius="2xl">
-              <StatTile label="Total MRR" value={fmtCurrency(derived.totalRevenue)} caption="Monthly recurring" icon={Wallet} accent="green.500" />
-            </Skeleton>
-            <Skeleton loading={loading} borderRadius="2xl">
-              <StatTile label="Subscribers" value={derived.totalSubs} caption="Active plans" icon={Users} accent="blue.500" />
-            </Skeleton>
-            <Skeleton loading={loading} borderRadius="2xl">
-              <StatTile label="Avg / Member" value={fmtCurrency(derived.avgRevPerMember)} caption="Revenue per head" icon={TrendingUp} accent="purple.500" />
-            </Skeleton>
-            <Skeleton loading={loading} borderRadius="2xl">
-              <StatTile label="Collection" value={`${derived.collectionRate}%`} caption="Payment success" icon={CreditCard} accent="teal.500" />
-            </Skeleton>
-          </SimpleGrid>
-        </Grid>
-      </Box>
       <PageHeader
         title="Revenue Report"
         subtitle={`Financial overview — ${derived.totalSubs} active subscribers generating recurring revenue.`}
+        icon={Wallet}
+        badge="Financial Intelligence"
+        accentColor="green"
       />
 
       <VStack align="stretch" gap={6} pb={8}>
+        {/* ── Hero Stats ──────────────────────────────── */}
+        <Box p={{ base: 5, lg: 7 }} borderRadius="2xl" bg={heroBg} border="1px solid"
+          borderColor={borderColor} boxShadow={useColorModeValue("0 4px 12px rgba(0, 0, 0, 0.05)", "0 1px 3px rgba(0,0,0,0.04)")} mb="1">
 
 
-        {/* ── Main Grid ───────────────────────────────── */}
-        <Grid templateColumns={{ base: "1fr", xl: "minmax(0, 1fr) 380px" }} gap={{ base: 6, xl: 8 }}>
-          <GridItem minW={0}>
-            <VStack align="stretch" gap={6}>
-              {/* Plan Revenue Breakdown */}
-              <Box p={5} borderRadius="2xl" bg={panelBg} border="1px solid" borderColor={borderColor}>
-                <VStack align="stretch" gap={5}>
-                  <HStack justify="space-between">
-                    <VStack align="start" gap={0}>
-                      <Heading size="md" fontWeight="900">Revenue by Plan</Heading>
-                      <Text fontSize="sm" color={muted} fontWeight="700">
-                        {plansData.length} plan(s) generating revenue
+          {/* ── Main Grid ───────────────────────────────── */}
+          <Grid templateColumns={{ base: "1fr", xl: "minmax(0, 1fr) 380px" }} gap={{ base: 6, xl: 8 }}>
+            <GridItem minW={0}>
+              <VStack align="stretch" gap={6}>
+                {/* Plan Revenue Breakdown */}
+                <Box p={5} borderRadius="2xl" bg={panelBg} border="1px solid" borderColor={borderColor}>
+                  <VStack align="stretch" gap={5}>
+                    <HStack justify="space-between">
+                      <VStack align="start" gap={0}>
+                        <Heading size="md" fontWeight="900">Revenue by Plan</Heading>
+                        <Text fontSize="sm" color={muted} fontWeight="700">
+                          {plansData.length} plan(s) generating revenue
+                        </Text>
+                      </VStack>
+                      <Circle size="10" bg="green.500/10" color="green.500"><Activity size={18} /></Circle>
+                    </HStack>
+
+                    {loading ? (
+                      <VStack gap={3}>{[1, 2, 3].map((i) => <Skeleton key={i} h="90px" borderRadius="xl" />)}</VStack>
+                    ) : derived.sortedPlans.length > 0 ? (
+                      <VStack align="stretch" gap={3}>
+                        {derived.sortedPlans.map((plan, i) => (
+                          <PlanRevenueRow key={plan.plan_code} plan={plan} maxRevenue={derived.maxRevenue} rank={i + 1} />
+                        ))}
+                      </VStack>
+                    ) : (
+                      <Flex direction="column" align="center" py={10} gap={3}>
+                        <Circle size="14" bg="blue.500/10" color="blue.500"><Activity size={28} /></Circle>
+                        <Text fontWeight="900">No revenue data yet</Text>
+                        <Text fontSize="sm" color={muted} fontWeight="600">Revenue will appear when members subscribe to plans.</Text>
+                      </Flex>
+                    )}
+                  </VStack>
+                </Box>
+
+                {/* Revenue Stream Breakdown */}
+                <Box p={5} borderRadius="2xl" bg={panelBg} border="1px solid" borderColor={borderColor}>
+                  <VStack align="stretch" gap={4}>
+                    <HStack justify="space-between">
+                      <Heading size="md" fontWeight="900">Revenue Distribution</Heading>
+                      <Badge colorPalette="blue" variant="subtle" borderRadius="full" fontWeight="900">
+                        {fmtCurrency(derived.totalRevenue)} total
+                      </Badge>
+                    </HStack>
+
+                    {/* Stacked bar */}
+                    {derived.sortedPlans.length > 0 && (
+                      <>
+                        <Box borderRadius="full" overflow="hidden" h="14px" bg="blackAlpha.100" display="flex">
+                          {derived.sortedPlans.map((plan) => {
+                            const pct = derived.totalRevenue > 0
+                              ? Math.round((plan.revenue / derived.totalRevenue) * 100) : 0;
+                            const accent = plan.accent_color || "blue";
+                            return (
+                              <Box key={plan.plan_code} h="full" w={`${pct}%`}
+                                bg={`${accent}.500`} transition="width 0.6s ease" />
+                            );
+                          })}
+                        </Box>
+                        <SimpleGrid columns={{ base: 2, md: 3 }} gap={3}>
+                          {derived.sortedPlans.map((plan) => {
+                            const pct = derived.totalRevenue > 0
+                              ? Math.round((plan.revenue / derived.totalRevenue) * 100) : 0;
+                            const accent = plan.accent_color || "blue";
+                            return (
+                              <HStack key={plan.plan_code} gap={2}>
+                                <Box w="3px" h="14px" borderRadius="full" bg={`${accent}.500`} />
+                                <VStack align="start" gap={0}>
+                                  <Text fontSize="2xs" fontWeight="800" color={muted} truncate>{plan.plan_name}</Text>
+                                  <Text fontSize="sm" fontWeight="900">{fmtCurrency(plan.revenue)} ({pct}%)</Text>
+                                </VStack>
+                              </HStack>
+                            );
+                          })}
+                        </SimpleGrid>
+                      </>
+                    )}
+                  </VStack>
+                </Box>
+              </VStack>
+            </GridItem>
+
+            {/* ── Sidebar ─────────────────────────────── */}
+            <GridItem>
+              <VStack align="stretch" gap={5} position={{ xl: "sticky" }} top={{ xl: "7rem" }}>
+                {/* Health Score */}
+                <Box p={5} borderRadius="2xl" bg="gray.950" color="white" border="1px solid" borderColor="whiteAlpha.200">
+                  <VStack align="stretch" gap={4}>
+                    <HStack justify="space-between">
+                      <Heading size="sm" fontWeight="900">Revenue Health</Heading>
+                      <Activity size={16} />
+                    </HStack>
+                    <VStack align="center" py={4} gap={1}>
+                      <Text fontSize="4xl" fontWeight="900">
+                        {derived.collectionRate}%
                       </Text>
+                      <Text fontSize="xs" fontWeight="600" opacity={0.9}>Collection Rate</Text>
+                      <Badge colorPalette={derived.collectionRate >= 90 ? "green" : derived.collectionRate >= 70 ? "orange" : "red"}
+                        variant="solid" mt={2} px={3} borderRadius="full">
+                        {derived.collectionRate >= 90 ? "Healthy" : derived.collectionRate >= 70 ? "Moderate" : "Needs Attention"}
+                      </Badge>
                     </VStack>
-                    <Circle size="10" bg="green.500/10" color="green.500"><Activity size={18} /></Circle>
-                  </HStack>
-
-                  {loading ? (
-                    <VStack gap={3}>{[1, 2, 3].map((i) => <Skeleton key={i} h="90px" borderRadius="xl" />)}</VStack>
-                  ) : derived.sortedPlans.length > 0 ? (
-                    <VStack align="stretch" gap={3}>
-                      {derived.sortedPlans.map((plan, i) => (
-                        <PlanRevenueRow key={plan.plan_code} plan={plan} maxRevenue={derived.maxRevenue} rank={i + 1} />
-                      ))}
-                    </VStack>
-                  ) : (
-                    <Flex direction="column" align="center" py={10} gap={3}>
-                      <Circle size="14" bg="blue.500/10" color="blue.500"><Activity size={28} /></Circle>
-                      <Text fontWeight="900">No revenue data yet</Text>
-                      <Text fontSize="sm" color={muted} fontWeight="600">Revenue will appear when members subscribe to plans.</Text>
-                    </Flex>
-                  )}
-                </VStack>
-              </Box>
-
-              {/* Revenue Stream Breakdown */}
-              <Box p={5} borderRadius="2xl" bg={panelBg} border="1px solid" borderColor={borderColor}>
-                <VStack align="stretch" gap={4}>
-                  <HStack justify="space-between">
-                    <Heading size="md" fontWeight="900">Revenue Distribution</Heading>
-                    <Badge colorPalette="blue" variant="subtle" borderRadius="full" fontWeight="900">
-                      {fmtCurrency(derived.totalRevenue)} total
-                    </Badge>
-                  </HStack>
-
-                  {/* Stacked bar */}
-                  {derived.sortedPlans.length > 0 && (
-                    <>
-                      <Box borderRadius="full" overflow="hidden" h="14px" bg="blackAlpha.100" display="flex">
-                        {derived.sortedPlans.map((plan) => {
-                          const pct = derived.totalRevenue > 0
-                            ? Math.round((plan.revenue / derived.totalRevenue) * 100) : 0;
-                          const accent = plan.accent_color || "blue";
-                          return (
-                            <Box key={plan.plan_code} h="full" w={`${pct}%`}
-                              bg={`${accent}.500`} transition="width 0.6s ease" />
-                          );
-                        })}
+                    <Separator borderColor="whiteAlpha.200" />
+                    <SimpleGrid columns={2} gap={4} textAlign="center">
+                      <Box>
+                        <Text fontSize="xs" opacity={0.7} mb={1}>Active Plans</Text>
+                        <Text fontSize="md" fontWeight="900">{stats?.active_plans || 0}</Text>
                       </Box>
-                      <SimpleGrid columns={{ base: 2, md: 3 }} gap={3}>
-                        {derived.sortedPlans.map((plan) => {
-                          const pct = derived.totalRevenue > 0
-                            ? Math.round((plan.revenue / derived.totalRevenue) * 100) : 0;
-                          const accent = plan.accent_color || "blue";
-                          return (
-                            <HStack key={plan.plan_code} gap={2}>
-                              <Box w="3px" h="14px" borderRadius="full" bg={`${accent}.500`} />
-                              <VStack align="start" gap={0}>
-                                <Text fontSize="2xs" fontWeight="800" color={muted} truncate>{plan.plan_name}</Text>
-                                <Text fontSize="sm" fontWeight="900">{fmtCurrency(plan.revenue)} ({pct}%)</Text>
-                              </VStack>
-                            </HStack>
-                          );
-                        })}
-                      </SimpleGrid>
-                    </>
-                  )}
-                </VStack>
-              </Box>
-            </VStack>
-          </GridItem>
-
-          {/* ── Sidebar ─────────────────────────────── */}
-          <GridItem>
-            <VStack align="stretch" gap={5} position={{ xl: "sticky" }} top={{ xl: "7rem" }}>
-              {/* Health Score */}
-              <Box p={5} borderRadius="2xl" bg="gray.950" color="white" border="1px solid" borderColor="whiteAlpha.200">
-                <VStack align="stretch" gap={4}>
-                  <HStack justify="space-between">
-                    <Heading size="sm" fontWeight="900">Revenue Health</Heading>
-                    <Activity size={16} />
-                  </HStack>
-                  <VStack align="center" py={4} gap={1}>
-                    <Text fontSize="4xl" fontWeight="900">
-                      {derived.collectionRate}%
-                    </Text>
-                    <Text fontSize="xs" fontWeight="600" opacity={0.9}>Collection Rate</Text>
-                    <Badge colorPalette={derived.collectionRate >= 90 ? "green" : derived.collectionRate >= 70 ? "orange" : "red"}
-                      variant="solid" mt={2} px={3} borderRadius="full">
-                      {derived.collectionRate >= 90 ? "Healthy" : derived.collectionRate >= 70 ? "Moderate" : "Needs Attention"}
-                    </Badge>
+                      <Box borderLeft="1px solid rgba(255,255,255,0.2)">
+                        <Text fontSize="xs" opacity={0.7} mb={1}>Total Plans</Text>
+                        <Text fontSize="md" fontWeight="900">{stats?.total_plans || 0}</Text>
+                      </Box>
+                    </SimpleGrid>
                   </VStack>
-                  <Separator borderColor="whiteAlpha.200" />
-                  <SimpleGrid columns={2} gap={4} textAlign="center">
-                    <Box>
-                      <Text fontSize="xs" opacity={0.7} mb={1}>Active Plans</Text>
-                      <Text fontSize="md" fontWeight="900">{stats?.active_plans || 0}</Text>
-                    </Box>
-                    <Box borderLeft="1px solid rgba(255,255,255,0.2)">
-                      <Text fontSize="xs" opacity={0.7} mb={1}>Total Plans</Text>
-                      <Text fontSize="md" fontWeight="900">{stats?.total_plans || 0}</Text>
-                    </Box>
-                  </SimpleGrid>
-                </VStack>
-              </Box>
+                </Box>
 
-              {/* Plan Metrics */}
-              <Box p={5} borderRadius="2xl" bg={panelBg} border="1px solid" borderColor={borderColor}>
-                <VStack align="stretch" gap={4}>
-                  <Heading size="sm" fontWeight="900">Plan Metrics</Heading>
-                  <VStack align="stretch" gap={3}>
-                    {derived.sortedPlans.map((plan) => {
-                      const accent = plan.accent_color || "blue";
-                      return (
-                        <HStack key={plan.plan_code} justify="space-between" p={3} borderRadius="xl"
-                          bg={`${accent}.500/6`} border="1px solid" borderColor={`${accent}.500/12`}>
-                          <VStack align="start" gap={0} minW={0}>
-                            <Text fontSize="xs" fontWeight="900" truncate>{plan.plan_name}</Text>
-                            <Text fontSize="2xs" color={muted} fontWeight="700">
-                              {fmtCurrency(plan.price)} / {plan.billing_cycle}
-                            </Text>
-                          </VStack>
-                          <VStack align="end" gap={0}>
-                            <Text fontSize="xs" fontWeight="900">{plan.member_count}</Text>
-                            <Text fontSize="2xs" color={muted} fontWeight="700">members</Text>
-                          </VStack>
-                        </HStack>
-                      );
-                    })}
+                {/* Plan Metrics */}
+                <Box p={5} borderRadius="2xl" bg={panelBg} border="1px solid" borderColor={borderColor}>
+                  <VStack align="stretch" gap={4}>
+                    <Heading size="sm" fontWeight="900">Plan Metrics</Heading>
+                    <VStack align="stretch" gap={3}>
+                      {derived.sortedPlans.map((plan) => {
+                        const accent = plan.accent_color || "blue";
+                        return (
+                          <HStack key={plan.plan_code} justify="space-between" p={3} borderRadius="xl"
+                            bg={`${accent}.500/6`} border="1px solid" borderColor={`${accent}.500/12`}>
+                            <VStack align="start" gap={0} minW={0}>
+                              <Text fontSize="xs" fontWeight="900" truncate>{plan.plan_name}</Text>
+                              <Text fontSize="2xs" color={muted} fontWeight="700">
+                                {fmtCurrency(plan.price)} / {plan.billing_cycle}
+                              </Text>
+                            </VStack>
+                            <VStack align="end" gap={0}>
+                              <Text fontSize="xs" fontWeight="900">{plan.member_count}</Text>
+                              <Text fontSize="2xs" color={muted} fontWeight="700">members</Text>
+                            </VStack>
+                          </HStack>
+                        );
+                      })}
+                    </VStack>
+                    <Separator opacity={0.35} />
+                    <SimpleGrid columns={2} gap={3}>
+                      <Box p={3} borderRadius="xl" bg="green.500/10">
+                        <Text fontSize="xs" color={muted} fontWeight="800">Avg Revenue</Text>
+                        <Text fontSize="lg" fontWeight="900">{fmtCurrency(derived.avgRevPerMember)}</Text>
+                      </Box>
+                      <Box p={3} borderRadius="xl" bg="blue.500/10">
+                        <Text fontSize="xs" color={muted} fontWeight="800">Subscribers</Text>
+                        <Text fontSize="lg" fontWeight="900">{derived.totalSubs}</Text>
+                      </Box>
+                    </SimpleGrid>
                   </VStack>
-                  <Separator opacity={0.35} />
-                  <SimpleGrid columns={2} gap={3}>
-                    <Box p={3} borderRadius="xl" bg="green.500/10">
-                      <Text fontSize="xs" color={muted} fontWeight="800">Avg Revenue</Text>
-                      <Text fontSize="lg" fontWeight="900">{fmtCurrency(derived.avgRevPerMember)}</Text>
-                    </Box>
-                    <Box p={3} borderRadius="xl" bg="blue.500/10">
-                      <Text fontSize="xs" color={muted} fontWeight="800">Subscribers</Text>
-                      <Text fontSize="lg" fontWeight="900">{derived.totalSubs}</Text>
-                    </Box>
-                  </SimpleGrid>
-                </VStack>
-              </Box>
-            </VStack>
-          </GridItem>
-        </Grid>
+                </Box>
+              </VStack>
+            </GridItem>
+          </Grid>
+        </Box>
       </VStack>
     </Box>
   );

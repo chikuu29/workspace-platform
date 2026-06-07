@@ -667,6 +667,8 @@ const SelectPlan = memo(() => {
             <PageLayout
                 title="Member Not Found"
                 subtitle={`No profile found for ID: ${memberId || "Unknown"}.`}
+                icon={ShieldCheck}
+                accentColor="orange"
             >
                 <Card p={12} borderRadius="3xl" bg={stepBg} backdropFilter="blur(20px)" border="1px solid" borderColor={borderColor}>
                     <VStack gap={6} textAlign="center">
@@ -708,6 +710,9 @@ const SelectPlan = memo(() => {
             title="Premium Plan Enrollment"
             subtitle={memberLoading ? "Loading member data..." : `Enrolling ${memberName} in subscription service`}
             position="relative"
+            icon={Crown}
+            badge="Enrollment Flow"
+            accentColor="blue"
         >
             {/* Background Blurs */}
             <style dangerouslySetInnerHTML={{ __html: `

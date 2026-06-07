@@ -330,6 +330,9 @@ const Subscription = () => {
         <PageLayout
             title="Subscription Hub"
             subtitle="Real-time membership health, revenue forecasting, and plan management."
+            icon={Wallet}
+            badge="Revenue Hub"
+            accentColor="purple"
         >
             <VStack align="stretch" gap={10} pb={8}>
 

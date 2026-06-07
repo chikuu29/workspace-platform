@@ -4,7 +4,7 @@
  * Member profile cockpit — redesigned to match the unified brand design system:
  *   • Primary gradient: #7551FF → #422AFB
  *   • Glassmorphism cards (blur + translucent bg)
- *   • Consistent button styles matching SelectMembershipPlan
+ *   • Consistent button styles matching plans
  *   • Status colors: Active=#01B574, Attention=#FFB547, Frozen=#3965FF
  *   • All interactive elements share the same hover/transition vocabulary
  */
@@ -53,7 +53,7 @@ const STATUS_META: Record<StatusKey, {
   frozen: { label: "Frozen", hex: "#3965FF", bg: "rgba(57,101,255,0.12)", gradient: "linear-gradient(135deg,#3965FF,#002DFF)" },
 };
 
-/** Human-readable billing cycle labels matching SelectMembershipPlan */
+/** Human-readable billing cycle labels matching plans */
 const BILLING_LABEL: Record<string, string> = {
   monthly: "month",
   quarterly: "quarter",
@@ -114,7 +114,7 @@ const AnimatedDecimalCounter = memo(({ value, duration = 800 }: { value: number;
 AnimatedDecimalCounter.displayName = "AnimatedDecimalCounter";
 
 // ─── GlassCard ───────────────────────────────────────────────────────────────
-// Unified card primitive — matches SelectMembershipPlan's card style
+// Unified card primitive — matches plans's card style
 
 interface GlassCardProps {
   children: React.ReactNode;
@@ -1166,7 +1166,7 @@ const MemberDetail = memo(() => {
 
   const handleAssignPlan = useCallback(() => {
     if (!memberId) return;
-    navigateTo("selectMembershipPlan", memberId);
+    navigateTo("plans", memberId);
   }, [navigateTo, memberId]);
 
   const handleViewCurrentSub = useCallback(() => {

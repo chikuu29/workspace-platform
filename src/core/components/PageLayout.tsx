@@ -13,6 +13,12 @@ export interface PageLayoutProps extends Omit<BoxProps, "title"> {
     onRefresh?: () => void;
     isRefreshing?: boolean;
     icon?: React.ElementType;
+    /** Contextual badge label displayed above the title */
+    badge?: string;
+    /** Override badge color palette */
+    badgeColor?: string;
+    /** Accent color key — controls gradient bar, icon glow, badge */
+    accentColor?: string;
     children: React.ReactNode;
 }
 
@@ -27,6 +33,9 @@ export const PageLayout = memo(({
     onRefresh,
     isRefreshing,
     icon,
+    badge,
+    badgeColor,
+    accentColor,
     children,
     ...rest
 }: PageLayoutProps) => {
@@ -43,13 +52,13 @@ export const PageLayout = memo(({
                 onRefresh={onRefresh}
                 isRefreshing={isRefreshing}
                 icon={icon}
+                badge={badge}
+                badgeColor={badgeColor}
+                accentColor={accentColor}
             />
             <Box
-                // bg="app.card.bg"
                 backdropFilter="blur(16px)"
-                // border="1px solid"
                 borderColor="app.card.border"
-                // borderRadius="2xl"
                 overflow="hidden"
                 boxShadow="inner-xl"
                 p={4}

@@ -127,8 +127,8 @@
             },
             "myApps": {},
             "gym": {
-                "SHOW_SIDE_NAV_MENU": true,
-                "SHOW_TOP_NAV_MENU": false,
+                "SHOW_SIDE_NAV_MENU": false,
+                "SHOW_TOP_NAV_MENU": true,
                 "MENU": [
                     {
                         "label": "Home",

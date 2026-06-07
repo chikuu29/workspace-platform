@@ -293,6 +293,9 @@ const GymManagementDashboard = memo(() => {
       <PageHeader
         title="Gym Command Center"
         subtitle="Live overview for members, renewals, floor activity, and revenue performance."
+        icon={Zap}
+        badge="Command Center"
+        accentColor="blue"
       />
 
       <VStack align="stretch" gap={6} pb={8}>

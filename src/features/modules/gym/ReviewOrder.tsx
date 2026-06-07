@@ -391,13 +391,13 @@ const ReviewOrder = memo(() => {
 
   const handleEditPlan = useCallback(() => {
     navigate(
-      `/${organizationName}/workspace/app/${appCode}/selectMembershipPlan/${memberId}`
+      `/${organizationName}/workspace/app/${appCode}/plans/${memberId}`
     );
   }, [navigate, organizationName, appCode, memberId]);
 
   const handleGoBack = useCallback(() => {
     navigate(
-      `/${organizationName}/workspace/app/${appCode}/selectMembershipPlan/${memberId}`
+      `/${organizationName}/workspace/app/${appCode}/plans/${memberId}`
     );
   }, [navigate, organizationName, appCode, memberId]);
 

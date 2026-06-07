@@ -1,6 +1,6 @@
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { useNavActionStore } from "@/core/store/useNavActionStore";
-import { Box, Breadcrumb, Circle, Flex, HStack, Text } from "@chakra-ui/react";
+import { Box, Breadcrumb, Button, Circle, Flex, HStack, Text } from "@chakra-ui/react";
 import React, { forwardRef, useEffect, useState } from "react";
 import {
   ArrowLeft,
@@ -105,10 +105,9 @@ const AppBreadcrumb = forwardRef((_props, _ref) => {
     <Box
       w="100%"
       // py={{ base: "0.5rem", md: "0.65rem" }}
-      px={{ base: "3", sm: "4", md: "6" }}
-      // borderBottom="1px solid"
-      // borderColor={borderColorValue}
-      // bg="app.card.bg"
+      // px={{ base: "1", sm: "1", md: "2" }}
+      px={2}
+
       backdropFilter="blur(12px)"
       position="sticky"
       top="0"
@@ -124,51 +123,25 @@ const AppBreadcrumb = forwardRef((_props, _ref) => {
         {/* Left: Back button + horizontally scrollable trail */}
         <Flex align="center" gap={0} flex="1" minW={0} overflow="hidden">
           {config.length > 1 && (
-            <HStack gap={2} align="center" flexShrink={0}>
-              <HStack
-                role="group"
-                gap={1.5}
-                pl="1.5"
-                pr={{ base: "1.5", sm: "3.5" }}
-                py="1"
-                rounded="full"
-                border="1px solid"
-                borderColor={useColorModeValue("blue.600", "blue.500")}
-                bg={useColorModeValue("blue.600", "blue.500")}
-                boxShadow={useColorModeValue("0 2px 8px rgba(49, 130, 206, 0.25)", "none")}
-                transition="all 0.25s cubic-bezier(0.16, 1, 0.3, 1)"
-                cursor="pointer"
-                onClick={goBack}
-                _hover={{
-                  bg: useColorModeValue("blue.700", "blue.600"),
-                  borderColor: useColorModeValue("blue.700", "blue.600"),
-                  boxShadow: useColorModeValue("0 4px 15px rgba(49, 130, 206, 0.45)", "0 4px 20px rgba(49, 130, 206, 0.35)"),
-                  transform: "translateY(-1px)",
-                }}
-                _active={{ transform: "scale(0.97)" }}
-                color="white"
-              >
-                <Circle
-                  size={5}
-                  bg={useColorModeValue("rgba(255, 255, 255, 0.18)", "rgba(255, 255, 255, 0.15)")}
-                  color="white"
-                  transition="transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)"
-                  _groupHover={{ transform: "translateX(-2px)" }}
-                >
-                  <ArrowLeft size={10} strokeWidth={3} />
-                </Circle>
-                <Text
-                  fontWeight="850"
-                  fontSize={{ base: "9px", md: "10px" }}
-                  letterSpacing="wider"
-                  textTransform="uppercase"
-                  display={{ base: "none", sm: "block" }}
-                >
-                  Back
-                </Text>
+
+            <Button
+              variant="outline"
+
+              borderRadius="md"
+              onClick={goBack}
+              fontWeight="700"
+              fontSize="sm"
+
+              borderColor={useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.08)")}
+              color="app.text.primary"
+              _hover={{ bg: useColorModeValue("gray.50", "rgba(255,255,255,0.04)") }}
+              _active={{ transform: "scale(0.97)" }}
+            >
+              <HStack gap={3}>
+                <ArrowLeft size={14} />
+                <Text>Back</Text>
               </HStack>
-              <ChevronRight size={11} color={inactiveColor} />
-            </HStack>
+            </Button>
           )}
 
           {/* Horizontally scrollable breadcrumb trail */}

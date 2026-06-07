@@ -7,7 +7,7 @@
  *   - Tab 3: Invoices List (paginated)
  *   - Tab 4: Payments List (paginated)
  */
-import { memo, useState, useEffect, useCallback, useMemo } from "react";
+import { memo, useState, useEffect, useCallback, useMemo, useRef } from "react";
 import {
   Box, Button, Circle, Flex, HStack, Icon, Separator,
   SimpleGrid, Text, VStack, Badge, Table, IconButton, Grid,
@@ -74,6 +74,44 @@ export const MemberMembershipAndBilling = memo(({
   const [activeTab, setActiveTab] = useState<TabKey>("membership");
   const muted = useColorModeValue("gray.500", "gray.400");
   const border = useColorModeValue("rgba(226,232,240,0.6)", "rgba(255,255,255,0.06)");
+
+  // ── Tab scroll state checking for horizontal overflow ──
+  const [scrollState, setScrollState] = useState({ canScrollLeft: false, canScrollRight: false });
+  const tabsRef = useRef<HTMLDivElement>(null);
+
+  const checkScroll = useCallback(() => {
+    const el = tabsRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setScrollState({
+      canScrollLeft: scrollLeft > 1,
+      canScrollRight: scrollLeft + clientWidth < scrollWidth - 1,
+    });
+  }, []);
+
+  useEffect(() => {
+    const el = tabsRef.current;
+    if (!el) return;
+
+    checkScroll();
+
+    el.addEventListener("scroll", checkScroll);
+    window.addEventListener("resize", checkScroll);
+
+    return () => {
+      el.removeEventListener("scroll", checkScroll);
+      window.removeEventListener("resize", checkScroll);
+    };
+  }, [checkScroll, activeTab]);
+
+  const leftFadeBg = useColorModeValue(
+    "linear-gradient(90deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 100%)",
+    "linear-gradient(90deg, rgba(18,22,40,0.95) 0%, rgba(18,22,40,0) 100%)"
+  );
+  const rightFadeBg = useColorModeValue(
+    "linear-gradient(270deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 100%)",
+    "linear-gradient(270deg, rgba(18,22,40,0.95) 0%, rgba(18,22,40,0) 100%)"
+  );
 
   // Data States
   const [membership, setMembership] = useState<any>(null);
@@ -217,31 +255,78 @@ export const MemberMembershipAndBilling = memo(({
       <Flex justify="space-between" align={{ base: "stretch", md: "center" }} direction={{ base: "column", md: "row" }} gap={3} pb={2} borderBottom="1px solid" borderColor={border}>
         <SectionHeading>Membership & Billing</SectionHeading>
         
-        <HStack gap={1} bg={tabBg} p={1} borderRadius="xl" overflow="hidden">
-          {tabList.map((tab) => {
-            const isActive = activeTab === tab.key;
-            return (
-              <Button
-                key={tab.key}
-                size="sm"
-                h="32px"
-                px={3}
-                borderRadius="lg"
-                variant={isActive ? "solid" : "ghost"}
-                bg={isActive ? BRAND_HEX : "transparent"}
-                color={isActive ? "white" : "app.text.muted"}
-                fontWeight="800"
-                fontSize="xs"
-                onClick={() => setActiveTab(tab.key)}
-                _hover={isActive ? {} : { bg: useColorModeValue("rgba(0,0,0,0.05)", "rgba(255,255,255,0.05)") }}
-                transition="all 0.2s"
-              >
-                <Icon as={tab.icon} boxSize={3} mr={1.5} />
-                {tab.label}
-              </Button>
-            );
-          })}
-        </HStack>
+        <Box position="relative" maxW="full" w={{ base: "full", md: "auto" }}>
+          {/* Left scroll fade indicator */}
+          {scrollState.canScrollLeft && (
+            <Box
+              position="absolute"
+              left="0"
+              top="0"
+              bottom="0"
+              w="8"
+              pointerEvents="none"
+              zIndex={2}
+              style={{ background: leftFadeBg }}
+            />
+          )}
+
+          <HStack
+            ref={tabsRef}
+            gap={1}
+            bg={tabBg}
+            p={1}
+            borderRadius="xl"
+            overflowX="auto"
+            whiteSpace="nowrap"
+            w={{ base: "full", md: "auto" }}
+            maxW="full"
+            flexShrink={0}
+            css={{
+              "&::-webkit-scrollbar": { display: "none" },
+              "msOverflowStyle": "none",
+              "scrollbarWidth": "none",
+            }}
+          >
+            {tabList.map((tab) => {
+              const isActive = activeTab === tab.key;
+              return (
+                <Button
+                  key={tab.key}
+                  flexShrink={0}
+                  size="sm"
+                  h="32px"
+                  px={3}
+                  borderRadius="lg"
+                  variant={isActive ? "solid" : "ghost"}
+                  bg={isActive ? BRAND_HEX : "transparent"}
+                  color={isActive ? "white" : "app.text.muted"}
+                  fontWeight="800"
+                  fontSize="xs"
+                  onClick={() => setActiveTab(tab.key)}
+                  _hover={isActive ? {} : { bg: useColorModeValue("rgba(0,0,0,0.05)", "rgba(255,255,255,0.05)") }}
+                  transition="all 0.2s"
+                >
+                  <Icon as={tab.icon} boxSize={3} mr={1.5} />
+                  {tab.label}
+                </Button>
+              );
+            })}
+          </HStack>
+
+          {/* Right scroll fade indicator */}
+          {scrollState.canScrollRight && (
+            <Box
+              position="absolute"
+              right="0"
+              top="0"
+              bottom="0"
+              w="8"
+              pointerEvents="none"
+              zIndex={2}
+              style={{ background: rightFadeBg }}
+            />
+          )}
+        </Box>
       </Flex>
 
       {/* ─── TAB 1: MEMBERSHIP ─── */}
@@ -269,7 +354,13 @@ export const MemberMembershipAndBilling = memo(({
                 <Box position="absolute" top="-20px" right="-20px" w="100px" h="100px" borderRadius="full" bg="whiteAlpha.200" />
                 <Box position="absolute" bottom="-30px" left="-10px" w="70px" h="70px" borderRadius="full" bg="whiteAlpha.100" />
 
-                <Flex justify="space-between" align="start" position="relative">
+                <Flex
+                  justify="space-between"
+                  align={{ base: "stretch", sm: "start" }}
+                  direction={{ base: "column", sm: "row" }}
+                  gap={4}
+                  position="relative"
+                >
                   <VStack align="start" gap={1}>
                     <Text fontSize="9px" fontWeight="900" color="whiteAlpha.700" letterSpacing="wider">CURRENT ACTIVE PLAN</Text>
                     <Text fontSize="xl" fontWeight="950" color="white" letterSpacing="tight">{membership.data.plan_name}</Text>
@@ -289,7 +380,7 @@ export const MemberMembershipAndBilling = memo(({
                     </HStack>
                   </VStack>
 
-                  <VStack align="end" gap={0.5}>
+                  <VStack align={{ base: "start", sm: "end" }} gap={0.5}>
                     <Text fontSize="9px" fontWeight="900" color="whiteAlpha.700" letterSpacing="wider">AMOUNT</Text>
                     <Text fontSize="2xl" fontWeight="950" color="white" letterSpacing="tight">
                       {fmtCurrency(membership.data.price, membership.data.currency)}
@@ -302,7 +393,7 @@ export const MemberMembershipAndBilling = memo(({
               </Box>
 
               {/* Coverage details */}
-              <SimpleGrid columns={3} gap={3}>
+              <SimpleGrid columns={{ base: 1, sm: 3 }} gap={3}>
                 {[
                   { label: "Start Date", value: fmtDate(membership.data.start_date), icon: CalendarDays, color: BRAND_HEX },
                   { label: "End Date", value: fmtDate(membership.data.end_date), icon: CalendarDays, color: daysRemaining !== null && daysRemaining <= 7 ? "#FFB547" : "#01B574" },

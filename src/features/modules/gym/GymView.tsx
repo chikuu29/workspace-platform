@@ -137,7 +137,6 @@ interface QuickActionsSectionProps {
 }
 
 const QuickActionsSection = memo(({ onNavigate }: QuickActionsSectionProps) => {
-  // const panelBg = useColorModeValue("rgba(255,255,255,0.74)", "rgba(15,23,42,0.58)");
   const borderColor = useColorModeValue("rgba(226,232,240,0.84)", "rgba(255,255,255,0.12)");
 
   /** Stable callbacks map — one per action */
@@ -149,17 +148,43 @@ const QuickActionsSection = memo(({ onNavigate }: QuickActionsSectionProps) => {
     [onNavigate],
   );
 
+  const renderActionCard = useCallback(
+    (action: QuickActionDef) => (
+      <QuickActionCard
+        key={action.id}
+        label={action.label}
+        description={action.description}
+        icon={action.icon}
+        accentColor={action.accentColor}
+        onClick={handlers[action.id]}
+      />
+    ),
+    [handlers],
+  );
+
   return (
     <Box
-      p={5}
-      borderRadius="2xl"
+      p={5.5}
+      borderRadius="24px"
       bg={"app.card.bg"}
       border="1px solid"
       borderColor={borderColor}
-      backdropFilter="blur(16px) saturate(140%)"
-      boxShadow={useColorModeValue("0 4px 12px rgba(0, 0, 0, 0.05)", "0 1px 3px rgba(0,0,0,0.04)")}
+      backdropFilter="blur(20px) saturate(160%)"
+      boxShadow={useColorModeValue("0 10px 30px rgba(0, 0, 0, 0.04)", "0 4px 20px rgba(0, 0, 0, 0.2)")}
+      position="relative"
+      overflow="hidden"
     >
-      <VStack align="stretch" gap={4}>
+      {/* Decorative vertical accent bar */}
+      <Box
+        position="absolute"
+        top="0"
+        left="0"
+        bottom="0"
+        w="4px"
+        bgGradient="linear(to-b, #7551FF, #422AFB)"
+      />
+
+      <VStack align="stretch" gap={4.5} pl={2}>
         <HStack justify="space-between" align="center">
           <VStack align="start" gap={0}>
             <Heading size="sm" fontWeight="900" color="app.text.primary">
@@ -182,16 +207,7 @@ const QuickActionsSection = memo(({ onNavigate }: QuickActionsSectionProps) => {
         </HStack>
 
         <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={3}>
-          {QUICK_ACTIONS.map((action) => (
-            <QuickActionCard
-              key={action.id}
-              label={action.label}
-              description={action.description}
-              icon={action.icon}
-              accentColor={action.accentColor}
-              onClick={handlers[action.id]}
-            />
-          ))}
+          {QUICK_ACTIONS.map(renderActionCard)}
         </SimpleGrid>
       </VStack>
     </Box>
@@ -344,8 +360,6 @@ const GymView = memo(() => {
     [attentionMembers, frozenMembers, checkinsToday],
   );
 
-  const recentMembers = stats?.recent_members || [];
-
   return (
     <Box w="full" animation="fade-in 0.4s ease-out">
       {/* ── Page Header ──────────────────────────────────────────── */}
@@ -412,8 +426,6 @@ const GymView = memo(() => {
             <VStack align="stretch" gap={6}>
               <QuickActionsSection onNavigate={navigateTo} />
               <RecentEnrollmentsList
-                members={recentMembers}
-                loading={loading}
                 onViewAll={handleViewAll}
                 onMemberClick={handleMemberClick}
               />

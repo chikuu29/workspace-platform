@@ -34,6 +34,7 @@ import {
   Link2,
   QrCode,
   Shield,
+  Check,
 } from "lucide-react";
 import { PageLayout } from "@/core/components/PageLayout";
 import { useInvoiceDetails } from "./hooks/useInvoiceDetails";
@@ -109,6 +110,103 @@ const PaymentMethodCard = memo(
 );
 PaymentMethodCard.displayName = "PaymentMethodCard";
 
+interface ProgressStepperProps {
+  currentStep: number;
+  accentHex: string;
+  onStepClick?: (stepIndex: number) => void;
+}
+
+const ProgressStepper = memo(({ currentStep, accentHex, onStepClick }: ProgressStepperProps) => {
+  const steps = [
+    { label: "Select Plan", index: 1 },
+    { label: "Review Order", index: 2 },
+    { label: "Invoice Details", index: 3 },
+    { label: "Collect Payment", index: 4 },
+  ];
+
+  const muted = useColorModeValue("gray.500", "gray.400");
+  const borderCol = useColorModeValue("rgba(226, 232, 240, 0.8)", "rgba(255, 255, 255, 0.08)");
+  const cardBg = useColorModeValue("rgba(255, 255, 255, 0.5)", "rgba(255, 255, 255, 0.02)");
+
+  return (
+    <Box
+      w="100%"
+      mb={8}
+      p={4}
+      px={6}
+      bg={cardBg}
+      backdropFilter="blur(10px)"
+      border="1px solid"
+      borderColor={borderCol}
+      borderRadius="24px"
+      position="relative"
+      zIndex={1}
+      boxShadow={useColorModeValue("0 2px 10px rgba(0,0,0,0.01)", "none")}
+    >
+      <Flex justify="space-between" align="center" position="relative" maxW="900px" mx="auto">
+        {steps.map((step, idx) => {
+          const isCompleted = currentStep > step.index;
+          const isActive = currentStep === step.index;
+          const isClickable = isCompleted && !!onStepClick;
+
+          const handleStepClick = () => {
+            if (isClickable && onStepClick) {
+              onStepClick(step.index);
+            }
+          };
+
+          return (
+            <HStack key={step.index} gap={3} align="center" flex={idx === steps.length - 1 ? "none" : 1}>
+              <HStack
+                gap={2}
+                align="center"
+                cursor={isClickable ? "pointer" : "default"}
+                onClick={handleStepClick}
+                role={isClickable ? "button" : undefined}
+                _hover={isClickable ? { opacity: 0.85 } : undefined}
+                transition="opacity 0.2s"
+              >
+                <Circle
+                  size={7}
+                  bg={isCompleted ? "green.500" : isActive ? accentHex : "transparent"}
+                  border="2px solid"
+                  borderColor={isCompleted ? "green.500" : isActive ? accentHex : useColorModeValue("gray.300", "gray.600")}
+                  color={isCompleted || isActive ? "white" : muted}
+                  fontWeight="800"
+                  fontSize="xs"
+                  boxShadow={isActive ? `0 0 12px ${accentHex}50` : "none"}
+                  transition="all 0.3s"
+                >
+                  {isCompleted ? <Check size={12} strokeWidth={3} /> : step.index}
+                </Circle>
+                <Text
+                  fontSize="xs"
+                  fontWeight={isActive ? "900" : "700"}
+                  color={isActive ? "app.text.primary" : muted}
+                  letterSpacing="tight"
+                >
+                  {step.label}
+                </Text>
+              </HStack>
+
+              {idx < steps.length - 1 && (
+                <Box
+                  h="2px"
+                  flex={1}
+                  mx={4}
+                  bg={isCompleted ? "green.500" : useColorModeValue("gray.200", "whiteAlpha.100")}
+                  transition="all 0.3s"
+                />
+              )}
+            </HStack>
+          );
+        })}
+      </Flex>
+    </Box>
+  );
+});
+ProgressStepper.displayName = "ProgressStepper";
+
 // ═══════════════════════════════════════════════════════════════════
 //  MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════
@@ -121,6 +219,17 @@ const PaymentSelection = memo(() => {
 
   const { invoice, loading } = useInvoiceDetails(invoiceNumber);
   const muted = useColorModeValue("gray.500", "gray.400");
+
+  const handleStepClick = useCallback((stepIdx: number) => {
+    if (!invoice) return;
+    if (stepIdx === 1) {
+      navigate(`/${organizationName}/workspace/app/${appCode}/plans/${invoice.member_id}`);
+    } else if (stepIdx === 2) {
+      navigate(`/${organizationName}/workspace/app/${appCode}/reviewOrder/${invoice.member_id}?planCode=${invoice.plan_code}`);
+    } else if (stepIdx === 3) {
+      navigate(`/${organizationName}/workspace/app/${appCode}/invoiceView/${encodeURIComponent(invoice.invoice_number)}`);
+    }
+  }, [navigate, organizationName, appCode, invoice]);
 
   const encoded = useMemo(
     () => (invoiceNumber ? encodeURIComponent(invoiceNumber) : ""),
@@ -168,15 +277,7 @@ const PaymentSelection = memo(() => {
       }
     >
       {/* Breadcrumb */}
-      <HStack gap={2} mb={8} color={muted} fontSize="xs" fontWeight="700">
-        <Text>Select Plan</Text>
-        <ArrowRight size={12} />
-        <Text>Review Order</Text>
-        <ArrowRight size={12} />
-        <Text>Invoice</Text>
-        <ArrowRight size={12} />
-        <Text color="brand.500">Payment</Text>
-      </HStack>
+      <ProgressStepper currentStep={4} accentHex={BRAND_HEX} onStepClick={handleStepClick} />
 
       <Box maxW="640px" mx="auto">
         {/* Amount due header */}

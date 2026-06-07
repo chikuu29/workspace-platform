@@ -46,6 +46,7 @@ import {
   Sparkles,
   Star,
   TrendingUp,
+  User,
   Users,
   X,
   Zap,
@@ -56,6 +57,10 @@ import { useGymMember } from "./hooks/useGymMember";
 import { useSubscriptionPlans } from "./hooks/useSubscriptionPlans";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 import type { SubscriptionPlanDocument } from "./types/Gym.types";
+import {
+  DialogRoot, DialogBackdrop, DialogContent, DialogHeader,
+  DialogFooter, DialogTitle, DialogBody, DialogCloseTrigger,
+} from "@/components/ui/dialog";
 
 const BRAND_HEX = "#422AFB";
 const BRAND_ALT = "#7551FF";
@@ -539,113 +544,175 @@ interface MemberContextBarProps {
   phone?: string;
   currentPlan?: string;
   memberStatus?: string;
+  onFindBestPlan: () => void;
+  onViewMember: () => void;
 }
 
 const MemberContextBar = memo(({
-  memberName, memberId, email, phone, currentPlan, memberStatus
+  memberName, memberId, email, phone, currentPlan, memberStatus, onFindBestPlan, onViewMember
 }: MemberContextBarProps) => {
-  const cardBg = useColorModeValue("rgba(255,255,255,0.85)", "rgba(18,22,40,0.65)");
-  const border = useColorModeValue("rgba(226,232,240,0.7)", "rgba(255,255,255,0.08)");
+  const cardBg = useColorModeValue("rgba(255,255,255,0.85)", "rgba(18,22,40,0.72)");
+  const border = useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.07)");
+  const shadow = useColorModeValue("0 8px 32px rgba(0,0,0,0.04)", "0 8px 32px rgba(0,0,0,0.18)");
   const muted = useColorModeValue("gray.500", "gray.400");
 
-  const statusColor = memberStatus === "active" ? "#c3f400"
-    : memberStatus === "attention" ? "#FFB547"
-      : "#3965FF";
+  const statusMap: Record<string, { label: string; hex: string }> = {
+    active: { label: "Active", hex: "#01B574" },
+    attention: { label: "Needs Attention", hex: "#FFB547" },
+    frozen: { label: "Frozen", hex: "#3965FF" },
+  };
+  const statusInfo = statusMap[memberStatus?.toLowerCase() || "frozen"] || statusMap.frozen;
 
   return (
     <Box
       p={{ base: 4, md: 5 }}
-      borderRadius="20px"
+      borderRadius="24px"
       bg={cardBg}
-      backdropFilter="blur(24px) saturate(180%)"
+      backdropFilter="blur(24px) saturate(190%)"
       border="1px solid"
       borderColor={border}
-      boxShadow={useColorModeValue("0 4px 24px rgba(0,0,0,0.06)", "0 4px 24px rgba(0,0,0,0.25)")}
+      boxShadow={shadow}
+      position="relative"
+      overflow="hidden"
       mb={6}
     >
-      <Flex justify="space-between" align="center" flexWrap="wrap" gap={4}>
-        {/* Left — Member identity */}
-        <HStack gap={4}>
-          {/* Avatar with status ring */}
-          <Box position="relative">
-            <Circle
-              size={12}
-              bg="g_blue"
-              border="2px solid"
-              borderColor={`${statusColor}55`}
-              color="white"
-              fontWeight="900"
-              fontSize="lg"
-            >
-              {memberName.slice(0, 1).toUpperCase()}
-            </Circle>
-            <Circle
-              size={3}
-              bg={statusColor}
-              position="absolute"
-              bottom={0}
-              right={0}
-              border="2px solid"
-              borderColor={useColorModeValue("white", "rgba(18,22,40,0.9)")}
-              boxShadow={`0 0 8px ${statusColor}80`}
-            />
-          </Box>
+      {/* Visual decorative brand bar on the left */}
+      <Box position="absolute" left={0} top={0} bottom={0} w="4px" bg={BRAND_GRADIENT} />
 
-          <VStack align="start" gap={0.5}>
-            <HStack gap={2}>
-              <Text fontSize="sm" fontWeight="900" color="app.text.primary">
+      <Flex justify="space-between" align="center" flexWrap="wrap" gap={4} pl={2}>
+        {/* Left — Member identity info */}
+        <HStack gap={4}>
+          <Circle
+            size="52px"
+            bg={`linear-gradient(135deg, ${BRAND_HEX}22, ${BRAND_ALT}22)`}
+            color={BRAND_HEX}
+            fontWeight="900"
+            fontSize="xl"
+            border="2px solid"
+            borderColor={`${BRAND_HEX}30`}
+          >
+            {memberName.slice(0, 1).toUpperCase() || "?"}
+          </Circle>
+
+          <VStack align="start" gap={1}>
+            <HStack gap={3} flexWrap="wrap" align="center">
+              <Text fontSize="md" fontWeight="950" color="app.text.primary" letterSpacing="tight">
                 {memberName}
               </Text>
+              
+              {/* Member status badge */}
+              <Badge
+                fontSize="9px"
+                fontWeight="900"
+                px={2.5}
+                py={0.5}
+                borderRadius="full"
+                bg={`${statusInfo.hex}22`}
+                color={statusInfo.hex}
+                border={`1px solid ${statusInfo.hex}40`}
+                boxShadow={`0 0 8px ${statusInfo.hex}15`}
+              >
+                {statusInfo.label.toUpperCase()}
+              </Badge>
+
               {currentPlan && (
                 <Badge
                   fontSize="9px"
                   fontWeight="900"
-                  px={2}
+                  px={2.5}
                   py={0.5}
                   borderRadius="full"
-                  bg={`g_blue26`}
-                  color="g_blue"
-                  border={`1px solid g_blue40`}
+                  bg={`${BRAND_HEX}12`}
+                  color={BRAND_HEX}
+                  border={`1px solid ${BRAND_HEX}30`}
                 >
-                  {currentPlan}
+                  {currentPlan.toUpperCase()}
                 </Badge>
               )}
             </HStack>
-            <Text fontSize="10px" color={muted} fontWeight="600" fontFamily="mono">
-              {memberId}
-            </Text>
+
+            <HStack gap={2} fontSize="xs" fontWeight="700" color={muted}>
+              <Text fontFamily="mono" fontSize="10px">{memberId}</Text>
+              <Text>•</Text>
+              <Text>Reviewing sales template options</Text>
+            </HStack>
           </VStack>
         </HStack>
 
-        {/* Right — Contact info pills */}
+        {/* Right — Actions & Contact details */}
         <HStack gap={3} flexWrap="wrap">
+          {/* View Profile Button */}
+          <Button
+            size="sm"
+            h="40px"
+            px={5}
+            borderRadius="xl"
+            fontWeight="900"
+            fontSize="xs"
+            variant="outline"
+            borderColor={`${BRAND_HEX}30`}
+            color={BRAND_HEX}
+            onClick={onViewMember}
+            _hover={{
+              bg: `${BRAND_HEX}0d`,
+              borderColor: `${BRAND_HEX}50`,
+            }}
+            _active={{ transform: "scale(0.97)" }}
+            transition="all 0.25s"
+          >
+            <User size={13} style={{ marginRight: "6px" }} />
+            View Profile
+          </Button>
+
+          {/* Find Best Plan Button */}
+          <Button
+            size="sm"
+            h="40px"
+            px={5}
+            borderRadius="xl"
+            fontWeight="900"
+            fontSize="xs"
+            onClick={onFindBestPlan}
+            style={{ background: BRAND_GRADIENT, color: "white" }}
+            boxShadow={`0 4px 15px ${BRAND_HEX}40`}
+            _hover={{
+              transform: "translateY(-2px)",
+              boxShadow: `0 8px 24px ${BRAND_HEX}60`,
+            }}
+            _active={{ transform: "scale(0.97)" }}
+            transition="all 0.25s"
+          >
+            <Sparkles size={13} style={{ marginRight: "6px" }} />
+            Find Best Plan
+          </Button>
+
           {email && (
             <Box
-              px={3}
-              py={1.5}
-              borderRadius="full"
-              bg={useColorModeValue("gray.50", "rgba(255,255,255,0.04)")}
+              px={4}
+              py={2}
+              borderRadius="xl"
+              bg={useColorModeValue("rgba(248,250,252,0.9)", "rgba(255,255,255,0.03)")}
               border="1px solid"
               borderColor={border}
             >
               <VStack align="start" gap={0}>
-                <Text fontSize="8px" color={muted} fontWeight="800" letterSpacing="wider">EMAIL</Text>
-                <Text fontSize="xs" fontWeight="700" color="app.text.primary">{email}</Text>
+                <Text fontSize="8px" color={muted} fontWeight="900" letterSpacing="wider">EMAIL ADDRESS</Text>
+                <Text fontSize="xs" fontWeight="750" color="app.text.primary">{email}</Text>
               </VStack>
             </Box>
           )}
           {phone && (
             <Box
-              px={3}
-              py={1.5}
-              borderRadius="full"
-              bg={useColorModeValue("gray.50", "rgba(255,255,255,0.04)")}
+              px={4}
+              py={2}
+              borderRadius="xl"
+              bg={useColorModeValue("rgba(248,250,252,0.9)", "rgba(255,255,255,0.03)")}
               border="1px solid"
               borderColor={border}
             >
               <VStack align="start" gap={0}>
-                <Text fontSize="8px" color={muted} fontWeight="800" letterSpacing="wider">PHONE</Text>
-                <Text fontSize="xs" fontWeight="700" color="app.text.primary">{phone}</Text>
+                <Text fontSize="8px" color={muted} fontWeight="900" letterSpacing="wider">PHONE NUMBER</Text>
+                <Text fontSize="xs" fontWeight="750" color="app.text.primary">{phone}</Text>
               </VStack>
             </Box>
           )}
@@ -952,12 +1019,185 @@ const BillingCycleFilter = memo(({ active, onChange }: BillingFilterProps) => {
 });
 BillingCycleFilter.displayName = "BillingCycleFilter";
 
+// ─── RecommendationModal ──────────────────────────────────────────────────────
+
+const RecommendationModal = memo(({
+  open,
+  onClose,
+  memberName,
+  fitnessGoals,
+  recommendation,
+  onSelect,
+}: {
+  open: boolean;
+  onClose: () => void;
+  memberName: string;
+  fitnessGoals?: string;
+  recommendation: { plan: SubscriptionPlanDocument; reason: string } | null;
+  onSelect: (plan: SubscriptionPlanDocument) => void;
+}) => {
+  const overlayBg = useColorModeValue("rgba(0,0,0,0.45)", "rgba(0,0,0,0.7)");
+  const dialogBg = useColorModeValue("rgba(255,255,255,0.97)", "rgba(14,18,36,0.97)");
+  const borderColor = useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.08)");
+  const accentHex = recommendation ? getAccentHex(recommendation.plan.data.accent_color) : BRAND_HEX;
+  const gradient = recommendation ? getGradient(recommendation.plan.data.accent_color) : BRAND_GRADIENT;
+  const muted = useColorModeValue("gray.500", "gray.400");
+  const quoteBg = useColorModeValue("rgba(248,250,252,0.9)", "rgba(255,255,255,0.03)");
+
+  const handleApply = useCallback(() => {
+    if (recommendation) {
+      onSelect(recommendation.plan);
+      toaster.create({
+        title: "Plan Recommended",
+        description: `Successfully pre-selected the ${recommendation.plan.data.name} plan.`,
+        type: "success",
+      });
+    }
+    onClose();
+  }, [recommendation, onSelect, onClose]);
+
+  const handleOpenChange = useCallback((e: { open: boolean }) => {
+    if (!e.open) onClose();
+  }, [onClose]);
+
+  if (!recommendation) return null;
+
+  return (
+    <DialogRoot open={open} onOpenChange={handleOpenChange} size="md" placement="center">
+      <DialogBackdrop bg={overlayBg} backdropFilter="blur(12px)" />
+      <DialogContent
+        bg={dialogBg}
+        backdropFilter="blur(28px)"
+        borderColor={borderColor}
+        border="1px solid"
+        borderRadius="24px"
+        boxShadow="0 40px 80px rgba(0,0,0,0.4)"
+        overflow="hidden"
+      >
+        <Box h="3px" bg={gradient} />
+        
+        <DialogHeader p={5}>
+          <HStack justify="space-between" align="center">
+            <HStack gap={3}>
+              <Circle size={10} style={{ background: gradient }} color="white">
+                <Sparkles size={16} />
+              </Circle>
+              <VStack align="start" gap={0}>
+                <DialogTitle fontSize="md" fontWeight="950" color="app.text.primary">
+                  Smart Plan Assistant
+                </DialogTitle>
+                <Text fontSize="xs" color={muted}>
+                  Tailored template match for {memberName}
+                </Text>
+              </VStack>
+            </HStack>
+            <DialogCloseTrigger color="app.text.muted" borderRadius="lg" />
+          </HStack>
+        </DialogHeader>
+
+        <DialogBody px={6} py={4}>
+          <VStack align="stretch" gap={5}>
+            {/* Member goals section */}
+            <Box p={4} borderRadius="20px" bg={quoteBg} border="1px solid" borderColor={borderColor}>
+              <Text fontSize="9px" fontWeight="900" color={muted} letterSpacing="wider" textTransform="uppercase" mb={1.5}>
+                MEMBER'S FITNESS OBJECTIVES
+              </Text>
+              <Text fontSize="sm" fontWeight="600" color="app.text.primary" fontStyle={fitnessGoals ? "normal" : "italic"}>
+                {fitnessGoals ? `"${fitnessGoals}"` : "No specific goals registered. Matching based on general admission."}
+              </Text>
+            </Box>
+
+            {/* Recommendation badge & reasoning */}
+            <VStack align="stretch" gap={3}>
+              <Text fontSize="9px" fontWeight="900" color={muted} letterSpacing="wider" textTransform="uppercase">
+                RECOMMENDED MEMBERSHIP PLAN
+              </Text>
+              
+              <Flex
+                p={4}
+                borderRadius="20px"
+                bg={`${accentHex}0f`}
+                border="1px solid"
+                borderColor={`${accentHex}30`}
+                align="center"
+                justify="space-between"
+              >
+                <HStack gap={3.5}>
+                  <Circle size={10} style={{ background: gradient }} color="white" boxShadow={`0 4px 12px ${accentHex}40`}>
+                    <Award size={18} />
+                  </Circle>
+                  <VStack align="start" gap={0}>
+                    <Text fontSize="md" fontWeight="900" color="app.text.primary">
+                      {recommendation.plan.data.name}
+                    </Text>
+                    <Text fontSize="xs" color={muted} fontWeight="600">
+                      {recommendation.plan.data.code} · {CURRENCY_SYMBOL}{recommendation.plan.data.price.toLocaleString("en-IN")} / {BILLING_LABEL[recommendation.plan.data.billing_cycle] ?? recommendation.plan.data.billing_cycle}
+                    </Text>
+                  </VStack>
+                </HStack>
+
+                <Badge
+                  fontSize="9px"
+                  fontWeight="900"
+                  px={2.5}
+                  py={1}
+                  borderRadius="full"
+                  style={{ background: gradient, color: "white" }}
+                  boxShadow={`0 4px 10px ${accentHex}40`}
+                >
+                  RECOMMENDED
+                </Badge>
+              </Flex>
+
+              <Text fontSize="xs" color="app.text.primary" fontWeight="600" lineHeight="relaxed">
+                {recommendation.reason}
+              </Text>
+            </VStack>
+          </VStack>
+        </DialogBody>
+
+        <DialogFooter p={5} borderTopWidth="1px" borderColor={borderColor}>
+          <HStack w="full" justify="end" gap={3}>
+            <Button
+              variant="ghost"
+              h="40px"
+              px={5}
+              borderRadius="xl"
+              fontWeight="700"
+              fontSize="xs"
+              onClick={onClose}
+            >
+              Cancel
+            </Button>
+            <Button
+              h="40px"
+              px={6}
+              borderRadius="xl"
+              fontWeight="900"
+              fontSize="xs"
+              onClick={handleApply}
+              style={{ background: gradient, color: "white" }}
+              boxShadow={`0 6px 16px ${accentHex}40`}
+              _hover={{ transform: "translateY(-1px)", boxShadow: `0 10px 24px ${accentHex}60` }}
+              _active={{ transform: "scale(0.98)" }}
+              transition="all 0.25s"
+            >
+              Select Recommended Plan
+            </Button>
+          </HStack>
+        </DialogFooter>
+      </DialogContent>
+    </DialogRoot>
+  );
+});
+RecommendationModal.displayName = "RecommendationModal";
+
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 
 const Plans = memo(() => {
   const { params: memberId } = useParams();
   const navigate = useNavigate();
-  const { organizationName, appCode } = useWorkspaceRouter();
+  const { organizationName, appCode, navigateTo } = useWorkspaceRouter();
 
   const { member, loading: memberLoading } = useGymMember(memberId);
   const { plans, loading: plansLoading } = useSubscriptionPlans({ activeOnly: true });
@@ -965,6 +1205,47 @@ const Plans = memo(() => {
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlanDocument | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [billingFilter, setBillingFilter] = useState<BillingFilter>("all");
+  const [recommendOpen, setRecommendOpen] = useState(false);
+
+  // ── Smart Recommendation matching based on fitnessGoals ──
+  const recommendation = useMemo(() => {
+    if (!member?.data || plans.length === 0) return null;
+    const goals = (member.data.fitnessGoals || "").toLowerCase();
+    
+    let bestPlan = plans[0];
+    let matchReason = "Based on general membership preferences for gym entries.";
+
+    const proPlan = plans.find(p => p.data.code.toLowerCase().includes("pro") || p.data.name.toLowerCase().includes("pro") || p.data.name.toLowerCase().includes("premium") || p.data.name.toLowerCase().includes("elite"));
+    const standardPlan = plans.find(p => p.data.code.toLowerCase().includes("standard") || p.data.name.toLowerCase().includes("standard") || p.data.name.toLowerCase().includes("plus"));
+    const basicPlan = plans.find(p => p.data.code.toLowerCase().includes("basic") || p.data.name.toLowerCase().includes("basic") || p.data.name.toLowerCase().includes("starter"));
+
+    if (goals.includes("personal trainer") || goals.includes("trainer") || goals.includes("custom") || goals.includes("coaching") || goals.includes("elite") || goals.includes("bodybuilding") || goals.includes("hypertrophy") || goals.includes("heavy")) {
+      if (proPlan) {
+        bestPlan = proPlan;
+        matchReason = "Your objectives include specialized training or personal coaching. The Pro/Elite plan offers custom workout schedules and dedicated personal training sessions.";
+      }
+    } else if (goals.includes("weight loss") || goals.includes("burn") || goals.includes("fat") || goals.includes("cardio") || goals.includes("aerobic") || goals.includes("group") || goals.includes("classes")) {
+      if (standardPlan) {
+        bestPlan = standardPlan;
+        matchReason = "For weight management and group exercises, the Standard Plan provides full access to group cardio classes and conditioning equipment.";
+      } else if (proPlan) {
+        bestPlan = proPlan;
+        matchReason = "The Pro plan provides comprehensive fat-burning programs and unlimited class pass access.";
+      }
+    } else if (goals.includes("flexibility") || goals.includes("stretch") || goals.includes("yoga") || goals.includes("maintenance") || goals.includes("healthy")) {
+      if (basicPlan) {
+        bestPlan = basicPlan;
+        matchReason = "For general maintenance, flexibility, and self-guided workouts, the Starter/Basic plan provides all essential gym floor access at the best price.";
+      }
+    } else {
+      const sorted = [...plans].sort((a, b) => a.data.price - b.data.price);
+      const midIndex = Math.floor(sorted.length / 2);
+      bestPlan = sorted[midIndex];
+      matchReason = "This mid-tier plan is recommended as it offers the most popular balance of class access and training amenities.";
+    }
+
+    return { plan: bestPlan, reason: matchReason };
+  }, [member, plans]);
 
   const pageBg = useColorModeValue("rgba(248,250,252,1)", "bg.default");
   const accentOrb = useColorModeValue(`g_blue0f`, `g_blue17`);
@@ -997,6 +1278,10 @@ const Plans = memo(() => {
   const handleSelectPlan = useCallback((plan: SubscriptionPlanDocument) => setSelectedPlan(plan), []);
   const handleBack = useCallback(() => navigate(-1), [navigate]);
   const handleClearSearch = useCallback(() => setSearchQuery(""), []);
+  const handleViewMember = useCallback(() => {
+    if (!memberId) return;
+    navigateTo("member", memberId);
+  }, [navigateTo, memberId]);
 
   const handleContinue = useCallback(() => {
     if (!selectedPlan) {
@@ -1075,7 +1360,7 @@ const Plans = memo(() => {
       />
 
       {/* ── Page Content ── */}
-      <Box maxW="1400px" mx="auto" px={{ base: 4, md: 8 }} py={8} position="relative" zIndex={1}>
+      <Box w="full" px={{ base: 4, md: 8 }} py={8} position="relative" zIndex={1}>
 
         {/* ── Page Header ── */}
         <PageHeader
@@ -1099,6 +1384,8 @@ const Plans = memo(() => {
             phone={member.data.phone}
             currentPlan={member.data.plan}
             memberStatus={member.data.status}
+            onFindBestPlan={() => setRecommendOpen(true)}
+            onViewMember={handleViewMember}
           />
         ) : memberLoading ? (
           <Skeleton height="76px" borderRadius="20px" mb={6} />
@@ -1202,6 +1489,16 @@ const Plans = memo(() => {
       <FloatingActionCard
         plan={selectedPlan}
         onContinue={handleContinue}
+      />
+
+      {/* ── AI Recommendation Modal ── */}
+      <RecommendationModal
+        open={recommendOpen}
+        onClose={() => setRecommendOpen(false)}
+        memberName={memberName}
+        fitnessGoals={member?.data?.fitnessGoals}
+        recommendation={recommendation}
+        onSelect={handleSelectPlan}
       />
     </Box>
   );

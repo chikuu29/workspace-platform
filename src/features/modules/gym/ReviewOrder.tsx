@@ -35,6 +35,7 @@ import {
   FileText,
   Loader2,
   Tag,
+  Check,
 } from "lucide-react";
 import { toaster } from "@/components/ui/toaster";
 import { useGymMember } from "./hooks/useGymMember";
@@ -198,113 +199,152 @@ interface MemberContextBarProps {
   phone?: string;
   currentPlan?: string;
   memberStatus?: string;
+  onViewMember: () => void;
 }
 
 const MemberContextBar = memo(({
-  memberName, memberId, email, phone, currentPlan, memberStatus
+  memberName, memberId, email, phone, currentPlan, memberStatus, onViewMember
 }: MemberContextBarProps) => {
-  const cardBg = useColorModeValue("rgba(255,255,255,0.85)", "rgba(18,22,40,0.65)");
-  const border = useColorModeValue("rgba(226,232,240,0.7)", "rgba(255,255,255,0.08)");
+  const cardBg = useColorModeValue("rgba(255,255,255,0.85)", "rgba(18,22,40,0.72)");
+  const border = useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.07)");
+  const shadow = useColorModeValue("0 8px 32px rgba(0,0,0,0.04)", "0 8px 32px rgba(0,0,0,0.18)");
   const muted = useColorModeValue("gray.500", "gray.400");
 
-  const statusColor = memberStatus === "active" ? "#c3f400"
-    : memberStatus === "attention" ? "#FFB547"
-      : "#3965FF";
+  const statusMap: Record<string, { label: string; hex: string }> = {
+    active: { label: "Active", hex: "#01B574" },
+    attention: { label: "Needs Attention", hex: "#FFB547" },
+    frozen: { label: "Frozen", hex: "#3965FF" },
+  };
+  const statusInfo = statusMap[memberStatus?.toLowerCase() || "frozen"] || statusMap.frozen;
 
   return (
     <Box
       p={{ base: 4, md: 5 }}
-      borderRadius="20px"
+      borderRadius="24px"
       bg={cardBg}
-      backdropFilter="blur(24px) saturate(180%)"
+      backdropFilter="blur(24px) saturate(190%)"
       border="1px solid"
       borderColor={border}
-      boxShadow={useColorModeValue("0 4px 24px rgba(0,0,0,0.04)", "0 4px 24px rgba(0,0,0,0.20)")}
+      boxShadow={shadow}
+      position="relative"
+      overflow="hidden"
       mb={6}
     >
-      <Flex justify="space-between" align="center" flexWrap="wrap" gap={4}>
-        {/* Left — Member identity */}
-        <HStack gap={4}>
-          {/* Avatar with status ring */}
-          <Box position="relative">
-            <Circle
-              size={12}
-              bg={`linear-gradient(135deg, ${BRAND_HEX}22, ${BRAND_ALT}22)`}
-              border="2px solid"
-              borderColor={`${statusColor}55`}
-              color={BRAND_HEX}
-              fontWeight="900"
-              fontSize="lg"
-            >
-              {memberName.slice(0, 1).toUpperCase()}
-            </Circle>
-            <Circle
-              size={3}
-              bg={statusColor}
-              position="absolute"
-              bottom={0}
-              right={0}
-              border="2px solid"
-              borderColor={useColorModeValue("white", "rgba(18,22,40,0.9)")}
-              boxShadow={`0 0 8px ${statusColor}80`}
-            />
-          </Box>
+      {/* Visual decorative brand bar on the left */}
+      <Box position="absolute" left={0} top={0} bottom={0} w="4px" bg={BRAND_GRADIENT} />
 
-          <VStack align="start" gap={0.5}>
-            <HStack gap={2}>
-              <Text fontSize="sm" fontWeight="900" color="app.text.primary">
+      <Flex justify="space-between" align="center" flexWrap="wrap" gap={4} pl={2}>
+        {/* Left — Member identity info */}
+        <HStack gap={4}>
+          <Circle
+            size="52px"
+            bg={`linear-gradient(135deg, ${BRAND_HEX}22, ${BRAND_ALT}22)`}
+            color={BRAND_HEX}
+            fontWeight="900"
+            fontSize="xl"
+            border="2px solid"
+            borderColor={`${BRAND_HEX}30`}
+          >
+            {memberName.slice(0, 1).toUpperCase() || "?"}
+          </Circle>
+
+          <VStack align="start" gap={1}>
+            <HStack gap={3} flexWrap="wrap" align="center">
+              <Text fontSize="md" fontWeight="950" color="app.text.primary" letterSpacing="tight">
                 {memberName}
               </Text>
+              
+              {/* Member status badge */}
+              <Badge
+                fontSize="9px"
+                fontWeight="900"
+                px={2.5}
+                py={0.5}
+                borderRadius="full"
+                bg={`${statusInfo.hex}22`}
+                color={statusInfo.hex}
+                border={`1px solid ${statusInfo.hex}40`}
+                boxShadow={`0 0 8px ${statusInfo.hex}15`}
+              >
+                {statusInfo.label.toUpperCase()}
+              </Badge>
+
               {currentPlan && (
                 <Badge
                   fontSize="9px"
                   fontWeight="900"
-                  px={2}
+                  px={2.5}
                   py={0.5}
                   borderRadius="full"
-                  bg={`${BRAND_HEX}26`}
+                  bg={`${BRAND_HEX}12`}
                   color={BRAND_HEX}
-                  border={`1px solid ${BRAND_HEX}40`}
+                  border={`1px solid ${BRAND_HEX}30`}
                 >
-                  {currentPlan}
+                  {currentPlan.toUpperCase()}
                 </Badge>
               )}
             </HStack>
-            <Text fontSize="10px" color={muted} fontWeight="600" fontFamily="mono">
-              {memberId}
-            </Text>
+
+            <HStack gap={2} fontSize="xs" fontWeight="700" color={muted}>
+              <Text fontFamily="mono" fontSize="10px">{memberId}</Text>
+              <Text>•</Text>
+              <Text>Reviewing sales order details</Text>
+            </HStack>
           </VStack>
         </HStack>
 
-        {/* Right — Contact info pills */}
+        {/* Right — Actions & Contact details */}
         <HStack gap={3} flexWrap="wrap">
+          {/* View Profile Button */}
+          <Button
+            size="sm"
+            h="40px"
+            px={5}
+            borderRadius="xl"
+            fontWeight="900"
+            fontSize="xs"
+            variant="outline"
+            borderColor={`${BRAND_HEX}30`}
+            color={BRAND_HEX}
+            onClick={onViewMember}
+            _hover={{
+              bg: `${BRAND_HEX}0d`,
+              borderColor: `${BRAND_HEX}50`,
+            }}
+            _active={{ transform: "scale(0.97)" }}
+            transition="all 0.25s"
+          >
+            <ArrowLeft size={13} style={{ marginRight: "6px" }} />
+            View Profile
+          </Button>
+
           {email && (
             <Box
-              px={3}
-              py={1.5}
-              borderRadius="full"
-              bg={useColorModeValue("gray.50", "rgba(255,255,255,0.04)")}
+              px={4}
+              py={2}
+              borderRadius="xl"
+              bg={useColorModeValue("rgba(248,250,252,0.9)", "rgba(255,255,255,0.03)")}
               border="1px solid"
               borderColor={border}
             >
               <VStack align="start" gap={0}>
-                <Text fontSize="8px" color={muted} fontWeight="800" letterSpacing="wider">EMAIL</Text>
-                <Text fontSize="xs" fontWeight="700" color="app.text.primary">{email}</Text>
+                <Text fontSize="8px" color={muted} fontWeight="900" letterSpacing="wider">EMAIL ADDRESS</Text>
+                <Text fontSize="xs" fontWeight="750" color="app.text.primary">{email}</Text>
               </VStack>
             </Box>
           )}
           {phone && (
             <Box
-              px={3}
-              py={1.5}
-              borderRadius="full"
-              bg={useColorModeValue("gray.50", "rgba(255,255,255,0.04)")}
+              px={4}
+              py={2}
+              borderRadius="xl"
+              bg={useColorModeValue("rgba(248,250,252,0.9)", "rgba(255,255,255,0.03)")}
               border="1px solid"
               borderColor={border}
             >
               <VStack align="start" gap={0}>
-                <Text fontSize="8px" color={muted} fontWeight="800" letterSpacing="wider">PHONE</Text>
-                <Text fontSize="xs" fontWeight="700" color="app.text.primary">{phone}</Text>
+                <Text fontSize="8px" color={muted} fontWeight="900" letterSpacing="wider">PHONE NUMBER</Text>
+                <Text fontSize="xs" fontWeight="750" color="app.text.primary">{phone}</Text>
               </VStack>
             </Box>
           )}
@@ -315,6 +355,103 @@ const MemberContextBar = memo(({
 });
 MemberContextBar.displayName = "MemberContextBar";
 
+interface ProgressStepperProps {
+  currentStep: number;
+  accentHex: string;
+  onStepClick?: (stepIndex: number) => void;
+}
+
+const ProgressStepper = memo(({ currentStep, accentHex, onStepClick }: ProgressStepperProps) => {
+  const steps = [
+    { label: "Select Plan", index: 1 },
+    { label: "Review Order", index: 2 },
+    { label: "Invoice Details", index: 3 },
+    { label: "Collect Payment", index: 4 },
+  ];
+
+  const muted = useColorModeValue("gray.500", "gray.400");
+  const borderCol = useColorModeValue("rgba(226, 232, 240, 0.8)", "rgba(255, 255, 255, 0.08)");
+  const cardBg = useColorModeValue("rgba(255, 255, 255, 0.5)", "rgba(255, 255, 255, 0.02)");
+
+  return (
+    <Box
+      w="100%"
+      mb={8}
+      p={4}
+      px={6}
+      bg={cardBg}
+      backdropFilter="blur(10px)"
+      border="1px solid"
+      borderColor={borderCol}
+      borderRadius="24px"
+      position="relative"
+      zIndex={1}
+      boxShadow={useColorModeValue("0 2px 10px rgba(0,0,0,0.01)", "none")}
+    >
+      <Flex justify="space-between" align="center" position="relative" maxW="900px" mx="auto">
+        {steps.map((step, idx) => {
+          const isCompleted = currentStep > step.index;
+          const isActive = currentStep === step.index;
+          const isClickable = isCompleted && !!onStepClick;
+
+          const handleStepClick = () => {
+            if (isClickable && onStepClick) {
+              onStepClick(step.index);
+            }
+          };
+
+          return (
+            <HStack key={step.index} gap={3} align="center" flex={idx === steps.length - 1 ? "none" : 1}>
+              <HStack
+                gap={2}
+                align="center"
+                cursor={isClickable ? "pointer" : "default"}
+                onClick={handleStepClick}
+                role={isClickable ? "button" : undefined}
+                _hover={isClickable ? { opacity: 0.85 } : undefined}
+                transition="opacity 0.2s"
+              >
+                <Circle
+                  size={7}
+                  bg={isCompleted ? "green.500" : isActive ? accentHex : "transparent"}
+                  border="2px solid"
+                  borderColor={isCompleted ? "green.500" : isActive ? accentHex : useColorModeValue("gray.300", "gray.600")}
+                  color={isCompleted || isActive ? "white" : muted}
+                  fontWeight="800"
+                  fontSize="xs"
+                  boxShadow={isActive ? `0 0 12px ${accentHex}50` : "none"}
+                  transition="all 0.3s"
+                >
+                  {isCompleted ? <Check size={12} strokeWidth={3} /> : step.index}
+                </Circle>
+                <Text
+                  fontSize="xs"
+                  fontWeight={isActive ? "900" : "700"}
+                  color={isActive ? "app.text.primary" : muted}
+                  letterSpacing="tight"
+                >
+                  {step.label}
+                </Text>
+              </HStack>
+
+              {idx < steps.length - 1 && (
+                <Box
+                  h="2px"
+                  flex={1}
+                  mx={4}
+                  bg={isCompleted ? "green.500" : useColorModeValue("gray.200", "whiteAlpha.100")}
+                  transition="all 0.3s"
+                />
+              )}
+            </HStack>
+          );
+        })}
+      </Flex>
+    </Box>
+  );
+});
+ProgressStepper.displayName = "ProgressStepper";
+
 // ═══════════════════════════════════════════════════════════════════
 //  MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════
@@ -323,7 +460,7 @@ const ReviewOrder = memo(() => {
   const { params: memberId } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { organizationName, appCode } = useWorkspaceRouter();
+  const { organizationName, appCode, navigateTo } = useWorkspaceRouter();
 
   const planCode = searchParams.get("planCode") ?? undefined;
 
@@ -395,11 +532,22 @@ const ReviewOrder = memo(() => {
     );
   }, [navigate, organizationName, appCode, memberId]);
 
+  const handleStepClick = useCallback((stepIdx: number) => {
+    if (stepIdx === 1) {
+      handleEditPlan();
+    }
+  }, [handleEditPlan]);
+
   const handleGoBack = useCallback(() => {
     navigate(
       `/${organizationName}/workspace/app/${appCode}/plans/${memberId}`
     );
   }, [navigate, organizationName, appCode, memberId]);
+
+  const handleViewMember = useCallback(() => {
+    if (!memberId) return;
+    navigateTo("member", memberId);
+  }, [navigateTo, memberId]);
 
   const handleGenerateInvoice = useCallback(() => {
     const effectiveMemberId = member?.data?.member_id || memberId;
@@ -516,8 +664,8 @@ const ReviewOrder = memo(() => {
 
   if (loading) {
     return (
-      <Box w="full" minH="100vh" bg={pageBg} fontFamily="'Inter', sans-serif" py={8}>
-        <Box maxW="1400px" mx="auto" px={{ base: 4, md: 8 }}>
+      <Box w="full" px={{ base: 4, md: 8 }} py={8}>
+        <Box w="full">
           <Flex justify="space-between" align="start" mb={8}>
             <VStack align="start" gap={2}>
               <Skeleton height="32px" width="200px" borderRadius="lg" />
@@ -606,7 +754,7 @@ const ReviewOrder = memo(() => {
       />
 
       {/* ── Page Content ── */}
-      <Box maxW="1400px" mx="auto" position="relative" zIndex={1}>
+      <Box w="full" px={{ base: 4, md: 8 }} py={8} position="relative" zIndex={1}>
 
         {/* ── Member Context Bar ── */}
         {!memberLoading && member ? (
@@ -617,41 +765,12 @@ const ReviewOrder = memo(() => {
             phone={member.data.phone}
             currentPlan={member.data.plan}
             memberStatus={member.data.status}
+            onViewMember={handleViewMember}
           />
         ) : null}
 
         {/* ── Breadcrumb steps ── */}
-        <HStack
-          gap={2.5}
-          mb={8}
-          p={1.5}
-          px={4}
-          borderRadius="full"
-          style={breadcrumbsStyle}
-          backdropFilter="blur(10px)"
-          w="fit-content"
-          fontSize="11px"
-          fontWeight="800"
-          letterSpacing="wider"
-          textTransform="uppercase"
-          color={muted}
-          boxShadow={useColorModeValue("0 2px 10px rgba(0,0,0,0.02)", "none")}
-        >
-          <Text
-            cursor="pointer"
-            onClick={handleEditPlan}
-            _hover={{ color: "app.text.primary" }}
-            transition="color 0.2s"
-          >
-            Select Plan
-          </Text>
-          <ArrowRight size={10} color={accentHex} strokeWidth={2.5} />
-          <Text color={accentHex}>Review Order</Text>
-          <ArrowRight size={10} />
-          <Text opacity={0.6}>Invoice</Text>
-          <ArrowRight size={10} />
-          <Text opacity={0.6}>Payment</Text>
-        </HStack>
+        <ProgressStepper currentStep={2} accentHex={accentHex} onStepClick={handleStepClick} />
 
         <Grid templateColumns={{ base: "1fr", lg: "1fr 380px" }} gap={6} alignItems="start">
           {/* ── Left: Details ── */}

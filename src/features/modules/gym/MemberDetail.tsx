@@ -985,20 +985,8 @@ const MemberDetail = memo(() => {
       w="full"
       bg={pageBg}
       fontFamily="'Inter', sans-serif"
-    // position="relative"
-    // className="fade-slide-up"
     >
-      {/* ── Keyframes ── */}
-      {/* <style>{`
-        @keyframes fadeSlideUp {
-          0%  { opacity:0; transform:translateY(20px); }
-          100%{ opacity:1; transform:translateY(0); }
-        }
-        .fade-slide-up { animation: fadeSlideUp 0.5s cubic-bezier(0.16,1,0.3,1) forwards; }
-        .stagger-cell  { opacity:0; animation: fadeSlideUp 0.5s cubic-bezier(0.16,1,0.3,1) forwards; }
-      `}</style> */}
-
-      {/* ── Ambient orbs ── */}
+      {/* Ambient orbs */}
       <Box
         position="fixed" top="-80px" right="-80px"
         w="400px" h="400px" borderRadius="full"
@@ -1006,131 +994,135 @@ const MemberDetail = memo(() => {
         pointerEvents="none" zIndex={0}
       />
 
+      {/* Premium Member Hero Banner */}
+      <Box
+        w="full"
+        mb={6}
+        borderRadius="24px"
+        bg={useColorModeValue("rgba(255,255,255,0.85)", "rgba(18,22,40,0.72)")}
+        backdropFilter="blur(24px) saturate(190%)"
+        border="1px solid"
+        borderColor={useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.07)")}
+        boxShadow={useColorModeValue("0 8px 32px rgba(0,0,0,0.04)", "0 8px 32px rgba(0,0,0,0.18)")}
+        overflow="hidden"
+        position="relative"
+        zIndex={1}
+      >
+        {/* Colored top gradient decoration */}
+        <Box h="120px" bg={BRAND_GRADIENT} position="relative" />
 
-      {/* ── Main Grid ── */}
+        {/* Banner Info Area */}
+        <Flex
+          direction={{ base: "column", md: "row" }}
+          px={8}
+          pb={6}
+          pt={0}
+          align={{ base: "start", md: "center" }}
+          gap={6}
+          mt="-50px"
+          position="relative"
+          zIndex={2}
+        >
+          {/* Large Profile Initials Circle */}
+          <Circle
+            size="100px"
+            bg={useColorModeValue("white", "rgba(18,22,40,1)")}
+            border="4px solid"
+            borderColor={useColorModeValue("white", "rgba(18,22,40,1)")}
+            boxShadow="lg"
+            overflow="hidden"
+            flexShrink={0}
+          >
+            <Circle
+              size="100%"
+              bg={`linear-gradient(135deg, ${BRAND_HEX}22, ${BRAND_ALT}22)`}
+              color={BRAND_HEX}
+              fontWeight="900"
+              fontSize="3xl"
+            >
+              {name.initials}
+            </Circle>
+          </Circle>
+
+          {/* Name, ID and Status Details */}
+          <VStack
+            align="start"
+            gap={1.5}
+            flex={1}
+            p={3.5}
+            px={5}
+            borderRadius="2xl"
+            bg={useColorModeValue("rgba(255,255,255,0.5)", "rgba(255,255,255,0.02)")}
+            border="1px solid"
+            borderColor={useColorModeValue("rgba(226,232,240,0.5)", "rgba(255,255,255,0.04)")}
+            backdropFilter="blur(10px)"
+          >
+            <HStack gap={3} flexWrap="wrap" align="center">
+              <Skeleton loading={loading}>
+                <Heading fontSize="2xl" fontWeight="950" color="app.text.primary" letterSpacing="tight" lineHeight="1.2">
+                  {name.full}
+                </Heading>
+              </Skeleton>
+              <Skeleton loading={loading}>
+                <Badge
+                  fontSize="10px"
+                  fontWeight="900"
+                  px={3}
+                  py={1}
+                  borderRadius="full"
+                  bg={`${sm.hex}22`}
+                  color={sm.hex}
+                  border={`1px solid ${sm.hex}40`}
+                  boxShadow={`0 0 10px ${sm.hex}20`}
+                >
+                  {sm.label.toUpperCase()}
+                </Badge>
+              </Skeleton>
+            </HStack>
+            <HStack gap={4} flexWrap="wrap" color={muted} fontSize="xs" fontWeight="600">
+              <Text fontFamily="mono">{member?.data.member_id || memberId}</Text>
+              <Text>•</Text>
+              <Text>Joined {fmtDate(member?._meta.created?.at || member?.data.joinDate)}</Text>
+              {sub?.plan_name && (
+                <>
+                  <Text>•</Text>
+                  <Text color={BRAND_HEX}>{sub.plan_name}</Text>
+                </>
+              )}
+            </HStack>
+            <Button
+              h="38px"
+              px={5}
+              borderRadius="xl"
+              fontWeight="900"
+              fontSize="xs"
+              style={{ background: BRAND_GRADIENT, color: "white" }}
+              boxShadow={`0 6px 18px ${BRAND_HEX}66`}
+              onClick={handleAssignPlan}
+              _hover={{ transform: "translateY(-2px)", boxShadow: `0 12px 28px ${BRAND_HEX}80` }}
+              _active={{ transform: "scale(0.98)" }}
+              transition="all 0.25s"
+              mt={2}
+            >
+              <Zap size={13} />
+              <Text ml={1.5}>{sub ? "Renew Membership Plan" : "Assign Plan Template"}</Text>
+            </Button>
+          </VStack>
+        </Flex>
+      </Box>
+
+      {/* Main Grid */}
       <Grid
         templateColumns={{ base: "1fr", lg: "repeat(12,1fr)" }}
         gap={6}
         position="relative"
         zIndex={1}
+        mb={6}
       >
         {/* ════ LEFT COLUMN ════ */}
         <GridItem colSpan={{ base: 12, lg: 4 }}>
           <VStack align="stretch" gap={5}>
-
-            {/* Profile Card */}
-            <GlassCard p={0} hover={false}>
-              {/* Hero image */}
-              <Skeleton loading={loading} borderRadius="20px">
-                <Box position="relative" h="200px" overflow="hidden" borderTopRadius="20px">
-                  <img
-                    src={avatarSrc}
-                    alt={name.full}
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                  />
-                  {/* Gradient overlay at bottom */}
-                  <Box
-                    position="absolute" bottom={0} left={0} right={0} h="80px"
-                    bgGradient="to-t"
-                    style={{ background: "linear-gradient(to top, rgba(0,0,0,0.55), transparent)" }}
-                  />
-                  {/* Status pill over image */}
-                  <HStack
-                    position="absolute" bottom={3} left={4} gap={2}
-                    px={2.5} py={1} borderRadius="full"
-                    style={{ background: `${sm.hex}22` }}
-                    border="1px solid"
-                    borderColor={`${sm.hex}50`}
-                    backdropFilter="blur(10px)"
-                  >
-                    <Circle size="2" style={{ background: sm.hex }} boxShadow={`0 0 6px ${sm.hex}`} />
-                    <Text fontSize="10px" fontWeight="800" color="white" letterSpacing="wide">
-                      {sm.label.toUpperCase()}
-                    </Text>
-                  </HStack>
-                </Box>
-              </Skeleton>
-
-              <VStack align="stretch" gap={4} p={5}>
-                {/* Name + ID */}
-                <Flex justify="space-between" align="start">
-                  <VStack align="start" gap={0.5}>
-                    <Skeleton loading={loading}>
-                      <HStack gap={2}>
-                        <Heading fontSize="xl" fontWeight="900" color="app.text.primary" letterSpacing="tight">
-                          {name.full}
-                        </Heading>
-                        {!loading && (
-                          <Circle size={5} bg="rgba(1,181,116,0.15)" color="#01B574">
-                            <Check size={11} strokeWidth={3} />
-                          </Circle>
-                        )}
-                      </HStack>
-                    </Skeleton>
-                    <Text fontSize="xs" color={muted} fontWeight="600" fontFamily="mono">
-                      {member?.data.member_id || memberId}
-                    </Text>
-                  </VStack>
-
-                  {/* Plan badge */}
-                  {(sub?.plan_name || member?.data.plan) && (
-                    <Badge
-                      fontSize="9px"
-                      fontWeight="900"
-                      px={2.5}
-                      py={1}
-                      borderRadius="full"
-                      style={{ background: `${BRAND_HEX}18`, color: BRAND_HEX, border: `1px solid ${BRAND_HEX}30` }}
-                    >
-                      {sub?.plan_name || member?.data.plan}
-                    </Badge>
-                  )}
-                </Flex>
-
-                {/* Physical stats row */}
-                <SimpleGrid columns={3} gap={3}>
-                  <StatBox
-                    label="Weight"
-                    value={<AnimatedCounter value={member?.data.weight || 195} />}
-                    unit="lbs"
-                    color="blue"
-                  />
-                  <StatBox
-                    label="Body Fat"
-                    value={<AnimatedDecimalCounter value={member?.data?.bodyFat || 11.4} />}
-                    unit="%"
-                    color="green"
-                  />
-                  <StatBox
-                    label="Height"
-                    value={member?.data.height || `6'2"`}
-                    color="red"
-                  />
-                </SimpleGrid>
-
-                {/* CTA — context-aware */}
-                <Button
-                  w="full"
-                  h="44px"
-                  borderRadius="xl"
-                  fontWeight="900"
-                  fontSize="sm"
-                  letterSpacing="wide"
-                  style={{ background: BRAND_GRADIENT, color: "white" }}
-                  boxShadow={`0 6px 18px ${BRAND_HEX}66`}
-                  onClick={handleAssignPlan}
-                  _hover={{ transform: "translateY(-2px)", boxShadow: `0 12px 28px ${BRAND_HEX}80` }}
-                  _active={{ transform: "scale(0.98)" }}
-                  transition="all 0.25s cubic-bezier(0.175,0.885,0.32,1.275)"
-                >
-                  <HStack gap={2}>
-                    <Zap size={14} />
-                    <Text>{sub ? "Renew Plan" : "Assign a Plan"}</Text>
-                  </HStack>
-                </Button>
-              </VStack>
-            </GlassCard>
-
+            
             {/* Personal Info */}
             <GlassCard>
               <SectionHeading>Personal Info</SectionHeading>
@@ -1141,6 +1133,44 @@ const MemberDetail = memo(() => {
                 <InfoRow icon={User} label="Gender" value={member?.data.gender || "Not recorded"} iconColor="#FFB547" />
                 <InfoRow icon={MapPin} label="Address" value={member?.data.address || "Not recorded"} iconColor="#EE5D50" />
               </VStack>
+            </GlassCard>
+
+            {/* Fitness & Health Metrics Card */}
+            <GlassCard>
+              <SectionHeading>Fitness & Health Metrics</SectionHeading>
+              <SimpleGrid columns={3} gap={3} mb={4}>
+                <StatBox
+                  label="Weight"
+                  value={<AnimatedCounter value={member?.data.weight || 195} />}
+                  unit="lbs"
+                  color="blue"
+                />
+                <StatBox
+                  label="Body Fat"
+                  value={<AnimatedDecimalCounter value={member?.data?.bodyFat || 11.4} />}
+                  unit="%"
+                  color="green"
+                />
+                <StatBox
+                  label="Height"
+                  value={member?.data.height || `6'2"`}
+                  color="red"
+                />
+              </SimpleGrid>
+
+              {member?.data.fitnessGoals && (
+                <>
+                  <Separator borderColor={useColorModeValue("rgba(226,232,240,0.6)", "rgba(255,255,255,0.06)")} my={4} />
+                  <VStack align="start" gap={1.5}>
+                    <Text fontSize="10px" fontWeight="800" color="app.text.muted" textTransform="uppercase" letterSpacing="wider">
+                      Fitness Objectives
+                    </Text>
+                    <Text fontSize="xs" color="app.text.primary" fontWeight="600" lineHeight="relaxed">
+                      {member?.data.fitnessGoals}
+                    </Text>
+                  </VStack>
+                </>
+              )}
             </GlassCard>
 
             {/* Account Health */}
@@ -1207,27 +1237,14 @@ const MemberDetail = memo(() => {
 
         {/* ════ RIGHT COLUMN ════ */}
         <GridItem colSpan={{ base: 12, lg: 8 }}>
-          <VStack align="stretch" gap={5}>
-
+          <VStack align="stretch" gap={5} h="full">
             {/* Attendance Calendar */}
             <GlassCard>
               <AttendanceCalendar />
             </GlassCard>
 
-            {/* Membership & Billing — plan-aware */}
-            <GlassCard>
-              {memberId && (
-                <MemberMembershipAndBilling
-                  memberId={memberId}
-                  onAssignPlan={handleAssignPlan}
-                  onViewInvoice={handleViewInvoice}
-                  onViewOrder={handleViewOrder}
-                />
-              )}
-            </GlassCard>
-
             {/* Quick Actions */}
-            <GlassCard>
+            <GlassCard flex={1}>
               <SectionHeading>Quick Actions</SectionHeading>
               <SimpleGrid columns={{ base: 1, md: 2 }} gap={2}>
                 <QuickAction icon={MessageSquare} label="Send Message" gradient={BRAND_GRADIENT} accentHex={BRAND_HEX} onClick={handleMessage} />
@@ -1241,7 +1258,17 @@ const MemberDetail = memo(() => {
         </GridItem>
       </Grid>
 
-
+      {/* ── Membership & Billing — FULL WIDTH ── */}
+      <GlassCard hover={false} position="relative" zIndex={1}>
+        {memberId && (
+          <MemberMembershipAndBilling
+            memberId={memberId}
+            onAssignPlan={handleAssignPlan}
+            onViewInvoice={handleViewInvoice}
+            onViewOrder={handleViewOrder}
+          />
+        )}
+      </GlassCard>
 
       {/* ── Edit Member Dialog ── */}
       <EditMemberModal

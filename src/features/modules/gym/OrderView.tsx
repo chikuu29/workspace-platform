@@ -27,6 +27,7 @@ import {
   CreditCard,
   Link2,
   AlertTriangle,
+  Check,
 } from "lucide-react";
 import { toaster } from "@/components/ui/toaster";
 import { PageLayout } from "@/core/components/PageLayout";
@@ -189,6 +190,103 @@ const SectionCard = memo(({ title, icon, children, accentHex }: SectionCardProps
 });
 SectionCard.displayName = "SectionCard";
 
+interface ProgressStepperProps {
+  currentStep: number;
+  accentHex: string;
+  onStepClick?: (stepIndex: number) => void;
+}
+
+const ProgressStepper = memo(({ currentStep, accentHex, onStepClick }: ProgressStepperProps) => {
+  const steps = [
+    { label: "Select Plan", index: 1 },
+    { label: "Review Order", index: 2 },
+    { label: "Invoice Details", index: 3 },
+    { label: "Collect Payment", index: 4 },
+  ];
+
+  const muted = useColorModeValue("gray.500", "gray.400");
+  const borderCol = useColorModeValue("rgba(226, 232, 240, 0.8)", "rgba(255, 255, 255, 0.08)");
+  const cardBg = useColorModeValue("rgba(255, 255, 255, 0.5)", "rgba(255, 255, 255, 0.02)");
+
+  return (
+    <Box
+      w="100%"
+      mb={8}
+      p={4}
+      px={6}
+      bg={cardBg}
+      backdropFilter="blur(10px)"
+      border="1px solid"
+      borderColor={borderCol}
+      borderRadius="24px"
+      position="relative"
+      zIndex={1}
+      boxShadow={useColorModeValue("0 2px 10px rgba(0,0,0,0.01)", "none")}
+    >
+      <Flex justify="space-between" align="center" position="relative" maxW="900px" mx="auto">
+        {steps.map((step, idx) => {
+          const isCompleted = currentStep > step.index;
+          const isActive = currentStep === step.index;
+          const isClickable = isCompleted && !!onStepClick;
+
+          const handleStepClick = () => {
+            if (isClickable && onStepClick) {
+              onStepClick(step.index);
+            }
+          };
+
+          return (
+            <HStack key={step.index} gap={3} align="center" flex={idx === steps.length - 1 ? "none" : 1}>
+              <HStack
+                gap={2}
+                align="center"
+                cursor={isClickable ? "pointer" : "default"}
+                onClick={handleStepClick}
+                role={isClickable ? "button" : undefined}
+                _hover={isClickable ? { opacity: 0.85 } : undefined}
+                transition="opacity 0.2s"
+              >
+                <Circle
+                  size={7}
+                  bg={isCompleted ? "green.500" : isActive ? accentHex : "transparent"}
+                  border="2px solid"
+                  borderColor={isCompleted ? "green.500" : isActive ? accentHex : useColorModeValue("gray.300", "gray.600")}
+                  color={isCompleted || isActive ? "white" : muted}
+                  fontWeight="800"
+                  fontSize="xs"
+                  boxShadow={isActive ? `0 0 12px ${accentHex}50` : "none"}
+                  transition="all 0.3s"
+                >
+                  {isCompleted ? <Check size={12} strokeWidth={3} /> : step.index}
+                </Circle>
+                <Text
+                  fontSize="xs"
+                  fontWeight={isActive ? "900" : "700"}
+                  color={isActive ? "app.text.primary" : muted}
+                  letterSpacing="tight"
+                >
+                  {step.label}
+                </Text>
+              </HStack>
+
+              {idx < steps.length - 1 && (
+                <Box
+                  h="2px"
+                  flex={1}
+                  mx={4}
+                  bg={isCompleted ? "green.500" : useColorModeValue("gray.200", "whiteAlpha.100")}
+                  transition="all 0.3s"
+                />
+              )}
+            </HStack>
+          );
+        })}
+      </Flex>
+    </Box>
+  );
+});
+ProgressStepper.displayName = "ProgressStepper";
+
 // ═══════════════════════════════════════════════════════════════════
 //  MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════
@@ -322,6 +420,15 @@ const OrderView = memo(() => {
     navigate(-1);
   }, [navigate]);
 
+  const handleStepClick = useCallback((stepIdx: number) => {
+    if (!order) return;
+    if (stepIdx === 1) {
+      navigate(`/${organizationName}/workspace/app/${appCode}/plans/${order.member_id}`);
+    } else if (stepIdx === 2) {
+      navigate(`/${organizationName}/workspace/app/${appCode}/reviewOrder/${order.member_id}?planCode=${order.plan_code}`);
+    }
+  }, [navigate, organizationName, appCode, order]);
+
   const muted = useColorModeValue("gray.500", "gray.400");
   const cardBg = useColorModeValue("rgba(255,255,255,0.8)", "rgba(18, 22, 40, 0.75)");
   const borderCol = useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.08)");
@@ -444,31 +551,7 @@ const OrderView = memo(() => {
 
       <Box mx="auto" style={relativeBoxStyle}>
         {/* Breadcrumbs steps */}
-        <HStack
-          gap={2.5}
-          mb={8}
-          p={1.5}
-          px={4}
-          borderRadius="full"
-          style={breadcrumbsStyle}
-          backdropFilter="blur(10px)"
-          w="fit-content"
-          fontSize="11px"
-          fontWeight="800"
-          letterSpacing="wider"
-          textTransform="uppercase"
-          color={muted}
-        >
-          <Text opacity={0.6}>Select Plan</Text>
-          <ArrowRight size={10} />
-          <Text opacity={0.6}>Review Order</Text>
-          <ArrowRight size={10} />
-          <Text color={accentHex}>Order View</Text>
-          <ArrowRight size={10} />
-          <Text opacity={0.6}>Invoice</Text>
-          <ArrowRight size={10} />
-          <Text opacity={0.6}>Payment</Text>
-        </HStack>
+        <ProgressStepper currentStep={3} accentHex={accentHex} onStepClick={handleStepClick} />
 
         <Grid templateColumns={{ base: "1fr", lg: "1fr 340px" }} gap={6} alignItems="start">
           {/* Left Column: Details */}

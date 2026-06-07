@@ -24,6 +24,7 @@ export interface RecentMember {
   name: string;
   plan: string;
   created_at: string;
+  status?: "active" | "attention" | "frozen" | string;
 }
 
 export interface GymDashboardStats {

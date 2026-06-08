@@ -86,7 +86,7 @@ const StatCard = memo(({
         <VStack align="start" gap={1} minW={0}>
           <Text
             fontSize="xs"
-            fontWeight="700"
+            fontWeight="bold"
             color="app.text.muted"
             textTransform="uppercase"
             letterSpacing="0.05em"

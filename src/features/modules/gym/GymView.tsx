@@ -16,7 +16,7 @@
  *
  * @module features/modules/gym/GymView
  */
-import { memo, useCallback, useMemo, useEffect } from "react";
+import { memo, useCallback, useMemo, useEffect, useState } from "react";
 import {
   Badge,
   Box,
@@ -62,6 +62,7 @@ import ActionRequiredList, { type AlertItem } from "./components/ActionRequiredL
 import RecentEnrollmentsList from "./components/RecentEnrollmentsList";
 import FloorCapacityGauge from "./components/FloorCapacityGauge";
 import { useColorModeValue } from "@/components/ui/color-mode";
+import ChartCard from "@/components/common/ChartCard";
 
 // ── Helpers ──────────────────────────────────────────────────────────
 
@@ -224,6 +225,20 @@ const GymView = memo(() => {
   const { stats, loading, refresh } = useGymDashboard();
   const { navigateTo } = useWorkspaceRouter();
 
+  const [revenueRange, setRevenueRange] = useState<string>("30d");
+
+  const revenueRangeOptions = useMemo(
+    () => [
+      { label: "Last 30 Days", value: "30d" },
+      { label: "This Year", value: "year" },
+    ],
+    []
+  );
+
+  const handleRevenueRangeChange = useCallback((value: string) => {
+    setRevenueRange(value);
+  }, []);
+
   const panelBg = useColorModeValue("rgba(255,255,255,0.74)", "rgba(15,23,42,0.58)");
   const borderColor = useColorModeValue("rgba(226,232,240,0.84)", "rgba(255,255,255,0.12)");
 
@@ -242,10 +257,10 @@ const GymView = memo(() => {
         <IconButton
           colorPalette="yellow"
           borderRadius="sm"
-          size="md"
-          h={{ base: "36px", md: "40px" }}
-          minW={{ base: "36px", md: "40px" }}
-          px={0}
+          size="sm"
+          // h={{ base: "36px", md: "40px" }}
+          // minW={{ base: "36px", md: "40px" }}
+          // px={0}
           flexShrink={0}
           onClick={refresh}
           aria-label="Refresh dashboard"
@@ -258,9 +273,9 @@ const GymView = memo(() => {
         <Button
           borderRadius="sm"
           fontWeight="800"
-          size="md"
-          h={{ base: "36px", md: "40px" }}
-          px={{ base: 1.5, md: 6 }}
+          size="sm"
+          // h={{ base: "36px", md: "40px" }}
+          // px={{ base: 1.5, md: 6 }}
           flex={{ base: "1", md: "none" }}
           minW={0}
           _hover={{ transform: "translateY(-1px)", boxShadow: "sm" }}
@@ -280,9 +295,9 @@ const GymView = memo(() => {
           borderRadius="sm"
           fontWeight="800"
           bg="g_blue"
-          size="md"
-          h={{ base: "36px", md: "40px" }}
-          px={{ base: 1.5, md: 6 }}
+          size="sm"
+          // h={{ base: "36px", md: "40px" }}
+          // px={{ base: 1.5, md: 6 }}
           flex={{ base: "1", md: "none" }}
           minW={0}
           _hover={{
@@ -316,6 +331,64 @@ const GymView = memo(() => {
   const retentionPct = useMemo(
     () => (totalMembers ? Math.round((activeMembers / totalMembers) * 100) : 0),
     [activeMembers, totalMembers],
+  );
+
+  const membershipData = useMemo(
+    () => [
+      { name: "Active Members", value: activeMembers },
+      { name: "Frozen Members", value: frozenMembers },
+      { name: "Needs Attention", value: attentionMembers },
+    ],
+    [activeMembers, frozenMembers, attentionMembers]
+  );
+
+  const planPopularityData = useMemo(
+    () => [
+      { name: "Monthly Plans", value: 55 },
+      { name: "Quarterly Plans", value: 25 },
+      { name: "Yearly Plans", value: 20 },
+    ],
+    []
+  );
+
+  const paymentStatusData = useMemo(
+    () => [
+      { name: "Paid Invoices", value: 80 },
+      { name: "Pending Invoices", value: 15 },
+      { name: "Overdue Invoices", value: 5 },
+    ],
+    []
+  );
+
+  const revenueTrendData = useMemo(
+    () => {
+      if (revenueRange === "year") {
+        return [
+          { label: "Jan", value: 120000 },
+          { label: "Feb", value: 140000 },
+          { label: "Mar", value: 170000 },
+          { label: "Apr", value: 210000 },
+          { label: "May", value: 280000 },
+          { label: "Jun", value: 360000 }, // Peak
+          { label: "Jul", value: 310000 }, // Dip
+          { label: "Aug", value: 290000 },
+          { label: "Sep", value: 330000 },
+          { label: "Oct", value: 390000 },
+          { label: "Nov", value: 440000 },
+          { label: "Dec", value: 510000 },
+        ];
+      }
+      return [
+        { label: "Day 1", value: 10000 },
+        { label: "Day 5", value: 15000 },
+        { label: "Day 10", value: 22000 },
+        { label: "Day 15", value: 35000 }, // Peak/Growth Rise
+        { label: "Day 20", value: 26000 }, // Dip/Fluctuation
+        { label: "Day 25", value: 31000 },
+        { label: "Day 30", value: 42000 }, // Final Growth
+      ];
+    },
+    [revenueRange]
   );
 
   // ── Stable navigation callbacks ───────────────────────────────────
@@ -416,6 +489,30 @@ const GymView = memo(() => {
           />
         </SimpleGrid>
 
+        {/* ── Analytics Charts ──────────────────────────────────────── */}
+        <VStack align="stretch" gap={6}>
+          {/* Row 1: Line Charts */}
+          <SimpleGrid columns={{ base: 1, lg: 2 }} gap={6}>
+            <ChartCard
+              title="Revenue Trend"
+              subtitle={revenueRange === "year" ? "Income growth over this year" : "Income growth over the last 30 days"}
+              type="line"
+              initialData={revenueTrendData}
+              filterOptions={revenueRangeOptions}
+              selectedFilter={revenueRange}
+              onFilterChange={handleRevenueRangeChange}
+            />
+            <ChartCard
+              title="Attendance Trend"
+              subtitle="Daily visits history for the last 7 days"
+              type="line"
+              apiEndpoint="/v1/gym/analytics/attendance"
+            />
+          </SimpleGrid>
+
+
+        </VStack>
+
         {/* ── Main Content Grid ────────────────────────────────────── */}
         <Grid
           templateColumns={{ base: "1fr", xl: "minmax(0, 1fr) 360px" }}
@@ -429,6 +526,30 @@ const GymView = memo(() => {
                 onViewAll={handleViewAll}
                 onMemberClick={handleMemberClick}
               />
+              {/* Row 2: Distribution Donut Charts */}
+              <SimpleGrid columns={{ base: 1, md: 3 }} gap={6}>
+                <ChartCard
+                  title="Membership Distribution"
+                  subtitle="Active, frozen, and attention memberships"
+                  type="pie"
+                  initialData={membershipData}
+
+                />
+                <ChartCard
+                  title="Plan Popularity"
+                  subtitle="Plan tier selection ratio"
+                  type="pie"
+                  initialData={planPopularityData}
+
+                />
+                <ChartCard
+                  title="Payment Status"
+                  subtitle="Fulfillment status ratio"
+                  type="pie"
+
+                  initialData={paymentStatusData}
+                />
+              </SimpleGrid>
             </VStack>
           </GridItem>
 

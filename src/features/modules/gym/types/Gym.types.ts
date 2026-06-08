@@ -639,3 +639,81 @@ export interface CancelInvoiceResponse {
     status: "cancelled";
   };
 }
+
+
+// ─── Unified Checkout Flow (New Single-Page path) ───────────────────────────
+
+export interface CheckoutPreviewPayload {
+  member_id: string;
+  plan_code: string;
+  start_date?: string;
+  coupon_code?: string;
+}
+
+export interface CheckoutPreviewResponse {
+  success: boolean;
+  message: string;
+  data: {
+    member: {
+      member_id: string;
+      name: string;
+      email: string;
+      phone: string;
+    };
+    plan: {
+      name: string;
+      code: string;
+      price: number;
+      billing_cycle: string;
+      accent_color?: string;
+      description?: string;
+    };
+    pricing: {
+      subtotal: number;
+      discount_amount: number;
+      tax_amount: number;
+      total: number;
+      currency: string;
+      coupon_code: string | null;
+      discount_type: string;
+      discount_value: number;
+    };
+    dates: {
+      start_date: string;
+      end_date: string;
+    };
+  };
+}
+
+export interface CheckoutPayload {
+  member_id: string;
+  plan_code: string;
+  start_date?: string;
+  payment_method: "cash" | "upi" | "payment_link";
+  transaction_ref?: string;
+  notes?: string;
+  send_link_via?: "email" | "sms" | "both";
+  coupon_code?: string;
+}
+
+export interface CheckoutResponse {
+  success: boolean;
+  message: string;
+  data: {
+    subscription_id: string;
+    member_id: string;
+    plan_name: string;
+    order_number: string;
+    invoice_number: string;
+    payment_number?: string;
+    payment_link_url?: string;
+    subtotal: number;
+    discount_amount: number;
+    tax_amount: number;
+    total: number;
+    start_date: string;
+    end_date: string;
+    status: "active" | "payment_pending";
+    send_via?: string;
+  };
+}

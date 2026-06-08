@@ -37,6 +37,7 @@ import {
   ArrowRight,
   Award,
   Check,
+  CheckCircle,
   CheckCircle2,
   Crown,
   Dumbbell,
@@ -599,7 +600,7 @@ const MemberContextBar = memo(({
               <Text fontSize="md" fontWeight="950" color="app.text.primary" letterSpacing="tight">
                 {memberName}
               </Text>
-              
+
               {/* Member status badge */}
               <Badge
                 fontSize="9px"
@@ -731,9 +732,10 @@ MemberContextBar.displayName = "MemberContextBar";
 interface FloatingActionCardProps {
   plan: SubscriptionPlanDocument | null;
   onContinue: () => void;
+  onQuickCheckout?: () => void;
 }
 
-const FloatingActionCard = memo(({ plan, onContinue }: FloatingActionCardProps) => {
+const FloatingActionCard = memo(({ plan, onContinue, onQuickCheckout }: FloatingActionCardProps) => {
   const cardBg = useColorModeValue(
     "rgba(255,255,255,0.96)",
     "rgba(16,20,44,0.96)"
@@ -764,7 +766,6 @@ const FloatingActionCard = memo(({ plan, onContinue }: FloatingActionCardProps) 
         backdropFilter="blur(28px) saturate(200%)"
         border="1px solid"
         borderColor={border}
-        // boxShadow={`0 24px 60px -12px ${accentHex}40, 0 8px 24px rgba(0,0,0,0.18)`}
         boxShadow="xl"
         overflow="hidden"
         position="relative"
@@ -780,7 +781,7 @@ const FloatingActionCard = memo(({ plan, onContinue }: FloatingActionCardProps) 
           borderTopRadius="24px"
         />
 
-        <VStack align="stretch" gap={4} pt={1}>
+        <VStack align="stretch" gap={3} pt={1}>
           {/* Plan identity */}
           <HStack gap={3}>
             <Circle
@@ -844,29 +845,56 @@ const FloatingActionCard = memo(({ plan, onContinue }: FloatingActionCardProps) 
             </HStack>
           </Box>
 
-          {/* CTA */}
-          <Button
-            w="full"
-            h="46px"
-            borderRadius="xl"
-            fontWeight="900"
-            fontSize="sm"
-            letterSpacing="wide"
-            onClick={onContinue}
-            style={{ background: gradient, color: "white" }}
-            boxShadow={`0 8px 24px -6px ${accentHex}55`}
-            _hover={{
-              transform: "translateY(-2px)",
-              boxShadow: `0 14px 32px -8px ${accentHex}65`,
-            }}
-            _active={{ transform: "translateY(0) scale(0.98)" }}
-            transition="all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
-          >
-            <HStack gap={2}>
-              <Text>Continue to Review</Text>
-              <ArrowRight size={15} />
-            </HStack>
-          </Button>
+          {/* CTA Buttons */}
+          <VStack gap={2}>
+            {/* Quick Single-Page Checkout */}
+            <Button
+              w="full"
+              h="40px"
+              borderRadius="xl"
+              fontWeight="900"
+              fontSize="xs"
+              variant="outline"
+              borderColor={`${accentHex}40`}
+              color={accentHex}
+              onClick={onQuickCheckout}
+              _hover={{
+                bg: `${accentHex}0a`,
+                borderColor: `${accentHex}60`,
+              }}
+              _active={{ transform: "scale(0.98)" }}
+              transition="all 0.25s"
+            >
+              <HStack gap={1.5}>
+                <CheckCircle size={13} />
+                <Text>Quick Checkout (Single Page)</Text>
+              </HStack>
+            </Button>
+
+            {/* Standard Continue Button */}
+            <Button
+              w="full"
+              h="46px"
+              borderRadius="xl"
+              fontWeight="900"
+              fontSize="sm"
+              letterSpacing="wide"
+              onClick={onContinue}
+              style={{ background: gradient, color: "white" }}
+              boxShadow={`0 8px 24px -6px ${accentHex}55`}
+              _hover={{
+                transform: "translateY(-2px)",
+                boxShadow: `0 14px 32px -8px ${accentHex}65`,
+              }}
+              _active={{ transform: "translateY(0) scale(0.98)" }}
+              transition="all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
+            >
+              <HStack gap={2}>
+                <Text>Continue to Review</Text>
+                <ArrowRight size={15} />
+              </HStack>
+            </Button>
+          </VStack>
         </VStack>
       </Box>
     </Box>
@@ -1075,7 +1103,7 @@ const RecommendationModal = memo(({
         overflow="hidden"
       >
         <Box h="3px" bg={gradient} />
-        
+
         <DialogHeader p={5}>
           <HStack justify="space-between" align="center">
             <HStack gap={3}>
@@ -1112,7 +1140,7 @@ const RecommendationModal = memo(({
               <Text fontSize="9px" fontWeight="900" color={muted} letterSpacing="wider" textTransform="uppercase">
                 RECOMMENDED MEMBERSHIP PLAN
               </Text>
-              
+
               <Flex
                 p={4}
                 borderRadius="20px"
@@ -1211,7 +1239,7 @@ const Plans = memo(() => {
   const recommendation = useMemo(() => {
     if (!member?.data || plans.length === 0) return null;
     const goals = (member.data.fitnessGoals || "").toLowerCase();
-    
+
     let bestPlan = plans[0];
     let matchReason = "Based on general membership preferences for gym entries.";
 
@@ -1294,6 +1322,19 @@ const Plans = memo(() => {
     }
     const reviewPath = `/${organizationName}/workspace/app/${appCode}/reviewOrder/${memberId}?planCode=${selectedPlan.data.code}`;
     navigate(reviewPath);
+  }, [selectedPlan, memberId, organizationName, appCode, navigate]);
+
+  const handleQuickCheckout = useCallback(() => {
+    if (!selectedPlan) {
+      toaster.create({
+        title: "Select a Plan",
+        description: "Please choose a membership plan to continue.",
+        type: "warning",
+      });
+      return;
+    }
+    const checkoutPath = `/${organizationName}/workspace/app/${appCode}/checkout/${memberId}?planCode=${selectedPlan.data.code}`;
+    navigate(checkoutPath);
   }, [selectedPlan, memberId, organizationName, appCode, navigate]);
 
   return (
@@ -1489,6 +1530,7 @@ const Plans = memo(() => {
       <FloatingActionCard
         plan={selectedPlan}
         onContinue={handleContinue}
+        onQuickCheckout={handleQuickCheckout}
       />
 
       {/* ── AI Recommendation Modal ── */}

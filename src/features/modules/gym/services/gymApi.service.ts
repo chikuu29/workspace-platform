@@ -40,6 +40,10 @@ import type {
   SendInvoiceLinkPayload,
   SendInvoiceLinkResponse,
   CancelInvoiceResponse,
+  CheckoutPreviewPayload,
+  CheckoutPreviewResponse,
+  CheckoutPayload,
+  CheckoutResponse,
 } from "../types/Gym.types";
 
 
@@ -364,6 +368,24 @@ export const GymApiService = {
       data: {},
       isPrivateApi: true,
     }).pipe(map((res: any) => res as CancelInvoiceResponse));
+  },
+
+  /** Preview checkout pricing for a member + plan combination */
+  checkoutPreview: (payload: CheckoutPreviewPayload) => {
+    return POSTAPI({
+      path: "/v1/gym/checkout/preview",
+      data: payload,
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as CheckoutPreviewResponse));
+  },
+
+  /** Execute checkout atomically */
+  checkout: (payload: CheckoutPayload) => {
+    return POSTAPI({
+      path: "/v1/gym/checkout",
+      data: payload,
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as CheckoutResponse));
   },
 };
 

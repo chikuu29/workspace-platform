@@ -133,6 +133,7 @@ const registry: RegistryConfig = {
         onlinePayment: () => import("@/features/modules/gym/OnlinePayment"),
         // Step 6C: Payment link dispatch via email or SMS
         paymentLink: () => import("@/features/modules/gym/PaymentLinkPage"),
+        checkout: () => import("@/features/modules/gym/MembershipCheckout"),
         // Trainers
         trainers: () => import("@/features/modules/gym/TrainersStaff"),
         TrainerProfile: () => import("@/features/modules/gym/TrainerProfile"),

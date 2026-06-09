@@ -109,7 +109,7 @@ const registry: RegistryConfig = {
         members: () => import("@/features/modules/gym/ViewMember"),
         membersList: () => import("@/features/modules/gym/ViewMember"),
         member: () => import("@/features/modules/gym/MemberDetail"),
-        MemberCheckIn: () => import("@/features/modules/gym/MemberCheckIn"),
+        attendance: () => import("@/features/modules/gym/Attendance"),
         // Billing & Subscriptions
         // Subscription: () => import("@/features/modules/gym/Subscription"),
         subscriptions: () => import("@/features/modules/gym/SubscriptionsPlan"),

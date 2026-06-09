@@ -329,7 +329,7 @@ const GymManagementDashboard = memo(() => {
 
                   <SimpleGrid columns={{ base: 1, md: 3 }} gap={3}>
                     <WorkflowButton label="New Enrollment" caption="Create member profile" icon={UserPlus} accent="blue.500" onClick={() => navigateTo("AddMember")} />
-                    <WorkflowButton label="Member Check-in" caption="Log front desk arrival" icon={Clock3} accent="green.500" onClick={() => navigateTo("MemberCheckIn")} />
+                    <WorkflowButton label="Attendance Terminal" caption="Log front desk arrivals" icon={Clock3} accent="green.500" onClick={() => navigateTo("Attendance")} />
                     <WorkflowButton label="Process Payment" caption="Open billing workflow" icon={Receipt} accent="purple.500" onClick={() => navigateTo("Subscription")} />
                   </SimpleGrid>
                 </VStack>

@@ -43,7 +43,7 @@ StubPage.displayName = "StubPage";
 // Named exports for the registry
 import { SquareCheck, Users, CalendarDays, TrendingUp, BarChart3, CreditCard } from "lucide-react";
 
-export const MemberCheckIn = () => <StubPage title="Member Check-In" description="Real-time scan and log system for gym entries." icon={SquareCheck} accent="teal" />;
+export const Attendance = () => <StubPage title="Attendance Terminal" description="Real-time scan and log system for gym entries." icon={SquareCheck} accent="teal" />;
 export const trainers = () => <StubPage title="Trainer Directory" description="Manage staff profiles and specializations." icon={Users} accent="blue" />;
 export const TrainerSchedules = () => <StubPage title="Trainer Schedules" description="Weekly timetables and PT booking slots." icon={CalendarDays} accent="green" />;
 export const ListClasses = () => <StubPage title="Class Catalog" description="Group session management and capacity tracking." icon={CalendarDays} accent="purple" />;

@@ -15,12 +15,14 @@ import {
 import { useColorModeValue } from "@/components/ui/color-mode";
 import {
   Check, X, Scan, User, CreditCard, History,
-  ArrowRight, Info, RefreshCw, Volume2, VolumeX, Flame, Activity, Users
+  ArrowRight, Info, RefreshCw, Volume2, VolumeX, Flame, Activity, Users,
+  Maximize2, Minimize2
 } from "lucide-react";
 import { toaster } from "@/components/ui/toaster";
 import { GymApiService } from "./services/gymApi.service";
 import { PageHeader } from "@/core/components/PageHeader"; ``
 import { useNavActionStore } from "@/core/store/useNavActionStore";
+import { MaximizeContainer } from "@/core/components/MaximizeContainer";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 import { Avatar } from "@/components/ui/avatar";
 import { motion, AnimatePresence } from "framer-motion";
@@ -114,9 +116,10 @@ interface ScannerHUDProps {
   status: "idle" | "loading" | "success" | "error";
   memberName?: string;
   errorMessage?: string;
+  h?: string | number;
 }
 
-const ScannerHUD = memo(({ status, memberName, errorMessage }: ScannerHUDProps) => {
+const ScannerHUD = memo(({ status, memberName, errorMessage, h = "240px" }: ScannerHUDProps) => {
   const statusColors = {
     idle: {
       color: "cyan.400",
@@ -142,7 +145,7 @@ const ScannerHUD = memo(({ status, memberName, errorMessage }: ScannerHUDProps) 
     <Box
       position="relative"
       w="full"
-      h="240px"
+      h={h}
       bg="gray.950"
       borderRadius="2xl"
       overflow="hidden"
@@ -365,10 +368,10 @@ const LiveActivityStream = memo(({ activities, onViewMember }: LiveActivityStrea
         <HStack justify="space-between" align="center">
           <VStack align="start" gap={0.5}>
             <Heading size="sm" fontWeight="950" color="app.text.primary">
-              Live Activity Stream
+              Live Attendance Stream
             </Heading>
             <Text fontSize="xs" fontWeight="700" color={muted}>
-              Recent terminal check-in logs
+              Recent front desk attendance scans
             </Text>
           </VStack>
 
@@ -463,9 +466,69 @@ const LiveActivityStream = memo(({ activities, onViewMember }: LiveActivityStrea
 
 LiveActivityStream.displayName = "LiveActivityStream";
 
+/**
+ * LiveClock Component
+ * Displays the current date and time with a blinking scanner indicator.
+ * Self-contained component to prevent dashboard-wide render cycles on clock ticks.
+ */
+const LiveClock = memo(() => {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formattedDate = time.toLocaleDateString(undefined, {
+    weekday: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+
+  const formattedTime = time.toLocaleTimeString(undefined, {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
+
+  const textColor = useColorModeValue("cyan.600", "cyan.400");
+  const bg = useColorModeValue("rgba(6, 182, 212, 0.05)", "rgba(6, 182, 212, 0.03)");
+  const border = useColorModeValue("rgba(6, 182, 212, 0.2)", "rgba(6, 182, 212, 0.1)");
+
+  return (
+    <HStack
+      px={4}
+      py={1.5}
+      borderRadius="xl"
+      bg={bg}
+      border="1px solid"
+      borderColor={border}
+      gap={2.5}
+      align="center"
+      fontSize="xs"
+      fontWeight="900"
+      color={textColor}
+      fontFamily="monospace"
+      boxShadow="0 2px 10px rgba(6, 182, 212, 0.03)"
+      mt={1}
+    >
+      <Circle size="1.5" bg="cyan.400" animation="pulse-light 1s infinite" />
+      <Text>{formattedDate}</Text>
+      <Text opacity={0.4} fontWeight="normal">•</Text>
+      <Text letterSpacing="wider">{formattedTime}</Text>
+    </HStack>
+  );
+});
+
+LiveClock.displayName = "LiveClock";
+
 // ─── Main Component ───────────────────────────────────────────────────
 
-const MemberCheckIn = memo(() => {
+const Attendance = memo(() => {
   const [memberId, setMemberId] = useState("");
   const [status, setStatus] = useState<"idle" | "success" | "error" | "loading">("idle");
   const [lastCheckin, setLastCheckin] = useState<any>(null);
@@ -719,9 +782,11 @@ const MemberCheckIn = memo(() => {
   const capacityLoad = kpis?.trainer_utilization || 0;
 
   return (
-    <Flex direction="column" minH="70vh" w="full" py={6} animation="fade-in 0.4s ease-out">
-      {/* Dynamic Keyframe Animations Injection */}
-      <style>{`
+    <MaximizeContainer maxW="1400px">
+      {({ isMaximized: isEntireMaximized, toggle: toggleEntireMaximize }) => (
+        <Flex direction="column" minH="70vh" w="full" py={6} animation="fade-in 0.4s ease-out">
+          {/* Dynamic Keyframe Animations Injection */}
+          <style>{`
         @keyframes scan-line {
           0% { top: 0%; opacity: 0.3; }
           50% { top: 100%; opacity: 1; }
@@ -742,159 +807,232 @@ const MemberCheckIn = memo(() => {
         }
       `}</style>
 
-      {/* Centered High-Tech Cockpit Header */}
-      <VStack w="full" align="center" justify="center" gap={4} mb={6} textAlign="center" position="relative" py={2}>
-        <Flex
-          align="center"
-          justify="center"
-          w="54px"
-          h="54px"
-          bg="linear-gradient(135deg, #06b6d4, #3b82f6)"
-          borderRadius="2xl"
-          color="white"
-          boxShadow="0 10px 25px -8px rgba(6, 182, 212, 0.6)"
-          animation="pulse-light 3s infinite"
-        >
-          <Scan size={26} />
-        </Flex>
-        
-        <VStack gap={1} align="center">
-          <HStack gap={3} align="center" justify="center">
-            <Heading size="2xl" fontWeight="950" letterSpacing="tight" color="app.text.primary">
-              Access Control Cockpit
-            </Heading>
-            <Badge colorPalette="green" variant="solid" borderRadius="full" px={2.5} py={0.5} fontSize="3xs" fontWeight="900">
-              ONLINE
-            </Badge>
-          </HStack>
-          
-          <Text fontSize="sm" fontWeight="700" color={muted} maxW="600px">
-            Secure barcode check-in module and attendance validation terminal.
-          </Text>
-        </VStack>
-      </VStack>
-
-      <Grid templateColumns={{ base: "1fr", lg: "1.3fr 1fr" }} gap={8} w="full" mt={6} alignItems="start">
-        {/* Left Column: Scanning Desk Terminal */}
-        <GridItem w="full">
-          <VStack gap={6} w="full">
-            <Box
-              w="full"
-              p={6}
-              borderRadius="3xl"
-              bg={panelBg}
-              border="1px solid"
-              borderColor={status === "success" ? "emerald.500/40" : status === "error" ? "rose.500/40" : borderColor}
-              boxShadow="0 30px 60px -25px rgba(0, 0, 0, 0.4)"
-              backdropFilter="blur(20px)"
-              transition="all 0.35s ease"
-              onClick={handleFocusInput}
-              cursor="pointer"
+          {/* Centered High-Tech Cockpit Header */}
+          <VStack
+            w="full"
+            align="center"
+            justify="center"
+            gap={4}
+            mb={6}
+            textAlign="center"
+            position="relative"
+            py={2}
+            onClick={toggleEntireMaximize}
+            cursor="pointer"
+            _hover={{ transform: "scale(1.01)", opacity: 0.95 }}
+            transition="all 0.2s ease"
+            title={isEntireMaximized ? "Click to exit fullscreen" : "Click to enter fullscreen"}
+          >
+            <Flex
+              align="center"
+              justify="center"
+              w="54px"
+              h="54px"
+              bg="linear-gradient(135deg, #06b6d4, #6366f1)"
+              borderRadius="2xl"
+              color="white"
+              boxShadow="0 10px 25px -8px rgba(6, 182, 212, 0.6)"
+              animation="pulse-light 3s infinite"
             >
-              <VStack gap={5}>
-                {/* HUD Header */}
-                <HStack w="full" justify="space-between" align="center">
-                  <HStack gap={2}>
-                    <Circle size="2" bg={status === "idle" ? "cyan.400" : status === "loading" ? "orange.400" : status === "success" ? "emerald.400" : "rose.400"} />
-                    <Text fontSize="xs" fontWeight="900" color="app.text.muted" letterSpacing="wider">
-                      TERMINAL HUD
-                    </Text>
-                  </HStack>
+              <Scan size={26} />
+            </Flex>
 
-                  <IconButton
-                    variant="ghost"
-                    colorPalette="gray"
-                    size="sm"
-                    borderRadius="xl"
-                    onClick={handleToggleMute}
-                    aria-label={isMuted ? "Unmute sound" : "Mute sound"}
-                  >
-                    {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
-                  </IconButton>
+            <VStack gap={1} align="center">
+              <HStack gap={3} align="center" justify="center">
+                <Heading
+                  size="2xl"
+                  fontWeight="950"
+                  letterSpacing="tight"
+                  bgGradient="linear-gradient(135deg, #06b6d4, #6366f1)"
+                  bgClip="text"
+                  color="transparent"
+                >
+                  Attendance Terminal
+                </Heading>
+                <Badge colorPalette="green" variant="solid" borderRadius="full" px={2.5} py={0.5} fontSize="3xs" fontWeight="900">
+                  ONLINE
+                </Badge>
+              </HStack>
+
+              <Text fontSize="sm" fontWeight="700" color={muted} maxW="600px">
+                Secure barcode scanning and automated attendance verification console.
+              </Text>
+
+              <Box mt={1.5}>
+                <LiveClock />
+              </Box>
+            </VStack>
+          </VStack>
+
+          <Grid templateColumns={{ base: "1fr", lg: "1.3fr 1fr" }} gap={8} w="full" mt={6} alignItems="start">
+            {/* Left Column: Scanning Desk Terminal */}
+            <GridItem w="full">
+              <VStack gap={6} w="full">
+                <MaximizeContainer maxW="800px">
+                  {({ isMaximized, toggle }) => (
+                    <Box
+                      w="full"
+                      p={isMaximized ? 8 : 6}
+                      borderRadius="3xl"
+                      bg={panelBg}
+                      border="1px solid"
+                      borderColor={status === "success" ? "emerald.500/40" : status === "error" ? "rose.500/40" : borderColor}
+                      boxShadow={isMaximized ? "0 40px 80px -20px rgba(0, 0, 0, 0.6)" : "0 30px 60px -25px rgba(0, 0, 0, 0.4)"}
+                      backdropFilter="blur(20px)"
+                      transition="all 0.35s ease"
+                      onClick={handleFocusInput}
+                      cursor="pointer"
+                    >
+                      <VStack gap={5}>
+                        {/* HUD Header */}
+                        <HStack w="full" justify="space-between" align="center">
+                          <HStack gap={2}>
+                            <Circle size="2" bg={status === "idle" ? "cyan.400" : status === "loading" ? "orange.400" : status === "success" ? "emerald.400" : "rose.400"} />
+                            <Text fontSize="xs" fontWeight="900" color="app.text.muted" letterSpacing="wider">
+                              ATTENDANCE HUD
+                            </Text>
+                          </HStack>
+
+                          <HStack gap={1.5}>
+                            <IconButton
+                              variant="ghost"
+                              colorPalette="gray"
+                              size="sm"
+                              borderRadius="xl"
+                              onClick={handleToggleMute}
+                              aria-label={isMuted ? "Unmute sound" : "Mute sound"}
+                            >
+                              {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
+                            </IconButton>
+                            <IconButton
+                              variant="ghost"
+                              colorPalette="gray"
+                              size="sm"
+                              borderRadius="xl"
+                              onClick={toggle}
+                              aria-label={isMaximized ? "Exit fullscreen" : "Enter fullscreen"}
+                            >
+                              {isMaximized ? <Minimize2 size={15} strokeWidth={2.5} /> : <Maximize2 size={15} strokeWidth={2.5} />}
+                            </IconButton>
+                          </HStack>
+                        </HStack>
+
+                        {/* Interactive Scanner Viewport */}
+                        <ScannerHUD
+                          status={status}
+                          memberName={lastCheckin?.data?.member_name}
+                          errorMessage={errorMessage}
+                          h={isMaximized ? "360px" : "240px"}
+                        />
+
+                        {/* Input Controls */}
+                        <VStack w="full" gap={4} mt={2}>
+                          <Input
+                            ref={inputRef}
+                            value={memberId}
+                            onChange={handleInputChange}
+                            onKeyDown={handleKeyDown}
+                            placeholder="SCAN CARD OR ENTER MEMBER ID"
+                            size="lg"
+                            h="64px"
+                            fontSize="xl"
+                            fontWeight="950"
+                            textAlign="center"
+                            letterSpacing="widest"
+                            borderRadius="2xl"
+                            bg={useColorModeValue("rgba(255, 255, 255, 0.8)", "rgba(10, 15, 30, 0.65)")}
+                            border="2px solid"
+                            borderColor={useColorModeValue("gray.200", "whiteAlpha.100")}
+                            backdropFilter="blur(10px)"
+                            _hover={{
+                              borderColor: useColorModeValue("cyan.400", "cyan.500/50"),
+                              bg: useColorModeValue("rgba(255, 255, 255, 0.9)", "rgba(10, 15, 30, 0.75)"),
+                            }}
+                            _focus={{
+                              borderColor: "cyan.500",
+                              bg: useColorModeValue("white", "rgba(5, 6, 12, 0.9)"),
+                              boxShadow: "0 0 20px rgba(6, 182, 212, 0.25)",
+                            }}
+                            _placeholder={{
+                              color: useColorModeValue("gray.400", "whiteAlpha.400"),
+                              fontSize: "sm",
+                              fontWeight: "800",
+                              letterSpacing: "widest",
+                            }}
+                            transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
+                            disabled={status === "loading"}
+                          />
+
+                          <Button
+                            w="full"
+                            h="56px"
+                            size="lg"
+                            borderRadius="2xl"
+                            fontWeight="950"
+                            onClick={handleBtnSubmit}
+                            disabled={!memberId || status === "loading"}
+                            bgGradient="linear-gradient(135deg, #06b6d4 0%, #3b82f6 50%, #6366f1 100%)"
+                            color="white"
+                            boxShadow="0 4px 20px rgba(6, 182, 212, 0.3)"
+                            _hover={{
+                              bgGradient: "linear-gradient(135deg, #22d3ee 0%, #60a5fa 50%, #818cf8 100%)",
+                              transform: "translateY(-2px)",
+                              boxShadow: "0 8px 30px rgba(6, 182, 212, 0.5)",
+                            }}
+                            _active={{
+                              transform: "translateY(0)",
+                              boxShadow: "0 4px 15px rgba(6, 182, 212, 0.3)",
+                            }}
+                            _disabled={{
+                              opacity: 0.4,
+                              cursor: "not-allowed",
+                              transform: "none",
+                              boxShadow: "none",
+                            }}
+                            transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
+                          >
+                            LOG ATTENDANCE <ArrowRight style={{ marginLeft: "8px" }} size={16} />
+                          </Button>
+                        </VStack>
+                      </VStack>
+                    </Box>
+                  )}
+                </MaximizeContainer>
+
+                {/* Sub-Card: Member quick lookup guidelines */}
+                <HStack w="full" p={4} bg="whiteAlpha.50" border="1px solid" borderColor="whiteAlpha.100" borderRadius="2xl" gap={3}>
+                  <Info size={16} style={{ color: "var(--chakra-colors-blue-500)", flexShrink: 0 }} />
+                  <Text fontSize="xs" fontWeight="700" color={muted}>
+                    Attendance focus is maintained automatically. Scan ID cards successively to log attendance.
+                  </Text>
                 </HStack>
+              </VStack>
+            </GridItem>
 
-                {/* Interactive Scanner Viewport */}
-                <ScannerHUD
-                  status={status}
-                  memberName={lastCheckin?.data?.member_name}
-                  errorMessage={errorMessage}
+            {/* Right Column: KPIs & Live feed streams */}
+            <GridItem w="full">
+              <VStack gap={6} w="full">
+                {/* KPI Counts */}
+                <StatsGrid
+                  checkinsToday={todayScans}
+                  activeMembers={activeMembers}
+                  capacityLoad={capacityLoad}
+                  loading={statsLoading}
                 />
 
-                {/* Input Controls */}
-                <VStack w="full" gap={4} mt={2}>
-                  <Input
-                    ref={inputRef}
-                    value={memberId}
-                    onChange={handleInputChange}
-                    onKeyDown={handleKeyDown}
-                    placeholder="SCAN ID CARD OR TYPE ID"
-                    size="lg"
-                    h="64px"
-                    fontSize="xl"
-                    fontWeight="950"
-                    textAlign="center"
-                    letterSpacing="widest"
-                    borderRadius="2xl"
-                    bg="blackAlpha.300"
-                    border="none"
-                    _focus={{ bg: "blackAlpha.400", boxShadow: "none" }}
-                    disabled={status === "loading"}
-                  />
-
-                  <Button
-                    w="full"
-                    h="56px"
-                    size="lg"
-                    colorPalette="blue"
-                    borderRadius="2xl"
-                    fontWeight="950"
-                    onClick={handleBtnSubmit}
-                    disabled={!memberId || status === "loading"}
-                    _hover={{
-                      transform: "translateY(-1px)",
-                      boxShadow: "0 10px 24px -8px var(--chakra-colors-blue-500)",
-                    }}
-                    _active={{ transform: "translateY(0)" }}
-                    transition="all 0.2s ease"
-                  >
-                    RECORD ARRIVAL <ArrowRight style={{ marginLeft: "6px" }} size={16} />
-                  </Button>
-                </VStack>
+                {/* Live Activities Stream log */}
+                <LiveActivityStream
+                  activities={recentCheckins}
+                  onViewMember={handleViewMember}
+                />
               </VStack>
-            </Box>
-
-            {/* Sub-Card: Member quick lookup guidelines */}
-            <HStack w="full" p={4} bg="whiteAlpha.50" border="1px solid" borderColor="whiteAlpha.100" borderRadius="2xl" gap={3}>
-              <Info size={16} style={{ color: "var(--chakra-colors-blue-500)", flexShrink: 0 }} />
-              <Text fontSize="xs" fontWeight="700" color={muted}>
-                Keyboard focus is maintained automatically. Scan barcodes successively to capture attendance.
-              </Text>
-            </HStack>
-          </VStack>
-        </GridItem>
-
-        {/* Right Column: KPIs & Live feed streams */}
-        <GridItem w="full">
-          <VStack gap={6} w="full">
-            {/* KPI Counts */}
-            <StatsGrid
-              checkinsToday={todayScans}
-              activeMembers={activeMembers}
-              capacityLoad={capacityLoad}
-              loading={statsLoading}
-            />
-
-            {/* Live Activities Stream log */}
-            <LiveActivityStream
-              activities={recentCheckins}
-              onViewMember={handleViewMember}
-            />
-          </VStack>
-        </GridItem>
-      </Grid>
-    </Flex>
+            </GridItem>
+          </Grid>
+        </Flex>
+      )}
+    </MaximizeContainer>
   );
 });
 
-MemberCheckIn.displayName = "MemberCheckIn";
-export default MemberCheckIn;
+Attendance.displayName = "Attendance";
+export default Attendance;

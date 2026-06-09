@@ -91,11 +91,11 @@ const QUICK_ACTIONS: QuickActionDef[] = [
   },
   {
     id: "checkin",
-    label: "Member Check-in",
-    description: "Log front desk arrival",
+    label: "Attendance Terminal",
+    description: "Log front desk arrivals",
     icon: Clock,
     accentColor: "green.500",
-    view: "MemberCheckIn",
+    view: "attendance",
   },
   {
     id: "billing",

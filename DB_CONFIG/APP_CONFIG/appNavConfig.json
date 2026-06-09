@@ -154,9 +154,9 @@
                                 "path": "/app/gym/AddMember"
                             },
                             {
-                                "label": "Member Check-In",
-                                "icon": "UserCheck",
-                                "path": "/app/gym/MemberCheckIn"
+                                "label": "Attendance",
+                                "icon": "fingerprint",
+                                "path": "/app/gym/attendance"
                             }
                         ]
                     },

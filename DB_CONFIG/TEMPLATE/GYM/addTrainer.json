@@ -52,7 +52,8 @@
                 "iconName": "LuSave",
                 "widget": "button",
                 "styles": {
-                    "variant": "outline"
+                    "variant": "outline",
+                    "bg": "gradient_orange"
                 },
                 "hidden": false,
                 "oneLiner": true,

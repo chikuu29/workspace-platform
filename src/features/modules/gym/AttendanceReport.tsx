@@ -81,29 +81,24 @@ const HourlyBar = memo(({ hour, count, maxCount, active }: { hour: number; count
 const AttendanceReport = memo(() => {
   const { stats, loading, refetch } = useAttendanceStats();
 
-  const mountNavActions = useNavActionStore((state) => state.setActions);
-  const unmountNavActions = useNavActionStore((state) => state.clearActions);
+  const setNavActionConfig = useNavActionStore((state) => state.setNavActionConfig);
+  const clearActions = useNavActionStore((state) => state.clearActions);
 
   useEffect(() => {
-    mountNavActions(
-      <HStack gap={2}>
-        <IconButton
-          variant="subtle"
-          colorPalette="yellow"
-          borderRadius="sm"
-          size="md"
-          h="40px"
-          px={6}
-          onClick={refetch}
-          aria-label="Refresh stats"
-          loading={loading}
-        >
-          <RefreshCw size={14} />
-        </IconButton>
-      </HStack>
-    );
-    return () => unmountNavActions();
-  }, [mountNavActions, unmountNavActions, refetch, loading]);
+    setNavActionConfig([
+      {
+        id: "refresh",
+        icon: RefreshCw,
+        bg: "gradient_cyan_purple",
+        color: "white",
+        ariaLabel: "Refresh stats",
+        onClick: refetch,
+        loading: loading,
+        flexShrink: 0,
+      },
+    ]);
+    return () => clearActions();
+  }, [setNavActionConfig, clearActions, refetch, loading]);
 
   const muted = useColorModeValue("gray.500", "gray.400");
   const borderColor = useColorModeValue("rgba(226,232,240,0.84)", "rgba(255,255,255,0.12)");

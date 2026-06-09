@@ -98,7 +98,16 @@ export const colors = {
     g_pink: { value: "linear-gradient(135deg, #EC4899 0%, #D946EF 100%)" },
     g_cyan: { value: "linear-gradient(135deg, #06B6D4 0%, #0891B2 100%)" },
     g_emerald: { value: "linear-gradient(135deg, #10B981 0%, #059669 100%)" },
-
+    gradient_purple: { value: "linear-gradient(135deg, #6366f1, #8b5cf6)" },
+    gradient_blue: { value: "linear-gradient(135deg, #3b82f6, #6366f1)" },
+    gradient_green: { value: "linear-gradient(135deg, #10b981, #3b82f6)" },
+    gradient_orange: { value: "linear-gradient(135deg, #f59e0b, #ef4444)" },
+    gradient_cyan: { value: "linear-gradient(135deg, #06b6d4, #3b82f6)" },
+    gradient_pink: { value: "linear-gradient(135deg, #a855f7, #ec4899)" },
+    gradient_teal: { value: "linear-gradient(135deg, #14b8a6, #22c55e)" },
+    gradient_gray: { value: "linear-gradient(135deg, #64748b, #475569)" },
+    gradient_purple_alt: { value: "linear-gradient(135deg, #8b5cf6, #6366f1)" },
+    gradient_cyan_purple: { value: "linear-gradient(135deg, #06b6d4, #6366f1)" },
 }
 
 export const semanticTokens = {

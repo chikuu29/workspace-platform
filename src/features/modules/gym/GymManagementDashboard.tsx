@@ -214,64 +214,40 @@ const GymManagementDashboard = memo(() => {
 
   const { stats, loading, refresh } = useGymDashboard();
 
-  const mountNavActions = useNavActionStore((state) => state.setActions);
-  const unmountNavActions = useNavActionStore((state) => state.clearActions);
+  const setNavActionConfig = useNavActionStore((state) => state.setNavActionConfig);
+  const clearActions = useNavActionStore((state) => state.clearActions);
 
   useEffect(() => {
-    mountNavActions(
-      <HStack gap={2}>
-        <IconButton
-          variant="subtle"
-          colorPalette="yellow"
-          borderRadius="sm"
-          size="md"
-          h="40px"
-          px={6}
-          onClick={refresh}
-          aria-label="Refresh dashboard"
-          loading={loading}
-        >
-          <RefreshCw size={14} />
-        </IconButton>
-        <Button
-          variant="outline"
-          borderRadius="sm"
-          size="md"
-          h="40px"
-          px={6}
-          onClick={() => navigateTo("members")}
-          fontWeight="800"
-          _hover={{
-            transform: "translateY(-1px)",
-            boxShadow: "sm",
-            bg: "whiteAlpha.100",
-          }}
-          _active={{ transform: "translateY(0)" }}
-          transition="all 0.2s ease"
-        >
-          <Users size={16} /> Directory
-        </Button>
-        <Button
-          colorPalette="blue"
-          borderRadius="sm"
-          size="md"
-          h="40px"
-          px={6}
-          onClick={() => navigateTo("AddMember")}
-          fontWeight="800"
-          _hover={{
-            transform: "translateY(-1px)",
-            boxShadow: "0 10px 24px -8px var(--chakra-colors-blue-500)",
-          }}
-          _active={{ transform: "translateY(0)" }}
-          transition="all 0.2s ease"
-        >
-          <UserPlus size={16} /> Enroll Member
-        </Button>
-      </HStack>
-    );
-    return () => unmountNavActions();
-  }, [mountNavActions, unmountNavActions, refresh, loading, navigateTo]);
+    setNavActionConfig([
+      {
+        id: "refresh",
+        icon: RefreshCw,
+        bg: "gradient_cyan_purple",
+        color: "white",
+        ariaLabel: "Refresh dashboard",
+        onClick: refresh,
+        loading: loading,
+        flexShrink: 0,
+      },
+      {
+        id: "members",
+        label: "Directory",
+        icon: Users,
+        bg: "gradient_cyan_purple",
+        color: "white",
+        onClick: () => navigateTo("members"),
+      },
+      {
+        id: "enroll",
+        label: "Enroll Member",
+        icon: UserPlus,
+        bg: "gradient_purple",
+        color: "white",
+        onClick: () => navigateTo("AddMember"),
+      },
+    ]);
+    return () => clearActions();
+  }, [setNavActionConfig, clearActions, refresh, loading, navigateTo]);
 
   const kpis = stats?.kpis;
   const totalMembers = kpis?.total_members || 0;

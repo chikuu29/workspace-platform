@@ -98,29 +98,24 @@ PlanRevenueRow.displayName = "PlanRevenueRow";
 const RevenueReport = memo(() => {
   const { stats, loading, refetch } = useSubscriptionStats();
 
-  const mountNavActions = useNavActionStore((state) => state.setActions);
-  const unmountNavActions = useNavActionStore((state) => state.clearActions);
+  const setNavActionConfig = useNavActionStore((state) => state.setNavActionConfig);
+  const clearActions = useNavActionStore((state) => state.clearActions);
 
   useEffect(() => {
-    mountNavActions(
-      <HStack gap={2}>
-        <IconButton
-          variant="subtle"
-          colorPalette="yellow"
-          borderRadius="sm"
-          size="md"
-          h="40px"
-          px={6}
-          onClick={refetch}
-          aria-label="Refresh revenue"
-          loading={loading}
-        >
-          <RefreshCw size={14} />
-        </IconButton>
-      </HStack>
-    );
-    return () => unmountNavActions();
-  }, [mountNavActions, unmountNavActions, refetch, loading]);
+    setNavActionConfig([
+      {
+        id: "refresh",
+        icon: RefreshCw,
+        bg: "gradient_cyan_purple",
+        color: "white",
+        ariaLabel: "Refresh revenue",
+        onClick: refetch,
+        loading: loading,
+        flexShrink: 0,
+      },
+    ]);
+    return () => clearActions();
+  }, [setNavActionConfig, clearActions, refetch, loading]);
 
   const plansData = stats?.plans_with_members || [];
 

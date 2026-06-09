@@ -862,56 +862,37 @@ const MemberDetail = memo(() => {
   const handleEditProfile = useCallback(() => setEditOpen(true), []);
   const handleCloseEdit = useCallback(() => setEditOpen(false), []);
 
-  const { setActions, clearActions } = useNavActionStore();
+  const setNavActionConfig = useNavActionStore((state) => state.setNavActionConfig);
+  const clearActions = useNavActionStore((state) => state.clearActions);
 
   // ── Portal Edit + Refresh buttons into the AppBreadcrumb nav slot ──
   // useEffect re-runs whenever loading changes so the Refresh spinner stays
   // in sync. clearActions on unmount prevents stale buttons leaking into
   // other pages when navigating away.
   useEffect(() => {
-    setActions(
-      <HStack gap={2}>
-        <Button
-          variant="outline"
-          size="sm"
-          h="34px"
-          px={4}
-          borderRadius="md"
-          fontWeight="700"
-          borderColor="rgba(226,232,240,0.8)"
-          color="app.text.primary"
-          onClick={handleEditProfile}
-          _hover={{ bg: `${BRAND_HEX}0d`, borderColor: `${BRAND_HEX}40` }}
-          _active={{ transform: "scale(0.97)" }}
-        >
-          <HStack gap={1.5}>
-            <Edit size={13} />
-            <Text>Edit</Text>
-          </HStack>
-        </Button>
-        <Button
-          size="sm"
-          h="34px"
-          px={4}
-          borderRadius="md"
-          fontWeight="700"
-          style={{ background: BRAND_GRADIENT, color: "white" }}
-          boxShadow={`0 4px 14px ${BRAND_HEX}59`}
-          onClick={() => refresh()}
-          loading={loading}
-          _hover={{ transform: "translateY(-1px)", boxShadow: `0 8px 20px ${BRAND_HEX}80` }}
-          _active={{ transform: "scale(0.97)" }}
-        >
-          <HStack gap={1.5}>
-            <RefreshCw size={13} />
-            <Text>Refresh</Text>
-          </HStack>
-        </Button>
-      </HStack>
-    );
+    setNavActionConfig([
+      {
+        id: "edit",
+        label: "Edit",
+        icon: Edit,
+        bg: "gradient_cyan_purple",
+        color: "white",
+        onClick: handleEditProfile,
+      },
+      {
+        id: "refresh",
+        icon: RefreshCw,
+        bg: "gradient_cyan_purple",
+        color: "white",
+        ariaLabel: "Refresh profile",
+        onClick: refresh,
+        loading: loading,
+        flexShrink: 0,
+      },
+    ]);
     // Clear nav actions when leaving this page
     return () => clearActions();
-  }, [loading, handleEditProfile, refresh, setActions, clearActions]);
+  }, [loading, handleEditProfile, refresh, setNavActionConfig, clearActions]);
 
   const handleAssignPlan = useCallback(() => {
     if (!memberId) return;

@@ -242,81 +242,40 @@ const GymView = memo(() => {
   const panelBg = useColorModeValue("rgba(255,255,255,0.74)", "rgba(15,23,42,0.58)");
   const borderColor = useColorModeValue("rgba(226,232,240,0.84)", "rgba(255,255,255,0.12)");
 
-  const mountNavActions = useNavActionStore((state) => state.setActions);
-  const unmountNavActions = useNavActionStore((state) => state.clearActions);
+  const setNavActionConfig = useNavActionStore((state) => state.setNavActionConfig);
+  const clearActions = useNavActionStore((state) => state.clearActions);
 
   useEffect(() => {
-    mountNavActions(
-      /*
-       * HStack fills 100% width on mobile so each child button can use
-       * flex="1" to equally share the available space. On md+ the HStack
-       * reverts to auto width and buttons use their natural size.
-       */
-      <HStack gap={2} w={{ base: "full", md: "auto" }}>
-        {/* Refresh — icon-only, fixed square so it doesn't expand */}
-        <IconButton
-          colorPalette="yellow"
-          borderRadius="sm"
-          size="sm"
-          // h={{ base: "36px", md: "40px" }}
-          // minW={{ base: "36px", md: "40px" }}
-          // px={0}
-          flexShrink={0}
-          onClick={refresh}
-          aria-label="Refresh dashboard"
-          loading={loading}
-        >
-          <RefreshCw size={16} />
-        </IconButton>
-
-        {/* Directory — expands to fill remaining space equally on mobile */}
-        <Button
-          borderRadius="sm"
-          fontWeight="800"
-          size="sm"
-          // h={{ base: "36px", md: "40px" }}
-          // px={{ base: 1.5, md: 6 }}
-          flex={{ base: "1", md: "none" }}
-          minW={0}
-          _hover={{ transform: "translateY(-1px)", boxShadow: "sm" }}
-          _active={{ transform: "translateY(0)" }}
-          transition="all 0.2s ease"
-          onClick={() => navigateTo("members")}
-        >
-          <Icon as={Users} />
-          <Text fontSize={{ base: "10px", sm: "xs", md: "sm" }} ml={1}>
-            Members
-          </Text>
-        </Button>
-
-        {/* Enroll Member — expands to fill remaining space equally on mobile */}
-        <Button
-          colorPalette="blue"
-          borderRadius="sm"
-          fontWeight="800"
-          bg="g_blue"
-          size="sm"
-          // h={{ base: "36px", md: "40px" }}
-          // px={{ base: 1.5, md: 6 }}
-          flex={{ base: "1", md: "none" }}
-          minW={0}
-          _hover={{
-            transform: "translateY(-1px)",
-            boxShadow: "0 10px 24px -8px var(--chakra-colors-blue-500)",
-          }}
-          _active={{ transform: "translateY(0)" }}
-          transition="all 0.2s ease"
-          onClick={() => navigateTo("AddMember")}
-        >
-          <Plus size={16} />
-          <Text fontSize={{ base: "10px", sm: "xs", md: "sm" }} ml={1}>
-            Enroll Member
-          </Text>
-        </Button>
-      </HStack>
-    );
-    return () => unmountNavActions();
-  }, [mountNavActions, unmountNavActions, refresh, loading, navigateTo]);
+    setNavActionConfig([
+      {
+        id: "refresh",
+        icon: RefreshCw,
+        bg: "gradient_cyan_purple",
+        color: "white",
+        ariaLabel: "Refresh dashboard",
+        onClick: refresh,
+        loading: loading,
+        flexShrink: 0,
+      },
+      {
+        id: "members",
+        label: "Members",
+        bg: "gradient_cyan_purple",
+        color: "white",
+        icon: Users,
+        onClick: () => navigateTo("members"),
+      },
+      {
+        id: "enroll",
+        label: "Enroll Member",
+        icon: Plus,
+        bg: "gradient_purple",
+        color: "white",
+        onClick: () => navigateTo("AddMember"),
+      },
+    ]);
+    return () => clearActions();
+  }, [setNavActionConfig, clearActions, refresh, loading, navigateTo]);
 
   // ── Derived KPI values ────────────────────────────────────────────
   const kpis = stats?.kpis;

@@ -263,46 +263,32 @@ const TrainersStaff = memo(() => {
   const borderColor = useColorModeValue("rgba(226,232,240,0.84)", "rgba(255,255,255,0.12)");
   const muted = useColorModeValue("gray.500", "gray.400");
 
-  const mountNavActions = useNavActionStore((state) => state.setActions);
-  const unmountNavActions = useNavActionStore((state) => state.clearActions);
+  const setNavActionConfig = useNavActionStore((state) => state.setNavActionConfig);
+  const clearActions = useNavActionStore((state) => state.clearActions);
 
   useEffect(() => {
-    mountNavActions(
-      <HStack gap={2}>
-        <IconButton
-          variant="subtle"
-          colorPalette="yellow"
-          borderRadius="sm"
-          size="md"
-          h="40px"
-          px={6}
-          onClick={refresh}
-          aria-label="Refresh list"
-          loading={loading}
-        >
-          <RefreshCw size={14} />
-        </IconButton>
-        <Button
-          colorPalette="blue"
-          borderRadius="sm"
-          px={6}
-          size="md"
-          h="40px"
-          fontWeight="800"
-          _hover={{
-            transform: "translateY(-1px)",
-            boxShadow: "0 10px 24px -8px var(--chakra-colors-blue-500)",
-          }}
-          _active={{ transform: "translateY(0)" }}
-          transition="all 0.2s ease"
-          onClick={() => navigateTo("AddTrainer")}
-        >
-          <Plus size={16} /> New Trainer
-        </Button>
-      </HStack>
-    );
-    return () => unmountNavActions();
-  }, [mountNavActions, unmountNavActions, refresh, loading, navigateTo]);
+    setNavActionConfig([
+      {
+        id: "refresh",
+        icon: RefreshCw,
+        bg: "gradient_cyan_purple",
+        color: "white",
+        ariaLabel: "Refresh list",
+        onClick: refresh,
+        loading: loading,
+        flexShrink: 0,
+      },
+      {
+        id: "enroll",
+        label: "New Trainer",
+        icon: Plus,
+        bg: "gradient_purple",
+        color: "white",
+        onClick: () => navigateTo("AddTrainer"),
+      },
+    ]);
+    return () => clearActions();
+  }, [setNavActionConfig, clearActions, refresh, loading, navigateTo]);
 
   return (
     <Box mt={4} animation="fade-in 0.5s ease-out" w="full">

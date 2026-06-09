@@ -221,46 +221,32 @@ const Subscriptions = memo(() => {
 
   const handleDrawerOpenChange = useCallback((e: { open: boolean }) => setIsOpen(e.open), []);
 
-  const mountNavActions = useNavActionStore((state) => state.setActions);
-  const unmountNavActions = useNavActionStore((state) => state.clearActions);
+  const setNavActionConfig = useNavActionStore((state) => state.setNavActionConfig);
+  const clearActions = useNavActionStore((state) => state.clearActions);
 
   useEffect(() => {
-    mountNavActions(
-      <HStack gap={2}>
-        <IconButton
-          variant="subtle"
-          colorPalette="yellow"
-          borderRadius="sm"
-          size="md"
-          h="40px"
-          px={6}
-          onClick={refetch}
-          aria-label="Refresh plans"
-          loading={isLoading}
-        >
-          <RefreshCw size={14} />
-        </IconButton>
-        <Button
-          colorPalette="blue"
-          borderRadius="sm"
-          px={6}
-          size="md"
-          h="40px"
-          fontWeight="800"
-          _hover={{
-            transform: "translateY(-1px)",
-            boxShadow: "0 10px 24px -8px var(--chakra-colors-blue-500)",
-          }}
-          _active={{ transform: "translateY(0)" }}
-          transition="all 0.2s ease"
-          onClick={handleAddClick}
-        >
-          <Plus size={16} /> New Plan
-        </Button>
-      </HStack>
-    );
-    return () => unmountNavActions();
-  }, [mountNavActions, unmountNavActions, refetch, isLoading, handleAddClick]);
+    setNavActionConfig([
+      {
+        id: "refresh",
+        icon: RefreshCw,
+        bg: "gradient_cyan_purple",
+        color: "white",
+        ariaLabel: "Refresh plans",
+        onClick: refetch,
+        loading: isLoading,
+        flexShrink: 0,
+      },
+      {
+        id: "enroll",
+        label: "New Plan",
+        icon: Plus,
+        bg: "gradient_purple",
+        color: "white",
+        onClick: handleAddClick,
+      },
+    ]);
+    return () => clearActions();
+  }, [setNavActionConfig, clearActions, refetch, isLoading, handleAddClick]);
 
   // ── Stable handlers for cards ──
   const createEditHandler = useCallback((plan: SubscriptionPlanDocument) => () => handleEditClick(plan), [handleEditClick]);

@@ -249,64 +249,40 @@ const Subscription = () => {
         navigateTo("subscriptions");
     }, [navigateTo]);
 
-    const mountNavActions = useNavActionStore((state) => state.setActions);
-    const unmountNavActions = useNavActionStore((state) => state.clearActions);
+    const setNavActionConfig = useNavActionStore((state) => state.setNavActionConfig);
+    const clearActions = useNavActionStore((state) => state.clearActions);
 
     useEffect(() => {
-        mountNavActions(
-            <HStack gap={2}>
-                <IconButton
-                    variant="solid"
-                    colorPalette="yellow"
-                    borderRadius="sm"
-                    size="md"
-                    h="40px"
-                    px={6}
-                    onClick={handleRefresh}
-                    aria-label="Refresh hub"
-                    loading={plansLoading || statsLoading}
-                >
-                    <RefreshCw size={14} />
-                </IconButton>
-                <Button
-                    variant="outline"
-                    borderRadius="sm"
-                    size="md"
-                    h="40px"
-                    px={6}
-                    onClick={handleManagePlans}
-                    fontWeight="800"
-                    _hover={{
-                        transform: "translateY(-1px)",
-                        boxShadow: "sm",
-                        bg: "whiteAlpha.100",
-                    }}
-                    _active={{ transform: "translateY(0)" }}
-                    transition="all 0.2s ease"
-                >
-                    <Settings size={16} /> Management
-                </Button>
-                <Button
-                    colorPalette="blue"
-                    borderRadius="sm"
-                    size="md"
-                    h="40px"
-                    px={6}
-                    onClick={handleCreatePlan}
-                    fontWeight="800"
-                    _hover={{
-                        transform: "translateY(-1px)",
-                        boxShadow: "0 10px 24px -8px var(--chakra-colors-blue-500)",
-                    }}
-                    _active={{ transform: "translateY(0)" }}
-                    transition="all 0.2s ease"
-                >
-                    <Plus size={16} /> New Plan
-                </Button>
-            </HStack>
-        );
-        return () => unmountNavActions();
-    }, [mountNavActions, unmountNavActions, handleRefresh, handleManagePlans, handleCreatePlan, plansLoading, statsLoading]);
+        setNavActionConfig([
+            {
+                id: "refresh",
+                icon: RefreshCw,
+                bg: "gradient_cyan_purple",
+                color: "white",
+                ariaLabel: "Refresh hub",
+                onClick: handleRefresh,
+                loading: plansLoading || statsLoading,
+                flexShrink: 0,
+            },
+            {
+                id: "management",
+                label: "Management",
+                icon: Settings,
+                bg: "gradient_cyan_purple",
+                color: "white",
+                onClick: handleManagePlans,
+            },
+            {
+                id: "enroll",
+                label: "New Plan",
+                icon: Plus,
+                bg: "gradient_purple",
+                color: "white",
+                onClick: handleCreatePlan,
+            },
+        ]);
+        return () => clearActions();
+    }, [setNavActionConfig, clearActions, handleRefresh, handleManagePlans, handleCreatePlan, plansLoading, statsLoading]);
 
     const handleViewMembers = useCallback(() => {
         navigateTo("members");

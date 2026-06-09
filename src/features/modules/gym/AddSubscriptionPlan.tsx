@@ -314,57 +314,35 @@ const AddSubscriptionPlan = memo(() => {
         return () => sub.unsubscribe();
     }, [isValid, validationErrors, name, code, description, price, currency, billingCycle, isActive, features, accentColor, handleBack]);
 
+    const setNavActionConfig = useNavActionStore((state) => state.setNavActionConfig);
+    const clearActions = useNavActionStore((state) => state.clearActions);
+
     useEffect(() => {
-        mountNavActions(
-            <HStack gap={2}>
-                <Button
-                    variant="outline"
-                    borderRadius="sm"
-                    size="md"
-                    h="40px"
-                    px={6}
-                    onClick={handleBack}
-                    fontWeight="800"
-                    _hover={{
-                        transform: "translateY(-1px)",
-                        boxShadow: "sm",
-                        bg: "whiteAlpha.100",
-                    }}
-                    _active={{ transform: "translateY(0)" }}
-                    transition="all 0.2s ease"
-                >
-                    <X size={14} /> Discard
-                </Button>
-                <Button
-                    colorPalette="blue"
-                    borderRadius="sm"
-                    px={6}
-                    size="md"
-                    h="40px"
-                    fontWeight="800"
-                    disabled={!isValid || isSubmitting}
-                    _hover={{
-                        transform: "translateY(-1px)",
-                        boxShadow: "0 10px 24px -8px var(--chakra-colors-blue-500)",
-                    }}
-                    _active={{ transform: "translateY(0)" }}
-                    transition="all 0.2s ease"
-                    onClick={() =>
-                        document.getElementById("plan-form")?.dispatchEvent(
-                            new Event("submit", { cancelable: true, bubbles: true })
-                        )
-                    }
-                >
-                    {isSubmitting ? (
-                        <HStack gap={2}><Spinner size="xs" /><Text>Publishing…</Text></HStack>
-                    ) : (
-                        <><Rocket size={14} /><Text ml={1}>Publish Plan</Text></>
-                    )}
-                </Button>
-            </HStack>
-        );
-        return () => unmountNavActions();
-    }, [mountNavActions, unmountNavActions, handleBack, isValid, isSubmitting]);
+        setNavActionConfig([
+            {
+                id: "back",
+                label: "Discard",
+                icon: X,
+                bg: "gradient_cyan_purple",
+                color: "white",
+                onClick: handleBack,
+            },
+            {
+                id: "enroll",
+                label: isSubmitting ? "Publishing…" : "Publish Plan",
+                icon: Rocket,
+                bg: "gradient_purple",
+                color: "white",
+                disabled: !isValid || isSubmitting,
+                loading: isSubmitting,
+                onClick: () =>
+                    document.getElementById("plan-form")?.dispatchEvent(
+                        new Event("submit", { cancelable: true, bubbles: true })
+                    ),
+            },
+        ]);
+        return () => clearActions();
+    }, [setNavActionConfig, clearActions, handleBack, isValid, isSubmitting]);
 
     // ── Theme ──
     const muted = useColorModeValue("gray.500", "gray.400");

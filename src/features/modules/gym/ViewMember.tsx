@@ -543,45 +543,32 @@ const ViewMember = memo(() => {
 
   const { members, total, loading, refresh } = useGymMembers();
 
-  const mountNavActions = useNavActionStore((state) => state.setActions);
-  const unmountNavActions = useNavActionStore((state) => state.clearActions);
+  const setNavActionConfig = useNavActionStore((state) => state.setNavActionConfig);
+  const clearActions = useNavActionStore((state) => state.clearActions);
 
   useEffect(() => {
-    mountNavActions(
-      <HStack gap={2}>
-        <IconButton
-          colorPalette="yellow"
-          borderRadius="sm"
-          size="md"
-          h="40px"
-          px={6}
-          onClick={refresh}
-          aria-label="Refresh members"
-          loading={loading}
-        >
-          <RefreshCw size={14} />
-        </IconButton>
-        <Button
-          colorPalette="blue"
-          borderRadius="sm"
-          size="md"
-          h="40px"
-          px={6}
-          fontWeight="800"
-          _hover={{
-            transform: "translateY(-1px)",
-            boxShadow: "0 10px 24px -8px var(--chakra-colors-blue-500)",
-          }}
-          _active={{ transform: "translateY(0)" }}
-          transition="all 0.2s ease"
-          onClick={() => navigateTo("AddMember")}
-        >
-          <Plus size={16} /> New Member
-        </Button>
-      </HStack>
-    );
-    return () => unmountNavActions();
-  }, [mountNavActions, unmountNavActions, refresh, loading, navigateTo]);
+    setNavActionConfig([
+      {
+        id: "refresh",
+        icon: RefreshCw,
+        bg: "gradient_cyan_purple",
+        color: "white",
+        ariaLabel: "Refresh members",
+        onClick: refresh,
+        loading: loading,
+        flexShrink: 0,
+      },
+      {
+        id: "enroll",
+        label: "New Member",
+        icon: Plus,
+        bg: "gradient_purple",
+        color: "white",
+        onClick: () => navigateTo("AddMember"),
+      },
+    ]);
+    return () => clearActions();
+  }, [setNavActionConfig, clearActions, refresh, loading, navigateTo]);
 
   const metrics = useMemo(() => {
     const active = members.filter((member) => member.data.status === "active").length;

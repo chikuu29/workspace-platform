@@ -687,46 +687,31 @@ const MemberCheckIn = memo(() => {
     }
   }, [status]);
 
-  // Navigation actions mount
-  const mountNavActions = useNavActionStore((state) => state.setActions);
-  const unmountNavActions = useNavActionStore((state) => state.clearActions);
+  const setNavActionConfig = useNavActionStore((state) => state.setNavActionConfig);
+  const clearActions = useNavActionStore((state) => state.clearActions);
 
   useEffect(() => {
-    mountNavActions(
-      <HStack gap={2}>
-        <IconButton
-          variant="subtle"
-          colorPalette="yellow"
-          borderRadius="sm"
-          size="md"
-          h="40px"
-          px={6}
-          onClick={handleReset}
-          aria-label="Reset terminal"
-        >
-          <RefreshCw size={14} />
-        </IconButton>
-        <Button
-          variant="outline"
-          borderRadius="sm"
-          size="md"
-          h="40px"
-          px={6}
-          fontWeight="800"
-          _hover={{
-            transform: "translateY(-1px)",
-            boxShadow: "sm",
-          }}
-          _active={{ transform: "translateY(0)" }}
-          transition="all 0.2s ease"
-          onClick={handleViewHistory}
-        >
-          <History size={16} /> History
-        </Button>
-      </HStack>
-    );
-    return () => unmountNavActions();
-  }, [mountNavActions, unmountNavActions, handleReset, handleViewHistory]);
+    setNavActionConfig([
+      {
+        id: "refresh",
+        icon: RefreshCw,
+        bg: "gradient_cyan_purple",
+        color: "white",
+        ariaLabel: "Reset terminal",
+        onClick: handleReset,
+        flexShrink: 0,
+      },
+      {
+        id: "history",
+        label: "History",
+        icon: History,
+        bg: "gradient_cyan_purple",
+        color: "white",
+        onClick: handleViewHistory,
+      },
+    ]);
+    return () => clearActions();
+  }, [setNavActionConfig, clearActions, handleReset, handleViewHistory]);
 
   const kpis = stats?.kpis;
   const todayScans = kpis?.checkins_today || 0;

@@ -113,46 +113,32 @@ const TrainerProfile = memo(() => {
   const borderColor = useColorModeValue("rgba(226,232,240,0.86)", "rgba(255,255,255,0.12)");
   const muted = useColorModeValue("gray.500", "gray.400");
 
-  const mountNavActions = useNavActionStore((state) => state.setActions);
-  const unmountNavActions = useNavActionStore((state) => state.clearActions);
+  const setNavActionConfig = useNavActionStore((state) => state.setNavActionConfig);
+  const clearActions = useNavActionStore((state) => state.clearActions);
 
   useEffect(() => {
-    mountNavActions(
-      <HStack gap={2}>
-        <Button
-          variant="outline"
-          borderRadius="sm"
-          fontWeight="800"
-          size="md"
-          h="40px"
-          px={6}
-          onClick={handleBack}
-          _hover={{
-            transform: "translateY(-1px)",
-            boxShadow: "sm",
-            bg: "whiteAlpha.100",
-          }}
-          _active={{ transform: "translateY(0)" }}
-          transition="all 0.2s ease"
-        >
-          <ArrowLeft size={14} /> Directory
-        </Button>
-        <IconButton
-          colorPalette="yellow"
-          borderRadius="sm"
-          size="md"
-          h="40px"
-          px={6}
-          onClick={refresh}
-          aria-label="Refresh profile"
-          loading={loading}
-        >
-          <RefreshCw size={14} />
-        </IconButton>
-      </HStack>
-    );
-    return () => unmountNavActions();
-  }, [mountNavActions, unmountNavActions, handleBack, refresh, loading]);
+    setNavActionConfig([
+      {
+        id: "back",
+        label: "Directory",
+        icon: ArrowLeft,
+        bg: "gradient_cyan_purple",
+        color: "white",
+        onClick: handleBack,
+      },
+      {
+        id: "refresh",
+        icon: RefreshCw,
+        bg: "gradient_cyan_purple",
+        color: "white",
+        ariaLabel: "Refresh profile",
+        onClick: refresh,
+        loading: loading,
+        flexShrink: 0,
+      },
+    ]);
+    return () => clearActions();
+  }, [setNavActionConfig, clearActions, handleBack, refresh, loading]);
 
   if (!loading && !trainer) {
     return (

@@ -1,7 +1,7 @@
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { useNavActionStore } from "@/core/store/useNavActionStore";
-import { Box, Breadcrumb, Button, Circle, Flex, HStack, Text } from "@chakra-ui/react";
-import React, { forwardRef, useEffect, useState } from "react";
+import { useNavActionStore, type NavActionConfig } from "@/core/store/useNavActionStore";
+import { Box, Breadcrumb, Button, Circle, Flex, HStack, Text, IconButton, Icon } from "@chakra-ui/react";
+import React, { forwardRef, useEffect, useState, isValidElement } from "react";
 import {
   ArrowLeft,
   Home,
@@ -22,6 +22,90 @@ interface ConfigItem {
   label: string;
   icon?: React.ReactElement;
 }
+
+/**
+ * Helper to render context action buttons.
+ * Supports legacy JSX elements or standard configuration objects.
+ */
+const renderNavActions = (actionsData: React.ReactNode | NavActionConfig[] | null) => {
+  if (!actionsData) return null;
+
+  if (isValidElement(actionsData)) {
+    return actionsData;
+  }
+
+  if (Array.isArray(actionsData)) {
+    return (
+      <HStack gap={2} w={{ base: "full", md: "auto" }}>
+        {actionsData.map((action, index) => {
+          const {
+            id,
+            label,
+            icon: IconComponent,
+            onClick,
+            type = "button",
+            flexMobile = true,
+            ...rest
+          } = action;
+
+          const key = id || `nav-action-${index}`;
+          const isIconButton = type === "icon-button";
+
+          const baseHoverStyles = rest._hover || {
+            transform: "translateY(-1px)",
+            boxShadow: rest.boxShadow || (rest.colorPalette === "blue" || rest.bg === "g_blue" ? "0 10px 24px -8px var(--chakra-colors-blue-500)" : "sm"),
+          };
+
+          const baseActiveStyles = rest._active || {
+            transform: "translateY(0)",
+          };
+
+          if (isIconButton) {
+            return (
+              <IconButton
+                key={key}
+                borderRadius="sm"
+                size="sm"
+                onClick={onClick}
+                aria-label={rest["aria-label"] || rest.ariaLabel || label || id || "action"}
+                _hover={baseHoverStyles}
+                _active={baseActiveStyles}
+                transition="all 0.2s ease"
+                {...rest}
+              >
+                {IconComponent && <IconComponent size={16} />}
+              </IconButton>
+            );
+          }
+
+          return (
+            <Button
+              key={key}
+              borderRadius="sm"
+              fontWeight="800"
+              size="sm"
+              flex={flexMobile ? { base: "1", md: "none" } : undefined}
+              transition="all 0.2s ease"
+              onClick={onClick}
+              _hover={baseHoverStyles}
+              _active={baseActiveStyles}
+              {...rest}
+            >
+              {IconComponent && <Icon as={IconComponent} />}
+              {label && (
+                <Text fontSize={{ base: "10px", sm: "xs", md: "sm" }} ml={IconComponent ? 1 : 0}>
+                  {label}
+                </Text>
+              )}
+            </Button>
+          );
+        })}
+      </HStack>
+    );
+  }
+
+  return null;
+};
 
 /**
  * AppBreadcrumb
@@ -104,10 +188,7 @@ const AppBreadcrumb = forwardRef((_props, _ref) => {
   return (
     <Box
       w="100%"
-      // py={{ base: "0.5rem", md: "0.65rem" }}
-      // px={{ base: "1", sm: "1", md: "2" }}
       px={2}
-
       backdropFilter="blur(12px)"
       position="sticky"
       top="0"
@@ -218,12 +299,12 @@ const AppBreadcrumb = forwardRef((_props, _ref) => {
          */}
         {breadcrumbActions && (
           <Box flexShrink={0} display={{ base: "none", md: "block" }}>
-            {breadcrumbActions}
+            {renderNavActions(breadcrumbActions)}
           </Box>
         )}
       </Flex>
 
-      {/*
+      {/* 
        * Mobile-only actions row (hidden on md+).
        * Renders full-width below the breadcrumb trail so buttons always have
        * enough room to be readable and comfortably tappable on small screens.
@@ -237,7 +318,7 @@ const AppBreadcrumb = forwardRef((_props, _ref) => {
           overflowX="auto"
           css={noScrollbar}
         >
-          {breadcrumbActions}
+          {renderNavActions(breadcrumbActions)}
         </Box>
       )}
     </Box>

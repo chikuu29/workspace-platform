@@ -71,9 +71,16 @@ const renderNavActions = (actionsData: React.ReactNode | NavActionConfig[] | nul
                 _hover={baseHoverStyles}
                 _active={baseActiveStyles}
                 transition="all 0.2s ease"
+                type="button"
                 {...rest}
               >
-                {IconComponent && <IconComponent size={16} />}
+                {IconComponent && (
+                  isValidElement(IconComponent) ? (
+                    IconComponent
+                  ) : (
+                    <IconComponent size={16} />
+                  )
+                )}
               </IconButton>
             );
           }
@@ -89,9 +96,16 @@ const renderNavActions = (actionsData: React.ReactNode | NavActionConfig[] | nul
               onClick={onClick}
               _hover={baseHoverStyles}
               _active={baseActiveStyles}
+              type={type === "submit" ? "submit" : "button"}
               {...rest}
             >
-              {IconComponent && <Icon as={IconComponent} />}
+              {IconComponent && (
+                isValidElement(IconComponent) ? (
+                  IconComponent
+                ) : (
+                  <Icon as={IconComponent} />
+                )
+              )}
               {label && (
                 <Text fontSize={{ base: "10px", sm: "xs", md: "sm" }} ml={IconComponent ? 1 : 0}>
                   {label}

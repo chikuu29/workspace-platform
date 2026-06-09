@@ -2,24 +2,17 @@
 import {
   Box,
   Button,
-  Container,
   Flex,
   Heading,
   Icon,
-  Input,
-  SimpleGrid,
+  Image,
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Alert } from "@/components/ui/alert";
-import { Field } from "@/components/ui/field";
-import { PasswordInput } from "@/components/ui/password-input";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { NavLink, useLocation, useNavigate } from "react-router";
 import { useEffect, useState, useCallback } from "react";
-import { HSeparator } from "@/features/ui/components/separator/Separator";
-// import { useAuth } from "@/contexts/AuthProvider";
 import { useDispatch } from "react-redux";
 import { login } from "@/app/slices/auth/authSlice";
 import { fetchAppConfig } from "@/app/slices/appConfig/appConfigSlice";
@@ -37,10 +30,56 @@ import {
   generateCodeChallenge,
   storeCodeVerifier,
 } from "@/core/utils/services/pkceService";
+import MarketingShowcase from "./MarketingShowcase";
 
+const MotionFlex = motion.create(Flex);
 const MotionBox = motion.create(Box);
 const MotionStack = motion.create(Stack);
-const MotionIcon = motion.create(Icon);
+
+const CustomSsoIcon = () => {
+  const iconStroke = useColorModeValue("#422AFB", "#a78bfa");
+  return (
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <linearGradient id="sso-icon-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#7551FF" />
+          <stop offset="100%" stopColor="#3965FF" />
+        </linearGradient>
+      </defs>
+      <motion.circle
+        cx="12"
+        cy="12"
+        r="9"
+        stroke="url(#sso-icon-grad)"
+        strokeWidth="1.8"
+        strokeDasharray="6 3"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+      />
+      <path
+        d="M12 5.5L7.5 7.2V11.2C7.5 14.5 12 17.5 12 17.5C12 17.5 16.5 14.5 16.5 11.2V7.2L12 5.5Z"
+        stroke={iconStroke}
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <motion.circle
+        cx="12"
+        cy="11.5"
+        r="2"
+        fill="#7551FF"
+        animate={{ scale: [0.8, 1.3, 0.8] }}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+      />
+    </svg>
+  );
+};
 
 const SignIn = () => {
   const [isNewVersionAvailable, setIsNewVersionAvailable] =
@@ -60,13 +99,9 @@ const SignIn = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
-  // const { authInfo, setLoginAuthInfo } = useAuth();
 
   const searchParams = new URLSearchParams(location.search);
   const redirectUrl = searchParams.get("redirect");
-  const googleBg = useColorModeValue("secondaryGray.300", "whiteAlpha.200");
-  const googleText = useColorModeValue("navy.700", "white");
-  const googleHover = { bg: useColorModeValue("gray.200", "whiteAlpha.300") };
 
   const checkVersion = useCallback(async () => {
     try {
@@ -101,12 +136,6 @@ const SignIn = () => {
     checkVersion();
   }, [checkVersion]);
 
-  // useEffect(() => {
-  //     if (authInfo?.success) {
-  //         navigate(redirectUrl || "/myApps", { replace: true });
-  //     }
-  // }, [authInfo, navigate, redirectUrl]);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setUserCredentials((prev) => ({ ...prev, [name]: value }));
@@ -126,7 +155,6 @@ const SignIn = () => {
         next: (res: any) => {
           setLoading(false);
           if (res.success) {
-            // setLoginAuthInfo(res["login_info"]);
             dispatch(fetchAppConfig());
             dispatch(login(res));
             setShowAlert({
@@ -212,256 +240,361 @@ const SignIn = () => {
     },
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, x: -20 },
-    visible: { opacity: 1, x: 0 },
-  };
-
   return (
-    <Box
+    <Flex
       position="relative"
       minH="100vh"
-      display="flex"
-      alignItems="center"
+      w="100vw"
+      direction={{ base: "column", md: "row" }}
       overflow="hidden"
       bg={useColorModeValue("gray.50", "navy.900")}
     >
       <AppVersionAlert isNewVersionAvailable={isNewVersionAvailable} />
 
-      {/* Background Decorative Elements */}
+      {/* Ambient decorative backgrounds */}
       <Box
         position="absolute"
         top="-15%"
         left="-10%"
-        w="500px"
-        h="500px"
+        w="600px"
+        h="600px"
         bgGradient="radial(brand.400, transparent)"
-        filter="blur(80px)"
-        opacity="0.4"
+        filter="blur(110px)"
+        opacity="0.2"
         zIndex="0"
+        pointerEvents="none"
       />
       <Box
         position="absolute"
         bottom="-15%"
         right="-10%"
-        w="600px"
-        h="600px"
+        w="700px"
+        h="700px"
         bgGradient="radial(blue.500, transparent)"
-        filter="blur(100px)"
-        opacity="0.3"
+        filter="blur(130px)"
+        opacity="0.18"
         zIndex="0"
+        pointerEvents="none"
       />
 
-      <Container
-        maxW="7xl"
+      {/* Left Panel: Marketing Showcase */}
+
+      <Flex
+        w={{ base: "100%", md: "50%" }}
+        h={{ base: "auto", md: "100vh" }}
+        direction="column"
+        justifyContent="center"
+        alignItems="center"
         position="relative"
+        px={{ base: 6, md: 12, lg: 20 }}
+        py={{ base: 12, md: 8 }}
         zIndex="1"
-        py={{ base: 12, md: 24 }}
+        bg={useColorModeValue("white", "navy.900")}
       >
-        <SimpleGrid
-          columns={{ base: 1, md: 2 }}
-          gap={{ base: 16, lg: 32 }}
-          alignItems="center"
+        <MotionStack
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          w="100%"
+          maxW="md"
+          gap={8}
+          align="stretch"
         >
-          {/* Left Side: Welcome Content */}
-          <MotionStack
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            bg={useColorModeValue("white", "navy.800")}
-            p={{ base: 8, md: 12 }}
-            rounded="3xl"
-            // shadow="2xl"
-            border="1px solid"
-            borderColor={useColorModeValue("gray.100", "whiteAlpha.100")}
-            maxW="lg"
-            w="full"
-            mx="auto"
-          >
-            <Stack gap={4} mb={10}>
-              <Flex align="center" gap={3}>
-                <Box h="2px" w="30px" bg="brand.400" borderRadius="full" />
-                <Text
-                  textTransform="uppercase"
-                  fontSize="xs"
-                  fontWeight="800"
-                  color="brand.400"
-                  letterSpacing="widest"
-                >
-                  Portal Access
-                </Text>
-              </Flex>
-
-              <Stack gap={2}>
-                <Heading
-                  fontSize={{ base: "3xl", md: "4xl" }}
-                  fontWeight="900"
-                  letterSpacing="tight"
-                  lineHeight="1"
-                >
-                  Sign In to <br />
-                  <Text
-                    as="span"
-                    bgGradient="to-r"
-                    gradientFrom="brand.400"
-                    gradientTo="blue.600"
-                    bgClip="text"
-                  >
-                    Workspace
-                  </Text>
-                  <Text as="span" color="brand.400">
-                    .
-                  </Text>
-                </Heading>
-                <Text
-                  color="gray.500"
-                  fontSize="lg"
-                  fontWeight="500"
-                  lineHeight="tall"
-                >
-                  Secure enterprise access to manage <br />
-                  all your business at one place.
-                </Text>
-              </Stack>
-            </Stack>
-
+          {/* Portal header with animated Logo */}
+          <Stack gap={4} align="center" textAlign="center">
+            {/* Logo Container with spring and rotation */}
             <MotionBox
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{
+                type: "spring",
+                stiffness: 260,
+                damping: 20,
+              }}
+              whileHover={{
+                scale: 1.05,
+                rotate: [0, 6, -6, 0],
+              }}
+              cursor="pointer"
+              mb={2}
             >
-              <Button
-                onClick={loginWithSso}
-                variant="premium"
-                size="lg"
-                h="70px"
-                borderRadius="2xl"
-                w="full"
-                mb={6}
-                fontSize="lg"
-                fontWeight="800"
-                letterSpacing="tight"
-                // boxShadow="0 20px 40px -12px rgba(66, 42, 251, 0.4)"
-              >
-                <MotionBox
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  me={4}
-                  animate={{
-                    rotate: [0, 10, -10, 0],
-                    scale: [1, 1.15, 1],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                >
-                  <Icon as={Fingerprint} w={7} h={7} />
-                </MotionBox>
-                Continue with SSO
-              </Button>
+              <Image
+                src="/assets/icons/workspace-logo.svg"
+                alt="Workspace Logo"
+                h="46px"
+                w="auto"
+                objectFit="contain"
+              />
             </MotionBox>
 
-            <Text
-              color="gray.500"
-              fontSize="xs"
-              textAlign="center"
-              fontWeight="600"
-              textTransform="uppercase"
-              letterSpacing="widest"
-              mb={4}
+            <Flex align="center" gap={2}>
+              <Box h="1.5px" w="20px" bg="brand.400" borderRadius="full" />
+              <Text
+                textTransform="uppercase"
+                fontSize="2xs"
+                fontWeight="800"
+                color="brand.400"
+                letterSpacing="widest"
+              >
+                Portal Access
+              </Text>
+              <Box h="1.5px" w="20px" bg="brand.400" borderRadius="full" />
+            </Flex>
+
+            <Heading
+              fontSize={{ base: "3xl", md: "4xl" }}
+              fontWeight="900"
+              letterSpacing="tight"
+              lineHeight="1.1"
+              color={useColorModeValue("navy.900", "white")}
             >
-              Secure Enterprise Login
-            </Text>
-
-           
+              Sign In to{" "}
+              <Text
+                as="span"
+                bgGradient="to-r"
+                gradientFrom="brand.400"
+                gradientTo="blue.600"
+                bgClip="text"
+              >
+                Workspace
+              </Text>
+              <Text as="span" color="brand.400">
+                .
+              </Text>
+            </Heading>
 
             <Text
-              mt={8}
-              color="gray.500"
+              color={useColorModeValue("gray.600", "secondaryGray.500")}
               fontSize="sm"
-              textAlign="center"
               fontWeight="500"
+              lineHeight="tall"
+              maxW="sm"
             >
-              Not registered yet?{" "}
-              <NavLink to="/auth/sign-up">
-                <Text
-                  as="span"
-                  color="brand.500"
-                  fontWeight="700"
-                  _hover={{ textDecoration: "underline" }}
-                >
-                  Create an Account
-                </Text>
-              </NavLink>
+              Secure enterprise access to manage all your business at one place.
             </Text>
-          </MotionStack>
+          </Stack>
 
-          {/* Right Side: Sign In Form */}
+          {/* Feedback message banner */}
+          <AnimatePresence>
+            {showAlert.isVisible && (
+              <MotionBox
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Alert
+                  status={showAlert.status as any}
+                  variant="outline"
+                  borderRadius="xl"
+                  borderWidth="1.5px"
+                  fontSize="sm"
+                  title={showAlert.title}
+                >
+                  {showAlert.description}
+                </Alert>
+              </MotionBox>
+            )}
+          </AnimatePresence>
 
-          <MotionStack
-            gap={8}
-            initial="hidden"
-            animate="visible"
-            variants={containerVariants}
-          >
-            <MotionBox variants={itemVariants}>
+          {/* Login actions panel */}
+          <Stack gap={6}>
+            <MotionBox
+              initial={{ opacity: 0, y: 10 }}
+              whileHover={{
+                scale: 1.025,
+                boxShadow: "0 0 25px rgba(117, 81, 255, 0.45)",
+              }}
+              whileTap={{ scale: 0.975 }}
+              cursor="pointer"
+              onClick={loginWithSso}
+              position="relative"
+              borderRadius="xl"
+              p="1.5px"
+              bgGradient="linear(to-r, brand.400, blue.400, brand.400)"
+              bgSize="200% auto"
+              animate={{
+                backgroundPosition: ["0% center", "200% center"],
+                opacity: 1,
+                y: 0,
+              }}
+              transition={{
+                backgroundPosition: {
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "linear",
+                },
+                opacity: { delay: 0.15 },
+                y: { delay: 0.15 },
+              }}
+              overflow="hidden"
+            >
+              <Flex
+                h="52px"
+                w="100%"
+                bg={useColorModeValue("white", "navy.950")}
+                borderRadius="calc(12px - 1.5px)"
+                align="center"
+                justify="center"
+                px={6}
+                transition="background 0.2s"
+                _hover={{
+                  bg: useColorModeValue("gray.50", "whiteAlpha.50"),
+                }}
+              >
+                <Box display="flex" alignItems="center" justifyContent="center" me={3}>
+                  <CustomSsoIcon />
+                </Box>
+                <Text
+                  fontSize="sm"
+                  fontWeight="800"
+                  letterSpacing="0.02em"
+                  bgGradient="to-r"
+                  gradientFrom="brand.400"
+                  gradientTo="blue.400"
+                  bgClip="text"
+                >
+                  Continue with SSO
+                </Text>
+              </Flex>
+            </MotionBox>
+
+            <Flex align="center" gap={3} px={2}>
+              <Box flex="1" h="1px" bg={useColorModeValue("gray.200", "whiteAlpha.100")} />
+              <Text
+                color={useColorModeValue("gray.400", "secondaryGray.600")}
+                fontSize="2xs"
+                textAlign="center"
+                fontWeight="750"
+                textTransform="uppercase"
+                letterSpacing="widest"
+              >
+                Secure Enterprise Login
+              </Text>
+              <Box flex="1" h="1px" bg={useColorModeValue("gray.200", "whiteAlpha.100")} />
+            </Flex>
+
+            {/* Footer Registration Link */}
+            <Flex justify="center" align="center" mt={2}>
+              <Text
+                color={useColorModeValue("gray.600", "secondaryGray.500")}
+                fontSize="sm"
+                fontWeight="500"
+              >
+                Not registered yet?{" "}
+                <NavLink to="/auth/sign-up">
+                  <Text
+                    as="span"
+                    color="brand.500"
+                    fontWeight="700"
+                    _hover={{ textDecoration: "underline" }}
+                    transition="color 0.2s"
+                  >
+                    Create an Account
+                  </Text>
+                </NavLink>
+              </Text>
+            </Flex>
+          </Stack>
+        </MotionStack>
+      </Flex>
+
+      {/* Right Panel: Sign In Portal */}
+      <Flex
+        w={{ base: "100%", md: "50%" }}
+        h={{ base: "auto", md: "100vh" }}
+        minH={{ base: "auto", md: "100vh" }}
+        direction="column"
+        justifyContent="center"
+        alignItems="center"
+        position="relative"
+        px={{ base: 6, md: 10, lg: 16 }}
+        py={{ base: 12, md: 8 }}
+        borderRight={{ base: "none", md: "1px solid" }}
+        borderColor={useColorModeValue("gray.200", "whiteAlpha.100")}
+        bg="navy.950"
+        zIndex="1"
+      >
+        {/* Sparkly background glow just for Left Panel */}
+        <Box
+          position="absolute"
+          top="50%"
+          left="50%"
+          transform="translate(-50%, -50%)"
+          w="450px"
+          h="450px"
+          bgGradient="radial(brand.400, transparent)"
+          filter="blur(120px)"
+          opacity="0.12"
+          zIndex="0"
+          pointerEvents="none"
+        />
+
+        <Flex
+          direction="column"
+          w="100%"
+          maxW="xl"
+          h="100%"
+          justifyContent="center"
+          gap={8}
+          zIndex="1"
+        >
+          {/* Headline Text */}
+          <Stack gap={2.5} align="center" textAlign="center">
+            <MotionFlex
+              align="center"
+              justify="center"
+              gap={2.5}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Box h="2px" w="12px" bg="brand.400" borderRadius="full" />
+              <Text
+                textTransform="uppercase"
+                fontSize="2xs"
+                fontWeight="800"
+                color="brand.400"
+                letterSpacing="widest"
+              >
+                Empower Your Business
+              </Text>
+              <Box h="2px" w="12px" bg="brand.400" borderRadius="full" />
+            </MotionFlex>
+
+            <MotionBox
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.05 }}
+            >
               <Heading
-                lineHeight={1.1}
-                fontSize={{ base: "4xl", sm: "5xl", md: "6xl" }}
+                lineHeight={1.2}
+                fontSize={{ base: "2xl", sm: "3xl", lg: "4xl" }}
                 fontWeight="900"
                 letterSpacing="tight"
+                // color="white"
+                textAlign="center"
               >
-                Unify Your{" "}
+                All-In-One SaaS{" "}
                 <Text
                   as="span"
                   bgGradient="to-r"
                   gradientFrom="brand.400"
-                  gradientTo="blue.500"
+                  gradientTo="blue.400"
                   bgClip="text"
                 >
-                  Entire Business.
+                  Enterprise Hub
                 </Text>
+                .
               </Heading>
             </MotionBox>
+          </Stack>
 
-            <MotionBox
-              variants={itemVariants}
-              p={8}
-              borderRadius="3xl"
-              bg={useColorModeValue("whiteAlpha.700", "whiteAlpha.100")}
-              backdropFilter="blur(16px)"
-              border="1px solid"
-              borderColor={useColorModeValue("white", "whiteAlpha.200")}
-            //   boxShadow="2xl"
-            >
-              <Stack gap={4}>
-                <Text
-                  fontSize="xl"
-                  fontWeight="600"
-                  color={useColorModeValue("gray.800", "white")}
-                >
-                  Experience the next generation of productivity.
-                </Text>
-                <Text
-                  fontSize="lg"
-                  color={useColorModeValue("gray.600", "gray.400")}
-                  lineHeight="tall"
-                >
-                  Every category of your business, unified in one powerful
-                  workspace. Sign in to access your dashboard and manage
-                  operations with unprecedented speed and security.
-                </Text>
-              </Stack>
-            </MotionBox>
-          </MotionStack>
-        </SimpleGrid>
-      </Container>
-    </Box>
+          {/* Rotating marketing panel */}
+          <MarketingShowcase />
+        </Flex>
+      </Flex>
+    </Flex>
   );
 };
 

@@ -9,7 +9,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { Alert } from "@/components/ui/alert";
-import { useColorModeValue } from "@/components/ui/color-mode";
+import { useColorModeValue, DarkMode } from "@/components/ui/color-mode";
 import { NavLink } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { POSTAPI } from "@/app/api";
@@ -489,68 +489,70 @@ const SignUp: React.FC = () => {
           pointerEvents="none"
         />
 
-        <Flex
-          direction="column"
-          w="100%"
-          maxW="xl"
-          h="100%"
-          justifyContent="center"
-          gap={8}
-          zIndex="1"
-        >
-          {/* Headline Text */}
-          <Stack gap={2.5} align="center" textAlign="center">
-            <MotionFlex
-              align="center"
-              justify="center"
-              gap={2.5}
-              initial={headingInitial}
-              animate={headingAnimate}
-              transition={headingTransition}
-            >
-              <Box h="2px" w="12px" bg="brand.400" borderRadius="full" />
-              <Text
-                textTransform="uppercase"
-                fontSize="2xs"
-                fontWeight="800"
-                color="brand.400"
-                letterSpacing="widest"
+        <DarkMode>
+          <Flex
+            direction="column"
+            w="100%"
+            maxW="xl"
+            justifyContent="center"
+            gap={8}
+            zIndex="1"
+          >
+            {/* Headline Text */}
+            <Stack gap={2.5} align="center" textAlign="center">
+              <MotionFlex
+                align="center"
+                justify="center"
+                gap={2.5}
+                initial={headingInitial}
+                animate={headingAnimate}
+                transition={headingTransition}
               >
-                Join the Network
-              </Text>
-              <Box h="2px" w="12px" bg="brand.400" borderRadius="full" />
-            </MotionFlex>
-
-            <MotionBox
-              initial={mainHeadingInitial}
-              animate={mainHeadingAnimate}
-              transition={mainHeadingTransition}
-            >
-              <Heading
-                lineHeight={1.2}
-                fontSize={{ base: "2xl", sm: "3xl", lg: "4xl" }}
-                fontWeight="900"
-                letterSpacing="tight"
-                textAlign="center"
-              >
-                Start Your{" "}
+                <Box h="2px" w="12px" bg="brand.400" borderRadius="full" />
                 <Text
-                  as="span"
-                  bgGradient="to-r"
-                  gradientFrom="brand.400"
-                  gradientTo="blue.400"
-                  bgClip="text"
+                  textTransform="uppercase"
+                  fontSize="2xs"
+                  fontWeight="800"
+                  color="brand.400"
+                  letterSpacing="widest"
                 >
-                  Business Journey
+                  Join the Network
                 </Text>
-                .
-              </Heading>
-            </MotionBox>
-          </Stack>
+                <Box h="2px" w="12px" bg="brand.400" borderRadius="full" />
+              </MotionFlex>
 
-          {/* Rotating marketing panel */}
-          <MarketingShowcase />
-        </Flex>
+              <MotionBox
+                initial={mainHeadingInitial}
+                animate={mainHeadingAnimate}
+                transition={mainHeadingTransition}
+              >
+                <Heading
+                  lineHeight={1.2}
+                  fontSize={{ base: "2xl", sm: "3xl", lg: "4xl" }}
+                  fontWeight="900"
+                  letterSpacing="tight"
+                  textAlign="center"
+                  color="white"
+                >
+                  Start Your{" "}
+                  <Text
+                    as="span"
+                    bgGradient="to-r"
+                    gradientFrom="brand.400"
+                    gradientTo="blue.400"
+                    bgClip="text"
+                  >
+                    Business Journey
+                  </Text>
+                  .
+                </Heading>
+              </MotionBox>
+            </Stack>
+
+            {/* Rotating marketing panel */}
+            <MarketingShowcase />
+          </Flex>
+        </DarkMode>
       </Flex>
     </Flex>
   );

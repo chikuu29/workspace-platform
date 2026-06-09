@@ -11,8 +11,8 @@ export default function Auth(props: any) {
         <Outlet />
       </Flex>
       <Flex position="fixed" bottom="30px" right="10" gap={3} zIndex={999}>
-        <ColorModeButton />
-        <FullscreenButton />
+        <ColorModeButton variant="solid" />
+        <FullscreenButton variant="solid" />
       </Flex>
       {/* <FixedPlugin /> */}
     </Flex>

@@ -185,7 +185,7 @@ export const useMaximize = (
   const fullscreenBgColor = isDark ? "#0b1437" : "#f5f5f5";
 
   // Pre-calculated container styling props
-  const containerProps = {
+  const fullscreenProps = {
     className: `maximize-container-el ${centerContent ? "maximize-center" : "maximize-top"}`,
     style: {
       "--fullscreen-bg": fullscreenBgColor,
@@ -206,7 +206,7 @@ export const useMaximize = (
   };
 
   // Pre-calculated inner content styling props
-  const contentProps = {
+  const contentWrapperProps = {
     w: "full",
     maxW: isMaximized ? maxW : "none",
     h: isMaximized ? "auto" : "full",
@@ -218,7 +218,7 @@ export const useMaximize = (
     isMaximized,
     isFullscreen,
     toggle,
-    containerProps,
-    contentProps,
+    fullscreenProps,
+    contentWrapperProps,
   };
 };

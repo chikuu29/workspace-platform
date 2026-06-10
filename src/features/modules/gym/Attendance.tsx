@@ -785,22 +785,22 @@ const Attendance = memo(() => {
   const terminalRef = useRef<HTMLDivElement>(null);
 
   const {
-    isMaximized: isEntireMaximized,
-    toggle: toggleEntireMaximize,
-    containerProps: pageContainerProps,
-    contentProps: pageContentProps,
+    isMaximized: isPageMaximized,
+    toggle: togglePageMaximize,
+    fullscreenProps: pageFullscreenProps,
+    contentWrapperProps: pageWrapperProps,
   } = useMaximize(pageRef, { maxW: "1400px", centerContent: false });
 
   const {
     isMaximized: isTerminalMaximized,
-    toggle: toggleTerminal,
-    containerProps: terminalContainerProps,
-    contentProps: terminalContentProps,
+    toggle: toggleTerminalMaximize,
+    fullscreenProps: terminalFullscreenProps,
+    contentWrapperProps: terminalWrapperProps,
   } = useMaximize(terminalRef, { maxW: "800px", centerContent: true });
 
   return (
-    <Box ref={pageRef} {...pageContainerProps}>
-      <Box {...pageContentProps}>
+    <Box ref={pageRef} {...pageFullscreenProps}>
+      <Box {...pageWrapperProps}>
         <Flex direction="column" minH="70vh" w="full" py={6} animation="fade-in 0.4s ease-out">
           {/* Dynamic Keyframe Animations Injection */}
           <style>{`
@@ -834,11 +834,11 @@ const Attendance = memo(() => {
             textAlign="center"
             position="relative"
             py={2}
-            onClick={toggleEntireMaximize}
+            onClick={togglePageMaximize}
             cursor="pointer"
             _hover={{ transform: "scale(1.01)", opacity: 0.95 }}
             transition="all 0.2s ease"
-            title={isEntireMaximized ? "Click to exit fullscreen" : "Click to enter fullscreen"}
+            title={isPageMaximized ? "Click to exit fullscreen" : "Click to enter fullscreen"}
           >
             <Flex
               align="center"
@@ -885,8 +885,8 @@ const Attendance = memo(() => {
             {/* Left Column: Scanning Desk Terminal */}
             <GridItem w="full">
               <VStack gap={6} w="full">
-                <Box ref={terminalRef} {...terminalContainerProps}>
-                  <Box {...terminalContentProps}>
+                <Box ref={terminalRef} {...terminalFullscreenProps}>
+                  <Box {...terminalWrapperProps}>
                     <Box
                       w="full"
                       p={isTerminalMaximized ? 8 : 6}
@@ -926,7 +926,7 @@ const Attendance = memo(() => {
                               colorPalette="gray"
                               size="sm"
                               borderRadius="xl"
-                              onClick={toggleTerminal}
+                              onClick={toggleTerminalMaximize}
                               aria-label={isTerminalMaximized ? "Exit fullscreen" : "Enter fullscreen"}
                             >
                               {isTerminalMaximized ? <Minimize2 size={15} strokeWidth={2.5} /> : <Maximize2 size={15} strokeWidth={2.5} />}

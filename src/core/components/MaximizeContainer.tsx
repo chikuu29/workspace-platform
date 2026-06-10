@@ -53,7 +53,7 @@ export const MaximizeContainer = forwardRef<HTMLDivElement, MaximizeContainerPro
     }
   };
 
-  const { isMaximized, toggle, containerProps, contentProps } = useMaximizeHook(localRef, {
+  const { isMaximized, toggle, fullscreenProps, contentWrapperProps } = useMaximizeHook(localRef, {
     controlledIsMaximized,
     onToggle,
     maxW,
@@ -66,7 +66,7 @@ export const MaximizeContainer = forwardRef<HTMLDivElement, MaximizeContainerPro
     <MaximizeContext.Provider value={{ isMaximized, toggle }}>
       <Box
         ref={setRefs}
-        {...containerProps}
+        {...fullscreenProps}
         {...props}
       >
         {isMaximized && showCloseButton && (
@@ -84,7 +84,7 @@ export const MaximizeContainer = forwardRef<HTMLDivElement, MaximizeContainerPro
             <Minimize2 size={16} />
           </IconButton>
         )}
-        <Box {...contentProps}>
+        <Box {...contentWrapperProps}>
           {content}
         </Box>
       </Box>

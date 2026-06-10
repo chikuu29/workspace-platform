@@ -22,7 +22,7 @@ import { toaster } from "@/components/ui/toaster";
 import { GymApiService } from "./services/gymApi.service";
 import { PageHeader } from "@/core/components/PageHeader"; ``
 import { useNavActionStore } from "@/core/store/useNavActionStore";
-import { MaximizeContainer } from "@/core/components/MaximizeContainer";
+import { useMaximize } from "@/core/hooks/useMaximize";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 import { Avatar } from "@/components/ui/avatar";
 import { motion, AnimatePresence } from "framer-motion";
@@ -781,9 +781,26 @@ const Attendance = memo(() => {
   const activeMembers = kpis?.active_members || 0;
   const capacityLoad = kpis?.trainer_utilization || 0;
 
+  const pageRef = useRef<HTMLDivElement>(null);
+  const terminalRef = useRef<HTMLDivElement>(null);
+
+  const {
+    isMaximized: isEntireMaximized,
+    toggle: toggleEntireMaximize,
+    containerProps: pageContainerProps,
+    contentProps: pageContentProps,
+  } = useMaximize(pageRef, { maxW: "1400px", centerContent: false });
+
+  const {
+    isMaximized: isTerminalMaximized,
+    toggle: toggleTerminal,
+    containerProps: terminalContainerProps,
+    contentProps: terminalContentProps,
+  } = useMaximize(terminalRef, { maxW: "800px", centerContent: true });
+
   return (
-    <MaximizeContainer maxW="1400px">
-      {({ isMaximized: isEntireMaximized, toggle: toggleEntireMaximize }) => (
+    <Box ref={pageRef} {...pageContainerProps}>
+      <Box {...pageContentProps}>
         <Flex direction="column" minH="70vh" w="full" py={6} animation="fade-in 0.4s ease-out">
           {/* Dynamic Keyframe Animations Injection */}
           <style>{`
@@ -868,16 +885,16 @@ const Attendance = memo(() => {
             {/* Left Column: Scanning Desk Terminal */}
             <GridItem w="full">
               <VStack gap={6} w="full">
-                <MaximizeContainer maxW="800px">
-                  {({ isMaximized, toggle }) => (
+                <Box ref={terminalRef} {...terminalContainerProps}>
+                  <Box {...terminalContentProps}>
                     <Box
                       w="full"
-                      p={isMaximized ? 8 : 6}
+                      p={isTerminalMaximized ? 8 : 6}
                       borderRadius="3xl"
                       bg={panelBg}
                       border="1px solid"
                       borderColor={status === "success" ? "emerald.500/40" : status === "error" ? "rose.500/40" : borderColor}
-                      boxShadow={isMaximized ? "0 40px 80px -20px rgba(0, 0, 0, 0.6)" : "0 30px 60px -25px rgba(0, 0, 0, 0.4)"}
+                      boxShadow={isTerminalMaximized ? "0 40px 80px -20px rgba(0, 0, 0, 0.6)" : "0 30px 60px -25px rgba(0, 0, 0, 0.4)"}
                       backdropFilter="blur(20px)"
                       transition="all 0.35s ease"
                       onClick={handleFocusInput}
@@ -909,10 +926,10 @@ const Attendance = memo(() => {
                               colorPalette="gray"
                               size="sm"
                               borderRadius="xl"
-                              onClick={toggle}
-                              aria-label={isMaximized ? "Exit fullscreen" : "Enter fullscreen"}
+                              onClick={toggleTerminal}
+                              aria-label={isTerminalMaximized ? "Exit fullscreen" : "Enter fullscreen"}
                             >
-                              {isMaximized ? <Minimize2 size={15} strokeWidth={2.5} /> : <Maximize2 size={15} strokeWidth={2.5} />}
+                              {isTerminalMaximized ? <Minimize2 size={15} strokeWidth={2.5} /> : <Maximize2 size={15} strokeWidth={2.5} />}
                             </IconButton>
                           </HStack>
                         </HStack>
@@ -922,7 +939,7 @@ const Attendance = memo(() => {
                           status={status}
                           memberName={lastCheckin?.data?.member_name}
                           errorMessage={errorMessage}
-                          h={isMaximized ? "360px" : "240px"}
+                          h={isTerminalMaximized ? "360px" : "240px"}
                         />
 
                         {/* Input Controls */}
@@ -996,8 +1013,8 @@ const Attendance = memo(() => {
                         </VStack>
                       </VStack>
                     </Box>
-                  )}
-                </MaximizeContainer>
+                  </Box>
+                </Box>
 
                 {/* Sub-Card: Member quick lookup guidelines */}
                 <HStack w="full" p={4} bg="whiteAlpha.50" border="1px solid" borderColor="whiteAlpha.100" borderRadius="2xl" gap={3}>
@@ -1029,8 +1046,8 @@ const Attendance = memo(() => {
             </GridItem>
           </Grid>
         </Flex>
-      )}
-    </MaximizeContainer>
+      </Box>
+    </Box>
   );
 });
 

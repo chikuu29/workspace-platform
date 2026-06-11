@@ -390,7 +390,7 @@ const GymManagementDashboard = memo(() => {
                     <VStack align="stretch" gap={3}>
                       {(stats?.recent_members || []).slice(0, 5).map((member) => (
                         <HStack
-                          key={member.record_id}
+                          key={member.id}
                           justify="space-between"
                           p={3}
                           borderRadius="xl"
@@ -398,7 +398,7 @@ const GymManagementDashboard = memo(() => {
                           cursor="pointer"
                           _hover={{ bg: "blue.500/12", transform: "translateX(2px)" }}
                           transition="all 0.2s"
-                          onClick={() => navigateTo(`members/${member.record_id}`)}
+                          onClick={() => navigateTo(`members/${member.id}`)}
                         >
                           <HStack gap={3} minW={0}>
                             <Avatar.Root size="sm" shape="rounded">

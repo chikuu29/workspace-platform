@@ -158,7 +158,7 @@ const SectionCard = memo(({ title, icon, children, accentHex }: SectionCardProps
 
   return (
     <Box
-      bg={cardBg}
+      bg={"app.card.bg"}
       backdropFilter="blur(24px) saturate(200%)"
       border="1px solid"
       borderColor={borderCol}
@@ -253,7 +253,7 @@ const MemberContextBar = memo(({
               <Text fontSize="md" fontWeight="950" color="app.text.primary" letterSpacing="tight">
                 {memberName}
               </Text>
-              
+
               {/* Member status badge */}
               <Badge
                 fontSize="9px"
@@ -692,9 +692,9 @@ const ReviewOrder = memo(() => {
   return (
     <Box
       w="full"
-      minH="100vh"
-      bg={pageBg}
-      fontFamily="'Inter', sans-serif"
+      // minH="100vh"
+      // bg={pageBg}
+      // fontFamily="'Inter', sans-serif"
       position="relative"
     >
       {/* ── Keyframe Animations ── */}
@@ -731,7 +731,7 @@ const ReviewOrder = memo(() => {
       <Box
         position="absolute"
         top="-100px"
-        right="-100px"
+        // right="-100px"
         w="500px"
         h="500px"
         borderRadius="full"
@@ -754,7 +754,7 @@ const ReviewOrder = memo(() => {
       />
 
       {/* ── Page Content ── */}
-      <Box w="full" px={{ base: 4, md: 8 }} py={8} position="relative" zIndex={1}>
+      <Box w="full" position="relative" zIndex={1}>
 
         {/* ── Member Context Bar ── */}
         {!memberLoading && member ? (
@@ -804,7 +804,7 @@ const ReviewOrder = memo(() => {
           {/* ── Right: Order Summary ── */}
           <Box position={{ base: "static", lg: "sticky" }} top="24px" className="card-enter-right">
             <Box
-              bg={summaryCardBg}
+              bg={"app.card.bg"}
               backdropFilter="blur(24px) saturate(200%)"
               border="1px solid"
               borderColor={summaryCardBorderColor}

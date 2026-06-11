@@ -238,7 +238,7 @@
                             {
                                 "label": "Subscription Plans",
                                 "icon": "Layers",
-                                "path": "/app/gym/subscription"
+                                "path": "/app/gym/subscriptions"
                             },
                             {
                                 "label": "Payment History",

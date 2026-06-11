@@ -110,7 +110,7 @@ const StaffCard = memo(({ trainer, onClick }: { trainer: TrainerDocument; onClic
   const cardBg = useColorModeValue("rgba(255,255,255,0.86)", "rgba(15,23,42,0.7)");
   const cardBorder = useColorModeValue("rgba(226,232,240,0.78)", "rgba(255,255,255,0.12)");
   const muted = useColorModeValue("gray.500", "gray.400");
-  
+
   const { data } = trainer;
   const name = getTrainerName(data);
   const status = data.status || "active";
@@ -122,7 +122,7 @@ const StaffCard = memo(({ trainer, onClick }: { trainer: TrainerDocument; onClic
       boxShadow="0 18px 44px -34px rgba(15, 23, 42, 0.72)" backdropFilter="blur(18px) saturate(150%)"
       position="relative" overflow="hidden" cursor="pointer"
       transition="all 0.24s cubic-bezier(0.4, 0, 0.2, 1)"
-      onClick={() => onClick(trainer._meta.record_id)}
+      onClick={() => onClick(trainer._meta.id)}
       _before={{
         content: '""', position: "absolute", top: 0, left: 0, right: 0, h: "3px",
         bg: `${accent}.400`,
@@ -137,7 +137,7 @@ const StaffCard = memo(({ trainer, onClick }: { trainer: TrainerDocument; onClic
           <HStack gap={3} minW={0}>
             <Box position="relative">
               <Avatar.Root size="lg" shape="rounded" border="1px solid" borderColor={cardBorder}>
-                 {data.profilePic && <Avatar.Image src={data.profilePic} />}
+                {data.profilePic && <Avatar.Image src={data.profilePic} />}
                 <Avatar.Fallback bg={`${accent}.500/10`} color={`${accent}.500`} fontWeight="900">
                   {name.initials}
                 </Avatar.Fallback>
@@ -151,7 +151,7 @@ const StaffCard = memo(({ trainer, onClick }: { trainer: TrainerDocument; onClic
                 {name.full}
               </Text>
               <Text fontSize="xs" color={muted} fontWeight="700" fontFamily="mono" truncate>
-                {trainer._meta.record_id}
+                {trainer._meta.id}
               </Text>
             </VStack>
           </HStack>
@@ -243,7 +243,7 @@ const TrainersStaff = memo(() => {
         `${data.firstName} ${data.lastName}`.toLowerCase().includes(q) ||
         data.email.toLowerCase().includes(q) ||
         data.specialization.toLowerCase().includes(q) ||
-        t._meta.record_id.toLowerCase().includes(q);
+        t._meta.id.toLowerCase().includes(q);
       return matchesFilter && matchesSearch;
     });
   }, [activeFilter, searchQuery, trainers]);
@@ -380,9 +380,9 @@ const TrainersStaff = memo(() => {
               ) : filteredStaff.length > 0 ? (
                 <SimpleGrid columns={{ base: 1, md: 2, "2xl": 3 }} gap={4}>
                   {filteredStaff.map((s) => (
-                    <StaffCard 
-                      key={s._id} 
-                      trainer={s} 
+                    <StaffCard
+                      key={s._id}
+                      trainer={s}
                       onClick={(id) => navigateTo(`TrainerProfile?trainer_id=${id}`)}
                     />
                   ))}
@@ -428,7 +428,7 @@ const TrainersStaff = memo(() => {
                         <HStack key={t._id} p={3} borderRadius="xl" bg={`${accent}.500/8`}
                           border="1px solid" borderColor={`${accent}.500/15`} gap={3}
                           transition="all 0.2s" _hover={{ transform: "translateX(2px)", bg: `${accent}.500/12` }}
-                          onClick={() => navigateTo(`TrainerProfile?trainer_id=${t._meta.record_id}`)} cursor="pointer">
+                          onClick={() => navigateTo(`TrainerProfile?trainer_id=${t._meta.id}`)} cursor="pointer">
                           <Circle size="8" bg={`${accent}.500/15`} color={`${accent}.500`} fontWeight="900" fontSize="xs">
                             #{i + 1}
                           </Circle>

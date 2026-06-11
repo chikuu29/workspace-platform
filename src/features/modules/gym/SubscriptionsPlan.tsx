@@ -187,7 +187,7 @@ const Subscriptions = memo(() => {
 
   const handleDelete = useCallback((plan: SubscriptionPlanDocument) => {
     if (!window.confirm(`Delete plan "${plan.data.name}"? This cannot be undone.`)) return;
-    GymApiService.deletePlan(plan._meta.record_id).subscribe({
+    GymApiService.deletePlan(plan._meta.id).subscribe({
       next: (res) => {
         if (res.success) { toaster.create({ title: "Plan Removed", type: "success" }); refetch(); }
         else { toaster.create({ title: "Failed", description: (res as any).message, type: "error" }); }
@@ -209,7 +209,7 @@ const Subscriptions = memo(() => {
       billing_cycle: fd.get("billing_cycle") as "monthly" | "quarterly" | "yearly",
       is_active: fd.get("is_active") === "on",
     };
-    GymApiService.updatePlan(selectedPlan._meta.record_id, payload).subscribe({
+    GymApiService.updatePlan(selectedPlan._meta.id, payload).subscribe({
       next: (res) => {
         setIsSaving(false);
         if (res.success) { toaster.create({ title: "Plan Updated", type: "success" }); setIsOpen(false); refetch(); }

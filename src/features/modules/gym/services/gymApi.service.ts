@@ -68,7 +68,7 @@ export const GymApiService = {
     }).pipe(map((res: any) => res as MembersResponse));
   },
 
-  /** Fetches a single member by record_id or member_id. */
+  /** Fetches a single member by id or member_id. */
   getMember: (identifier: string) => {
     return GETAPI({
       path: `/v1/gym/members/${identifier}`,
@@ -140,7 +140,7 @@ export const GymApiService = {
     }).pipe(map((res: any) => res as PlansResponse));
   },
 
-  /** Fetches a single subscription plan by record_id, code, or ObjectId. */
+  /** Fetches a single subscription plan by id, code, or ObjectId. */
   getPlan: (identifier: string) => {
     return GETAPI({
       path: `/v1/gym/plans/${identifier}`,
@@ -252,7 +252,7 @@ export const GymApiService = {
   },
 
   // ── Trainers ────────────────────────────────────────────────────────
-  
+
   /** Fetches the paginated list of gym trainers. */
   getTrainers: (skip: number = 0, limit: number = 50) => {
     return GETAPI({
@@ -262,7 +262,7 @@ export const GymApiService = {
     }).pipe(map((res: any) => res as TrainersResponse));
   },
 
-  /** Fetches a single trainer by record_id or trainer_id. */
+  /** Fetches a single trainer by id or trainer_id. */
   getTrainer: (identifier: string) => {
     return GETAPI({
       path: `/v1/gym/trainers/${identifier}`,

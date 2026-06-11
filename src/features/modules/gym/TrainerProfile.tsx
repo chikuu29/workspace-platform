@@ -53,7 +53,7 @@ const fmtDate = (d?: string) => {
 
 // ─── Sub-Components ─────────────────────────────────────────────────
 
-const SurfaceCard = memo(({ children, p = { base: 4, md: 5 }, ...props }: { children: React.ReactNode; p?: any; [k: string]: any }) => {
+const SurfaceCard = memo(({ children, p = { base: 4, md: 5 }, ...props }: { children: React.ReactNode; p?: any;[k: string]: any }) => {
   const bg = useColorModeValue("rgba(255,255,255,0.82)", "rgba(15,23,42,0.66)");
   const border = useColorModeValue("rgba(226,232,240,0.86)", "rgba(255,255,255,0.12)");
   return (
@@ -165,7 +165,7 @@ const TrainerProfile = memo(() => {
             <HStack gap={{ base: 4, md: 6 }} align="center" minW={0}>
               <Skeleton loading={loading} borderRadius="2xl">
                 <Avatar.Root size="2xl" shape="rounded" border="1px solid" borderColor={borderColor}>
-                   {trainer?.data.profilePic && <Avatar.Image src={trainer.data.profilePic} />}
+                  {trainer?.data.profilePic && <Avatar.Image src={trainer.data.profilePic} />}
                   <Avatar.Fallback bg={sm.bg} color={sm.accent} fontSize="4xl" fontWeight="900">{name.initials}</Avatar.Fallback>
                 </Avatar.Root>
               </Skeleton>
@@ -180,7 +180,7 @@ const TrainerProfile = memo(() => {
                   <Skeleton loading={loading}>
                     <HStack px={4} py={2} borderRadius="xl" bg="blackAlpha.50" color={muted}>
                       <Fingerprint size={15} />
-                      <Text fontSize="sm" fontWeight="900" fontFamily="mono">{trainer?._meta.record_id || trainerId}</Text>
+                      <Text fontSize="sm" fontWeight="900" fontFamily="mono">{trainer?._meta.id || trainerId}</Text>
                     </HStack>
                   </Skeleton>
                   <Skeleton loading={loading}>

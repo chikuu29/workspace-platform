@@ -85,8 +85,8 @@ const STATUS_MAP = {
 
 const MemberRow = memo(({ member, onClick }: MemberRowProps) => {
   const handleClick = useCallback(
-    () => onClick(member.record_id),
-    [onClick, member.record_id],
+    () => onClick(member.id),
+    [onClick, member.id],
   );
 
   const avatarStyle = useMemo(() => getAvatarColorScheme(member.name), [member.name]);
@@ -225,7 +225,7 @@ const RecentEnrollmentsList = memo(({ onViewAll, onMemberClick }: RecentEnrollme
   const renderMemberRow = useCallback(
     (m: RecentMember) => (
       <MemberRow
-        key={m.record_id}
+        key={m.id}
         member={m}
         onClick={onMemberClick}
       />

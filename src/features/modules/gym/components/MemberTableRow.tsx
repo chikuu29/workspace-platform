@@ -57,7 +57,7 @@ const MemberTableRow = memo(({ member, onClick, style }: MemberTableRowProps) =>
   const borderColor = useColorModeValue("rgba(226,232,240,0.5)", "rgba(255,255,255,0.06)");
   const muted = useColorModeValue("gray.500", "gray.400");
 
-  const handleClick = useCallback(() => onClick(_meta.record_id), [onClick, _meta.record_id]);
+  const handleClick = useCallback(() => onClick(_meta.id), [onClick, _meta.id]);
 
   return (
     <HStack

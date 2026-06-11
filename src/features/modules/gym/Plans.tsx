@@ -1341,10 +1341,10 @@ const Plans = memo(() => {
     <Box
       w="full"
       minH="100vh"
-      bg={pageBg}
+      // bg={pageBg}
       fontFamily="'Inter', sans-serif"
       position="relative"
-      pb={8}
+    // pb={8}
     >
       {/* ── Keyframe Animations ── */}
       <style>{`
@@ -1401,7 +1401,7 @@ const Plans = memo(() => {
       />
 
       {/* ── Page Content ── */}
-      <Box w="full" px={{ base: 4, md: 8 }} py={8} position="relative" zIndex={1}>
+      <Box w="full" position="relative" zIndex={1}>
 
         {/* ── Page Header ── */}
         <PageHeader

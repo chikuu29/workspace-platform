@@ -15,7 +15,7 @@ interface UseGymPlanResult {
 }
 
 /**
- * Fetches a single plan by code or record_id.
+ * Fetches a single plan by code or id.
  * Keeps the subscription stable (unmount cleanup) to avoid memory leaks.
  */
 export const useGymPlan = (identifier: string | undefined): UseGymPlanResult => {

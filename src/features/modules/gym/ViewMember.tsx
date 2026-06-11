@@ -288,20 +288,20 @@ const MemberProfile = memo(({
   const muted = useColorModeValue("gray.500", "gray.400");
 
   const handleClick = useCallback(() => {
-    onClick(_meta.record_id);
-  }, [onClick, _meta.record_id]);
+    onClick(_meta.id);
+  }, [onClick, _meta.id]);
 
   const handleRenew = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     toaster.create({ title: "Renew Plan", description: `Navigating to renewals for ${name.full}...`, type: "success" });
-    onClick(_meta.record_id);
-  }, [onClick, _meta.record_id, name.full]);
+    onClick(_meta.id);
+  }, [onClick, _meta.id, name.full]);
 
   const handleUpgrade = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     toaster.create({ title: "Upgrade Plan", description: `Navigating to plan template selection for ${name.full}...`, type: "info" });
-    onClick(_meta.record_id);
-  }, [onClick, _meta.record_id, name.full]);
+    onClick(_meta.id);
+  }, [onClick, _meta.id, name.full]);
 
   const handleFreeze = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -590,7 +590,7 @@ const ViewMember = memo(() => {
         name.full.toLowerCase().includes(q) ||
         contact.email.toLowerCase().includes(q) ||
         contact.phone.toLowerCase().includes(q) ||
-        member._meta.record_id.toLowerCase().includes(q);
+        member._meta.id.toLowerCase().includes(q);
 
       return matchesFilter && matchesSearch;
     });
@@ -940,7 +940,7 @@ const ViewMember = memo(() => {
                           cursor="pointer"
                           transition="all 0.2s"
                           _hover={{ transform: "translateX(2px)", bg: "orange.500/15" }}
-                          onClick={() => navigateTo(`members/${member._meta.record_id}`)}
+                          onClick={() => navigateTo(`members/${member._meta.id}`)}
                         >
                           <Avatar.Root size="sm" shape="rounded">
                             <Avatar.Fallback fontWeight="900" color="orange.600">

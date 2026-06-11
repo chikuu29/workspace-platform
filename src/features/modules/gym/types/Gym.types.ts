@@ -20,7 +20,7 @@ export interface GymKpiData {
 }
 
 export interface RecentMember {
-  record_id: string;
+  id: string;
   name: string;
   plan: string;
   created_at: string;
@@ -38,7 +38,7 @@ export interface MemberDocument {
   _id: string;
   _meta: {
     entity_type: string;
-    record_id: string;
+    id: string;
     version: number;
     is_deleted: boolean;
     created: { at: string; by: string };
@@ -101,7 +101,7 @@ export interface TrainerDocument {
   _id: string;
   _meta: {
     entity_type: string;
-    record_id: string;
+    id: string;
     version: number;
     is_deleted: boolean;
     created: { at: string; by: string };
@@ -144,7 +144,7 @@ export interface SubscriptionPlanDocument {
   _id: string;
   _meta: {
     entity_type: string;
-    record_id: string;
+    id: string;
     version: number;
     is_deleted: boolean;
     created: { at: string; by: string };
@@ -183,7 +183,7 @@ export interface SubscriptionDocument {
   _id: string;
   _meta: {
     entity_type: string;
-    record_id: string;
+    id: string;
     version: number;
     is_deleted: boolean;
     created: { at: string; by: string };
@@ -194,7 +194,7 @@ export interface SubscriptionDocument {
     member_name: string;
     plan_code: string;
     plan_name: string;
-    plan_record_id: string;
+    plan_id: string;
     subscription_id: string;
     price: number;
     currency: string;

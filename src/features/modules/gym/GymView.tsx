@@ -227,14 +227,6 @@ const GymView = memo(() => {
 
   const [revenueRange, setRevenueRange] = useState<string>("30d");
 
-  const revenueRangeOptions = useMemo(
-    () => [
-      { label: "Last 30 Days", value: "30d" },
-      { label: "This Year", value: "year" },
-    ],
-    []
-  );
-
   const handleRevenueRangeChange = useCallback((value: string) => {
     setRevenueRange(value);
   }, []);
@@ -292,67 +284,7 @@ const GymView = memo(() => {
     [activeMembers, totalMembers],
   );
 
-  const membershipData = useMemo(
-    () => [
-      { name: "Active Members", value: activeMembers },
-      { name: "Frozen Members", value: frozenMembers },
-      { name: "Needs Attention", value: attentionMembers },
-    ],
-    [activeMembers, frozenMembers, attentionMembers]
-  );
 
-  const planPopularityData = useMemo(
-    () => [
-      { name: "Monthly Plans", value: 55 },
-      { name: "Quarterly Plans", value: 25 },
-      { name: "Yearly Plans", value: 20 },
-    ],
-    []
-  );
-
-  const paymentStatusData = useMemo(
-    () => [
-      { name: "Paid Invoices", value: 80 },
-      { name: "Pending Invoices", value: 15 },
-      { name: "Overdue Invoices", value: 5 },
-    ],
-    []
-  );
-
-  const revenueTrendData = useMemo(
-    () => {
-      if (revenueRange === "year") {
-        return [
-          { label: "Jan", value: 120000 },
-          { label: "Feb", value: 140000 },
-          { label: "Mar", value: 170000 },
-          { label: "Apr", value: 210000 },
-          { label: "May", value: 280000 },
-          { label: "Jun", value: 360000 }, // Peak
-          { label: "Jul", value: 310000 }, // Dip
-          { label: "Aug", value: 290000 },
-          { label: "Sep", value: 330000 },
-          { label: "Oct", value: 390000 },
-          { label: "Nov", value: 440000 },
-          { label: "Dec", value: 510000 },
-        ];
-      }
-      return [
-        { label: "Day 1", value: 10000 },
-        { label: "Day 5", value: 15000 },
-        { label: "Day 10", value: 22000 },
-        { label: "Day 15", value: 35000 }, // Peak/Growth Rise
-        { label: "Day 20", value: 26000 }, // Dip/Fluctuation
-        { label: "Day 25", value: 31000 },
-        { label: "Day 30", value: 42000 }, // Final Growth
-      ];
-    },
-    [revenueRange]
-  );
-
-  // ── Stable navigation callbacks ───────────────────────────────────
-  const handleDirectory = useCallback(() => navigateTo("members"), [navigateTo]);
-  const handleEnroll = useCallback(() => navigateTo("AddMember"), [navigateTo]);
   const handleViewAll = useCallback(() => navigateTo("members"), [navigateTo]);
   const handleSchedule = useCallback(() => navigateTo("listClasses"), [navigateTo]);
 
@@ -453,19 +385,12 @@ const GymView = memo(() => {
           {/* Row 1: Line Charts */}
           <SimpleGrid columns={{ base: 1, lg: 2 }} gap={6}>
             <ChartCard
-              title="Revenue Trend"
-              subtitle={revenueRange === "year" ? "Income growth over this year" : "Income growth over the last 30 days"}
-              type="line"
-              initialData={revenueTrendData}
-              filterOptions={revenueRangeOptions}
+              apiEndpoint={`/v1/gym/analytics/revenue_trend?range=${revenueRange}`}
               selectedFilter={revenueRange}
               onFilterChange={handleRevenueRangeChange}
             />
             <ChartCard
-              title="Attendance Trend"
-              subtitle="Daily visits history for the last 7 days"
-              type="line"
-              apiEndpoint="/v1/gym/analytics/attendance"
+              apiEndpoint="/v1/gym/analytics/attendance_trend"
             />
           </SimpleGrid>
 
@@ -477,42 +402,26 @@ const GymView = memo(() => {
           templateColumns={{ base: "1fr", xl: "minmax(0, 1fr) 360px" }}
           gap={{ base: 6, xl: 8 }}
         >
-          {/* Left column: Quick Actions + Recent Enrollments */}
+          {/* Left column: Quick Actions + Charts */}
           <GridItem minW={0}>
             <VStack align="stretch" gap={6}>
               <QuickActionsSection onNavigate={navigateTo} />
-              <RecentEnrollmentsList
-                onViewAll={handleViewAll}
-                onMemberClick={handleMemberClick}
-              />
               {/* Row 2: Distribution Donut Charts */}
               <SimpleGrid columns={{ base: 1, md: 3 }} gap={6}>
                 <ChartCard
-                  title="Membership Distribution"
-                  subtitle="Active, frozen, and attention memberships"
-                  type="pie"
-                  initialData={membershipData}
-
+                  apiEndpoint="/v1/gym/analytics/membership_distribution"
                 />
                 <ChartCard
-                  title="Plan Popularity"
-                  subtitle="Plan tier selection ratio"
-                  type="pie"
-                  initialData={planPopularityData}
-
+                  apiEndpoint="/v1/gym/analytics/plan_popularity"
                 />
                 <ChartCard
-                  title="Payment Status"
-                  subtitle="Fulfillment status ratio"
-                  type="pie"
-
-                  initialData={paymentStatusData}
+                  apiEndpoint="/v1/gym/analytics/payment_status"
                 />
               </SimpleGrid>
             </VStack>
           </GridItem>
 
-          {/* Right column: Action Required + Floor Gauge */}
+          {/* Right column: Action Required + Floor Gauge + Recent Enrollments */}
           <GridItem>
             <VStack
               align="stretch"
@@ -524,9 +433,13 @@ const GymView = memo(() => {
                 items={alertItems}
                 totalCount={attentionMembers + frozenMembers}
               />
-              <FloorCapacityGauge
+              {/* <FloorCapacityGauge
                 utilization={utilization}
                 onViewSchedule={handleSchedule}
+              /> */}
+              <RecentEnrollmentsList
+                onViewAll={handleViewAll}
+                onMemberClick={handleMemberClick}
               />
             </VStack>
           </GridItem>

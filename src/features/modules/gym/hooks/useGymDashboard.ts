@@ -14,7 +14,7 @@ export const useGymDashboard = () => {
 
   const fetchData = useCallback(() => {
     setLoading(true);
-    return GymApiService.getGymKPIs().subscribe({
+    return GymApiService.getAnalytics().subscribe({
       next: (data) => {
         setStats(data);
         setLoading(false);

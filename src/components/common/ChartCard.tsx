@@ -4,6 +4,12 @@
  * Generic, reusable, theme-aware charting component built with Apache ECharts.
  * Fully compatible with React 18, React Strict Mode, and Chakra UI v3.
  *
+ * Supports two modes:
+ * 1. **Explicit** — Pass type/title/initialData as props (original behaviour).
+ * 2. **Widget-driven** — Pass only apiEndpoint; the backend returns a
+ *    self-describing envelope { chart_type, title, subtitle, filters, series }
+ *    and the component auto-configures itself.
+ *
  * Performance Features:
  * - Memoized component (React.memo)
  * - Ref-based ECharts initialization (prevents unnecessary re-renders)
@@ -35,20 +41,29 @@ import {
 
 // ── Types ────────────────────────────────────────────────────────────
 
+/** Filter option shape — shared by props and API response. */
+export interface FilterOption {
+  label: string;
+  value: string;
+}
+
 export interface ChartCardProps {
-  title: string;
+  /** Chart type — if omitted, auto-detected from API response `chart_type`. */
+  type?: "pie" | "bar" | "line" | "area" | "donut" | "funnel";
+  /** Display title — if omitted, auto-set from API response. */
+  title?: string;
+  /** Display subtitle — if omitted, auto-set from API response. */
   subtitle?: string;
-  type: "pie" | "bar" | "line";
   /** Initial static data */
   initialData?: any;
-  /** API endpoint to fetch data dynamically */
+  /** API endpoint to fetch data dynamically (widget endpoint) */
   apiEndpoint?: string;
   /** Optional custom data mapper to ECharts Option configuration */
   mapDataToOption?: (data: any, isDark: boolean) => echarts.EChartsOption;
   /** Visual height of the chart container */
   height?: string | number;
-  /** Optional selection dropdown filter options */
-  filterOptions?: { label: string; value: string }[];
+  /** Optional selection dropdown filter options (overrides API-provided filters) */
+  filterOptions?: FilterOption[];
   /** Current selected filter value */
   selectedFilter?: string;
   /** Callback triggered when the filter choice changes */
@@ -79,24 +94,36 @@ const COLORS = {
 // ── Component Implementation ─────────────────────────────────────────
 
 const ChartCard = memo(({
-  title,
-  subtitle,
-  type,
+  title: titleProp,
+  subtitle: subtitleProp,
+  type: typeProp,
   initialData,
   apiEndpoint,
   mapDataToOption,
   height = "300px",
-  filterOptions,
+  filterOptions: filterOptionsProp,
   selectedFilter,
   onFilterChange,
 }: ChartCardProps) => {
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstance = useRef<echarts.ECharts | null>(null);
 
-  // States
+  // Raw chart series data (extracted from widget envelope or raw API response)
   const [data, setData] = useState<any>(initialData);
   const [loading, setLoading] = useState<boolean>(!!apiEndpoint);
   const [error, setError] = useState<string | null>(null);
+
+  // ── Backend-driven widget config (auto-configured from API response) ──
+  const [serverChartType, setServerChartType] = useState<string | undefined>(undefined);
+  const [serverTitle, setServerTitle] = useState<string | undefined>(undefined);
+  const [serverSubtitle, setServerSubtitle] = useState<string | undefined>(undefined);
+  const [serverFilters, setServerFilters] = useState<FilterOption[] | undefined>(undefined);
+
+  // Resolved values — props take priority over server-provided values
+  const type = typeProp || serverChartType || "line";
+  const title = titleProp || serverTitle || "";
+  const subtitle = subtitleProp || serverSubtitle;
+  const filterOptions = filterOptionsProp || serverFilters;
 
   // Theme tracking
   const isDark = useColorModeValue(false, true);
@@ -106,7 +133,7 @@ const ChartCard = memo(({
   const shadow = useColorModeValue("0 10px 30px rgba(0, 0, 0, 0.04)", "0 4px 20px rgba(0, 0, 0, 0.2)");
   const selectColor = useColorModeValue("#2B3674", "#FFFFFF");
 
-  // Fetch data if apiEndpoint is supplied
+  // Fetch data if apiEndpoint is supplied — detects widget envelope
   useEffect(() => {
     if (!apiEndpoint) {
       setData(initialData);
@@ -121,10 +148,23 @@ const ChartCard = memo(({
       next: (res: any) => {
         if (res && res.success === false) {
           setError(res.message || "Failed to load chart data");
+          setLoading(false);
+          return;
+        }
+
+        // Unwrap standard REST envelope { success, data, message }
+        const payload = res && res.data !== undefined ? res.data : res;
+
+        // Detect widget envelope: { chart_type, title, subtitle, filters, series }
+        if (payload && payload.chart_type && payload.series !== undefined) {
+          setServerChartType(payload.chart_type);
+          if (payload.title) setServerTitle(payload.title);
+          if (payload.subtitle) setServerSubtitle(payload.subtitle);
+          if (Array.isArray(payload.filters)) setServerFilters(payload.filters);
+          setData(payload.series);
         } else {
-          // Unwrap standard REST envelope structures if they exist
-          const chartData = res && res.data !== undefined ? res.data : res;
-          setData(chartData);
+          // Fallback: raw data (backwards compatible with non-widget endpoints)
+          setData(payload);
         }
         setLoading(false);
       },
@@ -139,6 +179,16 @@ const ChartCard = memo(({
       subscription.unsubscribe();
     };
   }, [apiEndpoint, initialData]);
+
+  // Normalise chart type — map widget envelope types to ECharts types.
+  // "donut" and "funnel" share the same data shape as "pie" (Group A),
+  // "area" shares the same shape as "line" (Group B).
+  const resolvedEchartsType = useMemo(() => {
+    const typeStr = type as string;
+    if (typeStr === "donut" || typeStr === "funnel") return "pie";
+    if (typeStr === "area") return "line";
+    return typeStr as "pie" | "line" | "bar";
+  }, [type]);
 
   // Default option builder for each type
   const defaultMapper = useCallback(
@@ -173,7 +223,7 @@ const ChartCard = memo(({
 
       if (!chartData) return baseOptions;
 
-      switch (type) {
+      switch (resolvedEchartsType) {
         case "pie": {
           // Normalise array data or object mapping
           let seriesData = Array.isArray(chartData)
@@ -188,6 +238,10 @@ const ChartCard = memo(({
             name: item.name || item.label || "Other",
             value: typeof item.value === "number" ? item.value : 0,
           }));
+
+          // donut vs pie rendering: donut has center hole, pie fills fully
+          const isDonut = (type as string) !== "funnel";
+          const radius: [string, string] = isDonut ? ["50%", "70%"] : ["0%", "70%"];
 
           return {
             ...baseOptions,
@@ -210,7 +264,7 @@ const ChartCard = memo(({
               {
                 name: title,
                 type: "pie",
-                radius: ["50%", "70%"],
+                radius,
                 avoidLabelOverlap: true,
                 padAngle: 2,
                 itemStyle: {
@@ -254,6 +308,10 @@ const ChartCard = memo(({
           const xAxisData = items.map((item: any) => item.date || item.label || item.name || "");
           const yAxisData = items.map((item: any) => item.count || item.value || 0);
 
+          // Area chart uses a visible areaStyle, line chart uses subtle gradient
+          const isArea = (type as string) === "area";
+          const areaOpacity = isArea ? 0.35 : 0.15;
+
           return {
             ...baseOptions,
             xAxis: {
@@ -277,7 +335,7 @@ const ChartCard = memo(({
                 showSymbol: false,
                 lineStyle: { width: 3 },
                 areaStyle: {
-                  opacity: 0.15,
+                  opacity: areaOpacity,
                   color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                     { offset: 0, color: colors.palette[0] },
                     { offset: 1, color: "rgba(117, 81, 255, 0)" },
@@ -335,7 +393,7 @@ const ChartCard = memo(({
           return baseOptions;
       }
     },
-    [type, title]
+    [resolvedEchartsType, type, title]
   );
 
   // Compute final option based on current data state

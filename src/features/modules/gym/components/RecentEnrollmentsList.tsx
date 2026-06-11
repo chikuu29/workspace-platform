@@ -206,7 +206,7 @@ const RecentEnrollmentsList = memo(({ onViewAll, onMemberClick }: RecentEnrollme
   // Fetch recent enrollments directly inside the component
   useEffect(() => {
     setLoading(true);
-    const subscription = GymApiService.getGymKPIs().subscribe({
+    const subscription = GymApiService.getAnalytics().subscribe({
       next: (data) => {
         setMembers(data.recent_members || []);
         setLoading(false);

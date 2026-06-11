@@ -570,7 +570,7 @@ const Attendance = memo(() => {
   // Fetch KPI Stats for stats indicators
   const fetchKPIs = useCallback(() => {
     setStatsLoading(true);
-    GymApiService.getGymKPIs().subscribe({
+    GymApiService.getAnalytics().subscribe({
       next: (res) => {
         setStats(res);
         setStatsLoading(false);

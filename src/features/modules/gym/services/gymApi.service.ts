@@ -50,9 +50,9 @@ import type {
 export const GymApiService = {
   // ── Dashboard ───────────────────────────────────────────────────────
 
-  /** Fetches aggregated dashboard statistics and KPIs. */
-  getGymKPIs: () => {
-    return GETAPI({ path: "/v1/gym/analytics/kpis", isPrivateApi: true }).pipe(
+  /** Fetches dashboard analytics — KPIs + recent enrollments. */
+  getAnalytics: () => {
+    return GETAPI({ path: "/v1/gym/analytics", isPrivateApi: true }).pipe(
       map((res: any) => res.data as GymDashboardStats)
     );
   },

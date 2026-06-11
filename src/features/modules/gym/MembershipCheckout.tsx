@@ -632,7 +632,7 @@ const MembershipCheckout = memo(() => {
     setIsProcessing(true);
 
     const payload: CheckoutPayload = {
-      member_id: memberId,
+      member_id: previewData?.member?.member_id || memberId || "",
       plan_code: planCode,
       payment_method: paymentMethod,
       transaction_ref: paymentMethod === "upi" ? transactionRef.trim() : undefined,

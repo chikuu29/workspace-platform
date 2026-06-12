@@ -107,6 +107,11 @@ export default defineConfig(({ mode }) => {
               return 'utils'
             }
 
+            // ── ECharts & Graphics ───────────────────────────────────────────
+            if (id.includes('echarts') || id.includes('zrender')) {
+              return 'echarts'
+            }
+
             // ── Vendor fallback ──────────────────────────────────────────────
             // Anything unmatched (date-fns, lodash, etc.) lands here.
             // Monitor dist/stats.html to catch new large deps accumulating.

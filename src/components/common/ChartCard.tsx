@@ -28,7 +28,7 @@ import {
   Center,
   Button,
 } from "@chakra-ui/react";
-import * as echarts from "echarts";
+import * as echarts from "@/core/utils/echarts";
 import { ChevronDown } from "lucide-react";
 import { GETAPI } from "@/app/api";
 import { useColorModeValue } from "@/components/ui/color-mode";

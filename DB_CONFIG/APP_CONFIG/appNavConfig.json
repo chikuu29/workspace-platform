@@ -207,9 +207,27 @@
                         ]
                     },
                     {
+                        "label": "Billing & Payments",
+                        "isMaster": false,
+                        "icon": "CreditCard",
+                        "iconColor": "green.400",
+                        "menu": [
+                            {
+                                "label": "Subscription Plans",
+                                "icon": "Layers",
+                                "path": "/app/gym/subscriptions"
+                            },
+                            {
+                                "label": "Payment History",
+                                "icon": "Receipt",
+                                "path": "/app/gym/PaymentsHistory"
+                            }
+                        ]
+                    },
+                    {
                         "label": "Reports",
                         "isMaster": false,
-                        "icon": "BarChart3",
+                        "icon": "TrendingUp",
                         "iconColor": "teal.400",
                         "menu": [
                             {
@@ -226,24 +244,6 @@
                                 "label": "Performance Report",
                                 "icon": "TrendingUp",
                                 "path": "/app/gym/performanceReport"
-                            }
-                        ]
-                    },
-                    {
-                        "label": "Billing & Payments",
-                        "isMaster": false,
-                        "icon": "CreditCard",
-                        "iconColor": "green.400",
-                        "menu": [
-                            {
-                                "label": "Subscription Plans",
-                                "icon": "Layers",
-                                "path": "/app/gym/subscriptions"
-                            },
-                            {
-                                "label": "Payment History",
-                                "icon": "Receipt",
-                                "path": "/app/gym/PaymentsHistory"
                             }
                         ]
                     }

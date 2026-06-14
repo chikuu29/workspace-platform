@@ -17,7 +17,7 @@ import { lazy, type ComponentType, type LazyExoticComponent } from "react";
 // ─── Types ───────────────────────────────────────────────────────────
 
 /** Factory function that returns a dynamic import promise */
-type LazyImportFn = () => Promise<{ default: ComponentType<any> }>;
+export type LazyImportFn = () => Promise<{ default: ComponentType<any> }>;
 
 /** 
  * Optional config to attach PBAC permissions to a specific view route.
@@ -27,19 +27,19 @@ type LazyImportFn = () => Promise<{ default: ComponentType<any> }>;
  * - Set `requireAll: true` (AND logic) if they need EVERY permission in the array.
  * - Set `requireAll: false` (OR logic, default) if they only need ANY ONE of them.
  */
-interface AppViewConfig {
+export interface AppViewConfig {
     component: LazyImportFn;
     permissions?: string | string[];
     requireAll?: boolean;
 }
 
 /** Config for a single app — maps view names to lazy imports or complex configs */
-interface AppModuleConfig {
+export interface AppModuleConfig {
     [viewName: string]: LazyImportFn | AppViewConfig;
 }
 
 /** Top-level registry shape — maps app names to module configs */
-interface RegistryConfig {
+export interface RegistryConfig {
     [appName: string]: AppModuleConfig;
 }
 
@@ -55,108 +55,6 @@ const lazyCache = new Map<string, LazyExoticComponent<ComponentType<any>>>();
 
 /** Mutable registry — seeded with defaults, extensible at runtime */
 const registry: RegistryConfig = {
-    system: {
-        layout: () => import("@/theme/layouts/workspace"),
-        home: () => import("@/features/modules/system/PlatformView"),
-        DatabaseStatistics: {
-            component: () => import("@/features/modules/system/DatabaseStatisticsView"),
-            permissions: "SYSTEM.ADMINISTRATOR.*",
-        },
-        ApplicationClients: {
-            component: () => import("@/features/modules/system/OAuthView"),
-            permissions: "SYSTEM.ADMINISTRATOR.*",
-        },
-        AuthUsers: () => import("@/features/modules/system/AuthUser"),
-        Organizations: {
-            component: () => import("@/features/modules/system/OrganizationView"),
-            permissions: "SYSTEM.ADMINISTRATOR.*",
-        },
-        accesscontrol: {
-            component: () => import("@/features/modules/system/AccessControlView"),
-            permissions: "SYSTEM.ADMINISTRATOR.*",
-        },
-        SaasApps: {
-            component: () => import("@/features/modules/system/SaasAppsView"),
-            permissions: "SYSTEM.ADMINISTRATOR.*",
-        },
-        Features: {
-            component: () => import("@/features/modules/system/FeaturesView"),
-            permissions: "SYSTEM.ADMINISTRATOR.*",
-        },
-        Permissions: {
-            component: () => import("@/features/modules/system/PermissionsView"),
-            permissions: "SYSTEM.ADMINISTRATOR.*",
-        },
-        SubscriptionPlans: {
-            component: () => import("@/features/modules/system/SubscriptionPlansView"),
-            permissions: "SYSTEM.ADMINISTRATOR.*",
-        },
-        OrganizationRoles: {
-            component: () => import("@/features/modules/system/OrganizationRolesView")
-        },
-        OrganizationUsers: {
-            component: () => import("@/features/modules/system/OrganizationUsersView")
-        },
-        OrganizationAccess: () => import("@/features/modules/system/OrganizationAccessView"),
-        PolicyManagement: {
-            component: () => import("@/features/modules/system/PolicyManagementView")
-        },
-    },
-    gym: {
-        layout: () => import("@/theme/layouts/workspace"),
-        home: () => import("@/features/modules/gym/GymView"),
-        // Member management
-        members: () => import("@/features/modules/gym/ViewMember"),
-
-        member: () => import("@/features/modules/gym/MemberDetail"),
-        attendance: () => import("@/features/modules/gym/Attendance"),
-        // Billing & Subscriptions
-        // Subscription: () => import("@/features/modules/gym/Subscription"),
-        subscriptions: () => import("@/features/modules/gym/SubscriptionsPlan"),
-        AddSubscriptionPlan: () => import("@/features/modules/gym/AddSubscriptionPlan"),
-
-        PaymentsHistory: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.PaymentsHistory })),
-        // ── New Multi-Step Sales Flow (Invoice-First Architecture) ────
-        // Step 2: Plan selection — no API call, carries planCode via query param
-        plans: () => import("@/features/modules/gym/Plans"),
-        // Step 3: Order preview — fetches member+plan, computes estimated total
-        reviewOrder: () => import("@/features/modules/gym/ReviewOrder"),
-        // Step 3.5: Order view — shows order details + "Confirm & Generate Invoice" button
-        orderView: () => import("@/features/modules/gym/OrderView"),
-        // Step 4: Invoice details — server-computed tax, Pay Now / Send Link / Cancel
-        invoiceView: () => import("@/features/modules/gym/InvoiceDetails"),
-        // Step 5: Payment method selection — routes to cash/online/link pages
-        paymentSelect: () => import("@/features/modules/gym/PaymentSelection"),
-        // Step 6A: Cash payment with change calculator
-        cashPayment: () => import("@/features/modules/gym/CashPayment"),
-        // Step 6B: UPI / Card payment with transaction ref capture
-        onlinePayment: () => import("@/features/modules/gym/OnlinePayment"),
-        // Step 6C: Payment link dispatch via email or SMS
-        paymentLink: () => import("@/features/modules/gym/PaymentLinkPage"),
-        checkout: () => import("@/features/modules/gym/MembershipCheckout"),
-        // Trainers
-        trainers: () => import("@/features/modules/gym/TrainersStaff"),
-        TrainerProfile: () => import("@/features/modules/gym/TrainerProfile"),
-        trainerSchedules: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.TrainerSchedules })),
-        // Classes
-        listClasses: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.ListClasses })),
-        addClass: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.AddClass })),
-        classBookings: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.ClassBookings })),
-        // Reports
-        revenueReport: () => import("@/features/modules/gym/RevenueReport"),
-        attendanceReport: () => import("@/features/modules/gym/AttendanceReport"),
-        performanceReport: () => import("@/features/modules/gym/GymComingSoon").then(m => ({ default: m.PerformanceReport })),
-    },
-
-    myHostel: {
-        layout: () => import("@/theme/layouts/workspace"),
-        // Portfolio overview — shows all buildings in a grid
-        portfolio: () => import("@/features/modules/myHostel/MultiBuildingHostelPortfolio"),
-        // Building drill-down — separate page for rooms, guests, info
-        building: () => import("@/features/modules/myHostel/BuildingDetailPage"),
-        // Legacy alias kept for backwards-compat with any bookmarked URLs
-        // MultiBuildingHostelPortfolio: () => import("@/features/modules/myHostel/MultiBuildingHostelPortfolio"),
-    },
     Default: {
         workspacePage: () => import("@/core/WorkspacePage"),
         layout: () => import("@/theme/layouts/workspace"),
@@ -164,6 +62,57 @@ const registry: RegistryConfig = {
         pageNotFound: () => import("@/pages/NoPageFound"),
     },
 };
+
+// ─── Eager Load Local Module Registries ──────────────────────────────
+
+const localRegistries = import.meta.glob("../../features/modules/*/registry.ts", { eager: true });
+
+const initLocalRegistries = () => {
+    for (const path in localRegistries) {
+        const match = path.match(/\/features\/modules\/([^/]+)\/registry\.ts$/);
+        if (match) {
+            const [, appName] = match;
+            const moduleExport = localRegistries[path] as { registry?: AppModuleConfig };
+            if (moduleExport && moduleExport.registry) {
+                registry[appName] = moduleExport.registry;
+            }
+        }
+    }
+};
+
+initLocalRegistries();
+
+// ─── Auto-Discovery Glob Routing ────────────────────────────────────
+
+const directViews = import.meta.glob("../../features/modules/*/*.tsx");
+const indexViews = import.meta.glob("../../features/modules/*/*/index.tsx");
+
+const dynamicRegistry = new Map<string, LazyImportFn>();
+
+// Initialize dynamic registry for unconfigured views
+const initDynamicRegistry = () => {
+    // 1. Process direct views (*.tsx directly inside module directory)
+    for (const path in directViews) {
+        const match = path.match(/\/features\/modules\/([^/]+)\/([^/]+)\.tsx$/);
+        if (match) {
+            const [, app, view] = match;
+            const key = `${app.toLowerCase()}::${view.toLowerCase()}`;
+            dynamicRegistry.set(key, directViews[path] as LazyImportFn);
+        }
+    }
+
+    // 2. Process index views (index.tsx inside a subfolder under module directory)
+    for (const path in indexViews) {
+        const match = path.match(/\/features\/modules\/([^/]+)\/([^/]+)\/index\.tsx$/);
+        if (match) {
+            const [, app, view] = match;
+            const key = `${app.toLowerCase()}::${view.toLowerCase()}`;
+            dynamicRegistry.set(key, indexViews[path] as LazyImportFn);
+        }
+    }
+};
+
+initDynamicRegistry();
 
 // ─── Cache Helper ────────────────────────────────────────────────────
 
@@ -202,7 +151,7 @@ export const AppRegistry = {
         appName: string,
         viewName: string
     ): ResolvedAppView | null {
-        // Try app-specific config first
+        // 1. Try app-specific configuration first (now populated by local modules)
         const appConfig = registry[appName];
         if (appConfig && viewName in appConfig) {
             const entry = appConfig[viewName];
@@ -216,7 +165,14 @@ export const AppRegistry = {
             };
         }
 
-        // Fallback to Default config
+        // 2. Try auto-discovery glob registry for zero-config fallback
+        const lookupKey = `${appName.toLowerCase()}::${viewName.toLowerCase()}`;
+        const autoImport = dynamicRegistry.get(lookupKey);
+        if (autoImport) {
+            return { component: getCachedLazy(`${appName}::${viewName}`, autoImport) };
+        }
+
+        // 3. Fallback to Default config
         const defaultConfig = registry["Default"];
         if (defaultConfig && viewName in defaultConfig) {
             const entry = defaultConfig[viewName];
@@ -257,7 +213,7 @@ export const AppRegistry = {
      * Check if an app has a registered config.
      */
     hasApp(appName: string): boolean {
-        return appName in registry;
+        return appName in registry || Array.from(dynamicRegistry.keys()).some(k => k.startsWith(`${appName.toLowerCase()}::`));
     },
 
     /**
@@ -272,6 +228,8 @@ export const AppRegistry = {
      * Get all registered app names (debugging / dev tools).
      */
     getRegisteredApps(): string[] {
-        return Object.keys(registry);
+        const explicitApps = Object.keys(registry);
+        const dynamicApps = Array.from(dynamicRegistry.keys()).map(k => k.split("::")[0]);
+        return Array.from(new Set([...explicitApps, ...dynamicApps]));
     },
 } as const;

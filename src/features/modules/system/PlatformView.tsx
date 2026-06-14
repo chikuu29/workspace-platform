@@ -379,10 +379,11 @@ export default memo(function PlatformView() {
       title="Admin Console"
       subtitle="Select a module to manage your platform settings"
       icon={Settings}
+      p={0}
     >
 
       {/* ── Module grid by category ──────────────────────────────────────────────── */}
-      <VStack align="stretch" gap={10} w="full">
+      <VStack align="stretch" gap={2} w="full">
         {Object.entries(categorizedModules).map(([category, modules]) => (
           <CategorySection
             key={category}
@@ -451,7 +452,7 @@ const CategorySection = memo(({ category, modules, onNavigate }: CategorySection
 
       <SimpleGrid
 
-        columns={{ base: 2, sm: 2, md: 3, lg: 4, xl: 5 }} gap={4}
+        columns={{ base: 2, sm: 2, md: 3, lg: 4, xl: 5 }} gap={2}
 
       >
         {modules.map((module) => (

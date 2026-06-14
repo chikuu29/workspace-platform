@@ -61,7 +61,7 @@ export const PageLayout = memo(({
                 borderColor="app.card.border"
                 overflow="hidden"
                 boxShadow="inner-xl"
-                p={4}
+            // p={4}
             >
                 {children}
             </Box>

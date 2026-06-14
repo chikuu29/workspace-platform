@@ -243,6 +243,20 @@ export const GymApiService = {
     }).pipe(map((res: any) => res as { success: boolean; message: string; data: any }));
   },
 
+  /** Gets the member QR image stream URL. */
+  getMemberQrCodeUrl: (memberId: string) => {
+    return `/v1/gym/members/${encodeURIComponent(memberId)}/qr`;
+  },
+
+  /** Dispatches membership card email (simulated). */
+  emailMembershipCard: (memberId: string) => {
+    return POSTAPI({
+      path: `/v1/gym/members/${encodeURIComponent(memberId)}/email-card`,
+      data: {},
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res as { success: boolean; message: string }));
+  },
+
   /** Fetches attendance analytics and heatmap. */
   getAttendanceAnalytics: () => {
     return GETAPI({

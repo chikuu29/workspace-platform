@@ -12,7 +12,7 @@
 import { memo, useCallback, useMemo, type ElementType, useState, useEffect } from "react";
 import {
   Badge, Box, Button, Circle, Flex, Grid, GridItem, Heading,
-  HStack, Icon, Separator, SimpleGrid, Text, VStack, IconButton, Input, Textarea,
+  HStack, Icon, Separator, SimpleGrid, Text, VStack, IconButton, Input, Textarea, Spinner,
 } from "@chakra-ui/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useColorModeValue } from "@/components/ui/color-mode";
@@ -20,7 +20,7 @@ import { useParams } from "react-router";
 import { useForm } from "react-hook-form";
 import {
   ArrowLeft, CalendarDays, Check, CheckCircle2, CreditCard,
-  Dumbbell, Edit, FileText, Mail, MessageSquare,
+  Download, Dumbbell, Edit, FileText, Mail, MessageSquare,
   Phone, RefreshCw, ShieldCheck, Snowflake,
   Trash2, Zap, ChevronRight, TrendingUp, Clock,
   User, MapPin, Sparkles,
@@ -32,6 +32,8 @@ import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 import { toaster } from "@/components/ui/toaster";
 import { MemberMembershipAndBilling } from "./components/MemberMembershipAndBilling";
 import { useNavActionStore } from "@/core/store/useNavActionStore";
+import { GymApiService } from "./services/gymApi.service";
+import { privateAPI } from "@/app/handlers/axiosHandlers";
 import {
   DialogRoot, DialogBackdrop, DialogContent, DialogHeader,
   DialogFooter, DialogTitle, DialogBody, DialogCloseTrigger,
@@ -849,6 +851,70 @@ const MemberDetail = memo(() => {
   const { navigateTo, goBack } = useWorkspaceRouter();
 
   const [editOpen, setEditOpen] = useState(false);
+  const [emailingCard, setEmailingCard] = useState(false);
+  const [qrBlobUrl, setQrBlobUrl] = useState<string>("");
+
+  useEffect(() => {
+    const targetId = member?.data?.member_id;
+    if (!targetId) return;
+
+    let isMounted = true;
+    let localUrl = "";
+    
+    privateAPI.get(GymApiService.getMemberQrCodeUrl(targetId), {
+      responseType: "blob"
+    })
+    .then((response) => {
+      if (!isMounted) return;
+      localUrl = URL.createObjectURL(response.data);
+      setQrBlobUrl(localUrl);
+    })
+    .catch((err) => {
+      console.error("Failed to load authenticated member QR code:", err);
+    });
+
+    return () => {
+      isMounted = false;
+      if (localUrl) {
+        URL.revokeObjectURL(localUrl);
+      }
+    };
+  }, [member?.data?.member_id]);
+
+  const handleDownloadPass = useCallback(() => {
+    if (!qrBlobUrl) {
+      toaster.create({ title: "Unavailable", description: "QR code has not loaded yet.", type: "error" });
+      return;
+    }
+    const targetId = member?.data?.member_id || memberId || "member";
+    const link = document.createElement("a");
+    link.href = qrBlobUrl;
+    link.download = `gym_pass_${targetId}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toaster.create({ title: "Downloaded", description: "Membership QR Pass has been downloaded.", type: "success" });
+  }, [qrBlobUrl, member, memberId]);
+
+  const handleEmailCard = useCallback(() => {
+    const targetId = member?.data?.member_id;
+    if (!targetId) return;
+    setEmailingCard(true);
+    GymApiService.emailMembershipCard(targetId).subscribe({
+      next: (res: any) => {
+        setEmailingCard(false);
+        if (res.success) {
+          toaster.create({ title: "Email Dispatched", description: "Membership pass card has been emailed to the member.", type: "success" });
+        } else {
+          toaster.create({ title: "Email Failed", description: res.message, type: "error" });
+        }
+      },
+      error: (err: any) => {
+        setEmailingCard(false);
+        toaster.create({ title: "Email Failed", description: err?.message || "Could not dispatch email.", type: "error" });
+      }
+    });
+  }, [member]);
 
   const name = useMemo(() => getName(member?.data), [member]);
   const status = (member?.data.status || "frozen") as StatusKey;
@@ -967,6 +1033,32 @@ const MemberDetail = memo(() => {
       bg={pageBg}
       fontFamily="'Inter', sans-serif"
     >
+      {/* CSS Styles for Print Customisation */}
+      <style>{`
+        @media print {
+          /* Hide all page content except the membership pass card */
+          body * {
+            visibility: hidden !important;
+          }
+          .membership-pass-card, .membership-pass-card * {
+            visibility: visible !important;
+          }
+          .membership-pass-card {
+            position: absolute !important;
+            left: 50% !important;
+            top: 50% !important;
+            transform: translate(-50%, -50%) scale(1.2) !important;
+            width: 320px !important;
+            border: none !important;
+            box-shadow: none !important;
+            background: #14192d !important;
+            color: white !important;
+          }
+          .card-print-hide {
+            display: none !important;
+          }
+        }
+      `}</style>
       {/* Ambient orbs */}
       <Box
         position="fixed" top="-80px" right="-80px"
@@ -1145,6 +1237,130 @@ const MemberDetail = memo(() => {
         {/* ════ LEFT COLUMN ════ */}
         <GridItem colSpan={{ base: 12, lg: 4 }}>
           <VStack align="stretch" gap={5}>
+
+            {/* Membership Pass Card */}
+            <Box className="membership-pass-card">
+              <GlassCard
+                p={0}
+                overflow="hidden"
+                border="1px solid rgba(255,255,255,0.08)"
+                bg="app.card.bg"
+                color="app.text.primary"
+                hover={true}
+              >
+                {/* Header block with gradient background */}
+                <Box p={4} bg="linear-gradient(135deg, #7551FF 0%, #422AFB 100%)" position="relative">
+                  <HStack justify="space-between" align="center">
+                    <HStack gap={2}>
+                      <Dumbbell size={16} color="white" />
+                      <Text fontSize="xs" fontWeight="900" letterSpacing="wider" textTransform="uppercase" color="white">
+                        GYM PASS
+                      </Text>
+                    </HStack>
+                    <Badge
+                      fontSize="9px"
+                      fontWeight="900"
+                      px={2}
+                      py={0.5}
+                      borderRadius="full"
+                      bg={status === "active" ? "emerald.500/20" : "rose.500/20"}
+                      color={status === "active" ? "emerald.400" : "rose.400"}
+                      border="1px solid"
+                      borderColor={status === "active" ? "emerald.500/30" : "rose.500/30"}
+                    >
+                      {status.toUpperCase()}
+                    </Badge>
+                  </HStack>
+                </Box>
+
+                <VStack p={5} gap={4} align="center" textAlign="center">
+                  {/* QR Code container */}
+                  <Box
+                    p={2.5}
+                    bg="white"
+                    borderRadius="2xl"
+                    boxShadow="0 10px 25px rgba(0,0,0,0.3)"
+                    transition="transform 0.3s ease"
+                    _hover={{ transform: "scale(1.03)" }}
+                    w="180px"
+                    h="180px"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    {qrBlobUrl ? (
+                      <img
+                        src={qrBlobUrl}
+                        alt="Membership QR Code"
+                        style={{ width: "160px", height: "160px", display: "block" }}
+                      />
+                    ) : (
+                      <VStack gap={2}>
+                        <Spinner size="sm" color="purple.500" />
+                        <Text fontSize="2xs" color="gray.500" fontWeight="700">Loading Pass...</Text>
+                      </VStack>
+                    )}
+                  </Box>
+
+                  {/* Member Details */}
+                  <VStack gap={0.5}>
+                    <Text fontSize="md" fontWeight="950" color="app.text.primary">
+                      {name.full}
+                    </Text>
+                    <Text fontSize="xs" fontWeight="700" color="app.text.muted" fontFamily="mono">
+                      ID: {member?.data?.member_id || memberId}
+                    </Text>
+                  </VStack>
+
+                  <Separator borderColor="border" />
+
+                  {/* Validity Info */}
+                  <HStack w="full" justify="space-between" px={2} fontSize="2xs" fontWeight="700" color="app.text.muted">
+                    <VStack align="start" gap={0}>
+                      <Text color="app.text.muted" textTransform="uppercase" letterSpacing="wider">PLAN</Text>
+                      <Text color="app.text.primary">{sub?.plan_name || "No Plan"}</Text>
+                    </VStack>
+                    <VStack align="end" gap={0}>
+                      <Text color="app.text.muted" textTransform="uppercase" letterSpacing="wider">EXPIRES</Text>
+                      <Text color="app.text.primary">{fmtDate(sub?.end_date)}</Text>
+                    </VStack>
+                  </HStack>
+
+                  {/* Actions inside the pass card */}
+                  <SimpleGrid columns={2} gap={2} w="full" pt={2} className="card-print-hide">
+                    <Button
+                      size="sm"
+                      h="36px"
+                      borderRadius="xl"
+                      variant="outline"
+                      borderColor="border"
+                      color="app.text.primary"
+                      onClick={handleDownloadPass}
+                      fontSize="2xs"
+                      fontWeight="800"
+                    >
+                      <Download size={12} />
+                      Download Pass
+                    </Button>
+                    <Button
+                      size="sm"
+                      h="36px"
+                      borderRadius="xl"
+                      bg="linear-gradient(135deg, #7551FF 0%, #422AFB 100%)"
+                      color="white"
+                      _hover={{ transform: "translateY(-1px)", boxShadow: "0 4px 12px rgba(117,81,255,0.4)" }}
+                      onClick={handleEmailCard}
+                      loading={emailingCard}
+                      fontSize="2xs"
+                      fontWeight="800"
+                    >
+                      <Mail size={12} />
+                      Email Pass
+                    </Button>
+                  </SimpleGrid>
+                </VStack>
+              </GlassCard>
+            </Box>
 
             {/* Personal Info */}
             <GlassCard>

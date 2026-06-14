@@ -7,12 +7,14 @@
  */
 
 import { memo, useState, useCallback, useRef, useEffect } from "react";
+import { Html5Qrcode } from "html5-qrcode";
 import {
   Box, VStack, HStack, Text, Heading, Input, Button, Circle,
   Flex, Icon, Spinner, Badge, Grid, GridItem, Skeleton,
   SimpleGrid, IconButton,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
+import { NativeSelectRoot, NativeSelectField } from "@/components/ui/native-select";
 import {
   Check, X, Scan, User, CreditCard, History,
   ArrowRight, Info, RefreshCw, Volume2, VolumeX, Flame, Activity, Users,
@@ -117,9 +119,11 @@ interface ScannerHUDProps {
   memberName?: string;
   errorMessage?: string;
   h?: string | number;
+  isScanning?: boolean;
+  readerId?: string;
 }
 
-const ScannerHUD = memo(({ status, memberName, errorMessage, h = "240px" }: ScannerHUDProps) => {
+const ScannerHUD = memo(({ status, memberName, errorMessage, h = "240px", isScanning = false, readerId = "qr-scanner-hud" }: ScannerHUDProps) => {
   const statusColors = {
     idle: {
       color: "cyan.400",
@@ -157,10 +161,32 @@ const ScannerHUD = memo(({ status, memberName, errorMessage, h = "240px" }: Scan
       alignItems="center"
       justifyContent="center"
     >
+      {/* Video stream container for camera scanner */}
+      {isScanning && (
+        <Box
+          key="scanner-video-container"
+          id={readerId}
+          position="absolute"
+          inset={0}
+          w="full"
+          h="full"
+          overflow="hidden"
+          zIndex={1}
+          css={{
+            "& video": {
+              width: "100% !important",
+              height: "100% !important",
+              objectFit: "cover",
+            }
+          }}
+        />
+      )}
       {/* Grid Background Pattern */}
       <Box
+        key="scanner-grid"
         position="absolute"
         inset={0}
+        zIndex={2}
         opacity={status === "loading" ? 0.35 : 0.15}
         background="linear-gradient(rgba(18, 24, 38, 0.95), rgba(18, 24, 38, 0.95)),
                     linear-gradient(0deg, rgba(255,255,255,0.05) 1px, transparent 1px) 0 0 / 20px 20px,
@@ -170,18 +196,20 @@ const ScannerHUD = memo(({ status, memberName, errorMessage, h = "240px" }: Scan
       />
 
       {/* Cyber Corners Brackets */}
-      <Box position="absolute" top="4" left="4" w="6" h="6" borderTop="3px solid" borderLeft="3px solid" borderColor={current.color} transition="border-color 0.3s" />
-      <Box position="absolute" top="4" right="4" w="6" h="6" borderTop="3px solid" borderRight="3px solid" borderColor={current.color} transition="border-color 0.3s" />
-      <Box position="absolute" bottom="4" left="4" w="6" h="6" borderBottom="3px solid" borderLeft="3px solid" borderColor={current.color} transition="border-color 0.3s" />
-      <Box position="absolute" bottom="4" right="4" w="6" h="6" borderBottom="3px solid" borderRight="3px solid" borderColor={current.color} transition="border-color 0.3s" />
+      <Box key="corner-tl" position="absolute" top="4" left="4" w="6" h="6" borderTop="3px solid" borderLeft="3px solid" borderColor={current.color} transition="border-color 0.3s" zIndex={4} />
+      <Box key="corner-tr" position="absolute" top="4" right="4" w="6" h="6" borderTop="3px solid" borderRight="3px solid" borderColor={current.color} transition="border-color 0.3s" zIndex={4} />
+      <Box key="corner-bl" position="absolute" bottom="4" left="4" w="6" h="6" borderBottom="3px solid" borderLeft="3px solid" borderColor={current.color} transition="border-color 0.3s" zIndex={4} />
+      <Box key="corner-br" position="absolute" bottom="4" right="4" w="6" h="6" borderBottom="3px solid" borderRight="3px solid" borderColor={current.color} transition="border-color 0.3s" zIndex={4} />
 
       {/* Sweeping Scanning Laser */}
       {(status === "idle" || status === "loading") && (
         <Box
+          key="scanner-laser"
           position="absolute"
           left="4"
           right="4"
           h="2px"
+          zIndex={3}
           bg={status === "loading" ? "orange.400" : "cyan.400"}
           boxShadow={`0 0 10px ${status === "loading" ? "var(--chakra-colors-orange-400)" : "var(--chakra-colors-cyan-400)"}`}
           animation={`scan-line ${status === "loading" ? "1.2s" : "3s"} linear infinite`}
@@ -191,7 +219,18 @@ const ScannerHUD = memo(({ status, memberName, errorMessage, h = "240px" }: Scan
 
       {/* Overlay Status Content */}
       {status === "idle" && (
-        <Flex direction="column" align="center" gap={3} pointerEvents="none" animation="pulse-light 2.5s infinite">
+        <Flex
+          key="overlay-idle"
+          position="absolute"
+          inset={0}
+          direction="column"
+          align="center"
+          justify="center"
+          gap={3}
+          pointerEvents="none"
+          animation="pulse-light 2.5s infinite"
+          zIndex={5}
+        >
           <Circle size="12" bg="cyan.500/10" color="cyan.400" border="1px dashed" borderColor="cyan.400/30">
             <Scan size={22} />
           </Circle>
@@ -202,7 +241,17 @@ const ScannerHUD = memo(({ status, memberName, errorMessage, h = "240px" }: Scan
       )}
 
       {status === "loading" && (
-        <Flex direction="column" align="center" gap={3} pointerEvents="none">
+        <Flex
+          key="overlay-loading"
+          position="absolute"
+          inset={0}
+          direction="column"
+          align="center"
+          justify="center"
+          gap={3}
+          pointerEvents="none"
+          zIndex={5}
+        >
           <Spinner size="md" color="orange.400" />
           <Text fontSize="xs" fontWeight="900" color="orange.400" letterSpacing="widest" textTransform="uppercase">
             Verifying ID
@@ -211,7 +260,18 @@ const ScannerHUD = memo(({ status, memberName, errorMessage, h = "240px" }: Scan
       )}
 
       {status === "success" && (
-        <Flex direction="column" align="center" gap={3} pointerEvents="none" animation="scale-up 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)">
+        <Flex
+          key="overlay-success"
+          position="absolute"
+          inset={0}
+          direction="column"
+          align="center"
+          justify="center"
+          gap={3}
+          pointerEvents="none"
+          animation="scale-up 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
+          zIndex={5}
+        >
           <Circle size="16" bg="emerald.500" color="white" boxShadow="0 0 25px rgba(16, 185, 129, 0.4)">
             <Check size={32} strokeWidth={3} />
           </Circle>
@@ -227,7 +287,18 @@ const ScannerHUD = memo(({ status, memberName, errorMessage, h = "240px" }: Scan
       )}
 
       {status === "error" && (
-        <Flex direction="column" align="center" gap={3} pointerEvents="none" animation="scale-up 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)">
+        <Flex
+          key="overlay-error"
+          position="absolute"
+          inset={0}
+          direction="column"
+          align="center"
+          justify="center"
+          gap={3}
+          pointerEvents="none"
+          animation="scale-up 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
+          zIndex={5}
+        >
           <Circle size="16" bg="rose.500" color="white" boxShadow="0 0 25px rgba(244, 63, 94, 0.4)">
             <X size={32} strokeWidth={3} />
           </Circle>
@@ -534,6 +605,19 @@ const Attendance = memo(() => {
   const [lastCheckin, setLastCheckin] = useState<any>(null);
   const [errorMessage, setErrorMessage] = useState("");
 
+  // Scanner States
+  const [isScanning, setIsScanning] = useState(false);
+  const [cameras, setCameras] = useState<any[]>([]);
+  const [selectedCameraId, setSelectedCameraId] = useState<string>("");
+  const qrReaderRef = useRef<any>(null);
+  const qrStartPromiseRef = useRef<Promise<any> | null>(null);
+  const isThrottledRef = useRef(false);
+  const isRecoveringRef = useRef(false);
+  const retryCountRef = useRef(0);
+  const lastFrameTimestampRef = useRef<number>(Date.now());
+  const lastPixelDataRef = useRef<Uint8ClampedArray | null>(null);
+  const frozenCountRef = useRef(0);
+
   // Stats dashboard state
   const [stats, setStats] = useState<any>(null);
   const [statsLoading, setStatsLoading] = useState(true);
@@ -585,18 +669,95 @@ const Attendance = memo(() => {
     fetchKPIs();
   }, [fetchKPIs]);
 
-  // Main check-in core handler
-  const handleCheckIn = useCallback(() => {
-    if (!memberId) return;
-    const targetId = memberId.trim().toUpperCase();
+  // Extension Shield: Protect Canvas APIs from throwing disconnected port errors when crashed extensions intercept them
+  useEffect(() => {
+    const originalGetImageData = CanvasRenderingContext2D.prototype.getImageData;
+    CanvasRenderingContext2D.prototype.getImageData = function (
+      this: CanvasRenderingContext2D,
+      sx: number,
+      sy: number,
+      sw: number,
+      sh: number,
+      settings?: any
+    ) {
+      try {
+        return originalGetImageData.call(this, sx, sy, sw, sh, settings);
+      } catch (err: any) {
+        if (err?.message?.includes("disconnected port") || err?.stack?.includes("disconnected port")) {
+          console.warn("[Extension Shield] Prevented crash in getImageData:", err);
+          return this.createImageData(sw, sh);
+        }
+        throw err;
+      }
+    };
+
+    const originalToDataURL = HTMLCanvasElement.prototype.toDataURL;
+    HTMLCanvasElement.prototype.toDataURL = function (this: HTMLCanvasElement, type?: string, encoderOptions?: any) {
+      try {
+        return originalToDataURL.call(this, type, encoderOptions);
+      } catch (err: any) {
+        if (err?.message?.includes("disconnected port") || err?.stack?.includes("disconnected port")) {
+          console.warn("[Extension Shield] Prevented crash in toDataURL:", err);
+          return "";
+        }
+        throw err;
+      }
+    };
+
+    const originalGetContext = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, contextId: string, options?: any) {
+      try {
+        return originalGetContext.call(this, contextId, options);
+      } catch (err: any) {
+        if (err?.message?.includes("disconnected port") || err?.stack?.includes("disconnected port")) {
+          console.warn("[Extension Shield] Prevented crash in getContext:", err);
+          return null;
+        }
+        throw err;
+      }
+    } as any;
+
+    return () => {
+      CanvasRenderingContext2D.prototype.getImageData = originalGetImageData;
+      HTMLCanvasElement.prototype.toDataURL = originalToDataURL;
+      HTMLCanvasElement.prototype.getContext = originalGetContext;
+    };
+  }, []);
+
+  // Webcam Diagnostics
+  const logCameraStatus = useCallback((context: string) => {
+    try {
+      const videoEl = document.querySelector("#qr-scanner-hud video") as HTMLVideoElement;
+      if (videoEl) {
+        const stream = videoEl.srcObject as MediaStream;
+        const track = stream?.getVideoTracks()[0];
+        console.log(`[Diagnostics] ${context} - Camera element found: readyState="${track?.readyState}", enabled=${track?.enabled}, paused=${videoEl.paused}, videoWidth=${videoEl.videoWidth}, videoHeight=${videoEl.videoHeight}`);
+      } else {
+        console.log(`[Diagnostics] ${context} - No active video element found under "#qr-scanner-hud video".`);
+      }
+    } catch (e) {
+      console.warn(`[Diagnostics] ${context} - Failed to read camera status:`, e);
+    }
+  }, []);
+
+  // Main check-in core handler sharing logic between manual and QR scanner scan
+  const triggerCheckIn = useCallback((targetId: string, isFromCamera = false) => {
+    if (!targetId) return;
+    const cleanId = targetId.trim().toUpperCase();
+    console.log(`[CheckIn] Starting verification for member ID: "${cleanId}" (Source: ${isFromCamera ? 'Webcam Scanner' : 'Manual Input'})`);
 
     setStatus("loading");
-    GymApiService.checkin(targetId).subscribe({
+    isThrottledRef.current = true;
+
+    GymApiService.checkin(cleanId).subscribe({
       next: (res) => {
         if (res.success) {
+          console.log(`[CheckIn] SUCCESS for "${cleanId}":`, res.data);
           setStatus("success");
           setLastCheckin(res.data);
-          setMemberId("");
+          if (!isFromCamera) {
+            setMemberId("");
+          }
           playSuccess();
           toaster.create({ title: "Check-in Successful", type: "success" });
 
@@ -606,7 +767,7 @@ const Attendance = memo(() => {
 
           const newActivity: CheckInActivity = {
             id: Date.now().toString(),
-            member_id: targetId,
+            member_id: cleanId,
             member_name: name,
             timestamp: new Date().toISOString(),
             has_active_plan: hasActivePlan,
@@ -634,9 +795,13 @@ const Attendance = memo(() => {
           });
 
           setTimeout(() => {
+            console.log(`[CheckIn] Cooldown ended. Ready for next scan.`);
+            logCameraStatus("Post-cooldown success");
             setStatus("idle");
+            isThrottledRef.current = false;
           }, 3000);
         } else {
+          console.warn(`[CheckIn] DENIED for "${cleanId}": ${res.message}`);
           setStatus("error");
           setErrorMessage(res.message || "Failed to record check-in");
           playError();
@@ -644,7 +809,7 @@ const Attendance = memo(() => {
 
           const newActivity: CheckInActivity = {
             id: Date.now().toString(),
-            member_id: targetId,
+            member_id: cleanId,
             member_name: "Access Attempt Failed",
             timestamp: new Date().toISOString(),
             has_active_plan: false,
@@ -661,20 +826,24 @@ const Attendance = memo(() => {
           });
 
           setTimeout(() => {
+            console.log(`[CheckIn] Cooldown ended (after denied). Ready for next scan.`);
+            logCameraStatus("Post-cooldown denied");
             setStatus("idle");
-          }, 4000);
+            isThrottledRef.current = false;
+          }, 3000);
         }
       },
       error: (err) => {
         setStatus("error");
         const msg = err?.message || "Profile not found";
+        console.error(`[CheckIn] ERROR for "${cleanId}":`, msg);
         setErrorMessage(msg);
         playError();
         toaster.create({ title: "Network Error", description: msg, type: "error" });
 
         const newActivity: CheckInActivity = {
           id: Date.now().toString(),
-          member_id: targetId,
+          member_id: cleanId,
           member_name: "Verification Failed",
           timestamp: new Date().toISOString(),
           has_active_plan: false,
@@ -691,11 +860,264 @@ const Attendance = memo(() => {
         });
 
         setTimeout(() => {
+          console.log(`[CheckIn] Cooldown ended (after network error). Ready for next scan.`);
+          logCameraStatus("Post-cooldown error");
           setStatus("idle");
-        }, 4000);
+          isThrottledRef.current = false;
+        }, 3000);
       },
     });
-  }, [memberId, playSuccess, playError]);
+  }, [playSuccess, playError, logCameraStatus]);
+
+  const handleCheckIn = useCallback(() => {
+    triggerCheckIn(memberId, false);
+  }, [memberId, triggerCheckIn]);
+
+  // Scanner activation and camera enumeration
+  useEffect(() => {
+    if (isScanning) {
+      Html5Qrcode.getCameras()
+        .then((devices) => {
+          if (devices && devices.length > 0) {
+            setCameras(devices);
+            // Default to back camera if found, otherwise first camera
+            const backCam = devices.find(d =>
+              d.label.toLowerCase().includes("back") ||
+              d.label.toLowerCase().includes("environment") ||
+              d.label.toLowerCase().includes("rear")
+            );
+            const defaultId = backCam ? backCam.id : devices[0].id;
+            setSelectedCameraId(defaultId);
+          } else {
+            toaster.create({ title: "No Cameras Found", description: "Could not find any video capture devices.", type: "error" });
+            setIsScanning(false);
+          }
+        })
+        .catch((err) => {
+          console.error("Camera access error:", err);
+          toaster.create({
+            title: "Camera Access Denied",
+            description: "Please check permissions and allow camera access.",
+            type: "error",
+          });
+          setIsScanning(false);
+        });
+    } else {
+      setCameras([]);
+      setSelectedCameraId("");
+    }
+  }, [isScanning]);
+
+  const stopScanner = useCallback(() => {
+    const html5QrCode = qrReaderRef.current;
+    if (html5QrCode) {
+      qrReaderRef.current = null;
+      
+      const performStop = () => {
+        if (html5QrCode.isScanning) {
+          html5QrCode.stop()
+            .catch((e: any) => console.log("Failed to stop scanner:", e));
+        }
+      };
+
+      if (qrStartPromiseRef.current) {
+        qrStartPromiseRef.current
+          .then(performStop)
+          .catch((err) => {
+            console.log("Failed to start, no need to stop:", err);
+          })
+          .finally(() => {
+            qrStartPromiseRef.current = null;
+          });
+      } else {
+        performStop();
+      }
+    }
+  }, []);
+
+  // Scanner streaming lifecycle
+  useEffect(() => {
+    if (!isScanning || !selectedCameraId) {
+      stopScanner();
+      isRecoveringRef.current = false;
+      retryCountRef.current = 0;
+      lastPixelDataRef.current = null;
+      frozenCountRef.current = 0;
+      return;
+    }
+
+    console.log(`[WebcamScanner] Initializing camera: "${selectedCameraId}" with 25 FPS scan rate.`);
+    const html5QrCode = new Html5Qrcode("qr-scanner-hud");
+    qrReaderRef.current = html5QrCode;
+    let monitorInterval: any = null;
+
+    const restartScanner = () => {
+      console.warn("[WebcamScanner Monitor] Attempting self-healing scanner restart...");
+      isRecoveringRef.current = true;
+      lastPixelDataRef.current = null;
+      frozenCountRef.current = 0;
+      if (monitorInterval) clearInterval(monitorInterval);
+      stopScanner();
+      setTimeout(() => {
+        setIsScanning(false);
+        setTimeout(() => {
+          setIsScanning(true);
+        }, 150);
+      }, 100);
+    };
+
+    const startPromise = html5QrCode.start(
+      selectedCameraId,
+      {
+        fps: 25, // Bumping from 10 to 25 FPS makes it decode frames much more frequently
+        qrbox: (width, height) => {
+          const size = Math.min(width, height) * 0.75; // Bumping from 0.65 to 0.75 for a larger scan area
+          return { width: size, height: size };
+        }
+      },
+      (decodedText) => {
+        lastFrameTimestampRef.current = Date.now();
+        if (isThrottledRef.current) {
+          console.log(`[WebcamScanner] Frame decoded: "${decodedText}", but ignored (cooldown throttle active)`);
+          return;
+        }
+        
+        let parsedId = decodedText.trim();
+        console.log(`[WebcamScanner] Detected QR code payload: "${parsedId}"`);
+        if (parsedId.startsWith("gym:")) {
+          parsedId = parsedId.substring(4);
+          console.log(`[WebcamScanner] Legacy prefix stripped. Parsed ID: "${parsedId}"`);
+        }
+        
+        triggerCheckIn(parsedId, true);
+      },
+      (errorMessage) => {
+        lastFrameTimestampRef.current = Date.now();
+        // Quietly scan frames, but log other unexpected errors
+        if (errorMessage && !errorMessage.includes("No MultiFormat Readers") && !errorMessage.includes("No QR code found")) {
+          console.warn("[WebcamScanner] Frame processing error:", errorMessage);
+        }
+      }
+    );
+
+    qrStartPromiseRef.current = startPromise;
+
+    startPromise.then(() => {
+      console.log(`[WebcamScanner] Camera feed successfully started. Active scanning area initialized.`);
+      isRecoveringRef.current = false;
+      retryCountRef.current = 0;
+      lastFrameTimestampRef.current = Date.now();
+      lastPixelDataRef.current = null;
+      frozenCountRef.current = 0;
+      
+      // Keep-alive/self-healing loop to recover if the browser extension crashes, pauses or disrupts the webcam stream
+      monitorInterval = setInterval(() => {
+        if (!isScanning) return;
+        
+        // 1. Verify if the decoding loop is actively processing frames (detect crash or freeze)
+        if (Date.now() - lastFrameTimestampRef.current > 3000) {
+          console.warn("[WebcamScanner Monitor] Scanner loop frozen (no frames processed for 3s). Reinitializing scanner...");
+          restartScanner();
+          return;
+        }
+
+        const videoEl = document.querySelector("#qr-scanner-hud video") as HTMLVideoElement;
+        if (videoEl) {
+          // If video element exists but is paused, force resume it
+          if (videoEl.paused && !isThrottledRef.current) {
+            console.log("[WebcamScanner Monitor] Video playback paused. Force resuming video...");
+            videoEl.play().catch(e => console.warn("[WebcamScanner Monitor] Failed to resume video playback:", e));
+          }
+          
+          // 2. Verify if the video stream track is still active
+          const stream = videoEl.srcObject as MediaStream;
+          const track = stream?.getVideoTracks()[0];
+          if (track && track.readyState === "ended") {
+            console.warn("[WebcamScanner Monitor] Media stream track ended. Reinitializing scanner...");
+            restartScanner();
+            return;
+          }
+
+          // 3. Pixel-based frozen frame detection (in case browser plays frozen buffer without updating context)
+          let isFrozen = false;
+          try {
+            const canvas = document.createElement("canvas");
+            canvas.width = 8;
+            canvas.height = 8;
+            const ctx = canvas.getContext("2d");
+            if (ctx) {
+              ctx.drawImage(videoEl, 0, 0, 8, 8);
+              const imgData = ctx.getImageData(0, 0, 8, 8).data;
+              
+              if (lastPixelDataRef.current) {
+                let match = true;
+                for (let i = 0; i < imgData.length; i++) {
+                  if (imgData[i] !== lastPixelDataRef.current[i]) {
+                    match = false;
+                    break;
+                  }
+                }
+                if (match) {
+                  isFrozen = true;
+                }
+              }
+              lastPixelDataRef.current = imgData;
+            }
+          } catch (e) {
+            console.warn("[WebcamScanner Monitor] Failed to check pixel data:", e);
+          }
+
+          if (isFrozen) {
+            frozenCountRef.current += 1;
+            console.log(`[WebcamScanner Monitor] Static/frozen frame detected (${frozenCountRef.current}/3)`);
+            if (frozenCountRef.current >= 3) {
+              console.warn("[WebcamScanner Monitor] Camera feed is frozen. Reinitializing scanner...");
+              restartScanner();
+              return;
+            }
+          } else {
+            frozenCountRef.current = 0;
+          }
+        } else {
+          // Video element missing from DOM - React might have unmounted/cleared it
+          console.warn("[WebcamScanner Monitor] Video element not found in DOM. Reinitializing scanner...");
+          restartScanner();
+        }
+      }, 1000);
+    }).catch((err) => {
+      console.error("[WebcamScanner] Failed to start Html5Qrcode:", err);
+      if (qrReaderRef.current === html5QrCode) {
+        if (isRecoveringRef.current && retryCountRef.current < 3) {
+          retryCountRef.current += 1;
+          console.warn(`[WebcamScanner Monitor] Start failed during recovery. Retrying (${retryCountRef.current}/3) in 2 seconds...`);
+          if (monitorInterval) clearInterval(monitorInterval);
+          setTimeout(() => {
+            if (isScanning) {
+              restartScanner();
+            }
+          }, 2000);
+        } else {
+          toaster.create({ title: "Scanner Error", description: "Failed to initialize webcam feed.", type: "error" });
+          setIsScanning(false);
+          isRecoveringRef.current = false;
+          retryCountRef.current = 0;
+        }
+      }
+    });
+
+    return () => {
+      if (monitorInterval) clearInterval(monitorInterval);
+      stopScanner();
+    };
+  }, [isScanning, selectedCameraId, triggerCheckIn, stopScanner]);
+
+  const handleToggleScanner = useCallback(() => {
+    setIsScanning(prev => !prev);
+  }, []);
+
+  const handleCameraChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCameraId(e.target.value);
+  }, []);
 
   // Stable Callbacks
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -916,7 +1338,10 @@ const Attendance = memo(() => {
                               colorPalette="gray"
                               size="sm"
                               borderRadius="xl"
-                              onClick={handleToggleMute}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleToggleMute();
+                              }}
                               aria-label={isMuted ? "Unmute sound" : "Mute sound"}
                             >
                               {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
@@ -926,7 +1351,10 @@ const Attendance = memo(() => {
                               colorPalette="gray"
                               size="sm"
                               borderRadius="xl"
-                              onClick={toggleTerminalMaximize}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleTerminalMaximize();
+                              }}
                               aria-label={isTerminalMaximized ? "Exit fullscreen" : "Enter fullscreen"}
                             >
                               {isTerminalMaximized ? <Minimize2 size={15} strokeWidth={2.5} /> : <Maximize2 size={15} strokeWidth={2.5} />}
@@ -940,7 +1368,57 @@ const Attendance = memo(() => {
                           memberName={lastCheckin?.data?.member_name}
                           errorMessage={errorMessage}
                           h={isTerminalMaximized ? "360px" : "240px"}
+                          isScanning={isScanning}
+                          readerId="qr-scanner-hud"
                         />
+
+                        {/* Camera Controls Panel */}
+                        <HStack w="full" justify="space-between" align="center" gap={3} flexWrap="wrap">
+                          <Button
+                            size="xs"
+                            h="34px"
+                            borderRadius="lg"
+                            variant="outline"
+                            borderColor={isScanning ? "rose.500/50" : "cyan.500/50"}
+                            color={isScanning ? "rose.400" : "cyan.400"}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleToggleScanner();
+                            }}
+                            _hover={{ bg: isScanning ? "rose.500/10" : "cyan.500/10" }}
+                            px={3}
+                            fontWeight="800"
+                          >
+                            <Scan size={12} style={{ marginRight: "6px" }} />
+                            {isScanning ? "Stop QR Scanner" : "Activate QR Scanner"}
+                          </Button>
+                          
+                          {isScanning && cameras.length > 0 && (
+                            <NativeSelectRoot maxW="200px" size="sm" onClick={(e) => e.stopPropagation()}>
+                              <NativeSelectField
+                                value={selectedCameraId}
+                                onChange={handleCameraChange}
+                                bg="rgba(10, 15, 30, 0.65)"
+                                border="1px solid"
+                                borderColor="whiteAlpha.100"
+                                color="white"
+                                fontSize="xs"
+                                fontWeight="800"
+                                borderRadius="xl"
+                                h="34px"
+                                cursor="pointer"
+                                _hover={{ borderColor: "cyan.400/50" }}
+                                _focus={{ borderColor: "cyan.500", boxShadow: "0 0 10px rgba(6, 182, 212, 0.25)" }}
+                              >
+                                {cameras.map((cam) => (
+                                  <option key={cam.id} value={cam.id} style={{ background: "#0f172a", color: "white" }}>
+                                    {cam.label || `Camera ${cam.id}`}
+                                  </option>
+                                ))}
+                              </NativeSelectField>
+                            </NativeSelectRoot>
+                          )}
+                        </HStack>
 
                         {/* Input Controls */}
                         <VStack w="full" gap={4} mt={2}>

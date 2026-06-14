@@ -214,14 +214,15 @@ const ProgressStepper = memo(({ currentStep, accentHex, onStepClick }: ProgressS
       mb={8}
       p={4}
       px={6}
-      bg={cardBg}
+      bg={"app.card.bg"}
       backdropFilter="blur(10px)"
       border="1px solid"
       borderColor={borderCol}
-      borderRadius="24px"
+      // borderRadius="24px"
+      borderRadius={'md'}
       position="relative"
       zIndex={1}
-      boxShadow={useColorModeValue("0 2px 10px rgba(0,0,0,0.01)", "none")}
+    // boxShadow={useColorModeValue("0 2px 10px rgba(0,0,0,0.01)", "none")}
     >
       <Flex justify="space-between" align="center" position="relative" maxW="900px" mx="auto">
         {steps.map((step, idx) => {
@@ -556,7 +557,7 @@ const OrderView = memo(() => {
         <Grid templateColumns={{ base: "1fr", lg: "1fr 340px" }} gap={6} alignItems="start">
           {/* Left Column: Details */}
           <VStack gap={5} align="stretch">
-            
+
             {/* Order Header Card */}
             <Box bg={cardBg} backdropFilter="blur(24px) saturate(200%)" border="1px solid" borderColor={borderCol} borderRadius="24px" overflow="hidden" boxShadow={useColorModeValue("0 10px 30px rgba(0,0,0,0.03)", "0 10px 30px rgba(0,0,0,0.25)")}>
               <Box px={6} py={4.5} bg={gradient} color="white">
@@ -764,7 +765,7 @@ const OrderView = memo(() => {
           {/* Right Column: Pricing & Confirmation Summary */}
           <Box position={{ base: "static", lg: "sticky" }} top="24px">
             <VStack gap={4} align="stretch">
-              
+
               {/* Quick Summary Card */}
               <SectionCard title="Quick Summary" icon={<FileText size={14} />} accentHex={accentHex}>
                 <FieldRow label="Plan" value={planData?.name || order.plan_code || "—"} />
@@ -788,7 +789,7 @@ const OrderView = memo(() => {
               {/* Actions Card */}
               <SectionCard title="Actions" icon={<CreditCard size={14} />} accentHex={accentHex}>
                 <VStack gap={3} align="stretch" mt={1}>
-                  
+
                   {order.status === "pending" && (
                     <Button
                       w="full"

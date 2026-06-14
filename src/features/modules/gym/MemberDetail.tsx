@@ -990,7 +990,37 @@ const MemberDetail = memo(() => {
         zIndex={1}
       >
         {/* Colored top gradient decoration */}
-        <Box h="120px" bg={BRAND_GRADIENT} position="relative" />
+        <Box h="120px" bg={BRAND_GRADIENT} position="relative" overflow="hidden">
+          {/* Decorative glowing blobs */}
+          <Box
+            position="absolute"
+            top="-60px"
+            left="-30px"
+            w="200px"
+            h="200px"
+            borderRadius="full"
+            bg="rgba(6, 182, 212, 0.4)"
+            filter="blur(50px)"
+          />
+          <Box
+            position="absolute"
+            bottom="-50px"
+            right="15%"
+            w="180px"
+            h="180px"
+            borderRadius="full"
+            bg="rgba(217, 70, 239, 0.35)"
+            filter="blur(45px)"
+          />
+          {/* Subtle light mesh pattern */}
+          <Box
+            position="absolute"
+            inset={0}
+            opacity={0.08}
+            bgImage="radial-gradient(rgba(255,255,255,0.2) 1px, transparent 1px)"
+            bgSize="20px 20px"
+          />
+        </Box>
 
         {/* Banner Info Area */}
         <Flex
@@ -1014,15 +1044,27 @@ const MemberDetail = memo(() => {
             overflow="hidden"
             flexShrink={0}
           >
-            <Circle
-              size="100%"
-              bg={`linear-gradient(135deg, ${BRAND_HEX}22, ${BRAND_ALT}22)`}
-              color={BRAND_HEX}
-              fontWeight="900"
-              fontSize="3xl"
-            >
-              {name.initials}
-            </Circle>
+            {avatarSrc ? (
+              <Box
+                w="full"
+                h="full"
+                style={{
+                  backgroundImage: `url(${avatarSrc})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center"
+                }}
+              />
+            ) : (
+              <Circle
+                size="100%"
+                bg={`linear-gradient(135deg, ${BRAND_HEX}22, ${BRAND_ALT}22)`}
+                color={BRAND_HEX}
+                fontWeight="900"
+                fontSize="3xl"
+              >
+                {name.initials}
+              </Circle>
+            )}
           </Circle>
 
           {/* Name, ID and Status Details */}

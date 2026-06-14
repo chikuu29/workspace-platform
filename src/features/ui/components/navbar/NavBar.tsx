@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/app/store";
 import { APP_CONFIG_STATE } from "@/app/types/appConfigInterface";
 import useScrollShadow from "@/core/utils/hooks/useScrollShadow";
+import { useScrollContainer } from "@/contexts/ScrollContainerContext";
 
 // Centralized hover border — same token used across nav / sidebar / menu items
 const HOVER_BORDER_COLOR = "app.btn.border";
@@ -45,8 +46,11 @@ const Navbar = () => {
   );
   const showTopNavMenu = (DISPLAY_TYPE.SHOW_TOP_NAV_MENU ?? false) && FEATURE.length > 0;
 
-  // Scroll-aware shadow for depth perception
-  const scrollShadow = useScrollShadow();
+  // Scroll container ref — shared via context from WorkspaceLayout
+  const { scrollRef } = useScrollContainer();
+
+  // Scroll-aware shadow for depth perception — tracks the content container
+  const scrollShadow = useScrollShadow(20, 80, scrollRef);
 
   // Theme-aware colors
   const borderColor = useColorModeValue("gray.100", "whiteAlpha.100");
@@ -121,12 +125,21 @@ const Navbar = () => {
         top="0"
         left="0"
         zIndex={999}
-        // bg={"app.card.bg"}
         backdropFilter="blur(16px)"
         borderBottom="1px solid"
         borderColor={borderColor}
         boxShadow={scrollShadow}
         transition="box-shadow 0.25s ease"
+        css={{
+          /**
+           * iOS Safari requires the -webkit- prefix for backdrop-filter.
+           * transform: translate3d forces a GPU compositing layer which
+           * prevents the fixed header from disappearing during iOS elastic
+           * scroll bounce — a well-known WebKit rendering bug.
+           */
+          WebkitBackdropFilter: "blur(16px)",
+          transform: "translate3d(0, 0, 0)",
+        }}
       >
         <Flex
           w="100%"
@@ -214,6 +227,7 @@ const Navbar = () => {
         h={`var(${NAVBAR_HEIGHT_VAR}, 4rem)`}
         flexShrink={0}
         w="100%"
+        css={{ willChange: "height" }}
       />
     </>
   );

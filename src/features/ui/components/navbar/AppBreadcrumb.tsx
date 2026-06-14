@@ -1,7 +1,7 @@
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { useNavActionStore, type NavActionConfig } from "@/core/store/useNavActionStore";
-import { Box, Breadcrumb, Button, Circle, Flex, HStack, Text, IconButton, Icon } from "@chakra-ui/react";
-import React, { forwardRef, useEffect, useState, isValidElement } from "react";
+import { Box, Breadcrumb, Button, Flex, HStack, Text, IconButton, Icon } from "@chakra-ui/react";
+import React, { forwardRef, useEffect, useState, useMemo, useCallback, isValidElement } from "react";
 import {
   ArrowLeft,
   Home,
@@ -9,7 +9,6 @@ import {
   Layers,
   LayoutDashboard,
   ChevronRight,
-  Slash,
   User,
   Settings,
   HelpCircle,
@@ -22,6 +21,15 @@ interface ConfigItem {
   label: string;
   icon?: React.ReactElement;
 }
+
+/**
+ * Unified chip height across breakpoints — ensures the Back button and
+ * every breadcrumb item render at exactly the same height on every device.
+ */
+const CHIP_H = { base: "32px", sm: "34px", md: "36px" };
+
+/** Icon size that scales with the chip */
+const ICON_SIZE = { base: 12, md: 14 };
 
 /**
  * Helper to render context action buttons.
@@ -125,6 +133,12 @@ const renderNavActions = (actionsData: React.ReactNode | NavActionConfig[] | nul
  * AppBreadcrumb
  * Sticky sub-header with breadcrumb navigation + optional page-level actions.
  *
+ * Design:
+ *  - Every element in the bar — Back button, breadcrumb chips, separators —
+ *    shares the same height token (CHIP_H) for perfect vertical alignment.
+ *  - Pill-shaped chips with subtle borders and hover lift for a premium feel.
+ *  - ChevronRight separators keep the trail scannable.
+ *
  * Responsive layout:
  *  - base (mobile): breadcrumb trail row on top, action buttons in a
  *    dedicated full-width row below — prevents cramped side-by-side layout.
@@ -183,63 +197,106 @@ const AppBreadcrumb = forwardRef((_props, _ref) => {
 
   const navigate = useNavigate();
 
-  const handleNavigate = (c: ConfigItem, isLast: boolean) => {
-    if (!isLast) navigate(c.path);
-  };
+  const handleNavigate = useCallback(
+    (c: ConfigItem, isLast: boolean) => {
+      if (!isLast) navigate(c.path);
+    },
+    [navigate]
+  );
 
+  // ── Theme tokens ──
   const activeColor = useColorModeValue("blue.600", "blue.400");
-  const inactiveColor = useColorModeValue("gray.500", "whiteAlpha.500");
-  const hoverBg = useColorModeValue("blue.50", "whiteAlpha.100");
-  const borderColorValue = useColorModeValue("gray.100", "whiteAlpha.100");
+  const inactiveColor = useColorModeValue("gray.500", "whiteAlpha.600");
+  const separatorColor = useColorModeValue("gray.300", "whiteAlpha.300");
+  const hoverBg = useColorModeValue("gray.100", "whiteAlpha.100");
+  const chipBorder = useColorModeValue("gray.200", "whiteAlpha.100");
+  const activeBg = useColorModeValue("blue.50", "blue.500/10");
+  const borderBottom = useColorModeValue("gray.100", "whiteAlpha.50");
+  const backBtnBorder = useColorModeValue("gray.200", "whiteAlpha.100");
+  const backBtnHoverBg = useColorModeValue("gray.100", "whiteAlpha.100");
+
+  // Stable hover styles — not re-created every render
+  const chipHoverInactive = useMemo(
+    () => ({
+      bg: hoverBg,
+      borderColor: chipBorder,
+      transform: "translateY(-1px)",
+      boxShadow: "0 2px 8px -2px rgba(0,0,0,0.08)",
+    }),
+    [hoverBg, chipBorder]
+  );
 
   // Hidden-scrollbar CSS — reused in both scroll boxes
-  const noScrollbar = {
-    scrollbarWidth: "none" as const,
-    msOverflowStyle: "none" as const,
-    "&::-webkit-scrollbar": { display: "none" },
-  };
+  const noScrollbar = useMemo(
+    () => ({
+      scrollbarWidth: "none" as const,
+      msOverflowStyle: "none" as const,
+      "&::-webkit-scrollbar": { display: "none" },
+    }),
+    []
+  );
 
   return (
     <Box
       w="100%"
-      px={2}
+      px={{ base: 1, sm: 2, md: 3 }}
+      py={{ base: 1, md: "6px" }}
       backdropFilter="blur(12px)"
+      borderBottom="1px solid"
+      borderColor={borderBottom}
       position="sticky"
       top="0"
       zIndex={998}
+      css={{
+        /**
+         * iOS Safari needs -webkit-backdrop-filter for the glassmorphism blur.
+         * translate3d forces a compositing layer to prevent flicker.
+         */
+        WebkitBackdropFilter: "blur(12px)",
+        transform: "translate3d(0, 0, 0)",
+      }}
     >
-      {/* ── Top row: Back + breadcrumb trail (always) + actions on md+ ── */}
+      {/* ── Main row: Back + breadcrumb trail + actions ── */}
       <Flex
         align="center"
         justify="space-between"
-        gap={{ base: 2, md: 4 }}
-        minH={{ base: "36px", md: "44px" }}
+        gap={{ base: 1, md: 3 }}
+        minH={CHIP_H}
       >
         {/* Left: Back button + horizontally scrollable trail */}
-        <Flex align="center" gap={0} flex="1" minW={0} overflow="hidden">
+        <Flex align="center" gap={{ base: 1, md: 2 }} flex="1" minW={0} overflow="hidden">
+          {/* ── Back Button ── */}
           {config.length > 1 && (
-
             <Button
+              aria-label="Go back"
               variant="outline"
-
-              borderRadius="md"
+              h={CHIP_H}
+              px={{ base: 2, md: 3 }}
+              borderRadius="lg"
               onClick={goBack}
               fontWeight="700"
-              fontSize="sm"
-
-              borderColor={useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.08)")}
+              fontSize={{ base: "xs", md: "sm" }}
+              flexShrink={0}
+              border="1px solid"
+              borderColor={backBtnBorder}
               color="app.text.primary"
-              _hover={{ bg: useColorModeValue("gray.50", "rgba(255,255,255,0.04)") }}
+              transition="all 0.2s ease"
+              _hover={{
+                bg: backBtnHoverBg,
+                borderColor: chipBorder,
+                transform: "translateY(-1px)",
+                boxShadow: "0 2px 8px -2px rgba(0,0,0,0.08)",
+              }}
               _active={{ transform: "scale(0.97)" }}
             >
-              <HStack gap={3}>
+              <HStack gap={{ base: 1, md: 2 }}>
                 <ArrowLeft size={14} />
-                <Text>Back</Text>
+                <Text display={{ base: "none", sm: "inline" }}>Back</Text>
               </HStack>
             </Button>
           )}
 
-          {/* Horizontally scrollable breadcrumb trail */}
+          {/* ── Breadcrumb Trail ── */}
           <Box
             flex="1"
             minW={0}
@@ -249,41 +306,48 @@ const AppBreadcrumb = forwardRef((_props, _ref) => {
             css={noScrollbar}
           >
             <Breadcrumb.Root variant="plain" size="sm">
-              <Breadcrumb.List flexWrap="nowrap" minW="max-content">
+              <Breadcrumb.List flexWrap="nowrap" minW="max-content" gap={0}>
                 {config.map((c: ConfigItem, index) => {
                   const isLast = index === config.length - 1;
                   return (
-                    <React.Fragment key={index}>
+                    <React.Fragment key={c.path + c.label}>
                       <Breadcrumb.Item>
                         <HStack
                           gap={{ base: "1", md: "1.5" }}
-                          p="1.5"
-                          rounded="lg"
-                          transition="all 0.2s"
+                          h={CHIP_H}
+                          px={{ base: "1.5", md: "2.5" }}
+                          borderRadius="lg"
+                          border="1px solid"
+                          borderColor={isLast ? activeColor : "transparent"}
+                          bg={isLast ? activeBg : "transparent"}
+                          transition="all 0.2s ease"
                           cursor={isLast ? "default" : "pointer"}
                           onClick={() => handleNavigate(c, isLast)}
-                          _hover={
-                            !isLast
-                              ? { bg: hoverBg, transform: "translateY(-1px)" }
-                              : {}
-                          }
+                          _hover={!isLast ? chipHoverInactive : {}}
+                          _active={!isLast ? { transform: "scale(0.97)" } : {}}
                           color={isLast ? activeColor : inactiveColor}
                           minW="fit-content"
                         >
                           {c.icon && (
-                            <Box color={isLast ? activeColor : "inherit"}>
+                            <Box
+                              color={isLast ? activeColor : "inherit"}
+                              flexShrink={0}
+                              display="flex"
+                              alignItems="center"
+                            >
                               {c.icon}
                             </Box>
                           )}
                           <Text
-                            fontWeight={isLast ? "bold" : "600"}
-                            fontSize={{ base: "11px", md: "xs" }}
+                            fontWeight={isLast ? "700" : "600"}
+                            fontSize={{ base: "11px", sm: "xs", md: "xs" }}
                             textTransform="capitalize"
                             letterSpacing="tight"
+                            lineHeight="1"
                             maxW={{
-                              base: "80px",
-                              sm: "140px",
-                              md: "200px",
+                              base: "72px",
+                              sm: "120px",
+                              md: "180px",
                               lg: "260px",
                             }}
                             truncate
@@ -292,10 +356,18 @@ const AppBreadcrumb = forwardRef((_props, _ref) => {
                           </Text>
                         </HStack>
                       </Breadcrumb.Item>
+
+                      {/* Chevron separator — visually centered to the chip height */}
                       {!isLast && (
                         <Breadcrumb.Separator>
-                          <Box color={inactiveColor} display="flex" alignItems="center">
-                            <Slash size={11} color="currentColor" strokeWidth={2} />
+                          <Box
+                            color={separatorColor}
+                            display="flex"
+                            alignItems="center"
+                            h={CHIP_H}
+                            px={{ base: 0, md: "2px" }}
+                          >
+                            <ChevronRight size={14} strokeWidth={2} />
                           </Box>
                         </Breadcrumb.Separator>
                       )}
@@ -318,7 +390,7 @@ const AppBreadcrumb = forwardRef((_props, _ref) => {
         )}
       </Flex>
 
-      {/* 
+      {/*
        * Mobile-only actions row (hidden on md+).
        * Renders full-width below the breadcrumb trail so buttons always have
        * enough room to be readable and comfortably tappable on small screens.
@@ -328,7 +400,8 @@ const AppBreadcrumb = forwardRef((_props, _ref) => {
         <Box
           display={{ base: "flex", md: "none" }}
           w="full"
-          pt={2}
+          pt={1.5}
+          pb={1}
           overflowX="auto"
           css={noScrollbar}
         >

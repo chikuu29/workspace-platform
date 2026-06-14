@@ -1,3 +1,27 @@
+/* ─── iOS & Cross-Browser Global Fixes ─── */
+
+/**
+ * Use 100dvh for full-height layouts on iOS Safari, where 100vh
+ * includes the URL bar. Prevent pull-to-refresh / overscroll bounce
+ * on the html/body level so fixed/sticky headers stay stable.
+ */
+html,
+body {
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+/**
+ * Safe-area padding for notched iOS devices (iPhone X+).
+ * Applied to the body so content respects the notch / home indicator.
+ */
+body {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* ─── Animations ─── */
+
 .blink-red {
     color: red;
     animation: blink-animation 1s steps(5, start) infinite;

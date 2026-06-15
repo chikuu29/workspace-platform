@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { useSearchParams } from "react-router";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
+import { toaster } from "@/components/ui/toaster";
 import {
   Activity, ArrowLeft, CalendarDays, Check, CreditCard,
   Dumbbell, FileText, Fingerprint, Mail, MapPin,
@@ -32,10 +33,10 @@ import { useEffect } from "react";
 
 type StatusKey = "active" | "on_leave" | "terminated";
 
-const STATUS_META: Record<StatusKey, { label: string; colorPalette: string; accent: string; bg: string }> = {
-  active: { label: "Active", colorPalette: "green", accent: "green.500", bg: "green.500/10" },
-  on_leave: { label: "On Leave", colorPalette: "orange", accent: "orange.500", bg: "orange.500/10" },
-  terminated: { label: "Terminated", colorPalette: "red", accent: "red.500", bg: "red.500/10" },
+const STATUS_META: Record<StatusKey, { label: string; colorPalette: string; accent: string; bg: string; glowAnim: string }> = {
+  active: { label: "Active", colorPalette: "green", accent: "green.500", bg: "green.500/10", glowAnim: "pulse-glow" },
+  on_leave: { label: "On Leave", colorPalette: "orange", accent: "orange.500", bg: "orange.500/10", glowAnim: "pulse-glow-orange" },
+  terminated: { label: "Terminated", colorPalette: "red", accent: "red.500", bg: "red.500/10", glowAnim: "pulse-glow-red" },
 };
 
 // ─── Helpers ────────────────────────────────────────────────────────
@@ -53,8 +54,7 @@ const fmtDate = (d?: string) => {
 
 // ─── Sub-Components ─────────────────────────────────────────────────
 
-const SurfaceCard = memo(({ children, p = { base: 4, md: 5 }, ...props }: { children: React.ReactNode; p?: any;[k: string]: any }) => {
-  const bg = useColorModeValue("rgba(255,255,255,0.82)", "rgba(15,23,42,0.66)");
+const SurfaceCard = memo(({ children, p = { base: 4, md: 5 }, bg = "app.card.bg", ...props }: { children: React.ReactNode; p?: any; bg?: string; [k: string]: any }) => {
   const border = useColorModeValue("rgba(226,232,240,0.86)", "rgba(255,255,255,0.12)");
   return (
     <Box p={p} borderRadius="2xl" bg={bg} border="1px solid" borderColor={border}
@@ -74,22 +74,55 @@ const InfoTile = memo(({ label, value, icon, accent = "blue.500" }: { label: str
       </Circle>
       <VStack align="start" gap={0.5} minW={0}>
         <Text fontSize="xs" color={muted} fontWeight="900" textTransform="uppercase">{label}</Text>
-        <Text fontSize="sm" color="app.text.primary" fontWeight="800" truncate maxW="full">{value || "Not recorded"}</Text>
+        <Text fontSize="sm" color="app.text.primary" fontWeight="800">{value || "Not recorded"}</Text>
       </VStack>
     </HStack>
   );
 });
 InfoTile.displayName = "InfoTile";
 
-const ActionRow = memo(({ label, icon, color = "blue", danger = false }: { label: string; icon: ElementType; color?: string; danger?: boolean }) => (
-  <Button variant="ghost" justifyContent="start" h="12" px={3} borderRadius="xl"
-    colorPalette={danger ? "red" : (color as any)} fontWeight="900" _hover={{ transform: "translateX(3px)" }}>
-    <Circle size="8" bg={danger ? "red.500/10" : `${color}.500/10`}>
-      <Icon as={icon} boxSize={4} />
-    </Circle>
-    {label}
-  </Button>
-));
+const ActionRow = memo(({ label, icon, onClick, color = "blue", danger = false }: { label: string; icon: ElementType; onClick?: () => void; color?: string; danger?: boolean }) => {
+  const hoverBg = useColorModeValue(
+    danger ? "red.50" : `${color}.50`,
+    danger ? "rgba(239, 68, 68, 0.08)" : `rgba(117, 81, 255, 0.08)`
+  );
+  const iconColor = danger ? "red.500" : `${color}.500`;
+  const textColor = danger ? "red.600" : "app.text.primary";
+  const hoverBorderColor = useColorModeValue(
+    danger ? "red.200" : `${color}.200`,
+    danger ? "rgba(239, 68, 68, 0.2)" : "rgba(117, 81, 255, 0.2)"
+  );
+  const borderColor = useColorModeValue("transparent", "transparent");
+
+  return (
+    <Button
+      variant="outline"
+      justifyContent="start"
+      h="48px"
+      w="full"
+      px={4}
+      borderRadius="xl"
+      borderColor={borderColor}
+      bg="transparent"
+      color={textColor}
+      fontWeight="700"
+      fontSize="sm"
+      gap={3}
+      onClick={onClick}
+      transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
+      _hover={{
+        transform: "translateX(4px)",
+        bg: hoverBg,
+        borderColor: hoverBorderColor,
+      }}
+    >
+      <Circle size="8" bg={danger ? "red.500/10" : `${color}.500/10`} color={iconColor} transition="all 0.2s">
+        <Icon as={icon} boxSize={4} />
+      </Circle>
+      <Text fontSize="sm" fontWeight="inherit">{label}</Text>
+    </Button>
+  );
+});
 ActionRow.displayName = "ActionRow";
 
 // ─── Main Component ─────────────────────────────────────────────────
@@ -156,18 +189,86 @@ const TrainerProfile = memo(() => {
     );
   }
 
+  const specLabel = useMemo(() => {
+    const s = trainer?.data.specialization;
+    if (Array.isArray(s)) {
+      return s.map((item: string) => item.charAt(0).toUpperCase() + item.slice(1)).join(", ");
+    }
+    return s ? s.charAt(0).toUpperCase() + s.slice(1) : "General Trainer";
+  }, [trainer]);
+
+  // Helper mapping available slots array for display
+  const slotLabel = useMemo(() => {
+    const slot = trainer?.data.availableSlot;
+    if (Array.isArray(slot)) {
+      return slot
+        .map((s: string) => {
+          if (s === "morning") return "Morning Shift (6:00 AM - 12:00 PM)";
+          if (s === "afternoon") return "Afternoon Shift (12:00 PM - 5:00 PM)";
+          if (s === "evening") return "Evening Shift (5:00 PM - 10:00 PM)";
+          if (s === "full_day") return "Full Day Shift (Flexible)";
+          return s.charAt(0).toUpperCase() + s.slice(1);
+        })
+        .join(", ");
+    }
+    if (typeof slot === "string") {
+      if (slot === "morning") return "Morning Shift (6:00 AM - 12:00 PM)";
+      if (slot === "afternoon") return "Afternoon Shift (12:00 PM - 5:00 PM)";
+      if (slot === "evening") return "Evening Shift (5:00 PM - 10:00 PM)";
+      if (slot === "full_day") return "Full Day Shift (Flexible)";
+      return slot.charAt(0).toUpperCase() + slot.slice(1);
+    }
+    return "Flexible";
+  }, [trainer]);
+
   return (
     <Box mt={4} w="full" animation="fade-in 0.5s ease-out">
+      {/* Dynamic Keyframes for Status Badge pulse */}
+      <style>{`
+        @keyframes pulse-glow {
+          0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+          70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        @keyframes pulse-glow-orange {
+          0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.5); }
+          70% { box-shadow: 0 0 0 10px rgba(249, 115, 22, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
+        }
+        @keyframes pulse-glow-red {
+          0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+          70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+      `}</style>
+
       <VStack align="stretch" gap={6} pb={8}>
         {/* ── Hero Banner ─────────────────────────────────── */}
         <SurfaceCard p={{ base: 5, lg: 7 }} bg={heroBg} borderColor={borderColor}>
           <Flex direction={{ base: "column", lg: "row" }} gap={7} align={{ base: "start", lg: "center" }} justify="space-between">
             <HStack gap={{ base: 4, md: 6 }} align="center" minW={0}>
               <Skeleton loading={loading} borderRadius="2xl">
-                <Avatar.Root size="2xl" shape="rounded" border="1px solid" borderColor={borderColor}>
-                  {trainer?.data.profilePic && <Avatar.Image src={trainer.data.profilePic} />}
-                  <Avatar.Fallback bg={sm.bg} color={sm.accent} fontSize="4xl" fontWeight="900">{name.initials}</Avatar.Fallback>
-                </Avatar.Root>
+                <Box position="relative">
+                  <Avatar.Root size="2xl" shape="rounded" border="1.5px solid" borderColor={borderColor} p={0.5} bg="transparent">
+                    {trainer?.data.profilePic && <Avatar.Image src={trainer.data.profilePic} borderRadius="2xl" />}
+                    <Avatar.Fallback bg={sm.bg} color={sm.accent} fontSize="4xl" fontWeight="900" borderRadius="2xl">{name.initials}</Avatar.Fallback>
+                  </Avatar.Root>
+                  {/* Glowing Status Dot */}
+                  <Box
+                    position="absolute"
+                    bottom="-2px"
+                    right="-2px"
+                    w="16px"
+                    h="16px"
+                    borderRadius="full"
+                    bg={sm.accent}
+                    border="3px solid"
+                    borderColor={useColorModeValue("white", "#0f172a")}
+                    css={{
+                      animation: `${sm.glowAnim} 2s infinite ease-in-out`
+                    }}
+                  />
+                </Box>
               </Skeleton>
               <VStack align="start" gap={3} minW={0}>
                 <Skeleton loading={loading}>
@@ -186,7 +287,7 @@ const TrainerProfile = memo(() => {
                   <Skeleton loading={loading}>
                     <HStack px={4} py={2} borderRadius="xl" bg="blue.500/10" color="blue.500">
                       <Award size={15} />
-                      <Text fontSize="sm" fontWeight="900">{trainer?.data.specialization || "General Trainer"}</Text>
+                      <Text fontSize="sm" fontWeight="900">{specLabel}</Text>
                     </HStack>
                   </Skeleton>
                 </HStack>
@@ -196,7 +297,7 @@ const TrainerProfile = memo(() => {
         </SurfaceCard>
 
         {/* ── KPI Metrics ─────────────────────────────────── */}
-        <SimpleGrid columns={{ base: 1, md: 2, xl: 4 }} gap={4}>
+        <SimpleGrid columns={{ base: 1, md: 3, xl: 3 }} gap={4}>
           <SurfaceCard p={4}>
             <HStack justify="space-between" align="start">
               <VStack align="start" gap={0}>
@@ -210,18 +311,10 @@ const TrainerProfile = memo(() => {
           <SurfaceCard p={4}>
             <HStack justify="space-between" align="start">
               <VStack align="start" gap={0}>
-                <Text fontSize="xs" color={muted} fontWeight="900" textTransform="uppercase">Clients</Text>
-                <Heading size="lg" color="app.text.primary">{(Number(trainer?.data.experienceYears) || 1) * 4 + 2}</Heading>
-                <Text fontSize="xs" color={muted} fontWeight="700">Active sessions</Text>
-              </VStack>
-              <Circle size="10" bg="green.500/10" color="green.500"><Icon as={Users} boxSize={4} /></Circle>
-            </HStack>
-          </SurfaceCard>
-          <SurfaceCard p={4}>
-            <HStack justify="space-between" align="start">
-              <VStack align="start" gap={0}>
                 <Text fontSize="xs" color={muted} fontWeight="900" textTransform="uppercase">Payment</Text>
-                <Heading size="lg" color="app.text.primary">{trainer?.data.paymentMode || "Bank"}</Heading>
+                <Heading size="lg" color="app.text.primary">
+                  {trainer?.data.paymentMode === "bank" ? "Bank" : trainer?.data.paymentMode === "upi" ? "UPI" : "Cash"}
+                </Heading>
                 <Text fontSize="xs" color={muted} fontWeight="700">Salary disbursement</Text>
               </VStack>
               <Circle size="10" bg="purple.500/10" color="purple.500"><Icon as={CreditCard} boxSize={4} /></Circle>
@@ -257,10 +350,33 @@ const TrainerProfile = memo(() => {
                     <InfoTile label="Email" value={trainer?.data.email} icon={Mail} accent="blue.500" />
                     <InfoTile label="Phone" value={trainer?.data.phone} icon={Phone} accent="green.500" />
                     <InfoTile label="Address" value={trainer?.data.address} icon={MapPin} accent="orange.500" />
-                    <InfoTile label="Gender" value={trainer?.data.gender || "Not recorded"} icon={User} accent="purple.500" />
+                    <InfoTile label="Gender" value={trainer?.data.gender ? (trainer.data.gender.charAt(0).toUpperCase() + trainer.data.gender.slice(1)) : "Not recorded"} icon={User} accent="purple.500" />
                     <InfoTile label="Trainer ID" value={trainer?.data.trainer_id} icon={Fingerprint} accent="cyan.500" />
                     <InfoTile label="Joining Date" value={fmtDate(trainer?.data.joiningDate)} icon={CalendarDays} accent="teal.500" />
                   </SimpleGrid>
+
+                  {/* Payment Details Section */}
+                  {trainer?.data.paymentMode && (
+                    <>
+                      <Separator borderColor={borderColor} my={2} />
+                      <VStack align="start" gap={3} w="full">
+                        <Text fontSize="xs" color={muted} fontWeight="900" textTransform="uppercase">Payment & Disbursement details</Text>
+                        <SimpleGrid columns={{ base: 1, md: 2 }} gap={5} w="full">
+                          <InfoTile label="Payment Method" value={trainer.data.paymentMode === "bank" ? "Bank Transfer" : trainer.data.paymentMode === "upi" ? "UPI / Digital" : "Cash"} icon={CreditCard} accent="purple.500" />
+                          {trainer.data.paymentMode === "bank" && (
+                            <>
+                              <InfoTile label="Bank Name" value={trainer.data.bankName} icon={Briefcase} accent="blue.500" />
+                              <InfoTile label="Account Number" value={trainer.data.accountNumber} icon={FileText} accent="green.500" />
+                              <InfoTile label="IFSC Code" value={trainer.data.ifscCode} icon={ShieldCheck} accent="teal.500" />
+                            </>
+                          )}
+                          {trainer.data.paymentMode === "upi" && (
+                            <InfoTile label="UPI ID" value={trainer.data.upiId} icon={Zap} accent="cyan.500" />
+                          )}
+                        </SimpleGrid>
+                      </VStack>
+                    </>
+                  )}
                 </VStack>
               </SurfaceCard>
 
@@ -282,8 +398,8 @@ const TrainerProfile = memo(() => {
                       </Text>
                     </Box>
                     <SimpleGrid columns={{ base: 1, md: 2 }} gap={4} w="full">
-                      <InfoTile label="Specialization" value={trainer?.data.specialization} icon={Dumbbell} accent="blue.500" />
-                      <InfoTile label="Available Slot" value={trainer?.data.availableSlot || "Flexible"} icon={Clock} accent="orange.500" />
+                      <InfoTile label="Specialization" value={specLabel} icon={Dumbbell} accent="blue.500" />
+                       <InfoTile label="Available Slot" value={slotLabel} icon={Clock} accent="orange.500" />
                     </SimpleGrid>
                   </VStack>
                 </VStack>
@@ -300,33 +416,89 @@ const TrainerProfile = memo(() => {
                     <Circle size="10" bg="green.500/10" color="green.500"><ShieldCheck size={18} /></Circle>
                   </HStack>
                   <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
-                    <Box p={4} borderRadius="xl" bg="blue.500/8" border="1px solid" borderColor="blue.500/15" cursor="pointer" _hover={{ bg: "blue.500/12" }}>
-                      <VStack align="center" gap={2}>
-                        <Icon as={ShieldCheck} boxSize={6} color="blue.500" />
-                        <Text fontSize="xs" fontWeight="900">ID PROOF</Text>
-                        <Badge colorPalette={trainer?.data.idProof ? "green" : "orange"} size="xs">
-                          {trainer?.data.idProof ? "VERIFIED" : "PENDING"}
-                        </Badge>
-                      </VStack>
-                    </Box>
-                    <Box p={4} borderRadius="xl" bg="green.500/8" border="1px solid" borderColor="green.500/15" cursor="pointer" _hover={{ bg: "green.500/12" }}>
-                      <VStack align="center" gap={2}>
-                        <Icon as={Award} boxSize={6} color="green.500" />
-                        <Text fontSize="xs" fontWeight="900">CERTIFICATIONS</Text>
-                        <Badge colorPalette={trainer?.data.certifications ? "green" : "orange"} size="xs">
-                          {trainer?.data.certifications ? "VERIFIED" : "PENDING"}
-                        </Badge>
-                      </VStack>
-                    </Box>
-                    <Box p={4} borderRadius="xl" bg="orange.500/8" border="1px solid" borderColor="orange.500/15" cursor="pointer" _hover={{ bg: "orange.500/12" }}>
-                      <VStack align="center" gap={2}>
-                        <Icon as={FileText} boxSize={6} color="orange.500" />
-                        <Text fontSize="xs" fontWeight="900">CONTRACT</Text>
-                        <Badge colorPalette={trainer?.data.status === "active" ? "green" : "gray"} size="xs">
-                          {trainer?.data.status === "active" ? "SIGNED" : "PENDING"}
-                        </Badge>
-                      </VStack>
-                    </Box>
+                    {[
+                      {
+                        title: "ID PROOF",
+                        file: trainer?.data.idProof,
+                        fileName: "national_identity_card.pdf",
+                        icon: ShieldCheck,
+                        color: "blue",
+                        status: trainer?.data.idProof ? "VERIFIED" : "PENDING",
+                        statusPalette: trainer?.data.idProof ? "green" : "orange"
+                      },
+                      {
+                        title: "CERTIFICATIONS",
+                        file: trainer?.data.certifications,
+                        fileName: "fitness_trainer_cert.pdf",
+                        icon: Award,
+                        color: "green",
+                        status: trainer?.data.certifications ? "VERIFIED" : "PENDING",
+                        statusPalette: trainer?.data.certifications ? "green" : "orange"
+                      },
+                      {
+                        title: "CONTRACT",
+                        file: "#",
+                        fileName: "employment_contract.pdf",
+                        icon: FileText,
+                        color: "orange",
+                        status: trainer?.data.status === "active" ? "SIGNED" : "PENDING",
+                        statusPalette: trainer?.data.status === "active" ? "green" : "gray"
+                      }
+                    ].map((doc) => {
+                      const isAvailable = !!doc.file || doc.title === "CONTRACT";
+                      return (
+                        <Box
+                          key={doc.title}
+                          p={4}
+                          borderRadius="xl"
+                          bg={`${doc.color}.500/5`}
+                          border="1px solid"
+                          borderColor={useColorModeValue("rgba(226, 232, 240, 0.8)", "rgba(255, 255, 255, 0.08)")}
+                          transition="all 0.25s ease"
+                          _hover={{
+                            bg: `${doc.color}.500/10`,
+                            transform: "translateY(-2px)",
+                            borderColor: `${doc.color}.500/30`
+                          }}
+                          position="relative"
+                          overflow="hidden"
+                        >
+                          <VStack align="center" gap={3}>
+                            <Circle size="12" bg={`${doc.color}.500/10`} color={`${doc.color}.500`}>
+                              <Icon as={doc.icon} boxSize={5} />
+                            </Circle>
+                            <VStack gap={0.5} align="center">
+                              <Text fontSize="xs" fontWeight="900" color="app.text.primary">{doc.title}</Text>
+                              {isAvailable ? (
+                                <Text
+                                  as="span"
+                                  fontSize="10px"
+                                  fontWeight="700"
+                                  color="blue.500"
+                                  _hover={{ textDecoration: "underline" }}
+                                  cursor="pointer"
+                                >
+                                  <a
+                                    href={doc.file !== "#" ? doc.file : undefined}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    onClick={doc.file === "#" ? (e) => { e.preventDefault(); toaster.create({ title: "View Contract", description: "Opening employment contract PDF...", type: "info" }); } : undefined}
+                                    style={{ color: "inherit", textDecoration: "inherit" }}
+                                  >
+                                    {doc.fileName}
+                                  </a>
+                                </Text>
+                              ) : (
+                                <Text fontSize="10px" fontWeight="700" color="app.text.muted">No document uploaded</Text>
+                              )}
+                            </VStack>
+                            <Badge colorPalette={doc.statusPalette} variant="subtle" size="xs" px={2} py={0.5} borderRadius="full">
+                              {doc.status}
+                            </Badge>
+                          </VStack>
+                        </Box>
+                      );
+                    })}
                   </SimpleGrid>
                 </VStack>
               </SurfaceCard>
@@ -340,12 +512,12 @@ const TrainerProfile = memo(() => {
                 <VStack align="stretch" gap={4}>
                   <Heading size="sm" fontWeight="900">Quick Actions</Heading>
                   <VStack align="stretch" gap={2}>
-                    <ActionRow icon={MessageSquare} label="Send Message" color="blue" />
-                    <ActionRow icon={CalendarDays} label="Manage Schedule" color="green" />
-                    <ActionRow icon={Star} label="Performance Review" color="orange" />
-                    <ActionRow icon={FileText} label="View Salary Slips" color="purple" />
-                    <ActionRow icon={Snowflake} label="Request Leave" color="cyan" />
-                    <ActionRow icon={Trash2} label="Terminate Contract" danger />
+                    <ActionRow icon={MessageSquare} label="Send Message" color="blue" onClick={() => toaster.create({ title: "Send Message", description: "Opening trainer chat console...", type: "info" })} />
+                    <ActionRow icon={CalendarDays} label="Manage Schedule" color="green" onClick={() => toaster.create({ title: "Manage Schedule", description: "Loading calendar editor...", type: "success" })} />
+                    <ActionRow icon={Star} label="Performance Review" color="orange" onClick={() => toaster.create({ title: "Performance Review", description: "Opening appraisal metrics...", type: "info" })} />
+                    <ActionRow icon={FileText} label="View Salary Slips" color="purple" onClick={() => toaster.create({ title: "Salary Slips", description: "Generating payload slip PDF...", type: "success" })} />
+                    <ActionRow icon={Snowflake} label="Request Leave" color="cyan" onClick={() => toaster.create({ title: "Request Leave", description: "Leave request form opened.", type: "warning" })} />
+                    <ActionRow icon={Trash2} label="Terminate Contract" danger onClick={() => toaster.create({ title: "Terminate Contract", description: "Safety confirmation prompt initialized.", type: "error" as any })} />
                   </VStack>
                 </VStack>
               </SurfaceCard>

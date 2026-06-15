@@ -77,11 +77,10 @@ const formatDate = (date?: string) => {
 const StatTile = memo(({ label, value, caption, icon, accent }: {
   label: string; value: string | number; caption: string; icon: React.ElementType; accent: string;
 }) => {
-  const tileBg = useColorModeValue("rgba(255,255,255,0.78)", "rgba(15,23,42,0.58)");
   const borderColor = useColorModeValue("whiteAlpha.900", "whiteAlpha.200");
 
   return (
-    <Box p={{ base: 4, md: 5 }} borderRadius="2xl" bg={tileBg} border="1px solid" borderColor={borderColor}
+    <Box p={{ base: 4, md: 5 }} borderRadius="2xl" bg="app.card.bg" border="1px solid" borderColor={borderColor}
       backdropFilter="blur(18px) saturate(160%)" boxShadow="0 18px 42px -30px rgba(15, 23, 42, 0.55)">
       <HStack justify="space-between" align="start" gap={4}>
         <VStack align="start" gap={1}>
@@ -107,100 +106,147 @@ const FilterButton = memo(({ label, active, onClick }: { label: string; active: 
 FilterButton.displayName = "FilterButton";
 
 const StaffCard = memo(({ trainer, onClick }: { trainer: TrainerDocument; onClick: (id: string) => void }) => {
-  const cardBg = useColorModeValue("rgba(255,255,255,0.86)", "rgba(15,23,42,0.7)");
-  const cardBorder = useColorModeValue("rgba(226,232,240,0.78)", "rgba(255,255,255,0.12)");
+  const cardBorder = useColorModeValue("rgba(226, 232, 240, 0.7)", "rgba(255, 255, 255, 0.08)");
+  const hoverBorder = useColorModeValue("rgba(99, 102, 241, 0.3)", "rgba(99, 102, 241, 0.4)");
   const muted = useColorModeValue("gray.500", "gray.400");
+  const sectionBg = useColorModeValue("rgba(248, 250, 252, 0.8)", "rgba(255, 255, 255, 0.03)");
+  const outlineBorder = useColorModeValue("rgba(0,0,0,0.06)", "rgba(255,255,255,0.06)");
 
   const { data } = trainer;
   const name = getTrainerName(data);
   const status = data.status || "active";
-  const roleStyle = ROLE_STYLES[data._meta?.entity_type === "staff" ? "staff" : "trainer"];
   const accent = data._meta?.entity_type === "manager" ? "green" : (data._meta?.entity_type === "staff" ? "orange" : "blue");
 
+  const specLabel = useMemo(() => {
+    const s = data.specialization;
+    if (Array.isArray(s)) {
+      return s.map((item: string) => item.charAt(0).toUpperCase() + item.slice(1)).join(", ");
+    }
+    return s ? s.charAt(0).toUpperCase() + s.slice(1) : "Expert";
+  }, [data.specialization]);
+
+  const slotLabel = useMemo(() => {
+    const s = data.availableSlot;
+    if (Array.isArray(s)) {
+      return s.map((item: string) => {
+        if (item === "morning") return "Morning";
+        if (item === "afternoon") return "Afternoon";
+        if (item === "evening") return "Evening";
+        if (item === "full_day") return "Full Day";
+        return item;
+      }).join(", ");
+    }
+    if (typeof s === "string") {
+      if (s === "morning") return "Morning Shift";
+      if (s === "afternoon") return "Afternoon Shift";
+      if (s === "evening") return "Evening Shift";
+      if (s === "full_day") return "Full Day Shift";
+      return s;
+    }
+    return "Flex";
+  }, [data.availableSlot]);
+
   return (
-    <Box role="group" p={5} borderRadius="2xl" bg={cardBg} border="1px solid" borderColor={cardBorder}
-      boxShadow="0 18px 44px -34px rgba(15, 23, 42, 0.72)" backdropFilter="blur(18px) saturate(150%)"
-      position="relative" overflow="hidden" cursor="pointer"
-      transition="all 0.24s cubic-bezier(0.4, 0, 0.2, 1)"
+    <Box
+      role="group"
+      p={5}
+      borderRadius="20px"
+      bg="app.card.bg"
+      border="1px solid"
+      borderColor={cardBorder}
+      boxShadow="0 4px 20px -8px rgba(0,0,0,0.05)"
+      backdropFilter="blur(24px) saturate(180%)"
+      position="relative"
+      overflow="hidden"
+      cursor="pointer"
+      transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
       onClick={() => onClick(trainer._meta.id)}
-      _before={{
-        content: '""', position: "absolute", top: 0, left: 0, right: 0, h: "3px",
-        bg: `${accent}.400`,
-      }}
       _hover={{
-        transform: "translateY(-5px)", borderColor: `${accent}.400`,
-        boxShadow: "0 26px 56px -34px rgba(37, 99, 235, 0.72)",
-      }}>
-      <VStack align="stretch" gap={4}>
+        transform: "translateY(-4px)",
+        borderColor: hoverBorder,
+        boxShadow: "0 12px 30px -10px rgba(66, 42, 251, 0.15)",
+      }}
+    >
+      <VStack align="stretch" gap={4.5}>
         {/* Header */}
         <Flex justify="space-between" align="start" gap={3}>
           <HStack gap={3} minW={0}>
             <Box position="relative">
-              <Avatar.Root size="lg" shape="rounded" border="1px solid" borderColor={cardBorder}>
-                {data.profilePic && <Avatar.Image src={data.profilePic} />}
-                <Avatar.Fallback bg={`${accent}.500/10`} color={`${accent}.500`} fontWeight="900">
+              <Avatar.Root size="lg" shape="rounded" border="1.5px solid" borderColor={cardBorder} p={0.5} bg="transparent">
+                {data.profilePic && <Avatar.Image src={data.profilePic} borderRadius="lg" />}
+                <Avatar.Fallback bg={`${accent}.500/10`} color={`${accent}.500`} fontWeight="900" borderRadius="lg">
                   {name.initials}
                 </Avatar.Fallback>
               </Avatar.Root>
-              {/* Online indicator */}
-              <Circle size="3" bg={status === "active" ? "green.400" : "gray.400"}
-                position="absolute" bottom="0" right="0" border="2px solid" borderColor={cardBg} />
+              {/* Online status dot */}
+              <Circle
+                size="12px"
+                bg={status === "active" ? "green.400" : "gray.400"}
+                position="absolute"
+                bottom="-2px"
+                right="-2px"
+                border="2.5px solid"
+                borderColor={useColorModeValue("white", "#0f172a")}
+                boxShadow={status === "active" ? "0 0 8px rgba(34, 197, 94, 0.4)" : "none"}
+              />
             </Box>
             <VStack align="start" gap={0.5} minW={0}>
               <Text fontSize="md" fontWeight="900" color="app.text.primary" truncate>
                 {name.full}
               </Text>
-              <Text fontSize="xs" color={muted} fontWeight="700" fontFamily="mono" truncate>
+              <Text fontSize="10px" color={muted} fontWeight="700" fontFamily="mono" bg={sectionBg} px={1.5} py={0.5} borderRadius="md" truncate>
                 {trainer._meta.id}
               </Text>
             </VStack>
           </HStack>
           <Badge colorPalette={accent} variant="subtle" borderRadius="full"
-            px={3} py={1} fontSize="10px" fontWeight="900">
-            {data.specialization || "Expert"}
+            px={2.5} py={0.5} fontSize="9px" fontWeight="900">
+            {specLabel}
           </Badge>
         </Flex>
 
-        {/* Contact */}
-        <SimpleGrid columns={1} gap={2}>
-          <HStack gap={2.5} color={muted} minW={0}>
-            <Icon as={Mail} boxSize={3.5} />
-            <Text fontSize="sm" fontWeight="700" truncate>{data.email}</Text>
-          </HStack>
-          <HStack gap={2.5} color={muted}>
-            <Icon as={Phone} boxSize={3.5} />
-            <Text fontSize="sm" fontWeight="700">{data.phone}</Text>
-          </HStack>
-          <HStack gap={2.5} color={muted}>
-            <Icon as={CalendarDays} boxSize={3.5} />
-            <Text fontSize="sm" fontWeight="700">Joined {formatDate(data.joiningDate)}</Text>
-          </HStack>
-        </SimpleGrid>
+        {/* Contact info box */}
+        <Box p={3} borderRadius="14px" bg={sectionBg} border="1px solid" borderColor={outlineBorder}>
+          <SimpleGrid columns={1} gap={2}>
+            <HStack gap={2.5} color={muted} minW={0}>
+              <Icon as={Mail} boxSize={3.5} />
+              <Text fontSize="xs" fontWeight="700" truncate>{data.email}</Text>
+            </HStack>
+            <HStack gap={2.5} color={muted}>
+              <Icon as={Phone} boxSize={3.5} />
+              <Text fontSize="xs" fontWeight="700">{data.phone}</Text>
+            </HStack>
+            <HStack gap={2.5} color={muted}>
+              <Icon as={CalendarDays} boxSize={3.5} />
+              <Text fontSize="xs" fontWeight="700">Joined {formatDate(data.joiningDate)}</Text>
+            </HStack>
+          </SimpleGrid>
+        </Box>
 
-        <Separator opacity={0.35} />
+        <Separator opacity={0.3} />
 
         {/* Stats footer */}
         <HStack justify="space-between" gap={4}>
           <HStack gap={4}>
             <VStack align="start" gap={0}>
-              <Text fontSize="10px" color={muted} fontWeight="900" textTransform="uppercase">Exp</Text>
-              <Text fontSize="sm" fontWeight="900" color="app.text.primary">{data.experienceYears}y</Text>
+              <Text fontSize="9px" color={muted} fontWeight="900" textTransform="uppercase" letterSpacing="0.04em">Exp</Text>
+              <Text fontSize="sm" fontWeight="800" color="app.text.primary">{data.experienceYears}y</Text>
             </VStack>
             <VStack align="start" gap={0}>
-              <Text fontSize="10px" color={muted} fontWeight="900" textTransform="uppercase">Slot</Text>
-              <Text fontSize="sm" fontWeight="900" color="app.text.primary">{data.availableSlot || "Flex"}</Text>
+              <Text fontSize="9px" color={muted} fontWeight="900" textTransform="uppercase" letterSpacing="0.04em">Slot</Text>
+              <Text fontSize="sm" fontWeight="800" color="app.text.primary">{slotLabel}</Text>
             </VStack>
             <VStack align="start" gap={0}>
-              <Text fontSize="10px" color={muted} fontWeight="900" textTransform="uppercase">Rating</Text>
-              <HStack gap={1}>
-                <Star size={12} color="var(--chakra-colors-yellow-400)" fill="var(--chakra-colors-yellow-400)" />
-                <Text fontSize="sm" fontWeight="900" color="app.text.primary">4.9</Text>
+              <Text fontSize="9px" color={muted} fontWeight="900" textTransform="uppercase" letterSpacing="0.04em">Rating</Text>
+              <HStack gap={1} align="center">
+                <Star size={11} color="var(--chakra-colors-yellow-400)" fill="var(--chakra-colors-yellow-400)" />
+                <Text fontSize="sm" fontWeight="800" color="app.text.primary">4.9</Text>
               </HStack>
             </VStack>
           </HStack>
           <Circle size="9" bg={`${accent}.500/10`} color={`${accent}.500`}
-            transition="all 0.2s" _groupHover={{ transform: "translateX(2px)" }}>
-            <ArrowRight size={16} />
+            transition="all 0.2s" _groupHover={{ transform: "translateX(3px)", bg: `${accent}.500/20` }}>
+            <ArrowRight size={14} />
           </Circle>
         </HStack>
       </VStack>
@@ -254,12 +300,7 @@ const TrainersStaff = memo(() => {
     [trainers]
   );
 
-  // ── Theme ──
-  const heroBg = useColorModeValue(
-    "linear-gradient(135deg, rgba(240,249,255,0.96), rgba(255,255,255,0.92) 48%, rgba(245,243,255,0.9))",
-    "linear-gradient(135deg, rgba(15,23,42,0.94), rgba(30,41,59,0.88) 52%, rgba(49,10,101,0.42))"
-  );
-  const panelBg = useColorModeValue("rgba(255,255,255,0.74)", "rgba(15,23,42,0.58)");
+  const panelBg = "app.card.bg";
   const borderColor = useColorModeValue("rgba(226,232,240,0.84)", "rgba(255,255,255,0.12)");
   const muted = useColorModeValue("gray.500", "gray.400");
 
@@ -292,39 +333,6 @@ const TrainersStaff = memo(() => {
 
   return (
     <Box mt={4} animation="fade-in 0.5s ease-out" w="full">
-      {/* ── Hero Stats ──────────────────────────────────── */}
-      <Box p={{ base: 5, lg: 7 }} borderRadius="2xl" bg={heroBg} border="1px solid" mb={3}
-        borderColor={borderColor} overflow="hidden" position="relative"
-        boxShadow="0 1px 3px rgba(0,0,0,0.04)">
-        <Grid templateColumns={{ base: "1fr", xl: "1.1fr 1.6fr" }} gap={6} alignItems="stretch">
-          <VStack align="start" justify="space-between" gap={6}>
-            <VStack align="start" gap={3}>
-              <Badge colorPalette="purple" variant="subtle" borderRadius="full" px={3} py={1} fontWeight="900">
-                Team Management
-              </Badge>
-              <Heading size={{ base: "xl", md: "2xl" }} letterSpacing="tight" color="app.text.primary">
-                Your gym team at a glance.
-              </Heading>
-              <Text color={muted} fontSize="sm" maxW="560px" fontWeight="600">
-                Monitor trainer performance, manage schedules, and keep your staff operations running smoothly.
-              </Text>
-            </VStack>
-            <HStack gap={3} flexWrap="wrap">
-              <Button variant="outline" borderRadius="xl" fontWeight="800"
-                onClick={() => navigateTo("trainerSchedules")}>
-                <CalendarDays size={16} style={{ marginRight: "6px" }} /> View Schedules
-              </Button>
-            </HStack>
-          </VStack>
-
-          <SimpleGrid columns={{ base: 1, md: 2, xl: 4 }} gap={4}>
-            <StatTile label="Total Staff" value={metrics.total} caption="Across all roles" icon={Users} accent="blue.500" />
-            <StatTile label="Trainers" value={metrics.trainers} caption={`${metrics.online} online now`} icon={Dumbbell} accent="purple.500" />
-            <StatTile label="Avg Rating" value={metrics.avgRating} caption="Trainer average" icon={Star} accent="yellow.500" />
-            <StatTile label="Sessions" value={metrics.totalSessions} caption="This week total" icon={TrendingUp} accent="green.500" />
-          </SimpleGrid>
-        </Grid>
-      </Box>
       <PageHeader
         title="Trainers & Staff"
         subtitle={`${metrics.total} team members — ${metrics.online} currently online`}

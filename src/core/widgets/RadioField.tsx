@@ -21,13 +21,14 @@ interface RADIO {
   options: { label: string; value: string; icon?: React.ReactNode }[];
   disabled?: boolean;
   hidden?: boolean;
-  defaultValue?: string;
+  defaultValue?: string | string[];
   mandatory?: boolean;
   oneLiner?: boolean;
   outLineBorder?: boolean;
   events?: any;
   description?: string;
   errors: FieldError;
+  multiple?: boolean;
 }
 
 const RadioField = ({
@@ -43,6 +44,7 @@ const RadioField = ({
   description,
   events,
   errors,
+  multiple = false,
 }: RADIO) => {
   const methods = useFormContext();
 
@@ -51,23 +53,60 @@ const RadioField = ({
     control: methods.control,
   });
 
+  const valuesArray = React.useMemo(() => {
+    if (Array.isArray(value)) return value;
+    if (typeof value === "string") return value ? value.split(",") : [];
+    return [];
+  }, [value]);
+
   const clearSelection = () => {
-    methods.setValue(name, "", { shouldValidate: true });
+    methods.setValue(name, multiple ? [] : "", { shouldValidate: true, shouldDirty: true });
     if (events) {
-      ruleEngine.processEvents(events, "", "change", methods);
+      ruleEngine.processEvents(events, multiple ? [] : "", "change", methods);
     }
   };
+
+  const handleMultipleChange = React.useCallback(
+    (optionValue: string) => {
+      let newValues: string[];
+      if (valuesArray.includes(optionValue)) {
+        newValues = valuesArray.filter((v) => v !== optionValue);
+      } else {
+        newValues = [...valuesArray, optionValue];
+      }
+      methods.setValue(name, newValues, { shouldValidate: true, shouldDirty: true });
+      if (events) {
+        ruleEngine.processEvents(events, newValues, "change", methods);
+      }
+    },
+    [methods, name, valuesArray, events]
+  );
 
   const handleRadioChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = e.target.value;
-      methods.setValue(name, newValue, { shouldValidate: true });
+      methods.setValue(name, newValue, { shouldValidate: true, shouldDirty: true });
       if (events) {
         ruleEngine.processEvents(events, newValue, "change", methods);
       }
     },
     [methods, name, events],
   );
+
+  React.useEffect(() => {
+    if (multiple) {
+      methods.register(name, {
+        required: mandatory ? `${text} is required` : false,
+        validate: (val) => {
+          if (mandatory) {
+            const arr = Array.isArray(val) ? val : (val ? String(val).split(",") : []);
+            return arr.length > 0 || `${text} is required`;
+          }
+          return true;
+        }
+      });
+    }
+  }, [methods, name, mandatory, text, multiple]);
 
   const labelWidth = oneLiner ? { base: "full", md: "35%" } : "full";
   const contentWidth = oneLiner ? { base: "full", md: "65%" } : "full";
@@ -146,22 +185,15 @@ const RadioField = ({
           )}
 
           <Box w={contentWidth}>
-            <RadioGroup.Root
-              width="full"
-              id={name}
-              disabled={disabled}
-              value={String(value || "")}
-              aria-labelledby={text ? labelId : undefined}
-              aria-required={mandatory}
-            >
+            {multiple ? (
               <Flex direction="column" gap={3}>
                 <Stack direction="row" gap={3} flexWrap="wrap" w="full" align="center">
                   {options.map((option) => {
-                    const isSelected = String(value) === String(option.value);
+                    const isSelected = valuesArray.includes(String(option.value));
                     return (
-                      <RadioGroup.Item
+                      <Box
                         key={option.value}
-                        value={String(option.value)}
+                        onClick={() => !disabled && handleMultipleChange(String(option.value))}
                         position="relative"
                         px={4}
                         py={2.5}
@@ -174,20 +206,16 @@ const RadioField = ({
                           bg: isSelected ? selectedBg : hoverBg,
                         }}
                         transition="all 0.2s cubic-bezier(0.4,0,0.2,1)"
-                        cursor="pointer"
+                        cursor={disabled ? "not-allowed" : "pointer"}
                         display="flex"
                         alignItems="center"
                         justifyContent="center"
                         gap={2.5}
                         minW="110px"
                         flex="1"
-                        {...methods.register(name, {
-                          required: mandatory ? `${text} is required` : false,
-                        })}
+                        opacity={disabled ? 0.6 : 1}
                       >
-                        <RadioGroup.ItemHiddenInput onChange={handleRadioChange} />
-
-                        {/* ── Visual circle indicator (replaces native radio dot) ── */}
+                        {/* Checkbox indicator circle */}
                         <Circle
                           size="18px"
                           flexShrink={0}
@@ -205,7 +233,6 @@ const RadioField = ({
                           )}
                         </Circle>
 
-                        {/* Option icon (optional) */}
                         {option.icon && (
                           <Box
                             flexShrink={0}
@@ -216,28 +243,26 @@ const RadioField = ({
                           </Box>
                         )}
 
-                        <RadioGroup.ItemText
+                        <Text
                           fontWeight={isSelected ? "700" : "500"}
                           fontSize="sm"
                           color={isSelected ? selectedText : unselectedText}
                           transition="all 0.2s"
                         >
                           {option.label}
-                        </RadioGroup.ItemText>
-                      </RadioGroup.Item>
+                        </Text>
+                      </Box>
                     );
                   })}
 
                   {/* Clear selection button */}
-                  {value && !disabled && (
+                  {valuesArray.length > 0 && !disabled && (
                     <IconButton
                       size="sm"
                       variant="outline"
                       aria-label="Clear selection"
                       onClick={clearSelection}
                       color="fg.muted"
-                    // _hover={{ bg: "red.50", color: "red.500" }}
-                    // _dark={{ _hover: { bg: "red.900/30", color: "red.400" } }}
                     >
                       <X />
                     </IconButton>
@@ -248,7 +273,109 @@ const RadioField = ({
                   <Field.ErrorIcon /> {errors?.message?.toString()}
                 </Field.ErrorText>
               </Flex>
-            </RadioGroup.Root>
+            ) : (
+              <RadioGroup.Root
+                width="full"
+                id={name}
+                disabled={disabled}
+                value={String(value || "")}
+                aria-labelledby={text ? labelId : undefined}
+                aria-required={mandatory}
+              >
+                <Flex direction="column" gap={3}>
+                  <Stack direction="row" gap={3} flexWrap="wrap" w="full" align="center">
+                    {options.map((option) => {
+                      const isSelected = String(value) === String(option.value);
+                      return (
+                        <RadioGroup.Item
+                          key={option.value}
+                          value={String(option.value)}
+                          position="relative"
+                          px={4}
+                          py={2.5}
+                          borderRadius="xl"
+                          borderWidth="1.5px"
+                          borderColor={isSelected ? selectedBorder : unselectedBorder}
+                          bg={isSelected ? selectedBg : unselectedBg}
+                          _hover={{
+                            borderColor: isSelected ? selectedBorder : hoverBorder,
+                            bg: isSelected ? selectedBg : hoverBg,
+                          }}
+                          transition="all 0.2s cubic-bezier(0.4,0,0.2,1)"
+                          cursor="pointer"
+                          display="flex"
+                          alignItems="center"
+                          justifyContent="center"
+                          gap={2.5}
+                          minW="110px"
+                          flex="1"
+                          {...methods.register(name, {
+                            required: mandatory ? `${text} is required` : false,
+                          })}
+                        >
+                          <RadioGroup.ItemHiddenInput onChange={handleRadioChange} />
+
+                          {/* ── Visual circle indicator (replaces native radio dot) ── */}
+                          <Circle
+                            size="18px"
+                            flexShrink={0}
+                            bg={isSelected ? indicatorBg : "transparent"}
+                            borderWidth="2px"
+                            borderColor={isSelected ? indicatorBg : indicatorUnselBorder}
+                            transition="all 0.2s"
+                          >
+                            {isSelected && (
+                              <Check
+                                size={10}
+                                color="white"
+                                strokeWidth={3}
+                              />
+                            )}
+                          </Circle>
+
+                          {/* Option icon (optional) */}
+                          {option.icon && (
+                            <Box
+                              flexShrink={0}
+                              color={isSelected ? selectedBorder : unselectedText}
+                              transition="color 0.2s"
+                            >
+                              {option.icon}
+                            </Box>
+                          )}
+
+                          <RadioGroup.ItemText
+                            fontWeight={isSelected ? "700" : "500"}
+                            fontSize="sm"
+                            color={isSelected ? selectedText : unselectedText}
+                            transition="all 0.2s"
+                          >
+                            {option.label}
+                          </RadioGroup.ItemText>
+                        </RadioGroup.Item>
+                      );
+                    })}
+
+                    {/* Clear selection button */}
+                    {value && !disabled && (
+                      <IconButton
+                        size="sm"
+                        variant="outline"
+                        aria-label="Clear selection"
+                        onClick={clearSelection}
+                        color="fg.muted"
+                      >
+                        <X />
+                      </IconButton>
+                    )}
+                  </Stack>
+
+                  <Field.ErrorText fontSize="sm" color="red.500" fontWeight="medium">
+                    <Field.ErrorIcon /> {errors?.message?.toString()}
+                  </Field.ErrorText>
+                </Flex>
+              </RadioGroup.Root>
+            )}
           </Box>
         </Flex>
       </Field.Root>

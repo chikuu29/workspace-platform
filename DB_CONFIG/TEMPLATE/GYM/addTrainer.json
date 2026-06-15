@@ -160,6 +160,7 @@
                                 "description": "Primary area of expertise (e.g., Strength Training, Yoga, Cardio, CrossFit)",
                                 "widget": "radioField",
                                 "oneLiner": true,
+                                "multiple": true,
                                 "options": [
                                     {
                                         "label": "Strength Training",
@@ -206,10 +207,29 @@
                                 "name": "availableSlot",
                                 "text": "Available Slot",
                                 "description": "Preferred training session slot",
-                                "widget": "dateAndTimeField",
+                                "widget": "radioField",
+                                "multiple": true,
                                 "oneLiner": true,
                                 "mandatory": true,
-                                "enableClear": true
+                                "enableClear": true,
+                                "options": [
+                                    {
+                                        "label": "Morning Shift (6:00 AM - 12:00 PM)",
+                                        "value": "morning"
+                                    },
+                                    {
+                                        "label": "Afternoon Shift (12:00 PM - 5:00 PM)",
+                                        "value": "afternoon"
+                                    },
+                                    {
+                                        "label": "Evening Shift (5:00 PM - 10:00 PM)",
+                                        "value": "evening"
+                                    },
+                                    {
+                                        "label": "Full Day Shift (Flexible)",
+                                        "value": "full_day"
+                                    }
+                                ]
                             },
                             {
                                 "name": "bio",

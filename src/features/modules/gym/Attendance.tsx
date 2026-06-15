@@ -6,7 +6,7 @@
  * simulated biometric/card scanner HUD, Web Audio synthesized chimes, and a live check-in activity stream.
  */
 
-import { memo, useState, useCallback, useRef, useEffect } from "react";
+import { memo, useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import {
   Box, VStack, HStack, Text, Heading, Input, Button, Circle,
@@ -16,7 +16,7 @@ import {
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { NativeSelectRoot, NativeSelectField } from "@/components/ui/native-select";
 import {
-  Check, X, Scan, User, CreditCard, History,
+  Check, X, Scan, User, CreditCard, History, Calendar,
   ArrowRight, Info, RefreshCw, Volume2, VolumeX, Flame, Activity, Users,
   Maximize2, Minimize2
 } from "lucide-react";
@@ -121,9 +121,13 @@ interface ScannerHUDProps {
   h?: string | number;
   isScanning?: boolean;
   readerId?: string;
+  onToggleScanner?: () => void;
+  cameras?: any[];
+  selectedCameraId?: string;
+  onCameraChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 
-const ScannerHUD = memo(({ status, memberName, errorMessage, h = "240px", isScanning = false, readerId = "qr-scanner-hud" }: ScannerHUDProps) => {
+const ScannerHUD = memo(({ status, memberName, errorMessage, h = "320px", isScanning = false, readerId = "qr-scanner-hud", onToggleScanner, cameras = [], selectedCameraId, onCameraChange }: ScannerHUDProps) => {
   const statusColors = {
     idle: {
       color: "cyan.400",
@@ -145,6 +149,11 @@ const ScannerHUD = memo(({ status, memberName, errorMessage, h = "240px", isScan
 
   const current = statusColors[status] || statusColors.idle;
 
+  const handleToggleClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    onToggleScanner?.();
+  }, [onToggleScanner]);
+
   return (
     <Box
       position="relative"
@@ -157,51 +166,52 @@ const ScannerHUD = memo(({ status, memberName, errorMessage, h = "240px", isScan
       borderColor={status === "success" ? "emerald.500" : status === "error" ? "rose.500" : "whiteAlpha.100"}
       transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
       boxShadow={status !== "idle" ? `inset 0 0 30px ${current.glowColor}, 0 0 30px ${current.glowColor}` : "inset 0 0 20px rgba(0,0,0,0.8)"}
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
     >
-      {/* Video stream container for camera scanner */}
+      {/* ── Layer 1: Camera video feed (fills entire container) ── */}
       {isScanning && (
         <Box
           key="scanner-video-container"
           id={readerId}
           position="absolute"
           inset={0}
-          w="full"
-          h="full"
           overflow="hidden"
           zIndex={1}
+          bg="black"
           css={{
             "& video": {
               width: "100% !important",
               height: "100% !important",
               objectFit: "cover",
-            }
+              display: "block !important",
+            },
+            "& > div": {
+              width: "100% !important",
+              height: "100% !important",
+            },
+            "& > div > div": {
+              minHeight: "100% !important",
+            },
           }}
         />
       )}
-      {/* Grid Background Pattern */}
-      <Box
-        key="scanner-grid"
-        position="absolute"
-        inset={0}
-        zIndex={2}
-        opacity={status === "loading" ? 0.35 : 0.15}
-        background="linear-gradient(rgba(18, 24, 38, 0.95), rgba(18, 24, 38, 0.95)),
-                    linear-gradient(0deg, rgba(255,255,255,0.05) 1px, transparent 1px) 0 0 / 20px 20px,
-                    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px) 0 0 / 20px 20px"
-        animation={status === "loading" ? "grid-anim 0.8s linear infinite" : "none"}
-        pointerEvents="none"
-      />
 
-      {/* Cyber Corners Brackets */}
-      <Box key="corner-tl" position="absolute" top="4" left="4" w="6" h="6" borderTop="3px solid" borderLeft="3px solid" borderColor={current.color} transition="border-color 0.3s" zIndex={4} />
-      <Box key="corner-tr" position="absolute" top="4" right="4" w="6" h="6" borderTop="3px solid" borderRight="3px solid" borderColor={current.color} transition="border-color 0.3s" zIndex={4} />
-      <Box key="corner-bl" position="absolute" bottom="4" left="4" w="6" h="6" borderBottom="3px solid" borderLeft="3px solid" borderColor={current.color} transition="border-color 0.3s" zIndex={4} />
-      <Box key="corner-br" position="absolute" bottom="4" right="4" w="6" h="6" borderBottom="3px solid" borderRight="3px solid" borderColor={current.color} transition="border-color 0.3s" zIndex={4} />
+      {/* ── Layer 2: Grid background (only when camera is OFF) ── */}
+      {!isScanning && (
+        <Box
+          key="scanner-grid"
+          position="absolute"
+          inset={0}
+          zIndex={2}
+          opacity={status === "loading" ? 0.35 : 0.15}
+          background="linear-gradient(rgba(18, 24, 38, 0.95), rgba(18, 24, 38, 0.95)),
+                      linear-gradient(0deg, rgba(255,255,255,0.05) 1px, transparent 1px) 0 0 / 20px 20px,
+                      linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px) 0 0 / 20px 20px"
+          animation={status === "loading" ? "grid-anim 0.8s linear infinite" : "none"}
+          pointerEvents="none"
+        />
+      )}
 
-      {/* Sweeping Scanning Laser */}
+      {/* ── Layer 3: Scanning laser (active in both camera ON and OFF states) ── */}
       {(status === "idle" || status === "loading") && (
         <Box
           key="scanner-laser"
@@ -217,8 +227,16 @@ const ScannerHUD = memo(({ status, memberName, errorMessage, h = "240px", isScan
         />
       )}
 
-      {/* Overlay Status Content */}
-      {status === "idle" && (
+      {/* ── Layer 4: Cyber corner brackets (always visible to frame the scan area) ── */}
+      <>
+        <Box key="corner-tl" position="absolute" top="14" left="4" w="6" h="6" borderTop="3px solid" borderLeft="3px solid" borderColor={current.color} transition="border-color 0.3s" zIndex={4} />
+        <Box key="corner-tr" position="absolute" top="14" right="4" w="6" h="6" borderTop="3px solid" borderRight="3px solid" borderColor={current.color} transition="border-color 0.3s" zIndex={4} />
+        <Box key="corner-bl" position="absolute" bottom="4" left="4" w="6" h="6" borderBottom="3px solid" borderLeft="3px solid" borderColor={current.color} transition="border-color 0.3s" zIndex={4} />
+        <Box key="corner-br" position="absolute" bottom="4" right="4" w="6" h="6" borderBottom="3px solid" borderRight="3px solid" borderColor={current.color} transition="border-color 0.3s" zIndex={4} />
+      </>
+
+      {/* ── Layer 5: Status overlays (centered in full container) ── */}
+      {status === "idle" && !isScanning && (
         <Flex
           key="overlay-idle"
           position="absolute"
@@ -240,6 +258,36 @@ const ScannerHUD = memo(({ status, memberName, errorMessage, h = "240px", isScan
         </Flex>
       )}
 
+      {/* ── Layer 6: Scanning active guidance overlay ── */}
+      {status === "idle" && isScanning && (
+        <Flex
+          key="overlay-scanning-active"
+          position="absolute"
+          left={0}
+          right={0}
+          bottom={6}
+          justify="center"
+          align="center"
+          pointerEvents="none"
+          zIndex={5}
+          animation="pulse-light 2s infinite"
+        >
+          <Badge
+            bg="rgba(6, 182, 212, 0.75)"
+            color="white"
+            borderRadius="full"
+            px={3}
+            py={1}
+            fontSize="3xs"
+            fontWeight="950"
+            letterSpacing="widest"
+            boxShadow="0 4px 15px rgba(6, 182, 212, 0.4)"
+          >
+            ALIGN QR CODE INSIDE FRAME
+          </Badge>
+        </Flex>
+      )}
+
       {status === "loading" && (
         <Flex
           key="overlay-loading"
@@ -250,7 +298,7 @@ const ScannerHUD = memo(({ status, memberName, errorMessage, h = "240px", isScan
           justify="center"
           gap={3}
           pointerEvents="none"
-          zIndex={5}
+          zIndex={8}
         >
           <Spinner size="md" color="orange.400" />
           <Text fontSize="xs" fontWeight="900" color="orange.400" letterSpacing="widest" textTransform="uppercase">
@@ -270,7 +318,8 @@ const ScannerHUD = memo(({ status, memberName, errorMessage, h = "240px", isScan
           gap={3}
           pointerEvents="none"
           animation="scale-up 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
-          zIndex={5}
+          zIndex={8}
+          bg="blackAlpha.500"
         >
           <Circle size="16" bg="emerald.500" color="white" boxShadow="0 0 25px rgba(16, 185, 129, 0.4)">
             <Check size={32} strokeWidth={3} />
@@ -297,7 +346,8 @@ const ScannerHUD = memo(({ status, memberName, errorMessage, h = "240px", isScan
           gap={3}
           pointerEvents="none"
           animation="scale-up 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
-          zIndex={5}
+          zIndex={8}
+          bg="blackAlpha.500"
         >
           <Circle size="16" bg="rose.500" color="white" boxShadow="0 0 25px rgba(244, 63, 94, 0.4)">
             <X size={32} strokeWidth={3} />
@@ -312,6 +362,81 @@ const ScannerHUD = memo(({ status, memberName, errorMessage, h = "240px", isScan
           </Flex>
         </Flex>
       )}
+
+      {/* ── Layer 10: Floating toolbar (always on top) ── */}
+      <Flex
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        zIndex={10}
+        px={4}
+        py={2}
+        justify="space-between"
+        align="center"
+        bg={isScanning ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.45)"}
+        backdropFilter="blur(8px)"
+        borderBottom="1px solid"
+        borderColor="whiteAlpha.100"
+      >
+        <HStack gap={2} align="center">
+          <Circle size="2" bg={isScanning ? "emerald.400" : "gray.500"} animation={isScanning ? "pulse-light 1s infinite" : "none"} />
+          <Text fontSize="2xs" fontWeight="900" color="whiteAlpha.700" letterSpacing="widest" textTransform="uppercase">
+            {isScanning ? "CAMERA ACTIVE" : "CAMERA OFF"}
+          </Text>
+        </HStack>
+
+        <HStack gap={2}>
+          {isScanning && cameras.length > 1 && onCameraChange && (
+            <NativeSelectRoot maxW="170px" size="xs">
+              <NativeSelectField
+                value={selectedCameraId}
+                onChange={onCameraChange}
+                bg="rgba(10, 15, 30, 0.8)"
+                border="1px solid"
+                borderColor="whiteAlpha.150"
+                color="white"
+                fontSize="2xs"
+                fontWeight="800"
+                borderRadius="lg"
+                h="28px"
+                cursor="pointer"
+                _hover={{ borderColor: "cyan.400/50" }}
+              >
+                {cameras.map((cam) => (
+                  <option key={cam.id} value={cam.id} className="attendance-select-option">
+                    {cam.label || `Camera ${cam.id}`}
+                  </option>
+                ))}
+              </NativeSelectField>
+            </NativeSelectRoot>
+          )}
+
+          {onToggleScanner && (
+            <Button
+              size="2xs"
+              h="28px"
+              w="130px"
+              borderRadius="lg"
+              variant="solid"
+              bg={isScanning ? "rose.500" : "transparent"}
+              border="1px solid"
+              borderColor={isScanning ? "rose.500" : "cyan.500/50"}
+              color="white"
+              onClick={handleToggleClick}
+              _hover={{ bg: isScanning ? "rose.600" : "cyan.500/15", transform: "scale(1.02)" }}
+              px={3}
+              fontWeight="900"
+              fontSize="2xs"
+              letterSpacing="wide"
+              transition="all 0.2s ease"
+            >
+              <Scan size={11} className="icon-mr-5" />
+              {isScanning ? "STOP" : "START SCANNER"}
+            </Button>
+          )}
+        </HStack>
+      </Flex>
     </Box>
   );
 });
@@ -400,17 +525,62 @@ StatsGrid.displayName = "StatsGrid";
 
 /**
  * LiveActivityStream Component
- * Scrolling logs container that renders checking logs from the current session.
+ * Scrolling logs container that renders checking logs grouped by date.
  */
 interface LiveActivityStreamProps {
   activities: CheckInActivity[];
   onViewMember: (memberId: string) => void;
 }
 
-const LiveActivityStream = memo(({ activities, onViewMember }: LiveActivityStreamProps) => {
+/** Groups activities by date string (e.g. "Today", "Yesterday", "Mon, Jun 12") */
+const groupActivitiesByDate = (activities: CheckInActivity[]): Map<string, CheckInActivity[]> => {
+  const groups = new Map<string, CheckInActivity[]>();
+  const now = new Date();
+  const todayKey = now.toDateString();
+  const yesterdayDate = new Date(now);
+  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+  const yesterdayKey = yesterdayDate.toDateString();
+
+  for (const activity of activities) {
+    let dateLabel: string;
+    try {
+      const d = new Date(activity.timestamp);
+      const key = d.toDateString();
+      if (key === todayKey) {
+        dateLabel = "Today";
+      } else if (key === yesterdayKey) {
+        dateLabel = "Yesterday";
+      } else {
+        dateLabel = d.toLocaleDateString(undefined, {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+        });
+      }
+    } catch {
+      dateLabel = "Unknown";
+    }
+
+    const existing = groups.get(dateLabel);
+    if (existing) {
+      existing.push(activity);
+    } else {
+      groups.set(dateLabel, [activity]);
+    }
+  }
+  return groups;
+};
+
+interface ActivityItemProps {
+  activity: CheckInActivity;
+  onViewMember: (id: string) => void;
+}
+
+const ActivityItem = memo(({ activity, onViewMember }: ActivityItemProps) => {
   const muted = useColorModeValue("gray.500", "gray.400");
-  const cardBg = useColorModeValue("rgba(255,255,255,0.76)", "rgba(15,23,42,0.52)");
-  const border = useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.08)");
+  const handleClick = useCallback(() => {
+    onViewMember(activity.member_id);
+  }, [activity.member_id, onViewMember]);
 
   const formatTime = (isoString: string) => {
     try {
@@ -425,6 +595,67 @@ const LiveActivityStream = memo(({ activities, onViewMember }: LiveActivityStrea
   };
 
   return (
+    <HStack
+      justify="space-between"
+      p={3}
+      borderRadius="xl"
+      bg={activity.status === "success" ? "blue.500/8" : "rose.500/8"}
+      border="1px solid"
+      borderColor={activity.status === "success" ? "blue.500/12" : "rose.500/12"}
+      cursor="pointer"
+      _hover={{
+        bg: activity.status === "success" ? "blue.500/12" : "rose.500/12",
+        transform: "translateX(2px)"
+      }}
+      transition="all 0.18s ease"
+      onClick={handleClick}
+    >
+      <HStack gap={3} minW={0}>
+        <Avatar name={activity.member_name} size="xs" shape="rounded" />
+        <VStack align="start" gap={0} minW={0}>
+          <Text fontSize="xs" fontWeight="950" color="app.text.primary" truncate>
+            {activity.member_name}
+          </Text>
+          <Text fontSize="3xs" color={muted} fontWeight="800">
+            {activity.member_id} • {formatTime(activity.timestamp)}
+          </Text>
+        </VStack>
+      </HStack>
+
+      <VStack align="end" gap={1} flexShrink={0}>
+        {activity.status === "success" ? (
+          activity.has_active_plan ? (
+            <Badge colorPalette="green" variant="solid" borderRadius="full" fontSize="3xs" px={1.5} py={0.5}>
+              Active
+            </Badge>
+          ) : (
+            <Badge colorPalette="orange" variant="solid" borderRadius="full" fontSize="3xs" px={1.5} py={0.5}>
+              No Plan
+            </Badge>
+          )
+        ) : (
+          <Badge colorPalette="rose" variant="solid" borderRadius="full" fontSize="3xs" px={1.5} py={0.5}>
+            Denied
+          </Badge>
+        )}
+      </VStack>
+    </HStack>
+  );
+});
+
+ActivityItem.displayName = "ActivityItem";
+
+const LiveActivityStream = memo(({ activities, onViewMember }: LiveActivityStreamProps) => {
+  const muted = useColorModeValue("gray.500", "gray.400");
+  const cardBg = useColorModeValue("rgba(255,255,255,0.76)", "rgba(15,23,42,0.52)");
+  const border = useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.08)");
+  const dateLabelBg = useColorModeValue("gray.100", "whiteAlpha.50");
+  const dateLabelColor = useColorModeValue("gray.600", "gray.400");
+
+  // Memoize date grouping to avoid recomputation on every render
+  const groupedActivities = useMemo(() => groupActivitiesByDate(activities), [activities]);
+
+  return (
     <Box
       w="full"
       p={5}
@@ -432,8 +663,8 @@ const LiveActivityStream = memo(({ activities, onViewMember }: LiveActivityStrea
       bg={cardBg}
       border="1px solid"
       borderColor={border}
-      backdropFilter="blur(16px)"
-      boxShadow="0 15px 35px -20px rgba(0,0,0,0.3)"
+      // backdropFilter="blur(16px)"
+      boxShadow="md"
     >
       <VStack align="stretch" gap={4}>
         <HStack justify="space-between" align="center">
@@ -454,69 +685,56 @@ const LiveActivityStream = memo(({ activities, onViewMember }: LiveActivityStrea
           </HStack>
         </HStack>
 
-        <Box maxH="320px" overflowY="auto" pr={1} css={{
+        <Box maxH="420px" overflowY="auto" pr={1} css={{
           "&::-webkit-scrollbar": { width: "4px" },
           "&::-webkit-scrollbar-track": { bg: "transparent" },
           "&::-webkit-scrollbar-thumb": { bg: "rgba(255,255,255,0.1)", borderRadius: "2px" },
         }}>
-          <VStack align="stretch" gap={2}>
-            <AnimatePresence initial={false}>
-              {activities.map((activity) => (
-                <motion.div
-                  key={activity.id}
-                  initial={{ opacity: 0, y: -12, scale: 0.96 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.96 }}
-                  transition={{ duration: 0.25 }}
-                >
-                  <HStack
-                    justify="space-between"
-                    p={3}
-                    borderRadius="xl"
-                    bg={activity.status === "success" ? "blue.500/8" : "rose.500/8"}
-                    border="1px solid"
-                    borderColor={activity.status === "success" ? "blue.500/12" : "rose.500/12"}
-                    cursor="pointer"
-                    _hover={{
-                      bg: activity.status === "success" ? "blue.500/12" : "rose.500/12",
-                      transform: "translateX(2px)"
-                    }}
-                    transition="all 0.18s ease"
-                    onClick={() => onViewMember(activity.member_id)}
+          <VStack align="stretch" gap={3}>
+            {Array.from(groupedActivities.entries()).map(([dateLabel, dateActivities]) => (
+              <VStack key={dateLabel} align="stretch" gap={2}>
+                {/* Date separator header */}
+                <HStack gap={2} align="center" py={1}>
+                  <Calendar size={12} className="icon-gray-muted" />
+                  <Text
+                    fontSize="2xs"
+                    fontWeight="900"
+                    color={dateLabelColor}
+                    letterSpacing="wider"
+                    textTransform="uppercase"
                   >
-                    <HStack gap={3} minW={0}>
-                      <Avatar name={activity.member_name} size="xs" shape="rounded" />
-                      <VStack align="start" gap={0} minW={0}>
-                        <Text fontSize="xs" fontWeight="950" color="app.text.primary" truncate>
-                          {activity.member_name}
-                        </Text>
-                        <Text fontSize="3xs" color={muted} fontWeight="800">
-                          {activity.member_id} • {formatTime(activity.timestamp)}
-                        </Text>
-                      </VStack>
-                    </HStack>
+                    {dateLabel}
+                  </Text>
+                  <Box flex="1" h="1px" bg={dateLabelBg} />
+                  <Badge
+                    variant="subtle"
+                    colorPalette="gray"
+                    borderRadius="full"
+                    fontSize="3xs"
+                    px={1.5}
+                    py={0.5}
+                    fontWeight="900"
+                  >
+                    {dateActivities.length}
+                  </Badge>
+                </HStack>
 
-                    <VStack align="end" gap={1} flexShrink={0}>
-                      {activity.status === "success" ? (
-                        activity.has_active_plan ? (
-                          <Badge colorPalette="green" variant="solid" borderRadius="full" fontSize="3xs" px={1.5} py={0.5}>
-                            Active
-                          </Badge>
-                        ) : (
-                          <Badge colorPalette="orange" variant="solid" borderRadius="full" fontSize="3xs" px={1.5} py={0.5}>
-                            No Plan
-                          </Badge>
-                        )
-                      ) : (
-                        <Badge colorPalette="rose" variant="solid" borderRadius="full" fontSize="3xs" px={1.5} py={0.5}>
-                          Denied
-                        </Badge>
-                      )}
-                    </VStack>
-                  </HStack>
-                </motion.div>
-              ))}
-            </AnimatePresence>
+                {/* Activities for this date */}
+                <AnimatePresence initial={false}>
+                  {dateActivities.map((activity) => (
+                    <motion.div
+                      key={activity.id}
+                      initial={{ opacity: 0, y: -12, scale: 0.96 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.96 }}
+                      transition={{ duration: 0.25 }}
+                    >
+                      <ActivityItem activity={activity} onViewMember={onViewMember} />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </VStack>
+            ))}
 
             {activities.length === 0 && (
               <VStack py={12} gap={2}>
@@ -794,12 +1012,13 @@ const Attendance = memo(() => {
             };
           });
 
+          // Reduced cooldown from 3s to 1.5s for faster successive scans
           setTimeout(() => {
             console.log(`[CheckIn] Cooldown ended. Ready for next scan.`);
             logCameraStatus("Post-cooldown success");
             setStatus("idle");
             isThrottledRef.current = false;
-          }, 3000);
+          }, 1500);
         } else {
           console.warn(`[CheckIn] DENIED for "${cleanId}": ${res.message}`);
           setStatus("error");
@@ -825,12 +1044,13 @@ const Attendance = memo(() => {
             return updated;
           });
 
+          // Reduced cooldown from 3s to 1.5s for faster successive scans
           setTimeout(() => {
             console.log(`[CheckIn] Cooldown ended (after denied). Ready for next scan.`);
             logCameraStatus("Post-cooldown denied");
             setStatus("idle");
             isThrottledRef.current = false;
-          }, 3000);
+          }, 1500);
         }
       },
       error: (err) => {
@@ -859,12 +1079,13 @@ const Attendance = memo(() => {
           return updated;
         });
 
+        // Reduced cooldown from 3s to 1.5s for faster successive scans
         setTimeout(() => {
           console.log(`[CheckIn] Cooldown ended (after network error). Ready for next scan.`);
           logCameraStatus("Post-cooldown error");
           setStatus("idle");
           isThrottledRef.current = false;
-        }, 3000);
+        }, 1500);
       },
     });
   }, [playSuccess, playError, logCameraStatus]);
@@ -912,7 +1133,7 @@ const Attendance = memo(() => {
     const html5QrCode = qrReaderRef.current;
     if (html5QrCode) {
       qrReaderRef.current = null;
-      
+
       const performStop = () => {
         if (html5QrCode.isScanning) {
           html5QrCode.stop()
@@ -946,9 +1167,8 @@ const Attendance = memo(() => {
       return;
     }
 
-    console.log(`[WebcamScanner] Initializing camera: "${selectedCameraId}" with 25 FPS scan rate.`);
-    const html5QrCode = new Html5Qrcode("qr-scanner-hud");
-    qrReaderRef.current = html5QrCode;
+    let isMounted = true;
+    let html5QrCode: Html5Qrcode | null = null;
     let monitorInterval: any = null;
 
     const restartScanner = () => {
@@ -959,153 +1179,189 @@ const Attendance = memo(() => {
       if (monitorInterval) clearInterval(monitorInterval);
       stopScanner();
       setTimeout(() => {
-        setIsScanning(false);
-        setTimeout(() => {
-          setIsScanning(true);
-        }, 150);
+        if (isMounted) {
+          setIsScanning(false);
+          setTimeout(() => {
+            if (isMounted) {
+              setIsScanning(true);
+            }
+          }, 150);
+        }
       }, 100);
     };
 
-    const startPromise = html5QrCode.start(
-      selectedCameraId,
-      {
-        fps: 25, // Bumping from 10 to 25 FPS makes it decode frames much more frequently
-        qrbox: (width, height) => {
-          const size = Math.min(width, height) * 0.75; // Bumping from 0.65 to 0.75 for a larger scan area
-          return { width: size, height: size };
-        }
-      },
-      (decodedText) => {
-        lastFrameTimestampRef.current = Date.now();
-        if (isThrottledRef.current) {
-          console.log(`[WebcamScanner] Frame decoded: "${decodedText}", but ignored (cooldown throttle active)`);
-          return;
-        }
-        
-        let parsedId = decodedText.trim();
-        console.log(`[WebcamScanner] Detected QR code payload: "${parsedId}"`);
-        if (parsedId.startsWith("gym:")) {
-          parsedId = parsedId.substring(4);
-          console.log(`[WebcamScanner] Legacy prefix stripped. Parsed ID: "${parsedId}"`);
-        }
-        
-        triggerCheckIn(parsedId, true);
-      },
-      (errorMessage) => {
-        lastFrameTimestampRef.current = Date.now();
-        // Quietly scan frames, but log other unexpected errors
-        if (errorMessage && !errorMessage.includes("No MultiFormat Readers") && !errorMessage.includes("No QR code found")) {
-          console.warn("[WebcamScanner] Frame processing error:", errorMessage);
-        }
-      }
-    );
+    // Paint delay to ensure DOM layout is completed and container dimensions are calculated
+    const initTimeout = setTimeout(() => {
+      if (!isMounted) return;
 
-    qrStartPromiseRef.current = startPromise;
-
-    startPromise.then(() => {
-      console.log(`[WebcamScanner] Camera feed successfully started. Active scanning area initialized.`);
-      isRecoveringRef.current = false;
-      retryCountRef.current = 0;
-      lastFrameTimestampRef.current = Date.now();
-      lastPixelDataRef.current = null;
-      frozenCountRef.current = 0;
-      
-      // Keep-alive/self-healing loop to recover if the browser extension crashes, pauses or disrupts the webcam stream
-      monitorInterval = setInterval(() => {
-        if (!isScanning) return;
-        
-        // 1. Verify if the decoding loop is actively processing frames (detect crash or freeze)
-        if (Date.now() - lastFrameTimestampRef.current > 3000) {
-          console.warn("[WebcamScanner Monitor] Scanner loop frozen (no frames processed for 3s). Reinitializing scanner...");
-          restartScanner();
-          return;
+      console.log(`[WebcamScanner] Initializing camera: "${selectedCameraId}" after layout paint delay.`);
+      try {
+        const container = document.getElementById("qr-scanner-hud");
+        if (!container || container.clientWidth === 0 || container.clientHeight === 0) {
+          console.warn("[WebcamScanner] Container size not ready. width:", container?.clientWidth, "height:", container?.clientHeight);
         }
 
-        const videoEl = document.querySelector("#qr-scanner-hud video") as HTMLVideoElement;
-        if (videoEl) {
-          // If video element exists but is paused, force resume it
-          if (videoEl.paused && !isThrottledRef.current) {
-            console.log("[WebcamScanner Monitor] Video playback paused. Force resuming video...");
-            videoEl.play().catch(e => console.warn("[WebcamScanner Monitor] Failed to resume video playback:", e));
+        html5QrCode = new Html5Qrcode("qr-scanner-hud", {
+          verbose: false,
+          useBarCodeDetectorIfSupported: true,
+        });
+        qrReaderRef.current = html5QrCode;
+
+        const startPromise = html5QrCode.start(
+          selectedCameraId,
+          {
+            fps: 30, // Higher FPS = more frame decode attempts per second
+            qrbox: (width, height) => {
+              // Use 85% of the smaller dimension for a larger, more forgiving scan region
+              const size = Math.min(width, height) * 0.85;
+              return { width: size, height: size };
+            },
+            // Skip horizontal flip — saves one canvas transform per frame
+            disableFlip: true,
+            // Prefer environment (rear) camera with optimal resolution for decoding
+            aspectRatio: 1.0,
+          },
+          (decodedText) => {
+            lastFrameTimestampRef.current = Date.now();
+            if (isThrottledRef.current) {
+              console.log(`[WebcamScanner] Frame decoded: "${decodedText}", but ignored (cooldown throttle active)`);
+              return;
+            }
+
+            let parsedId = decodedText.trim();
+            console.log(`[WebcamScanner] Detected QR code payload: "${parsedId}"`);
+            if (parsedId.startsWith("gym:")) {
+              parsedId = parsedId.substring(4);
+              console.log(`[WebcamScanner] Legacy prefix stripped. Parsed ID: "${parsedId}"`);
+            }
+
+            triggerCheckIn(parsedId, true);
+          },
+          (errorMessage) => {
+            lastFrameTimestampRef.current = Date.now();
+            // Quietly scan frames, but log other unexpected errors
+            if (errorMessage && !errorMessage.includes("No MultiFormat Readers") && !errorMessage.includes("No QR code found")) {
+              console.warn("[WebcamScanner] Frame processing error:", errorMessage);
+            }
           }
-          
-          // 2. Verify if the video stream track is still active
-          const stream = videoEl.srcObject as MediaStream;
-          const track = stream?.getVideoTracks()[0];
-          if (track && track.readyState === "ended") {
-            console.warn("[WebcamScanner Monitor] Media stream track ended. Reinitializing scanner...");
-            restartScanner();
+        );
+
+        qrStartPromiseRef.current = startPromise;
+
+        startPromise.then(() => {
+          if (!isMounted) {
+            stopScanner();
             return;
           }
+          console.log(`[WebcamScanner] Camera feed successfully started. Active scanning area initialized.`);
+          isRecoveringRef.current = false;
+          retryCountRef.current = 0;
+          lastFrameTimestampRef.current = Date.now();
+          lastPixelDataRef.current = null;
+          frozenCountRef.current = 0;
 
-          // 3. Pixel-based frozen frame detection (in case browser plays frozen buffer without updating context)
-          let isFrozen = false;
-          try {
-            const canvas = document.createElement("canvas");
-            canvas.width = 8;
-            canvas.height = 8;
-            const ctx = canvas.getContext("2d");
-            if (ctx) {
-              ctx.drawImage(videoEl, 0, 0, 8, 8);
-              const imgData = ctx.getImageData(0, 0, 8, 8).data;
-              
-              if (lastPixelDataRef.current) {
-                let match = true;
-                for (let i = 0; i < imgData.length; i++) {
-                  if (imgData[i] !== lastPixelDataRef.current[i]) {
-                    match = false;
-                    break;
-                  }
-                }
-                if (match) {
-                  isFrozen = true;
-                }
-              }
-              lastPixelDataRef.current = imgData;
-            }
-          } catch (e) {
-            console.warn("[WebcamScanner Monitor] Failed to check pixel data:", e);
-          }
+          // Keep-alive/self-healing loop to recover if the browser extension crashes, pauses or disrupts the webcam stream
+          monitorInterval = setInterval(() => {
+            if (!isMounted || !isScanning) return;
 
-          if (isFrozen) {
-            frozenCountRef.current += 1;
-            console.log(`[WebcamScanner Monitor] Static/frozen frame detected (${frozenCountRef.current}/3)`);
-            if (frozenCountRef.current >= 3) {
-              console.warn("[WebcamScanner Monitor] Camera feed is frozen. Reinitializing scanner...");
+            // 1. Verify if the decoding loop is actively processing frames (detect crash or freeze)
+            if (Date.now() - lastFrameTimestampRef.current > 3000) {
+              console.warn("[WebcamScanner Monitor] Scanner loop frozen (no frames processed for 3s). Reinitializing scanner...");
               restartScanner();
               return;
             }
-          } else {
-            frozenCountRef.current = 0;
-          }
-        } else {
-          // Video element missing from DOM - React might have unmounted/cleared it
-          console.warn("[WebcamScanner Monitor] Video element not found in DOM. Reinitializing scanner...");
-          restartScanner();
-        }
-      }, 1000);
-    }).catch((err) => {
-      console.error("[WebcamScanner] Failed to start Html5Qrcode:", err);
-      if (qrReaderRef.current === html5QrCode) {
-        if (isRecoveringRef.current && retryCountRef.current < 3) {
-          retryCountRef.current += 1;
-          console.warn(`[WebcamScanner Monitor] Start failed during recovery. Retrying (${retryCountRef.current}/3) in 2 seconds...`);
-          if (monitorInterval) clearInterval(monitorInterval);
-          setTimeout(() => {
-            if (isScanning) {
+
+            const videoEl = document.querySelector("#qr-scanner-hud video") as HTMLVideoElement;
+            if (videoEl) {
+              // If video element exists but is paused, force resume it
+              if (videoEl.paused && !isThrottledRef.current) {
+                console.log("[WebcamScanner Monitor] Video playback paused. Force resuming video...");
+                videoEl.play().catch(e => console.warn("[WebcamScanner Monitor] Failed to resume video playback:", e));
+              }
+
+              // 2. Verify if the video stream track is still active
+              const stream = videoEl.srcObject as MediaStream;
+              const track = stream?.getVideoTracks()[0];
+              if (track && track.readyState === "ended") {
+                console.warn("[WebcamScanner Monitor] Media stream track ended. Reinitializing scanner...");
+                restartScanner();
+                return;
+              }
+
+              // 3. Pixel-based frozen frame detection (in case browser plays frozen buffer without updating context)
+              let isFrozen = false;
+              try {
+                const canvas = document.createElement("canvas");
+                canvas.width = 8;
+                canvas.height = 8;
+                const ctx = canvas.getContext("2d");
+                if (ctx) {
+                  ctx.drawImage(videoEl, 0, 0, 8, 8);
+                  const imgData = ctx.getImageData(0, 0, 8, 8).data;
+
+                  if (lastPixelDataRef.current) {
+                    let match = true;
+                    for (let i = 0; i < imgData.length; i++) {
+                      if (imgData[i] !== lastPixelDataRef.current[i]) {
+                        match = false;
+                        break;
+                      }
+                    }
+                    if (match) {
+                      isFrozen = true;
+                    }
+                  }
+                  lastPixelDataRef.current = imgData;
+                }
+              } catch (e) {
+                console.warn("[WebcamScanner Monitor] Failed to check pixel data:", e);
+              }
+
+              if (isFrozen) {
+                frozenCountRef.current += 1;
+                console.log(`[WebcamScanner Monitor] Static/frozen frame detected (${frozenCountRef.current}/3)`);
+                if (frozenCountRef.current >= 3) {
+                  console.warn("[WebcamScanner Monitor] Camera feed is frozen. Reinitializing scanner...");
+                  restartScanner();
+                  return;
+                }
+              } else {
+                frozenCountRef.current = 0;
+              }
+            } else {
+              // Video element missing from DOM - React might have unmounted/cleared it
+              console.warn("[WebcamScanner Monitor] Video element not found in DOM. Reinitializing scanner...");
               restartScanner();
             }
-          }, 2000);
-        } else {
-          toaster.create({ title: "Scanner Error", description: "Failed to initialize webcam feed.", type: "error" });
-          setIsScanning(false);
-          isRecoveringRef.current = false;
-          retryCountRef.current = 0;
-        }
+          }, 1000);
+        }).catch((err) => {
+          console.error("[WebcamScanner] Failed to start Html5Qrcode:", err);
+          if (isMounted && qrReaderRef.current === html5QrCode) {
+            if (isRecoveringRef.current && retryCountRef.current < 3) {
+              retryCountRef.current += 1;
+              console.warn(`[WebcamScanner Monitor] Start failed during recovery. Retrying (${retryCountRef.current}/3) in 2 seconds...`);
+              if (monitorInterval) clearInterval(monitorInterval);
+              setTimeout(() => {
+                if (isMounted && isScanning) {
+                  restartScanner();
+                }
+              }, 2000);
+            } else {
+              toaster.create({ title: "Scanner Error", description: "Failed to initialize webcam feed.", type: "error" });
+              setIsScanning(false);
+              isRecoveringRef.current = false;
+              retryCountRef.current = 0;
+            }
+          }
+        });
+      } catch (err) {
+        console.error("[WebcamScanner] Initialization failed:", err);
       }
-    });
+    }, 150);
 
     return () => {
+      isMounted = false;
+      clearTimeout(initTimeout);
       if (monitorInterval) clearInterval(monitorInterval);
       stopScanner();
     };
@@ -1160,6 +1416,11 @@ const Attendance = memo(() => {
   const handleFocusInput = useCallback(() => {
     inputRef.current?.focus();
   }, []);
+
+  const handleMuteClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    handleToggleMute();
+  }, [handleToggleMute]);
 
   // Autofocus keyboard listener
   useEffect(() => {
@@ -1220,31 +1481,94 @@ const Attendance = memo(() => {
     contentWrapperProps: terminalWrapperProps,
   } = useMaximize(terminalRef, { maxW: "800px", centerContent: true });
 
+  const handleTerminalMaximizeClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleTerminalMaximize();
+  }, [toggleTerminalMaximize]);
+
   return (
     <Box ref={pageRef} {...pageFullscreenProps}>
       <Box {...pageWrapperProps}>
         <Flex direction="column" minH="70vh" w="full" py={6} animation="fade-in 0.4s ease-out">
-          {/* Dynamic Keyframe Animations Injection */}
+          {/* Dynamic Keyframe Animations & Global Overrides Injection */}
           <style>{`
-        @keyframes scan-line {
-          0% { top: 0%; opacity: 0.3; }
-          50% { top: 100%; opacity: 1; }
-          100% { top: 0%; opacity: 0.3; }
-        }
-        @keyframes pulse-light {
-          0% { opacity: 0.4; }
-          50% { opacity: 1; }
-          100% { opacity: 0.4; }
-        }
-        @keyframes grid-anim {
-          0% { background-position: 0 0; }
-          100% { background-position: 0 40px; }
-        }
-        @keyframes scale-up {
-          0% { transform: scale(0.9); opacity: 0; }
-          100% { transform: scale(1); opacity: 1; }
-        }
-      `}</style>
+            @keyframes scan-line {
+              0% { top: 0%; opacity: 0.3; }
+              50% { top: 100%; opacity: 1; }
+              100% { top: 0%; opacity: 0.3; }
+            }
+            @keyframes pulse-light {
+              0% { opacity: 0.4; }
+              50% { opacity: 1; }
+              100% { opacity: 0.4; }
+            }
+            @keyframes grid-anim {
+              0% { background-position: 0 0; }
+              100% { background-position: 0 40px; }
+            }
+            @keyframes scale-up {
+              0% { transform: scale(0.9); opacity: 0; }
+              100% { transform: scale(1); opacity: 1; }
+            }
+            
+            /* Global resets for html5-qrcode camera stream containers to prevent white borders/bars */
+            #qr-scanner-hud {
+              position: absolute !important;
+              inset: 0 !important;
+              width: 100% !important;
+              height: 100% !important;
+              background-color: #000000 !important;
+              background: #000000 !important;
+              overflow: hidden !important;
+              border: none !important;
+            }
+            #qr-scanner-hud * {
+              background-color: transparent !important;
+              background: transparent !important;
+              border: none !important;
+              box-shadow: none !important;
+            }
+            #qr-scanner-hud video {
+              position: absolute !important;
+              inset: 0 !important;
+              width: 100% !important;
+              height: 100% !important;
+              object-fit: cover !important;
+              object-position: center !important;
+              display: block !important;
+            }
+            #qr-scanner-hud canvas {
+              position: absolute !important;
+              inset: 0 !important;
+              width: 100% !important;
+              height: 100% !important;
+              object-fit: cover !important;
+              pointer-events: none !important;
+              opacity: 0.8 !important;
+            }
+            
+            /* Custom CSS utility classes to avoid inline style objects */
+            .icon-mr-5 {
+              margin-right: 5px !important;
+              flex-shrink: 0 !important;
+            }
+            .icon-ml-8 {
+              margin-left: 8px !important;
+              flex-shrink: 0 !important;
+            }
+            .icon-gray-muted {
+              color: var(--chakra-colors-gray-500) !important;
+              flex-shrink: 0 !important;
+            }
+            .icon-blue-muted {
+              color: var(--chakra-colors-blue-500) !important;
+              flex-shrink: 0 !important;
+            }
+            .attendance-select-option {
+              background-color: #0f172a !important;
+              color: #ffffff !important;
+            }
+          `}</style>
 
           {/* Centered High-Tech Cockpit Header */}
           <VStack
@@ -1270,7 +1594,7 @@ const Attendance = memo(() => {
               bg="linear-gradient(135deg, #06b6d4, #6366f1)"
               borderRadius="2xl"
               color="white"
-              boxShadow="0 10px 25px -8px rgba(6, 182, 212, 0.6)"
+              // boxShadow="0 10px 25px -8px rgba(6, 182, 212, 0.6)"
               animation="pulse-light 3s infinite"
             >
               <Scan size={26} />
@@ -1303,7 +1627,7 @@ const Attendance = memo(() => {
             </VStack>
           </VStack>
 
-          <Grid templateColumns={{ base: "1fr", lg: "1.3fr 1fr" }} gap={8} w="full" mt={6} alignItems="start">
+          <Grid templateColumns={{ base: "1fr", lg: "1.3fr 1fr" }} gap={8} w="full" mt={6} alignItems="stretch">
             {/* Left Column: Scanning Desk Terminal */}
             <GridItem w="full">
               <VStack gap={6} w="full">
@@ -1316,7 +1640,8 @@ const Attendance = memo(() => {
                       bg={panelBg}
                       border="1px solid"
                       borderColor={status === "success" ? "emerald.500/40" : status === "error" ? "rose.500/40" : borderColor}
-                      boxShadow={isTerminalMaximized ? "0 40px 80px -20px rgba(0, 0, 0, 0.6)" : "0 30px 60px -25px rgba(0, 0, 0, 0.4)"}
+                      boxShadow={"md"}
+                      // boxShadow={isTerminalMaximized ? "0 40px 80px -20px rgba(0, 0, 0, 0.6)" : "0 30px 60px -25px rgba(0, 0, 0, 0.4)"}
                       backdropFilter="blur(20px)"
                       transition="all 0.35s ease"
                       onClick={handleFocusInput}
@@ -1338,10 +1663,7 @@ const Attendance = memo(() => {
                               colorPalette="gray"
                               size="sm"
                               borderRadius="xl"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleToggleMute();
-                              }}
+                              onClick={handleMuteClick}
                               aria-label={isMuted ? "Unmute sound" : "Mute sound"}
                             >
                               {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
@@ -1351,10 +1673,7 @@ const Attendance = memo(() => {
                               colorPalette="gray"
                               size="sm"
                               borderRadius="xl"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleTerminalMaximize();
-                              }}
+                              onClick={handleTerminalMaximizeClick}
                               aria-label={isTerminalMaximized ? "Exit fullscreen" : "Enter fullscreen"}
                             >
                               {isTerminalMaximized ? <Minimize2 size={15} strokeWidth={2.5} /> : <Maximize2 size={15} strokeWidth={2.5} />}
@@ -1362,63 +1681,19 @@ const Attendance = memo(() => {
                           </HStack>
                         </HStack>
 
-                        {/* Interactive Scanner Viewport */}
+                        {/* Interactive Scanner Viewport — fixed heights: 320px normal, 480px fullscreen */}
                         <ScannerHUD
                           status={status}
                           memberName={lastCheckin?.data?.member_name}
                           errorMessage={errorMessage}
-                          h={isTerminalMaximized ? "360px" : "240px"}
+                          h={isTerminalMaximized ? "480px" : "320px"}
                           isScanning={isScanning}
                           readerId="qr-scanner-hud"
+                          onToggleScanner={handleToggleScanner}
+                          cameras={cameras}
+                          selectedCameraId={selectedCameraId}
+                          onCameraChange={handleCameraChange}
                         />
-
-                        {/* Camera Controls Panel */}
-                        <HStack w="full" justify="space-between" align="center" gap={3} flexWrap="wrap">
-                          <Button
-                            size="xs"
-                            h="34px"
-                            borderRadius="lg"
-                            variant="outline"
-                            borderColor={isScanning ? "rose.500/50" : "cyan.500/50"}
-                            color={isScanning ? "rose.400" : "cyan.400"}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleToggleScanner();
-                            }}
-                            _hover={{ bg: isScanning ? "rose.500/10" : "cyan.500/10" }}
-                            px={3}
-                            fontWeight="800"
-                          >
-                            <Scan size={12} style={{ marginRight: "6px" }} />
-                            {isScanning ? "Stop QR Scanner" : "Activate QR Scanner"}
-                          </Button>
-                          
-                          {isScanning && cameras.length > 0 && (
-                            <NativeSelectRoot maxW="200px" size="sm" onClick={(e) => e.stopPropagation()}>
-                              <NativeSelectField
-                                value={selectedCameraId}
-                                onChange={handleCameraChange}
-                                bg="rgba(10, 15, 30, 0.65)"
-                                border="1px solid"
-                                borderColor="whiteAlpha.100"
-                                color="white"
-                                fontSize="xs"
-                                fontWeight="800"
-                                borderRadius="xl"
-                                h="34px"
-                                cursor="pointer"
-                                _hover={{ borderColor: "cyan.400/50" }}
-                                _focus={{ borderColor: "cyan.500", boxShadow: "0 0 10px rgba(6, 182, 212, 0.25)" }}
-                              >
-                                {cameras.map((cam) => (
-                                  <option key={cam.id} value={cam.id} style={{ background: "#0f172a", color: "white" }}>
-                                    {cam.label || `Camera ${cam.id}`}
-                                  </option>
-                                ))}
-                              </NativeSelectField>
-                            </NativeSelectRoot>
-                          )}
-                        </HStack>
 
                         {/* Input Controls */}
                         <VStack w="full" gap={4} mt={2}>
@@ -1486,21 +1761,23 @@ const Attendance = memo(() => {
                             }}
                             transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
                           >
-                            LOG ATTENDANCE <ArrowRight style={{ marginLeft: "8px" }} size={16} />
+                            LOG ATTENDANCE <ArrowRight className="icon-ml-8" size={16} />
                           </Button>
                         </VStack>
                       </VStack>
+                      {/* Sub-Card: Member quick lookup guidelines */}
+                      <HStack w="full" p={4} bg="whiteAlpha.50" border="1px solid" borderColor="whiteAlpha.100" borderRadius="2xl" gap={3} >
+                        <Info size={16} className="icon-blue-muted" />
+                        <Text fontSize="xs" fontWeight="700" color={muted} >
+                          Attendance focus is maintained automatically. Scan ID cards successively to log attendance.
+                        </Text>
+                      </HStack>
                     </Box>
                   </Box>
+
                 </Box>
 
-                {/* Sub-Card: Member quick lookup guidelines */}
-                <HStack w="full" p={4} bg="whiteAlpha.50" border="1px solid" borderColor="whiteAlpha.100" borderRadius="2xl" gap={3}>
-                  <Info size={16} style={{ color: "var(--chakra-colors-blue-500)", flexShrink: 0 }} />
-                  <Text fontSize="xs" fontWeight="700" color={muted}>
-                    Attendance focus is maintained automatically. Scan ID cards successively to log attendance.
-                  </Text>
-                </HStack>
+
               </VStack>
             </GridItem>
 

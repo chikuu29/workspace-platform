@@ -57,7 +57,7 @@
                 },
                 "hidden": false,
                 "oneLiner": true,
-                "required": true,
+                "mandatory": true,
                 "event": "draft"
             }
         ]
@@ -86,7 +86,7 @@
                                 "description": "Enter trainer's first name",
                                 "widget": "textField",
                                 "oneLiner": true,
-                                "required": true,
+                                "mandatory": true,
                                 "maxLength": 50
                             },
                             {
@@ -95,7 +95,7 @@
                                 "description": "Enter trainer's last name",
                                 "widget": "textField",
                                 "oneLiner": true,
-                                "required": true,
+                                "mandatory": true,
                                 "maxLength": 50
                             },
                             {
@@ -105,7 +105,7 @@
                                 "type": "email",
                                 "widget": "textField",
                                 "oneLiner": true,
-                                "required": true
+                                "mandatory": true
                             },
                             {
                                 "name": "phone",
@@ -114,7 +114,7 @@
                                 "type": "tel",
                                 "widget": "textField",
                                 "oneLiner": true,
-                                "required": true
+                                "mandatory": true
                             },
                             {
                                 "name": "gender",
@@ -123,6 +123,7 @@
                                 "widget": "radioField",
                                 "oneLiner": true,
                                 "enableClear": true,
+                                "mandatory": true,
                                 "options": [
                                     {
                                         "label": "Male",
@@ -144,7 +145,7 @@
                                 "description": "Current permanent residence details",
                                 "widget": "textAreaField",
                                 "oneLiner": true,
-                                "required": false
+                                "mandatory": false
                             }
                         ]
                     },
@@ -181,7 +182,7 @@
                                         "value": "personal"
                                     }
                                 ],
-                                "required": true
+                                "mandatory": true
                             },
                             {
                                 "name": "experienceYears",
@@ -190,7 +191,7 @@
                                 "widget": "textField",
                                 "type": "number",
                                 "oneLiner": true,
-                                "required": true
+                                "mandatory": true
                             },
                             {
                                 "name": "joiningDate",
@@ -198,7 +199,7 @@
                                 "description": "Select the official start date of employment",
                                 "widget": "dateField",
                                 "oneLiner": true,
-                                "required": true,
+                                "mandatory": true,
                                 "enableClear": true
                             },
                             {
@@ -207,7 +208,7 @@
                                 "description": "Preferred training session slot",
                                 "widget": "dateAndTimeField",
                                 "oneLiner": true,
-                                "required": true,
+                                "mandatory": true,
                                 "enableClear": true
                             },
                             {
@@ -230,7 +231,7 @@
                                 "description": "Upload a valid passport, driver's license, or national ID",
                                 "widget": "uploadField",
                                 "oneLiner": true,
-                                "required": true,
+                                "mandatory": false,
                                 "liveCameraAllow": true,
                                 "defaultApiConfig": {
                                     "uploadURL": "app/upload"
@@ -242,7 +243,7 @@
                                 "description": "Upload professional fitness certifications (e.g., ACE, NASM, ISSA)",
                                 "widget": "uploadField",
                                 "oneLiner": true,
-                                "required": true,
+                                "mandatory": false,
                                 "liveCameraAllow": false,
                                 "defaultApiConfig": {
                                     "uploadURL": "app/upload"
@@ -255,8 +256,11 @@
                                 "widget": "uploadField",
                                 "oneLiner": true,
                                 "liveCameraAllow": true,
+                                "mandatory": true,
                                 "accept": "image/*",
                                 "defaultApiConfig": {
+                                    "max_size_bytes": 5242880,
+                                    "accept": "image/*",
                                     "uploadURL": "app/upload"
                                 }
                             },
@@ -280,7 +284,167 @@
                                         "label": "UPI / Digital",
                                         "value": "upi"
                                     }
-                                ]
+                                ],
+                                "events": {
+                                    "change": [
+                                        {
+                                            "condition": "value === 'bank'",
+                                            "actions": [
+                                                {
+                                                    "type": "show",
+                                                    "target": [
+                                                        "bankName",
+                                                        "accountNumber",
+                                                        "ifscCode"
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "mandatory",
+                                                    "target": [
+                                                        "bankName",
+                                                        "accountNumber",
+                                                        "ifscCode"
+                                                    ],
+                                                    "value": true
+                                                },
+                                                {
+                                                    "type": "hide",
+                                                    "target": [
+                                                        "upiId"
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "mandatory",
+                                                    "target": [
+                                                        "upiId"
+                                                    ],
+                                                    "value": false
+                                                },
+                                                {
+                                                    "type": "setValue",
+                                                    "target": [
+                                                        "upiId"
+                                                    ],
+                                                    "value": ""
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "condition": "value === 'upi'",
+                                            "actions": [
+                                                {
+                                                    "type": "show",
+                                                    "target": [
+                                                        "upiId"
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "mandatory",
+                                                    "target": [
+                                                        "upiId"
+                                                    ],
+                                                    "value": true
+                                                },
+                                                {
+                                                    "type": "hide",
+                                                    "target": [
+                                                        "bankName",
+                                                        "accountNumber",
+                                                        "ifscCode"
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "mandatory",
+                                                    "target": [
+                                                        "bankName",
+                                                        "accountNumber",
+                                                        "ifscCode"
+                                                    ],
+                                                    "value": false
+                                                },
+                                                {
+                                                    "type": "setValue",
+                                                    "target": [
+                                                        "bankName",
+                                                        "accountNumber",
+                                                        "ifscCode"
+                                                    ],
+                                                    "value": ""
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "condition": "value !== 'bank' && value !== 'upi'",
+                                            "actions": [
+                                                {
+                                                    "type": "hide",
+                                                    "target": [
+                                                        "bankName",
+                                                        "accountNumber",
+                                                        "ifscCode",
+                                                        "upiId"
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "mandatory",
+                                                    "target": [
+                                                        "bankName",
+                                                        "accountNumber",
+                                                        "ifscCode",
+                                                        "upiId"
+                                                    ],
+                                                    "value": false
+                                                },
+                                                {
+                                                    "type": "setValue",
+                                                    "target": [
+                                                        "bankName",
+                                                        "accountNumber",
+                                                        "ifscCode",
+                                                        "upiId"
+                                                    ],
+                                                    "value": ""
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "bankName",
+                                "text": "Bank Name",
+                                "description": "Enter the name of the bank",
+                                "widget": "textField",
+                                "oneLiner": true,
+                                "hidden": true,
+                                "mandatory": false
+                            },
+                            {
+                                "name": "accountNumber",
+                                "text": "Account Number",
+                                "description": "Enter the bank account number",
+                                "widget": "textField",
+                                "oneLiner": true,
+                                "hidden": true,
+                                "mandatory": false
+                            },
+                            {
+                                "name": "ifscCode",
+                                "text": "IFSC Code",
+                                "description": "Enter the bank's IFSC code",
+                                "widget": "textField",
+                                "oneLiner": true,
+                                "hidden": true,
+                                "mandatory": false
+                            },
+                            {
+                                "name": "upiId",
+                                "text": "UPI ID",
+                                "description": "Enter UPI ID (e.g., username@bank)",
+                                "widget": "textField",
+                                "oneLiner": true,
+                                "hidden": true,
+                                "mandatory": false
                             }
                         ]
                     }

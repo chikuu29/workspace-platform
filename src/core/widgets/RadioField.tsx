@@ -231,7 +231,7 @@ const RadioField = ({
                   {/* Clear selection button */}
                   {value && !disabled && (
                     <IconButton
-                      size="md"
+                      size="sm"
                       variant="outline"
                       aria-label="Clear selection"
                       onClick={clearSelection}

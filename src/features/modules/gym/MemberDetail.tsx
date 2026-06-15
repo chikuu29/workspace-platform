@@ -22,7 +22,7 @@ import {
   ArrowLeft, CalendarDays, Check, CheckCircle2, CreditCard,
   Download, Dumbbell, Edit, FileText, Mail, MessageSquare,
   Phone, RefreshCw, ShieldCheck, Snowflake,
-  Trash2, Zap, ChevronRight, TrendingUp, Clock,
+  Trash2, Zap, ChevronLeft, ChevronRight, TrendingUp, Clock,
   User, MapPin, Sparkles,
 } from "lucide-react";
 
@@ -128,7 +128,6 @@ interface GlassCardProps {
 }
 
 const GlassCard = memo(({ children, p = 6, hover = true, ...props }: GlassCardProps) => {
-  const bg = useColorModeValue("rgba(255,255,255,0.82)", "rgba(18,22,40,0.72)");
   const border = useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.07)");
   const shadow = useColorModeValue("0 8px 32px rgba(0,0,0,0.06)", "0 8px 32px rgba(0,0,0,0.22)");
 
@@ -136,7 +135,7 @@ const GlassCard = memo(({ children, p = 6, hover = true, ...props }: GlassCardPr
     <Box
       p={p}
       borderRadius="20px"
-      bg={bg}
+      bg={"app.card.bg"}
       backdropFilter="blur(24px) saturate(190%)"
       border="1px solid"
       borderColor={border}
@@ -146,8 +145,8 @@ const GlassCard = memo(({ children, p = 6, hover = true, ...props }: GlassCardPr
       transition={hover ? "transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275), border-color 0.25s, box-shadow 0.3s" : undefined}
       _hover={hover ? {
         transform: "translateY(-4px)",
-        borderColor: `${BRAND_HEX}35`,
-        boxShadow: useColorModeValue("0 16px 48px rgba(0,0,0,0.10)", "0 16px 48px rgba(0,0,0,0.36)"),
+        // borderColor: `${BRAND_HEX}35`,
+        // boxShadow: useColorModeValue("0 16px 48px rgba(0,0,0,0.10)", "0 16px 48px rgba(0,0,0,0.36)"),
       } : undefined}
       {...props}
     >
@@ -255,111 +254,337 @@ StatBox.displayName = "StatBox";
 
 // ─── AttendanceCalendar ───────────────────────────────────────────────────────
 
-const AttendanceCalendar = memo(() => {
-  const now = useMemo(() => new Date(), []);
-  const year = now.getFullYear();
-  const month = now.getMonth();
-  const todayDate = now.getDate();
+interface AttendanceCalendarProps {
+  memberId: string;
+}
 
-  const monthName = useMemo(() => now.toLocaleString("default", { month: "long" }), [now]);
+const AttendanceCalendar = memo(({ memberId }: AttendanceCalendarProps) => {
+  const [currentDate, setCurrentDate] = useState(() => new Date());
+  const [checkedInDays, setCheckedInDays] = useState<Set<number>>(new Set());
+  const [historyLog, setHistoryLog] = useState<any[]>([]);
+  const [viewMode, setViewMode] = useState<"calendar" | "history">("calendar");
+  const [loading, setLoading] = useState(false);
+
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth(); // 0-indexed locally
+  const todayDate = useMemo(() => new Date().getDate(), []);
+
+  const isCurrentMonth = useMemo(() => {
+    const today = new Date();
+    return today.getFullYear() === year && today.getMonth() === month;
+  }, [year, month]);
+
+  const monthName = useMemo(() => currentDate.toLocaleString("default", { month: "long" }), [currentDate]);
   const totalDays = useMemo(() => new Date(year, month + 1, 0).getDate(), [year, month]);
   const startDay = useMemo(() => new Date(year, month, 1).getDay(), [year, month]);
   const blanks = useMemo(() => Array.from({ length: startDay }), [startDay]);
   const days = useMemo(() => Array.from({ length: totalDays }).map((_, i) => i + 1), [totalDays]);
-  const checkedIn = useMemo(() => new Set([1, 2, 4, 8, 10, 11, 15, 17, 18, 22, 24, 25, 29]), []);
   const totalRows = Math.ceil((blanks.length + days.length) / 7);
   const weekLabels = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
   const bgCell = useColorModeValue("rgba(226,232,240,0.3)", "rgba(255,255,255,0.03)");
   const border = useColorModeValue("rgba(226,232,240,0.6)", "rgba(255,255,255,0.06)");
 
+  useEffect(() => {
+    if (!memberId) return;
+
+    let isMounted = true;
+    setLoading(true);
+
+    const apiMonth = month + 1; // 1-indexed API month
+    const sub = GymApiService.getMemberAttendanceReport(memberId, year, apiMonth).subscribe({
+      next: (res: any) => {
+        if (!isMounted) return;
+        setCheckedInDays(new Set(res?.checked_in_days || []));
+        setHistoryLog(res?.history || []);
+        setLoading(false);
+      },
+      error: (err: any) => {
+        if (!isMounted) return;
+        console.error("Failed to load member attendance report:", err);
+        setLoading(false);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      sub.unsubscribe();
+    };
+  }, [memberId, year, month]);
+
+  const handlePrevMonth = useCallback(() => {
+    setCurrentDate((prev) => {
+      const next = new Date(prev);
+      next.setMonth(next.getMonth() - 1);
+      return next;
+    });
+  }, []);
+
+  const handleNextMonth = useCallback(() => {
+    setCurrentDate((prev) => {
+      const next = new Date(prev);
+      next.setMonth(next.getMonth() + 1);
+      return next;
+    });
+  }, []);
+
+  const handleSetToday = useCallback(() => {
+    setCurrentDate(new Date());
+  }, []);
+
+  const handleCalendarViewClick = useCallback(() => {
+    setViewMode("calendar");
+  }, []);
+
+  const handleHistoryViewClick = useCallback(() => {
+    setViewMode("history");
+  }, []);
+
   return (
     <VStack align="stretch" gap={4}>
-      <Flex justify="space-between" align="center">
+      <Flex justify="space-between" align="center" flexWrap="wrap" gap={3}>
         <HStack gap={2}>
           <Box w={1} h={5} bg={BRAND_GRADIENT} borderRadius="full" />
           <Heading fontSize="sm" fontWeight="800" color="app.text.primary">
             Attendance · {monthName} {year}
           </Heading>
         </HStack>
-        <HStack gap={3}>
-          <HStack gap={1.5}>
-            <Circle size="2" bg="#01B574" boxShadow="0 0 6px #01B57480" />
-            <Text fontSize="10px" color="app.text.muted" fontWeight="700">Attended</Text>
+
+        <HStack gap={2}>
+          {/* Navigation Controls */}
+          <HStack gap={1}>
+            <IconButton
+              size="xs"
+              variant="outline"
+              borderColor="border"
+              color="app.text.primary"
+              aria-label="Previous month"
+              onClick={handlePrevMonth}
+            >
+              <ChevronLeft size={14} />
+            </IconButton>
+            <Button
+              size="xs"
+              variant="ghost"
+              fontSize="10px"
+              fontWeight="900"
+              color={BRAND_HEX}
+              onClick={handleSetToday}
+            >
+              TODAY
+            </Button>
+            <IconButton
+              size="xs"
+              variant="outline"
+              borderColor="border"
+              color="app.text.primary"
+              aria-label="Next month"
+              onClick={handleNextMonth}
+            >
+              <ChevronRight size={14} />
+            </IconButton>
           </HStack>
-          <HStack gap={1.5}>
-            <Circle size="2" border="1.5px solid" borderColor={border} />
-            <Text fontSize="10px" color="app.text.muted" fontWeight="700">Absent</Text>
+
+          {/* Toggle View Mode */}
+          <HStack gap={1} p={0.5} bg={useColorModeValue("gray.100", "rgba(255,255,255,0.04)")} borderRadius="lg">
+            <Button
+              size="2xs"
+              h="24px"
+              borderRadius="md"
+              variant={viewMode === "calendar" ? "solid" : "ghost"}
+              bg={viewMode === "calendar" ? BRAND_HEX : "transparent"}
+              color={viewMode === "calendar" ? "white" : "app.text.muted"}
+              fontWeight="800"
+              fontSize="2xs"
+              onClick={handleCalendarViewClick}
+            >
+              <Icon as={CalendarDays} me="1" boxSize="3" />
+              Calendar
+            </Button>
+            <Button
+              size="2xs"
+              h="24px"
+              borderRadius="md"
+              variant={viewMode === "history" ? "solid" : "ghost"}
+              bg={viewMode === "history" ? BRAND_HEX : "transparent"}
+              color={viewMode === "history" ? "white" : "app.text.muted"}
+              fontWeight="800"
+              fontSize="2xs"
+              onClick={handleHistoryViewClick}
+
+            >
+              <Icon as={Clock} me="1" boxSize="3" />
+              History Log
+            </Button>
           </HStack>
         </HStack>
       </Flex>
 
-      <SimpleGrid columns={7} gap={1.5} textAlign="center">
-        {weekLabels.map((l) => (
-          <Text key={l} fontSize="10px" fontWeight="800" color="app.text.muted" py={1}>{l}</Text>
-        ))}
-        {blanks.map((_, i) => <Box key={`b-${i}`} />)}
-        {days.map((day, dayIdx) => {
-          const isToday = day === todayDate;
-          const isChecked = checkedIn.has(day);
-          const isFuture = day > todayDate;
-          const rowDelay = `${(totalRows - Math.floor((blanks.length + dayIdx) / 7)) * 0.07}s`;
+      {loading ? (
+        <Flex h="220px" align="center" justify="center">
+          <Spinner size="md" color={BRAND_HEX} />
+        </Flex>
+      ) : viewMode === "calendar" ? (
+        <VStack align="stretch" gap={3}>
+          <SimpleGrid columns={7} gap={1.5} textAlign="center">
+            {weekLabels.map((l) => (
+              <Text key={l} fontSize="10px" fontWeight="800" color="app.text.muted" py={1}>{l}</Text>
+            ))}
+            {blanks.map((_, i) => <Box key={`b-${i}`} />)}
+            {days.map((day, dayIdx) => {
+              const isToday = isCurrentMonth && day === todayDate;
+              const isChecked = checkedInDays.has(day);
+              const isFuture = !isCurrentMonth ? (year > new Date().getFullYear() || (year === new Date().getFullYear() && month > new Date().getMonth())) : day > todayDate;
+              const rowDelay = `${(totalRows - Math.floor((blanks.length + dayIdx) / 7)) * 0.05}s`;
 
-          return (
-            <Flex
-              key={`d-${day}`}
-              h="11"
-              borderRadius="lg"
-              align="center"
-              justify="center"
-              position="relative"
-              cursor={isFuture ? "default" : "pointer"}
-              transition="all 0.2s"
-              className="stagger-cell"
-              style={{ animationDelay: rowDelay }}
-              bg={isChecked ? "rgba(1,181,116,0.1)" : isToday ? `${BRAND_HEX}12` : bgCell}
-              border="1px solid"
-              borderColor={
-                isChecked ? "#01B57460"
-                  : isToday ? `${BRAND_HEX}50`
-                    : isFuture ? "transparent"
-                      : border
-              }
-              _hover={isFuture ? {} : {
-                transform: "translateY(-2px)",
-                bg: isChecked ? "rgba(1,181,116,0.18)" : `${BRAND_HEX}12`,
-                borderColor: isChecked ? "#01B574" : BRAND_HEX,
-              }}
-            >
-              <Text
-                fontSize="xs"
-                fontWeight={isToday || isChecked ? "800" : "500"}
-                color={
-                  isChecked ? "#01B574"
-                    : isToday ? BRAND_HEX
-                      : isFuture ? "app.text.muted"
-                        : "app.text.primary"
-                }
-                mb={isChecked ? "2" : "0"}
-              >
-                {day}
-              </Text>
-              {isChecked && (
-                <Circle
-                  size="1.5"
-                  bg="#01B574"
-                  position="absolute"
-                  bottom="1.5"
-                  boxShadow="0 0 6px #01B574"
-                />
-              )}
-            </Flex>
-          );
-        })}
-      </SimpleGrid>
+              return (
+                <Flex
+                  key={`d-${day}`}
+                  h="11"
+                  borderRadius="lg"
+                  align="center"
+                  justify="center"
+                  position="relative"
+                  cursor={isFuture ? "default" : "pointer"}
+                  transition="all 0.2s"
+                  className="stagger-cell"
+                  style={{ animationDelay: rowDelay }}
+                  bg={isChecked ? "rgba(1,181,116,0.1)" : isToday ? `${BRAND_HEX}12` : bgCell}
+                  border="1px solid"
+                  borderColor={
+                    isChecked ? "#01B57460"
+                      : isToday ? `${BRAND_HEX}50`
+                        : isFuture ? "transparent"
+                          : border
+                  }
+                  _hover={isFuture ? {} : {
+                    transform: "translateY(-2px)",
+                    bg: isChecked ? "rgba(1,181,116,0.18)" : `${BRAND_HEX}12`,
+                    borderColor: isChecked ? "#01B574" : BRAND_HEX,
+                  }}
+                >
+                  <Text
+                    fontSize="xs"
+                    fontWeight={isToday || isChecked ? "800" : "500"}
+                    color={
+                      isChecked ? "#01B574"
+                        : isToday ? BRAND_HEX
+                          : isFuture ? "app.text.muted"
+                            : "app.text.primary"
+                    }
+                    mb={isChecked ? "2" : "0"}
+                  >
+                    {day}
+                  </Text>
+                  {isChecked && (
+                    <Circle
+                      size="1.5"
+                      bg="#01B574"
+                      position="absolute"
+                      bottom="1.5"
+                      boxShadow="0 0 6px #01B574"
+                    />
+                  )}
+                </Flex>
+              );
+            })}
+          </SimpleGrid>
+
+          <HStack gap={4} justify="flex-end" pt={2}>
+            <HStack gap={1.5}>
+              <Circle size="2" bg="#01B574" boxShadow="0 0 6px #01B57480" />
+              <Text fontSize="10px" color="app.text.muted" fontWeight="700">Attended</Text>
+            </HStack>
+            <HStack gap={1.5}>
+              <Circle size="2" border="1.5px solid" borderColor={border} />
+              <Text fontSize="10px" color="app.text.muted" fontWeight="700">Absent</Text>
+            </HStack>
+          </HStack>
+        </VStack>
+      ) : (
+        <Box
+          maxH="220px"
+          overflowY="auto"
+          pr={1}
+          css={{
+            "&::-webkit-scrollbar": { width: "4px" },
+            "&::-webkit-scrollbar-track": { bg: "transparent" },
+            "&::-webkit-scrollbar-thumb": { bg: "rgba(255,255,255,0.1)", borderRadius: "2px" },
+          }}
+        >
+          <VStack align="stretch" gap={2}>
+            {historyLog.length > 0 ? (
+              historyLog.map((log) => {
+                const checkinTime = log.timestamp
+                  ? new Date(log.timestamp).toLocaleTimeString(undefined, {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                  })
+                  : "00:00:00";
+
+                const checkinDate = log.date || "N/A";
+
+                return (
+                  <HStack
+                    key={log.id}
+                    justify="space-between"
+                    p={2.5}
+                    borderRadius="xl"
+                    bg="whiteAlpha.50"
+                    border="1px solid"
+                    borderColor="whiteAlpha.100"
+                    fontSize="xs"
+                    fontWeight="700"
+                  >
+                    <HStack gap={2.5}>
+                      <Circle size={6} bg="green.500/10" color="green.500">
+                        <Check size={12} strokeWidth={3} />
+                      </Circle>
+                      <VStack align="start" gap={0.5}>
+                        <Text fontSize="xs" fontWeight="950" color="app.text.primary">
+                          Checked In
+                        </Text>
+                        <HStack gap={1} fontSize="3xs" color="app.text.muted">
+                          <Icon as={CalendarDays} boxSize={2.5} />
+                          <Text>{checkinDate}</Text>
+                          <Text>•</Text>
+                          <Icon as={Clock} boxSize={2.5} />
+                          <Text>{checkinTime}</Text>
+                        </HStack>
+                      </VStack>
+                    </HStack>
+                    <Badge
+                      colorPalette={log.has_active_plan ? "green" : "orange"}
+                      variant="subtle"
+                      borderRadius="full"
+                      fontSize="3xs"
+                      px={2}
+                      py={0.5}
+                      display="inline-flex"
+                      alignItems="center"
+                    >
+                      <Icon as={log.has_active_plan ? ShieldCheck : Clock} me="1" boxSize="2.5" />
+                      {log.has_active_plan ? "Active Plan" : "No active plan"}
+                    </Badge>
+                  </HStack>
+                );
+              })
+            ) : (
+              <Flex direction="column" align="center" justify="center" py={10} gap={2}>
+                <Clock size={20} className="icon-gray-muted" />
+                <Text fontSize="xs" color="app.text.muted" fontWeight="800">
+                  No attendance history logged.
+                </Text>
+              </Flex>
+            )}
+          </VStack>
+        </Box>
+      )}
     </VStack>
   );
 });
+
 AttendanceCalendar.displayName = "AttendanceCalendar";
 
 // ─── QuickActionButton ────────────────────────────────────────────────────────
@@ -383,7 +608,7 @@ const QuickAction = memo(({ label, icon, gradient, accentHex, danger = false, on
       justifyContent="start"
       h="12"
       w="full"
-      px={3}
+      px={4}
       borderRadius="xl"
       bg={bg}
       border="1px solid"
@@ -392,12 +617,12 @@ const QuickAction = memo(({ label, icon, gradient, accentHex, danger = false, on
       color="app.text.primary"
       transition="all 0.2s cubic-bezier(0.175,0.885,0.32,1.275)"
       _hover={{
-        transform: "translateX(5px) translateY(-1px)",
-        bg: `${accentHex}0d`,
+        // transform: "translateX(5px) translateY(-1px)",
+        // bg: `${accentHex}0d`,
         borderColor: `${accentHex}35`,
-        boxShadow: `0 4px 16px ${accentHex}22`,
+        // boxShadow: `0 4px 16px ${accentHex}22`,
       }}
-      _active={{ transform: "translateX(2px) scale(0.98)" }}
+    // _active={{ transform: "translateX(2px) scale(0.98)" }}
     >
       <Circle
         size="8"
@@ -860,18 +1085,18 @@ const MemberDetail = memo(() => {
 
     let isMounted = true;
     let localUrl = "";
-    
+
     privateAPI.get(GymApiService.getMemberQrCodeUrl(targetId), {
       responseType: "blob"
     })
-    .then((response) => {
-      if (!isMounted) return;
-      localUrl = URL.createObjectURL(response.data);
-      setQrBlobUrl(localUrl);
-    })
-    .catch((err) => {
-      console.error("Failed to load authenticated member QR code:", err);
-    });
+      .then((response) => {
+        if (!isMounted) return;
+        localUrl = URL.createObjectURL(response.data);
+        setQrBlobUrl(localUrl);
+      })
+      .catch((err) => {
+        console.error("Failed to load authenticated member QR code:", err);
+      });
 
     return () => {
       isMounted = false;
@@ -1013,12 +1238,18 @@ const MemberDetail = memo(() => {
             </Text>
           </VStack>
           <Button
-            h="44px" px={7} borderRadius="xl" fontWeight="900"
-            style={{ background: BRAND_GRADIENT, color: "white" }}
+            h="44px"
+            px={7}
+            borderRadius="xl"
+            fontWeight="900"
+            bgImage={BRAND_GRADIENT}
+            color="white"
+            cursor="pointer"
             boxShadow={`0 8px 24px ${BRAND_HEX}66`}
             onClick={handleBack}
             _hover={{ transform: "translateY(-2px)", boxShadow: `0 14px 32px ${BRAND_HEX}80` }}
             _active={{ transform: "scale(0.98)" }}
+            transition="all 0.2s"
           >
             Return to Directory
           </Button>
@@ -1057,6 +1288,24 @@ const MemberDetail = memo(() => {
           .card-print-hide {
             display: none !important;
           }
+        }
+        @keyframes pulse-glowing {
+          0% {
+            transform: scale(0.95);
+            opacity: 0.75;
+          }
+          50% {
+            transform: scale(1.25);
+            opacity: 1;
+            box-shadow: 0 0 10px var(--pulse-color);
+          }
+          100% {
+            transform: scale(0.95);
+            opacity: 0.75;
+          }
+        }
+        .pulse-dot {
+          animation: pulse-glowing 2s infinite ease-in-out;
         }
       `}</style>
       {/* Ambient orbs */}
@@ -1179,19 +1428,33 @@ const MemberDetail = memo(() => {
                 </Heading>
               </Skeleton>
               <Skeleton loading={loading}>
-                <Badge
-                  fontSize="10px"
-                  fontWeight="900"
+                <HStack
+                  gap={1.5}
                   px={3}
                   py={1}
                   borderRadius="full"
-                  bg={`${sm.hex}22`}
-                  color={sm.hex}
-                  border={`1px solid ${sm.hex}40`}
-                  boxShadow={`0 0 10px ${sm.hex}20`}
+                  bg={`${sm.hex}18`}
+                  border="1px solid"
+                  borderColor={`${sm.hex}30`}
+                  boxShadow={`0 2px 10px ${sm.hex}10`}
+                  align="center"
                 >
-                  {sm.label.toUpperCase()}
-                </Badge>
+                  <Circle
+                    size="2"
+                    bg={sm.hex}
+                    className="pulse-dot"
+                    style={{ "--pulse-color": sm.hex } as any}
+                  />
+                  <Text
+                    fontSize="10px"
+                    fontWeight="900"
+                    color={sm.hex}
+                    letterSpacing="wider"
+                    textTransform="uppercase"
+                  >
+                    {sm.label}
+                  </Text>
+                </HStack>
               </Skeleton>
             </HStack>
             <HStack gap={4} flexWrap="wrap" color={muted} fontSize="xs" fontWeight="600">
@@ -1211,7 +1474,9 @@ const MemberDetail = memo(() => {
               borderRadius="xl"
               fontWeight="900"
               fontSize="xs"
-              style={{ background: BRAND_GRADIENT, color: "white" }}
+              bgImage={BRAND_GRADIENT}
+              color="white"
+              cursor="pointer"
               boxShadow={`0 6px 18px ${BRAND_HEX}66`}
               onClick={handleAssignPlan}
               _hover={{ transform: "translateY(-2px)", boxShadow: `0 12px 28px ${BRAND_HEX}80` }}
@@ -1335,9 +1600,13 @@ const MemberDetail = memo(() => {
                       variant="outline"
                       borderColor="border"
                       color="app.text.primary"
+                      cursor="pointer"
                       onClick={handleDownloadPass}
                       fontSize="2xs"
                       fontWeight="800"
+                      transition="all 0.2s"
+                      _hover={{ bg: useColorModeValue("gray.50", "whiteAlpha.50"), transform: "translateY(-1px)" }}
+                      _active={{ transform: "scale(0.98)" }}
                     >
                       <Download size={12} />
                       Download Pass
@@ -1346,13 +1615,17 @@ const MemberDetail = memo(() => {
                       size="sm"
                       h="36px"
                       borderRadius="xl"
-                      bg="linear-gradient(135deg, #7551FF 0%, #422AFB 100%)"
+                      bgImage={BRAND_GRADIENT}
                       color="white"
+                      cursor="pointer"
+                      border="none"
                       _hover={{ transform: "translateY(-1px)", boxShadow: "0 4px 12px rgba(117,81,255,0.4)" }}
+                      _active={{ transform: "scale(0.98)" }}
                       onClick={handleEmailCard}
                       loading={emailingCard}
                       fontSize="2xs"
                       fontWeight="800"
+                      transition="all 0.2s"
                     >
                       <Mail size={12} />
                       Email Pass
@@ -1479,13 +1752,15 @@ const MemberDetail = memo(() => {
           <VStack align="stretch" gap={5} h="full">
             {/* Attendance Calendar */}
             <GlassCard>
-              <AttendanceCalendar />
+              {memberId && (
+                <AttendanceCalendar memberId={memberId} />
+              )}
             </GlassCard>
 
             {/* Quick Actions */}
             <GlassCard flex={1}>
               <SectionHeading>Quick Actions</SectionHeading>
-              <SimpleGrid columns={{ base: 1, md: 2 }} gap={2}>
+              <SimpleGrid columns={{ base: 2, md: 2 }} gap={2}>
                 <QuickAction icon={MessageSquare} label="Send Message" gradient={BRAND_GRADIENT} accentHex={BRAND_HEX} onClick={handleMessage} />
                 <QuickAction icon={Zap} label="Assign / Renew" gradient={BRAND_GRADIENT} accentHex={BRAND_ALT} onClick={handleAssignPlan} />
                 <QuickAction icon={Snowflake} label="Freeze Account" gradient="linear-gradient(135deg,#3965FF,#002DFF)" accentHex="#3965FF" onClick={handleFreeze} />
@@ -1493,21 +1768,23 @@ const MemberDetail = memo(() => {
                 <QuickAction icon={Trash2} label="Deactivate Member" gradient="linear-gradient(135deg,#EE5D50,#C52A1D)" accentHex="#EE5D50" danger onClick={handleDeactivate} />
               </SimpleGrid>
             </GlassCard>
+
+            {/* ── Membership & Billing — FULL WIDTH ── */}
+            <GlassCard hover={false} position="relative" zIndex={1}>
+              {memberId && (
+                <MemberMembershipAndBilling
+                  memberId={memberId}
+                  onAssignPlan={handleAssignPlan}
+                  onViewInvoice={handleViewInvoice}
+                  onViewOrder={handleViewOrder}
+                />
+              )}
+            </GlassCard>
           </VStack>
         </GridItem>
       </Grid>
 
-      {/* ── Membership & Billing — FULL WIDTH ── */}
-      <GlassCard hover={false} position="relative" zIndex={1}>
-        {memberId && (
-          <MemberMembershipAndBilling
-            memberId={memberId}
-            onAssignPlan={handleAssignPlan}
-            onViewInvoice={handleViewInvoice}
-            onViewOrder={handleViewOrder}
-          />
-        )}
-      </GlassCard>
+
 
       {/* ── Edit Member Dialog ── */}
       <EditMemberModal

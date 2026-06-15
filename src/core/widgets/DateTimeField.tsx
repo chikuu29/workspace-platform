@@ -154,8 +154,9 @@ const DateTimeField = ({
             if (events) ruleEngine.processEvents(events, "", "change", methods);
             return;
         }
-        // Preserve existing time when changing the date
-        const prevTime = calValue[0] ?? { hour: 0, minute: 0 };
+        // Preserve existing time when changing the date, or default to current system time
+        const now = new Date();
+        const prevTime = calValue[0] ?? { hour: now.getHours(), minute: now.getMinutes() };
         const next = new CalendarDateTime(
             newDate.year,
             newDate.month,
@@ -246,6 +247,13 @@ const DateTimeField = ({
                         <DatePicker.Root
                             value={calValue as any}
                             onValueChange={handleDateChange as any}
+                            onOpenChange={(details) => {
+                                if (!details.open) {
+                                    if (document.activeElement instanceof HTMLElement) {
+                                        document.activeElement.blur();
+                                    }
+                                }
+                            }}
                             closeOnSelect={false}
                             disabled={disabled}
                             w="full"
@@ -268,21 +276,29 @@ const DateTimeField = ({
                                             fontWeight={displayLabel ? "600" : "600"}
                                             color={displayLabel ? "fg.default" : "app.text.muted"}
                                             disabled={disabled}
+                                            cursor={disabled ? "not-allowed" : "pointer"}
                                             px={4}
-                                            _hover={{ borderColor: "app.input.border.focus" }}
+                                            _hover={{
+                                                bg: "app.input.bg",
+                                                borderColor: hasError ? "red.500" : "app.input.border"
+                                            }}
                                             _focus={{
                                                 outline: "none",
-                                                borderColor: hasError ? "red.500" : "app.input.border.focus",
+                                                bg: "app.input.bg",
+                                                borderColor: hasError ? "red.500" : "app.input.border",
                                                 boxShadow: hasError
                                                     ? "0 0 0 3px rgba(239,68,68,0.2)"
-                                                    : "app.input.glow",
+                                                    : "none",
+                                            }}
+                                            _active={{
+                                                bg: "app.input.bg"
                                             }}
                                             transition="all 0.22s cubic-bezier(0.4,0,0.2,1)"
                                         >
-                                            <Box style={{ color: hasError ? "#ef4444" : accent }} mr={2} flexShrink={0}>
+                                            <Box color={hasError ? "red.500" : "app.text.muted"} mr={2} flexShrink={0}>
                                                 <Calendar size={15} />
                                             </Box>
-                                            <Text flex={1} textAlign="left" truncate>
+                                            <Text flex={1} textAlign="left" truncate >
                                                 {displayLabel || (oneLiner ? description : "Select date & time...")}
                                             </Text>
                                         </Button>
@@ -311,9 +327,10 @@ const DateTimeField = ({
                                         borderRadius="2xl"
                                         border="1.5px solid"
                                         borderColor={borderColor}
-                                        // bg={panelBg}
+                                        bg={"app.card.bg"}
                                         boxShadow="0 20px 60px -12px rgba(0,0,0,0.3)"
                                         minW="280px"
+
                                     >
                                         {/* Day view: header + calendar + time input */}
                                         <DatePicker.View view="day">
@@ -331,7 +348,7 @@ const DateTimeField = ({
                                                     size="sm"
                                                     borderRadius="lg"
                                                     borderColor={borderColor}
-                                                    bg={inputBg}
+                                                    bg={"app.card.bg"}
                                                     fontFamily="mono"
                                                     fontWeight="600"
                                                     fontSize="sm"

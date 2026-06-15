@@ -229,9 +229,9 @@ const ChartCard = memo(({
           let seriesData = Array.isArray(chartData)
             ? chartData
             : Object.entries(chartData).map(([key, val]) => ({
-                name: key,
-                value: val,
-              }));
+              name: key,
+              value: val,
+            }));
 
           // Standardise labels (support name/label keys)
           seriesData = seriesData.map((item: any) => ({
@@ -449,7 +449,7 @@ const ChartCard = memo(({
     <Box
       p={5}
       borderRadius="24px"
-      bg={cardBg}
+      bg={"app.card.bg"}
       border="1px solid"
       borderColor={borderColor}
       backdropFilter="blur(20px) saturate(160%)"

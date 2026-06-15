@@ -462,7 +462,7 @@ const StatsGrid = memo(({ checkinsToday, activeMembers, capacityLoad, loading }:
   return (
     <SimpleGrid columns={3} gap={4} w="full">
       {/* Scans Today */}
-      <Box p={4} borderRadius="2xl" bg={bg} border="1px solid" borderColor={border} backdropFilter="blur(16px)">
+      <Box p={4} borderRadius="2xl" bg={"app.card.bg"} border="1px solid" borderColor={border} backdropFilter="blur(16px)">
         <HStack justify="space-between" align="center">
           <VStack align="start" gap={0.5}>
             <Text fontSize="2xs" color={muted} fontWeight="900" textTransform="uppercase">
@@ -481,7 +481,7 @@ const StatsGrid = memo(({ checkinsToday, activeMembers, capacityLoad, loading }:
       </Box>
 
       {/* Active Members */}
-      <Box p={4} borderRadius="2xl" bg={bg} border="1px solid" borderColor={border} backdropFilter="blur(16px)">
+      <Box p={4} borderRadius="2xl" bg={"app.card.bg"} border="1px solid" borderColor={border} backdropFilter="blur(16px)">
         <HStack justify="space-between" align="center">
           <VStack align="start" gap={0.5}>
             <Text fontSize="2xs" color={muted} fontWeight="900" textTransform="uppercase">
@@ -500,7 +500,7 @@ const StatsGrid = memo(({ checkinsToday, activeMembers, capacityLoad, loading }:
       </Box>
 
       {/* Floor Density */}
-      <Box p={4} borderRadius="2xl" bg={bg} border="1px solid" borderColor={border} backdropFilter="blur(16px)">
+      <Box p={4} borderRadius="2xl" bg={"app.card.bg"} border="1px solid" borderColor={border} backdropFilter="blur(16px)">
         <HStack justify="space-between" align="center">
           <VStack align="start" gap={0.5}>
             <Text fontSize="2xs" color={muted} fontWeight="900" textTransform="uppercase">
@@ -660,7 +660,7 @@ const LiveActivityStream = memo(({ activities, onViewMember }: LiveActivityStrea
       w="full"
       p={5}
       borderRadius="2xl"
-      bg={cardBg}
+      bg={"app.card.bg"}
       border="1px solid"
       borderColor={border}
       // backdropFilter="blur(16px)"
@@ -1637,7 +1637,7 @@ const Attendance = memo(() => {
                       w="full"
                       p={isTerminalMaximized ? 8 : 6}
                       borderRadius="3xl"
-                      bg={panelBg}
+                      bg={"app.card.bg"}
                       border="1px solid"
                       borderColor={status === "success" ? "emerald.500/40" : status === "error" ? "rose.500/40" : borderColor}
                       boxShadow={"md"}

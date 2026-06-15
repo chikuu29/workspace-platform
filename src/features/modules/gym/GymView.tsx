@@ -231,8 +231,6 @@ const GymView = memo(() => {
     setRevenueRange(value);
   }, []);
 
-  const panelBg = useColorModeValue("rgba(255,255,255,0.74)", "rgba(15,23,42,0.58)");
-  const borderColor = useColorModeValue("rgba(226,232,240,0.84)", "rgba(255,255,255,0.12)");
 
   const setNavActionConfig = useNavActionStore((state) => state.setNavActionConfig);
   const clearActions = useNavActionStore((state) => state.clearActions);
@@ -286,7 +284,6 @@ const GymView = memo(() => {
 
 
   const handleViewAll = useCallback(() => navigateTo("members"), [navigateTo]);
-  const handleSchedule = useCallback(() => navigateTo("listClasses"), [navigateTo]);
 
   const handleMemberClick = useCallback(
     (recordId: string) => navigateTo(`member/${recordId}`),

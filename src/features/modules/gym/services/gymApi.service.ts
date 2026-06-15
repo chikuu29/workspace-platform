@@ -265,6 +265,15 @@ export const GymApiService = {
     }).pipe(map((res: any) => res.data as AttendanceStats));
   },
 
+  /** Gets member attendance report (month-wise and history log). */
+  getMemberAttendanceReport: (memberId: string, year?: number, month?: number) => {
+    return GETAPI({
+      path: `/v1/gym/analytics/attendance/member/${encodeURIComponent(memberId)}`,
+      params: { year, month },
+      isPrivateApi: true,
+    }).pipe(map((res: any) => res.data));
+  },
+
   // ── Trainers ────────────────────────────────────────────────────────
 
   /** Fetches the paginated list of gym trainers. */

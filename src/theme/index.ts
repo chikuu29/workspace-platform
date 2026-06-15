@@ -32,6 +32,9 @@ export const system = createSystem(defaultConfig, {
             },
             "scrollbarWidth": "none",
         },
+        "button, [role='button'], [data-part='cell-trigger'], [data-part='prev-trigger'], [data-part='next-trigger'], [data-part='trigger']": {
+            cursor: "pointer",
+        },
         "*": {
             "&::-webkit-scrollbar": {
                 display: "none",

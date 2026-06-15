@@ -43,6 +43,7 @@ import {
   Phone,
   Plus,
   RefreshCw,
+  Snowflake,
   Sparkles,
   UserCheck,
   Users,
@@ -335,7 +336,7 @@ const MemberProfile = memo(({
       <Box
         p={0}
         borderRadius="20px"
-        bg={cardBg}
+        bg={"app.card.bg"}
         border="1px solid"
         borderColor={cardBorder}
         boxShadow={shadow}
@@ -524,12 +525,17 @@ const MemberProfile = memo(({
               fontWeight="900"
               fontSize="10px"
               letterSpacing="0.02em"
-              style={{ background: BRAND_GRADIENT, color: "white" }}
+              bgImage={BRAND_GRADIENT}
+              color="white"
+              cursor="pointer"
               boxShadow={`0 3px 10px ${BRAND_HEX}30`}
               onClick={handleRenew}
-              _hover={{ opacity: 0.92 }}
+              _hover={{ transform: "translateY(-1px)", boxShadow: `0 6px 14px ${BRAND_HEX}50` }}
+              _active={{ transform: "scale(0.98)" }}
+              transition="all 0.2s"
             >
-              Renew
+              <Icon as={RefreshCw} boxSize={3} />
+              <Text ml={1}>Renew</Text>
             </Button>
             <Button
               size="xs"
@@ -542,10 +548,14 @@ const MemberProfile = memo(({
               variant="outline"
               borderColor={outlineBorder}
               color="app.text.primary"
+              cursor="pointer"
               onClick={handleUpgrade}
-              _hover={{ borderColor: BRAND_HEX, color: BRAND_HEX }}
+              transition="all 0.2s"
+              _hover={{ bg: useColorModeValue("gray.50", "whiteAlpha.50"), borderColor: BRAND_HEX, color: BRAND_HEX, transform: "translateY(-1px)" }}
+              _active={{ transform: "scale(0.98)" }}
             >
-              Upgrade
+              <Icon as={Crown} boxSize={3} />
+              <Text ml={1}>Upgrade</Text>
             </Button>
             <Button
               size="xs"
@@ -558,10 +568,14 @@ const MemberProfile = memo(({
               variant="outline"
               borderColor={outlineBorder}
               color="app.text.primary"
+              cursor="pointer"
               onClick={handleFreeze}
-              _hover={{ borderColor: "#3965FF", color: "#3965FF" }}
+              transition="all 0.2s"
+              _hover={{ bg: useColorModeValue("gray.50", "whiteAlpha.50"), borderColor: "#3965FF", color: "#3965FF", transform: "translateY(-1px)" }}
+              _active={{ transform: "scale(0.98)" }}
             >
-              Freeze
+              <Icon as={Snowflake} boxSize={3} />
+              <Text ml={1}>Freeze</Text>
             </Button>
           </HStack>
         </Box>

@@ -30,6 +30,8 @@ import { useSubscriptionPlans } from "./hooks/useSubscriptionPlans";
 import { GymApiService } from "./services/gymApi.service";
 import type { SubscriptionPlanDocument } from "./types/Gym.types";
 import { useNavActionStore } from "@/core/store/useNavActionStore";
+import { SegmentedControl } from "./components/SegmentedControl";
+import type { SegmentedOption } from "./components/SegmentedControl";
 
 // ─── Helpers ────────────────────────────────────────────────────────
 
@@ -37,6 +39,12 @@ const fmtCurrency = (amount: number, currency = "INR") =>
   new Intl.NumberFormat("en-IN", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount);
 
 type PlanFilter = "all" | "active" | "inactive";
+
+const PLAN_FILTER_OPTIONS: readonly SegmentedOption[] = [
+  { id: "all", label: "All" },
+  { id: "active", label: "Active" },
+  { id: "inactive", label: "Inactive" },
+] as const;
 
 const accentColorMap: Record<string, string> = {
   blue: "blue",
@@ -422,11 +430,8 @@ const Subscriptions = memo(() => {
 
   const handleDrawerOpenChange = useCallback((e: { open: boolean }) => setIsOpen(e.open), []);
 
-  const handleFilterClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
-    const filter = event.currentTarget.getAttribute("data-filter") as PlanFilter;
-    if (filter) {
-      setActiveFilter(filter);
-    }
+  const handleFilterChange = useCallback((id: string) => {
+    setActiveFilter(id as PlanFilter);
   }, []);
 
   const handleSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -550,22 +555,11 @@ const Subscriptions = memo(() => {
                 </Box>
               </HStack>
               <HStack gap={1.5} flexWrap="wrap" justify={{ base: "start", md: "end" }}>
-                {(["all", "active", "inactive"] as PlanFilter[]).map((f) => (
-                  <Button
-                    key={f}
-                    size="sm"
-                    variant={activeFilter === f ? "solid" : "ghost"}
-                    colorPalette={activeFilter === f ? "blue" : "gray"}
-                    borderRadius="xl"
-                    px={4}
-                    fontWeight="800"
-                    data-filter={f}
-                    onClick={handleFilterClick}
-                    textTransform="capitalize"
-                  >
-                    {f}
-                  </Button>
-                ))}
+              <SegmentedControl
+                options={PLAN_FILTER_OPTIONS}
+                activeId={activeFilter}
+                onChange={handleFilterChange}
+              />
               </HStack>
             </Flex>
 

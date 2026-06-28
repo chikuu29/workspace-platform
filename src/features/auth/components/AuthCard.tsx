@@ -36,7 +36,8 @@ export const AuthCard: React.FC<AuthCardProps> = ({
       alignItems="center"
       justifyContent="center"
       position="relative"
-      overflow="hidden"
+      overflowX="hidden"
+      overflowY="auto"
       p={{ base: 4, md: 8 }}
       // Full page background
       bg="auth.bg"
@@ -57,47 +58,49 @@ export const AuthCard: React.FC<AuthCardProps> = ({
         zIndex: 0,
       }}
     >
-      {/* ── Decorative animated orbs ───────────────────────────────── */}
+      {/* ── Decorative animated orbs wrapped to prevent container expansion ── */}
       <Box
         position="absolute"
-        top="8%"
-        left="4%"
-        w={{ base: "220px", md: "340px" }}
-        h={{ base: "220px", md: "340px" }}
-        borderRadius="full"
-        _light={{ bg: "rgba(99,102,241,0.08)" }}
-        _dark={{ bg: "rgba(99,102,241,0.06)" }}
-        filter="blur(64px)"
+        inset="0"
+        overflow="hidden"
         pointerEvents="none"
         zIndex={0}
-      />
-      <Box
-        position="absolute"
-        bottom="5%"
-        right="3%"
-        w={{ base: "260px", md: "400px" }}
-        h={{ base: "260px", md: "400px" }}
-        borderRadius="full"
-        _light={{ bg: "rgba(139,92,246,0.09)" }}
-        _dark={{ bg: "rgba(139,92,246,0.07)" }}
-        filter="blur(80px)"
-        pointerEvents="none"
-        zIndex={0}
-      />
-      <Box
-        position="absolute"
-        top="50%"
-        left="50%"
-        transform="translate(-50%, -50%)"
-        w={{ base: "300px", md: "500px" }}
-        h={{ base: "300px", md: "500px" }}
-        borderRadius="full"
-        _light={{ bg: "rgba(236,72,153,0.04)" }}
-        _dark={{ bg: "rgba(236,72,153,0.03)" }}
-        filter="blur(90px)"
-        pointerEvents="none"
-        zIndex={0}
-      />
+      >
+        <Box
+          position="absolute"
+          top="8%"
+          left="4%"
+          w={{ base: "220px", md: "340px" }}
+          h={{ base: "220px", md: "340px" }}
+          borderRadius="full"
+          _light={{ bg: "rgba(99,102,241,0.08)" }}
+          _dark={{ bg: "rgba(99,102,241,0.06)" }}
+          filter="blur(64px)"
+        />
+        <Box
+          position="absolute"
+          bottom="5%"
+          right="3%"
+          w={{ base: "260px", md: "400px" }}
+          h={{ base: "260px", md: "400px" }}
+          borderRadius="full"
+          _light={{ bg: "rgba(139,92,246,0.09)" }}
+          _dark={{ bg: "rgba(139,92,246,0.07)" }}
+          filter="blur(80px)"
+        />
+        <Box
+          position="absolute"
+          top="50%"
+          left="50%"
+          transform="translate(-50%, -50%)"
+          w={{ base: "300px", md: "500px" }}
+          h={{ base: "300px", md: "500px" }}
+          borderRadius="full"
+          _light={{ bg: "rgba(236,72,153,0.04)" }}
+          _dark={{ bg: "rgba(236,72,153,0.03)" }}
+          filter="blur(90px)"
+        />
+      </Box>
 
       {/* ── Main glass card ────────────────────────────────────────── */}
       <MotionBox

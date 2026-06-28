@@ -23,6 +23,7 @@ import {
   SimpleGrid,
   Text,
   VStack,
+  Input,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
@@ -40,13 +41,16 @@ import {
   TrendingUp,
   UserCheck,
   Users,
+  Search,
 } from "lucide-react";
 import { useEffect } from "react";
-import { PageHeader } from "@/core/components/PageHeader";
 import { useNavActionStore } from "@/core/store/useNavActionStore";
 import { useGymTrainers } from "./hooks/useGymTrainers";
 import type { TrainerDocument } from "./types/Gym.types";
+import { TrainerProfileDetail } from "./TrainerProfile";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SegmentedControl } from "./components/SegmentedControl";
+import type { SegmentedOption } from "./components/SegmentedControl";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -97,13 +101,12 @@ const StatTile = memo(({ label, value, caption, icon, accent }: {
 });
 StatTile.displayName = "StatTile";
 
-const FilterButton = memo(({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) => (
-  <Button size="sm" variant={active ? "solid" : "ghost"} colorPalette={active ? "blue" : "gray"}
-    borderRadius="xl" px={4} fontWeight="800" onClick={onClick}>
-    {label}
-  </Button>
-));
-FilterButton.displayName = "FilterButton";
+const STAFF_FILTER_OPTIONS: readonly SegmentedOption[] = [
+  { id: "all", label: "All" },
+  { id: "trainer", label: "Trainers" },
+  { id: "manager", label: "Managers" },
+  { id: "staff", label: "Staff" },
+] as const;
 
 const StaffCard = memo(({ trainer, onClick }: { trainer: TrainerDocument; onClick: (id: string) => void }) => {
   const cardBorder = useColorModeValue("rgba(226, 232, 240, 0.7)", "rgba(255, 255, 255, 0.08)");
@@ -146,6 +149,10 @@ const StaffCard = memo(({ trainer, onClick }: { trainer: TrainerDocument; onClic
     return "Flex";
   }, [data.availableSlot]);
 
+  const handleCardClick = useCallback(() => {
+    onClick(trainer._meta.id);
+  }, [trainer._meta.id, onClick]);
+
   return (
     <Box
       role="group"
@@ -160,7 +167,7 @@ const StaffCard = memo(({ trainer, onClick }: { trainer: TrainerDocument; onClic
       overflow="hidden"
       cursor="pointer"
       transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
-      onClick={() => onClick(trainer._meta.id)}
+      onClick={handleCardClick}
       _hover={{
         transform: "translateY(-4px)",
         borderColor: hoverBorder,
@@ -255,6 +262,40 @@ const StaffCard = memo(({ trainer, onClick }: { trainer: TrainerDocument; onClic
 });
 StaffCard.displayName = "StaffCard";
 
+const PerformerItem = memo(({ trainer, index, onClick }: { trainer: TrainerDocument; index: number; onClick: (id: string) => void }) => {
+  const { data } = trainer;
+  const name = getTrainerName(data);
+  const accent = trainer._meta?.entity_type === "manager" ? "green" : (trainer._meta?.entity_type === "staff" ? "orange" : "blue");
+
+  const handleClick = useCallback(() => {
+    onClick(trainer._meta.id);
+  }, [trainer._meta.id, onClick]);
+
+  const hoverBorder = useColorModeValue("rgba(99, 102, 241, 0.3)", "rgba(99, 102, 241, 0.4)");
+  const muted = useColorModeValue("gray.500", "gray.400");
+
+  return (
+    <HStack key={trainer._id} p={3} borderRadius="xl" bg={`${accent}.500/8`}
+      border="1px solid" borderColor={`${accent}.500/15`} gap={3}
+      transition="all 0.2s" _hover={{ transform: "translateX(2px)", bg: `${accent}.500/12`, borderColor: hoverBorder }}
+      onClick={handleClick} cursor="pointer">
+      <Circle size="8" bg={`${accent}.500/15`} color={`${accent}.500`} fontWeight="900" fontSize="xs">
+        #{index + 1}
+      </Circle>
+      <VStack align="start" gap={0} flex={1} minW={0}>
+        <Text fontSize="sm" fontWeight="900" truncate>
+          {name.full}
+        </Text>
+        <HStack gap={1}>
+          <Star size={10} color="var(--chakra-colors-yellow-400)" fill="var(--chakra-colors-yellow-400)" />
+          <Text fontSize="xs" color={muted} fontWeight="800">4.9 · {data.experienceYears}y exp</Text>
+        </HStack>
+      </VStack>
+    </HStack>
+  );
+});
+PerformerItem.displayName = "PerformerItem";
+
 // ─── Main Component ─────────────────────────────────────────────────────────
 
 const TrainersStaff = memo(() => {
@@ -262,6 +303,19 @@ const TrainersStaff = memo(() => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<StaffFilter>("all");
+  const [selectedTrainerId, setSelectedTrainerId] = useState<string | null>(null);
+
+  // ── Stable Event Handlers ──
+  const handleFilterChange = useCallback((id: string) => {
+    setActiveFilter(id as StaffFilter);
+  }, []);
+  const handleCloseProfile = useCallback(() => setSelectedTrainerId(null), []);
+  const handleSearchInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  }, []);
+  const handleSchedulesClick = useCallback(() => {
+    navigateTo("trainerSchedules");
+  }, [navigateTo]);
 
   // ── Real API Integration ──
   const { trainers, total, loading, refresh } = useGymTrainers();
@@ -333,65 +387,91 @@ const TrainersStaff = memo(() => {
 
   return (
     <Box mt={4} animation="fade-in 0.5s ease-out" w="full">
-      <PageHeader
-        title="Trainers & Staff"
-        subtitle={`${metrics.total} team members — ${metrics.online} currently online`}
-        actions={
-          <Button colorPalette="blue" borderRadius="xl" px={5} fontWeight="900"
-            onClick={() => navigateTo("trainerSchedules")}>
-            <CalendarDays size={16} style={{ marginRight: "6px" }} /> Schedules
-          </Button>
-        }
-        onSearchChange={setSearchQuery}
-        searchValue={searchQuery}
-        searchPlaceholder="Search by name, specialty, or ID..."
-        icon={Dumbbell}
-        badge="Team Management"
-        accentColor="purple"
-      />
-
       <VStack align="stretch" gap={6} pb={8}>
-
-
-        {/* ── Directory Grid + Sidebar ────────────────────── */}
-        <Grid templateColumns={{ base: "1fr", xl: "minmax(0, 1fr) 340px" }} gap={{ base: 6, xl: 8 }}>
-          <GridItem minW={0}>
+        {/* ── Directory Grid + Sidebar/Profile Split View ────────────────────── */}
+        <Grid
+          templateColumns={{
+            base: "1fr",
+            xl: selectedTrainerId ? "420px minmax(0, 1fr)" : "minmax(0, 1fr) 340px"
+          }}
+          gap={{ base: 6, xl: 8 }}
+        >
+          {/* Left Column: Directory List */}
+          <GridItem
+            minW={0}
+            display={selectedTrainerId ? { base: "none", xl: "block" } : "block"}
+          >
             <VStack align="stretch" gap={5}>
-              {/* Filter bar */}
-              <Flex align={{ base: "start", md: "center" }} justify="space-between"
-                direction={{ base: "column", md: "row" }} gap={4} p={4} borderRadius="2xl"
-                bg={panelBg} border="1px solid" borderColor={borderColor}>
-                <HStack gap={2}>
-                  <Circle size="9" bg="purple.500/10" color="purple.500">
-                    <Filter size={16} />
-                  </Circle>
-                  <VStack align="start" gap={0}>
-                    <Text fontWeight="900" color="app.text.primary">Directory</Text>
-                    <Text fontSize="xs" color={muted} fontWeight="700">
-                      Showing {filteredStaff.length} team members
-                    </Text>
-                  </VStack>
-                </HStack>
-                <HStack gap={2} flexWrap="wrap">
-                  <FilterButton label="All" active={activeFilter === "all"} onClick={() => setActiveFilter("all")} />
-                  <FilterButton label="Trainers" active={activeFilter === "trainer"} onClick={() => setActiveFilter("trainer")} />
-                  <FilterButton label="Managers" active={activeFilter === "manager"} onClick={() => setActiveFilter("manager")} />
-                  <FilterButton label="Staff" active={activeFilter === "staff"} onClick={() => setActiveFilter("staff")} />
-                </HStack>
-              </Flex>
+              {/* Redesigned Directory Control Box */}
+              <Box p={5} borderRadius="2xl" bg={panelBg} border="1px solid" borderColor={borderColor} backdropFilter="blur(10px)">
+                <VStack align="stretch" gap={4}>
+                  {/* Title & Actions Row */}
+                  <Flex align="center" justify="space-between" gap={4}>
+                    <HStack gap={2.5}>
+                      <Circle size="10" bg="purple.500/10" color="purple.500">
+                        <Filter size={18} />
+                      </Circle>
+                      <VStack align="start" gap={0}>
+                        <Heading size="md" fontWeight="950" letterSpacing="tight" color="app.text.primary">Directory</Heading>
+                        <Text fontSize="xs" color={muted} fontWeight="700">
+                          Showing {filteredStaff.length} team members
+                        </Text>
+                      </VStack>
+                    </HStack>
+                  </Flex>
+
+                  <Separator opacity={0.15} />
+
+                  {/* Filter Segmented Control Row */}
+                  <SegmentedControl
+                    options={STAFF_FILTER_OPTIONS}
+                    activeId={activeFilter}
+                    onChange={handleFilterChange}
+                  />
+
+                  {/* Search and Schedules Controls Row */}
+                  <Flex
+                    align={selectedTrainerId ? "stretch" : { base: "stretch", sm: "center" }}
+                    gap={3}
+                    direction={selectedTrainerId ? "column" : { base: "column", sm: "row" }}
+                    w="full"
+                  >
+                    <Box position="relative" w={selectedTrainerId ? "full" : { base: "full", sm: "280px" }}>
+                      <Input
+                        placeholder="Search by name, specialty, or ID..."
+                        value={searchQuery}
+                        onChange={handleSearchInputChange}
+                        size="sm"
+                        borderRadius="xl"
+                        pl={9}
+                        bg={"app.input.bg"}
+                        borderColor={borderColor}
+                        _focus={{ borderColor: "purple.500", boxShadow: "0 0 0 1px var(--chakra-colors-purple-500)" }}
+                        fontWeight="700"
+                        fontSize="xs"
+                        h="38px"
+                      />
+                      <Box position="absolute" left={3} top="50%" transform="translateY(-50%)" color={muted} pointerEvents="none">
+                        <Search size={14} />
+                      </Box>
+                    </Box>
+
+                  </Flex>
+                </VStack>
+              </Box>
 
               {/* Card grid */}
               {loading ? (
-                <SimpleGrid columns={{ base: 1, md: 2, "2xl": 3 }} gap={4}>
+                <SimpleGrid columns={selectedTrainerId ? 1 : { base: 1, md: 2, "2xl": 3 }} gap={4}>
                   {[1, 2, 3].map((i) => <Skeleton key={i} height="240px" borderRadius="2xl" />)}
                 </SimpleGrid>
               ) : filteredStaff.length > 0 ? (
-                <SimpleGrid columns={{ base: 1, md: 2, "2xl": 3 }} gap={4}>
+                <SimpleGrid columns={selectedTrainerId ? 1 : { base: 1, md: 2, "2xl": 3 }} gap={4}>
                   {filteredStaff.map((s) => (
                     <StaffCard
                       key={s._id}
                       trainer={s}
-                      onClick={(id) => navigateTo(`TrainerProfile?trainer_id=${id}`)}
+                      onClick={setSelectedTrainerId}
                     />
                   ))}
                 </SimpleGrid>
@@ -412,93 +492,86 @@ const TrainersStaff = memo(() => {
             </VStack>
           </GridItem>
 
-          {/* ── Sidebar ───────────────────────────────────── */}
-          <GridItem>
-            <VStack align="stretch" gap={5} position={{ xl: "sticky" }} top={{ xl: "7rem" }}>
-              {/* Top Performers */}
-              <Box p={5} borderRadius="2xl" bg={panelBg} border="1px solid" borderColor={borderColor}>
-                <VStack align="stretch" gap={4}>
-                  <HStack justify="space-between">
-                    <VStack align="start" gap={0}>
-                      <Heading size="sm" fontWeight="900">Top Performers</Heading>
-                      <Text fontSize="xs" color={muted} fontWeight="700">Highest rated trainers</Text>
+          {/* Right Column: Profile Detail OR Metrics Sidebar */}
+          <GridItem minW={0}>
+            {selectedTrainerId ? (
+              <TrainerProfileDetail
+                trainerId={selectedTrainerId}
+                onBack={handleCloseProfile}
+                isEmbedded={true}
+              />
+            ) : (
+              <VStack align="stretch" gap={5} position={{ xl: "sticky" }} top={{ xl: "7rem" }}>
+                {/* Top Performers */}
+                <Box p={5} borderRadius="2xl" bg={panelBg} border="1px solid" borderColor={borderColor}>
+                  <VStack align="stretch" gap={4}>
+                    <HStack justify="space-between">
+                      <VStack align="start" gap={0}>
+                        <Heading size="sm" fontWeight="900">Top Performers</Heading>
+                        <Text fontSize="xs" color={muted} fontWeight="700">Highest rated trainers</Text>
+                      </VStack>
+                      <Badge colorPalette="yellow" borderRadius="full" variant="solid">
+                        <Award size={12} />
+                      </Badge>
+                    </HStack>
+
+                    <VStack align="stretch" gap={3}>
+                      {topPerformers.map((t, i) => (
+                        <PerformerItem
+                          key={t._id}
+                          trainer={t}
+                          index={i}
+                          onClick={setSelectedTrainerId}
+                        />
+                      ))}
                     </VStack>
-                    <Badge colorPalette="yellow" borderRadius="full" variant="solid">
-                      <Award size={12} />
-                    </Badge>
-                  </HStack>
+                  </VStack>
+                </Box>
 
-                  <VStack align="stretch" gap={3}>
-                    {topPerformers.map((t, i) => {
-                      const name = getTrainerName(t.data);
-                      const accent = t._meta?.entity_type === "manager" ? "green" : (t._meta?.entity_type === "staff" ? "orange" : "blue");
-                      return (
-                        <HStack key={t._id} p={3} borderRadius="xl" bg={`${accent}.500/8`}
-                          border="1px solid" borderColor={`${accent}.500/15`} gap={3}
-                          transition="all 0.2s" _hover={{ transform: "translateX(2px)", bg: `${accent}.500/12` }}
-                          onClick={() => navigateTo(`TrainerProfile?trainer_id=${t._meta.id}`)} cursor="pointer">
-                          <Circle size="8" bg={`${accent}.500/15`} color={`${accent}.500`} fontWeight="900" fontSize="xs">
-                            #{i + 1}
-                          </Circle>
-                          <VStack align="start" gap={0} flex={1} minW={0}>
-                            <Text fontSize="sm" fontWeight="900" truncate>
-                              {name.full}
-                            </Text>
-                            <HStack gap={1}>
-                              <Star size={10} color="var(--chakra-colors-yellow-400)" fill="var(--chakra-colors-yellow-400)" />
-                              <Text fontSize="xs" color={muted} fontWeight="800">4.9 · {t.data.experienceYears}y exp</Text>
+                {/* Role Distribution */}
+                <Box p={5} borderRadius="2xl" bg={panelBg} border="1px solid" borderColor={borderColor}>
+                  <VStack align="stretch" gap={4}>
+                    <Heading size="sm" fontWeight="900">Role Breakdown</Heading>
+                    <VStack align="stretch" gap={3}>
+                      {(["trainer", "manager", "staff"] as StaffRole[]).map((role) => {
+                        const count = trainers.filter((t) => {
+                          const r = t._meta?.entity_type === "manager" ? "manager" : (t._meta?.entity_type === "staff" ? "staff" : "trainer");
+                          return r === role;
+                        }).length;
+                        const pct = trainers.length ? Math.round((count / trainers.length) * 100) : 0;
+                        const rs = ROLE_STYLES[role];
+                        return (
+                          <VStack key={role} align="stretch" gap={1}>
+                            <HStack justify="space-between">
+                              <Text fontSize="sm" color={muted} fontWeight="800">{rs.label}s</Text>
+                              <Text fontSize="sm" fontWeight="900">{count} ({pct}%)</Text>
                             </HStack>
+                            <Box h="8px" bg="blackAlpha.100" borderRadius="full" overflow="hidden">
+                              <Box h="full" w={`${pct}%`} bg={`${rs.colorPalette}.500`} borderRadius="full"
+                                transition="width 0.5s ease" />
+                            </Box>
                           </VStack>
-                        </HStack>
-                      );
-                    })}
+                        );
+                      })}
+                    </VStack>
+                    <Separator opacity={0.35} />
+                    <SimpleGrid columns={2} gap={3}>
+                      <Box p={3} borderRadius="xl" bg="purple.500/10">
+                        <Text fontSize="xs" color={muted} fontWeight="800">Online Now</Text>
+                        <Text fontSize="lg" fontWeight="900">{metrics.online}</Text>
+                      </Box>
+                      <Box p={3} borderRadius="xl" bg="blue.500/10">
+                        <Text fontSize="xs" color={muted} fontWeight="800">Total Clients</Text>
+                        <Text fontSize="lg" fontWeight="900">
+                          {/* Placeholder until real clients API is ready */}
+                          {trainers.length * 12}
+                        </Text>
+                      </Box>
+                    </SimpleGrid>
                   </VStack>
-                </VStack>
-              </Box>
-
-              {/* Role Distribution */}
-              <Box p={5} borderRadius="2xl" bg={panelBg} border="1px solid" borderColor={borderColor}>
-                <VStack align="stretch" gap={4}>
-                  <Heading size="sm" fontWeight="900">Role Breakdown</Heading>
-                  <VStack align="stretch" gap={3}>
-                    {(["trainer", "manager", "staff"] as StaffRole[]).map((role) => {
-                      const count = trainers.filter((t) => {
-                        const r = t._meta?.entity_type === "manager" ? "manager" : (t._meta?.entity_type === "staff" ? "staff" : "trainer");
-                        return r === role;
-                      }).length;
-                      const pct = trainers.length ? Math.round((count / trainers.length) * 100) : 0;
-                      const rs = ROLE_STYLES[role];
-                      return (
-                        <VStack key={role} align="stretch" gap={1}>
-                          <HStack justify="space-between">
-                            <Text fontSize="sm" color={muted} fontWeight="800">{rs.label}s</Text>
-                            <Text fontSize="sm" fontWeight="900">{count} ({pct}%)</Text>
-                          </HStack>
-                          <Box h="8px" bg="blackAlpha.100" borderRadius="full" overflow="hidden">
-                            <Box h="full" w={`${pct}%`} bg={`${rs.colorPalette}.500`} borderRadius="full"
-                              transition="width 0.5s ease" />
-                          </Box>
-                        </VStack>
-                      );
-                    })}
-                  </VStack>
-                  <Separator opacity={0.35} />
-                  <SimpleGrid columns={2} gap={3}>
-                    <Box p={3} borderRadius="xl" bg="purple.500/10">
-                      <Text fontSize="xs" color={muted} fontWeight="800">Online Now</Text>
-                      <Text fontSize="lg" fontWeight="900">{metrics.online}</Text>
-                    </Box>
-                    <Box p={3} borderRadius="xl" bg="blue.500/10">
-                      <Text fontSize="xs" color={muted} fontWeight="800">Total Clients</Text>
-                      <Text fontSize="lg" fontWeight="900">
-                        {/* Placeholder until real clients API is ready */}
-                        {trainers.length * 12}
-                      </Text>
-                    </Box>
-                  </SimpleGrid>
-                </VStack>
-              </Box>
-            </VStack>
+                </Box>
+              </VStack>
+            )}
           </GridItem>
         </Grid>
       </VStack>

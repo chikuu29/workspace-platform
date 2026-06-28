@@ -147,7 +147,7 @@ interface SectionCardProps {
 }
 
 const SectionCard = memo(({ title, icon, children, accentHex }: SectionCardProps) => {
-  const cardBg = useColorModeValue("rgba(255, 255, 255, 0.82)", "rgba(18, 22, 40, 0.75)");
+  const cardBg = "app.card.bg";
   const borderCol = useColorModeValue("rgba(226, 232, 240, 0.8)", "rgba(255, 255, 255, 0.07)");
   const headerBg = useColorModeValue("rgba(255,255,255,0.4)", "rgba(255,255,255,0.02)");
 
@@ -206,7 +206,7 @@ const ProgressStepper = memo(({ currentStep, accentHex, onStepClick }: ProgressS
 
   const muted = useColorModeValue("gray.500", "gray.400");
   const borderCol = useColorModeValue("rgba(226, 232, 240, 0.8)", "rgba(255, 255, 255, 0.08)");
-  const cardBg = useColorModeValue("rgba(255, 255, 255, 0.5)", "rgba(255, 255, 255, 0.02)");
+  const cardBg = "app.card.bg";
 
   return (
     <Box
@@ -431,7 +431,7 @@ const OrderView = memo(() => {
   }, [navigate, organizationName, appCode, order]);
 
   const muted = useColorModeValue("gray.500", "gray.400");
-  const cardBg = useColorModeValue("rgba(255,255,255,0.8)", "rgba(18, 22, 40, 0.75)");
+  const cardBg = "app.card.bg";
   const borderCol = useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.08)");
 
   const breadcrumbsBorderColor = useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.06)");
@@ -649,27 +649,27 @@ const OrderView = memo(() => {
             {/* Line Items Table */}
             <SectionCard title="Ordered Items" icon={<FileText size={14} />} accentHex={accentHex}>
               <Box overflowX="auto" mx={-6} mt={-3} mb={-3}>
-                <Table.Root size="sm">
+                <Table.Root size="sm" bg="transparent" borderColor={borderCol}>
                   <Table.Header>
-                    <Table.Row bg={useColorModeValue("gray.50", "rgba(255,255,255,0.02)")}>
-                      <Table.ColumnHeader px={6} py={3} fontSize="9px" fontWeight="900" textTransform="uppercase" letterSpacing="wider" color={muted}>
+                    <Table.Row bg={useColorModeValue("gray.50", "navy.900")} borderColor={borderCol}>
+                      <Table.ColumnHeader px={6} py={3} fontSize="9px" fontWeight="900" textTransform="uppercase" letterSpacing="wider" color={muted} borderColor={borderCol}>
                         Description
                       </Table.ColumnHeader>
-                      <Table.ColumnHeader px={4} py={3} textAlign="center" fontSize="9px" fontWeight="900" textTransform="uppercase" letterSpacing="wider" color={muted}>
+                      <Table.ColumnHeader px={4} py={3} textAlign="center" fontSize="9px" fontWeight="900" textTransform="uppercase" letterSpacing="wider" color={muted} borderColor={borderCol}>
                         Qty
                       </Table.ColumnHeader>
-                      <Table.ColumnHeader px={4} py={3} textAlign="right" fontSize="9px" fontWeight="900" textTransform="uppercase" letterSpacing="wider" color={muted}>
+                      <Table.ColumnHeader px={4} py={3} textAlign="right" fontSize="9px" fontWeight="900" textTransform="uppercase" letterSpacing="wider" color={muted} borderColor={borderCol}>
                         Unit Price
                       </Table.ColumnHeader>
-                      <Table.ColumnHeader px={6} py={3} textAlign="right" fontSize="9px" fontWeight="900" textTransform="uppercase" letterSpacing="wider" color={muted}>
+                      <Table.ColumnHeader px={6} py={3} textAlign="right" fontSize="9px" fontWeight="900" textTransform="uppercase" letterSpacing="wider" color={muted} borderColor={borderCol}>
                         Total
                       </Table.ColumnHeader>
                     </Table.Row>
                   </Table.Header>
                   <Table.Body>
                     {order.line_items?.map((item, index) => (
-                      <Table.Row key={index}>
-                        <Table.Cell px={6} py={4}>
+                      <Table.Row key={index} borderColor={borderCol}>
+                        <Table.Cell px={6} py={4} borderColor={borderCol}>
                           <VStack align="start" gap={0.5}>
                             <Text fontSize="sm" fontWeight="700" color="app.text.primary">
                               {item.description}
@@ -681,15 +681,15 @@ const OrderView = memo(() => {
                             )}
                           </VStack>
                         </Table.Cell>
-                        <Table.Cell px={4} py={4} textAlign="center">
+                        <Table.Cell px={4} py={4} textAlign="center" borderColor={borderCol}>
                           <Text fontSize="sm" fontWeight="700" color="app.text.primary">{item.quantity || 1}</Text>
                         </Table.Cell>
-                        <Table.Cell px={4} py={4} textAlign="right">
+                        <Table.Cell px={4} py={4} textAlign="right" borderColor={borderCol}>
                           <Text fontSize="sm" fontWeight="700" color="app.text.primary">
                             {formatINR(item.unit_price)}
                           </Text>
                         </Table.Cell>
-                        <Table.Cell px={6} py={4} textAlign="right">
+                        <Table.Cell px={6} py={4} textAlign="right" borderColor={borderCol}>
                           <Text fontSize="sm" fontWeight="800" color="app.text.primary">
                             {formatINR(item.line_total)}
                           </Text>

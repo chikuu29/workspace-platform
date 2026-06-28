@@ -58,6 +58,8 @@ import { useGymMember } from "./hooks/useGymMember";
 import { useSubscriptionPlans } from "./hooks/useSubscriptionPlans";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 import type { SubscriptionPlanDocument } from "./types/Gym.types";
+import { SegmentedControl } from "./components/SegmentedControl";
+import type { SegmentedOption } from "./components/SegmentedControl";
 import {
   DialogRoot, DialogBackdrop, DialogContent, DialogHeader,
   DialogFooter, DialogTitle, DialogBody, DialogCloseTrigger,
@@ -176,7 +178,7 @@ interface PlanCardProps {
 }
 
 const PlanCard = memo(({ plan, isSelected, badgeLabel, onSelect, animationDelay }: PlanCardProps) => {
-  const cardBg = useColorModeValue("rgba(255,255,255,0.82)", "rgba(18, 22, 40, 0.75)");
+  const cardBg = "app.card.bg";
   const mutedText = useColorModeValue("gray.500", "gray.400");
   const borderFallback = useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.07)");
 
@@ -474,7 +476,7 @@ PlanCardSkeleton.displayName = "PlanCardSkeleton";
 const EmptyPlansState = memo(() => {
   const { navigateTo } = useWorkspaceRouter();
   const handleCreate = useCallback(() => navigateTo("AddSubscriptionPlan"), [navigateTo]);
-  const cardBg = useColorModeValue("rgba(255,255,255,0.8)", "rgba(18,22,40,0.6)");
+  const cardBg = "app.card.bg";
 
   return (
     <Box
@@ -552,7 +554,7 @@ interface MemberContextBarProps {
 const MemberContextBar = memo(({
   memberName, memberId, email, phone, currentPlan, memberStatus, onFindBestPlan, onViewMember
 }: MemberContextBarProps) => {
-  const cardBg = useColorModeValue("rgba(255,255,255,0.85)", "rgba(18,22,40,0.72)");
+  const cardBg = "app.card.bg";
   const border = useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.07)");
   const shadow = useColorModeValue("0 8px 32px rgba(0,0,0,0.04)", "0 8px 32px rgba(0,0,0,0.18)");
   const muted = useColorModeValue("gray.500", "gray.400");
@@ -1006,43 +1008,25 @@ const FILTER_OPTIONS: { label: string; value: BillingFilter }[] = [
 ];
 
 const BillingCycleFilter = memo(({ active, onChange }: BillingFilterProps) => {
-  const border = useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.08)");
-  const trackBg = useColorModeValue("rgba(226,232,240,0.5)", "rgba(255,255,255,0.04)");
+  const options = useMemo<readonly SegmentedOption[]>(() => [
+    { id: "all", label: "All" },
+    { id: "monthly", label: "Monthly" },
+    { id: "quarterly", label: "Quarterly" },
+    { id: "yearly", label: "Yearly" },
+  ], []);
+
+  const handleFilterChange = useCallback((id: string) => {
+    onChange(id as BillingFilter);
+  }, [onChange]);
 
   return (
-    <HStack
-      gap={1}
-      bg={trackBg}
-      p={1}
-      borderRadius="xl"
-      border="1px solid"
-      borderColor={border}
-      flexWrap="wrap"
-      mb={6}
-    >
-      {FILTER_OPTIONS.map((opt) => {
-        const isActive = active === opt.value;
-        return (
-          <Button
-            key={opt.value}
-            size="xs"
-            h="32px"
-            px={4}
-            borderRadius="lg"
-            fontWeight="700"
-            fontSize="xs"
-            onClick={() => onChange(opt.value)}
-            bg={isActive ? "g_blue" : "transparent"}
-            color={isActive ? "white" : "app.text.muted"}
-            _hover={isActive ? {} : { bg: useColorModeValue("gray.100", "rgba(255,255,255,0.06)"), color: "app.text.primary" }}
-            transition="all 0.2s"
-            boxShadow={isActive ? `0 4px 12px g_blue66` : "none"}
-          >
-            {opt.label}
-          </Button>
-        );
-      })}
-    </HStack>
+    <Box mb={6}>
+      <SegmentedControl
+        options={options}
+        activeId={active}
+        onChange={handleFilterChange}
+      />
+    </Box>
   );
 });
 BillingCycleFilter.displayName = "BillingCycleFilter";
@@ -1461,7 +1445,7 @@ const Plans = memo(() => {
             <Box
               p={14}
               borderRadius="28px"
-              bg={useColorModeValue("rgba(255,255,255,0.8)", "rgba(18,22,40,0.6)")}
+              bg="app.card.bg"
               backdropFilter="blur(24px)"
               border="1px solid"
               borderColor={useColorModeValue("rgba(226,232,240,0.6)", "rgba(255,255,255,0.07)")}

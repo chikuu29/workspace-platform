@@ -30,6 +30,8 @@ import { useGymMember } from "./hooks/useGymMember";
 import type { MemberDocument } from "./types/Gym.types";
 import { useWorkspaceRouter } from "@/core/hooks/useWorkspaceRouter";
 import { toaster } from "@/components/ui/toaster";
+import { SegmentedControl } from "./components/SegmentedControl";
+import type { SegmentedOption } from "./components/SegmentedControl";
 import { MemberMembershipAndBilling } from "./components/MemberMembershipAndBilling";
 import { useNavActionStore } from "@/core/store/useNavActionStore";
 import { GymApiService } from "./services/gymApi.service";
@@ -662,8 +664,12 @@ interface EditMemberModalProps {
   onSuccess?: () => void;
 }
 
-const EDIT_TABS = ["Personal Details", "Fitness Goals"] as const;
-type EditTab = (typeof EDIT_TABS)[number];
+type EditTab = "Personal Details" | "Fitness Goals";
+
+const EDIT_TABS: readonly SegmentedOption[] = [
+  { id: "Personal Details", label: "Personal Details" },
+  { id: "Fitness Goals", label: "Fitness Goals" },
+] as const;
 
 const EditMemberModal = memo(({ open, member, onClose, onSuccess }: EditMemberModalProps) => {
   const [activeTab, setActiveTab] = useState<EditTab>("Personal Details");
@@ -791,29 +797,13 @@ const EditMemberModal = memo(({ open, member, onClose, onSuccess }: EditMemberMo
           </HStack>
 
           {/* Tab strip */}
-          <HStack gap={1} mt={4} p={1} borderRadius="12px" bg={tabBarBg}>
-            {EDIT_TABS.map(tab => {
-              const isActive = activeTab === tab;
-              return (
-                <Button
-                  key={tab}
-                  flex={1}
-                  h="34px"
-                  borderRadius="10px"
-                  fontSize="xs"
-                  fontWeight="800"
-                  onClick={() => setActiveTab(tab)}
-                  style={isActive ? { background: BRAND_GRADIENT, color: "white" } : {}}
-                  variant={isActive ? undefined : "ghost"}
-                  color={isActive ? "white" : "app.text.muted"}
-                  boxShadow={isActive ? `0 4px 12px ${BRAND_HEX}59` : undefined}
-                  transition="all 0.2s"
-                >
-                  {tab}
-                </Button>
-              );
-            })}
-          </HStack>
+          <Box mt={4} w="full">
+            <SegmentedControl
+              options={EDIT_TABS}
+              activeId={activeTab}
+              onChange={(id) => setActiveTab(id as EditTab)}
+            />
+          </Box>
         </DialogHeader>
 
         {/* Body */}

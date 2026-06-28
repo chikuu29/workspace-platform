@@ -213,47 +213,52 @@ const SignIn = () => {
       minH="100vh"
       w="100vw"
       direction={{ base: "column", md: "row" }}
-      overflow="hidden"
+      overflowX="hidden"
+      overflowY="auto"
       bg={mainWrapperBg}
     >
       <AppVersionAlert isNewVersionAvailable={isNewVersionAvailable} />
 
-      {/* Ambient decorative backgrounds */}
+      {/* Ambient decorative backgrounds wrapped to prevent layout expansion */}
       <Box
         position="absolute"
-        top="-15%"
-        left="-10%"
-        w="600px"
-        h="600px"
-        bgGradient="radial(brand.400, transparent)"
-        filter="blur(110px)"
-        opacity="0.2"
-        zIndex="0"
+        inset="0"
+        overflow="hidden"
         pointerEvents="none"
-      />
-      <Box
-        position="absolute"
-        bottom="-15%"
-        right="-10%"
-        w="700px"
-        h="700px"
-        bgGradient="radial(blue.500, transparent)"
-        filter="blur(130px)"
-        opacity="0.18"
         zIndex="0"
-        pointerEvents="none"
-      />
+      >
+        <Box
+          position="absolute"
+          top="-15%"
+          left="-10%"
+          w="600px"
+          h="600px"
+          bgGradient="radial(brand.400, transparent)"
+          filter="blur(110px)"
+          opacity="0.2"
+        />
+        <Box
+          position="absolute"
+          bottom="-15%"
+          right="-10%"
+          w="700px"
+          h="700px"
+          bgGradient="radial(blue.500, transparent)"
+          filter="blur(130px)"
+          opacity="0.18"
+        />
+      </Box>
 
       {/* Left Panel: Sign In Form & Actions */}
       <Flex
         w={{ base: "100%", md: "50%" }}
-        h={{ base: "auto", md: "100vh" }}
+        minH={{ base: "auto", md: "100vh" }}
         direction="column"
         justifyContent="center"
         alignItems="center"
         position="relative"
         px={{ base: 6, md: 12, lg: 20 }}
-        py={{ base: 12, md: 8 }}
+        py={{ base: 8, md: 10, lg: 12 }}
         zIndex="1"
         bg={formPanelBg}
       >
@@ -263,7 +268,7 @@ const SignIn = () => {
           animate="visible"
           w="100%"
           maxW="md"
-          gap={8}
+          gap={{ base: 6, md: 8 }}
           align="stretch"
         >
           {/* Portal header with static Logo */}
@@ -436,33 +441,38 @@ const SignIn = () => {
       {/* Right Panel: Feature Showcase */}
       <Flex
         w={{ base: "100%", md: "50%" }}
-        h={{ base: "auto", md: "100vh" }}
         minH={{ base: "auto", md: "100vh" }}
         direction="column"
         justifyContent="center"
         alignItems="center"
         position="relative"
         px={{ base: 6, md: 10, lg: 16 }}
-        py={{ base: 12, md: 8 }}
+        py={{ base: 8, md: 10, lg: 12 }}
         borderRight={{ base: "none", md: "1px solid" }}
         borderColor={useColorModeValue("gray.200", "whiteAlpha.100")}
         bg="navy.950"
         zIndex="1"
       >
-        {/* Sparkly background glow just for Right Panel */}
+        {/* Sparkly background glow wrapped to prevent layout expansion */}
         <Box
           position="absolute"
-          top="50%"
-          left="50%"
-          transform="translate(-50%, -50%)"
-          w="450px"
-          h="450px"
-          bgGradient="radial(brand.400, transparent)"
-          filter="blur(120px)"
-          opacity="0.12"
-          zIndex="0"
+          inset="0"
+          overflow="hidden"
           pointerEvents="none"
-        />
+          zIndex="0"
+        >
+          <Box
+            position="absolute"
+            top="50%"
+            left="50%"
+            transform="translate(-50%, -50%)"
+            w="450px"
+            h="450px"
+            bgGradient="radial(brand.400, transparent)"
+            filter="blur(120px)"
+            opacity="0.12"
+          />
+        </Box>
 
         <DarkMode>
           <Flex
@@ -470,7 +480,7 @@ const SignIn = () => {
             w="100%"
             maxW="xl"
             justifyContent="center"
-            gap={8}
+            gap={{ base: 4, md: 6, lg: 8 }}
             zIndex="1"
           >
             {/* Headline Text */}

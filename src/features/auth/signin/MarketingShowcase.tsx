@@ -403,46 +403,48 @@ export const MarketingShowcase: React.FC = () => {
 
   return (
     <Stack
-      gap={8}
+      gap={{ base: 4, md: 6, lg: 8 }}
       w="full"
       h="full"
       justifyContent="center"
       position="relative"
       px={{ base: 4, lg: 8 }}
-      py={8}
+      py={{ base: 4, md: 6, lg: 8 }}
     >
       {/* Decorative Orbs behind the Marketing Showcase */}
-      <AnimatePresence mode="wait">
-        <MotionBox
-          key={slideData.id + "-orb"}
-          position="absolute"
-          top="50%"
-          left="50%"
-          transform="translate(-50%, -50%)"
-          w="380px"
-          h="380px"
-          borderRadius="full"
-          bg={slideData.glowColor}
-          filter="blur(80px)"
-          zIndex="0"
-          pointerEvents="none"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.8 }}
-        />
-      </AnimatePresence>
+      <Box
+        position="absolute"
+        inset="0"
+        overflow="hidden"
+        pointerEvents="none"
+        zIndex="0"
+      >
+        <AnimatePresence mode="wait">
+          <MotionBox
+            key={slideData.id + "-orb"}
+            position="absolute"
+            top="50%"
+            left="50%"
+            transform="translate(-50%, -50%)"
+            w="380px"
+            h="380px"
+            borderRadius="full"
+            bg={slideData.glowColor}
+            filter="blur(80px)"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+          />
+        </AnimatePresence>
+      </Box>
 
       {/* Main Glassmorphic Panel */}
       <MotionBox
         zIndex="1"
-        p={5}
+        p={{ base: 4, md: 5 }}
         borderRadius="3xl"
         bg="whiteAlpha.50"
-        // backdropFilter="blur(20px)"
-        // border="1px solid"
-        // borderColor="whiteAlpha.100"
-        // boxShadow="0 25px 60px -15px rgba(0, 0, 0, 0.4)"
         boxShadow={"sm"}
         position="relative"
         overflow="hidden"
@@ -452,14 +454,14 @@ export const MarketingShowcase: React.FC = () => {
       >
         <Flex
           direction="column"
-          h={{ base: "240px", md: "280px" }}
+          h={{ base: "220px", sm: "240px", md: "260px", lg: "280px" }}
           w="full"
           bg="navy.900"
           borderRadius="2xl"
           overflow="hidden"
           border="1px solid"
           borderColor="whiteAlpha.50"
-          mb={6}
+          mb={{ base: 4, md: 5, lg: 6 }}
         >
           <AnimatePresence mode="wait">
             <MotionBox

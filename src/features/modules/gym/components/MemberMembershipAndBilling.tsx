@@ -7,10 +7,10 @@
  *   - Tab 3: Invoices List (paginated)
  *   - Tab 4: Payments List (paginated)
  */
-import { memo, useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { memo, useState, useEffect, useCallback, useMemo } from "react";
 import {
   Box, Button, Circle, Flex, HStack, Icon, Separator,
-  SimpleGrid, Text, VStack, Badge, Table, IconButton, Grid,
+  SimpleGrid, Text, VStack, Badge, Table, IconButton, Grid, Heading,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import {
@@ -21,6 +21,8 @@ import { GymApiService } from "../services/gymApi.service";
 import Pagination, { PageSize } from "./Pagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toaster } from "@/components/ui/toaster";
+import { SegmentedControl } from "./SegmentedControl";
+import type { SegmentedOption } from "./SegmentedControl";
 
 const BRAND_HEX = "#422AFB";
 const BRAND_GRADIENT = "linear-gradient(135deg, #7551FF 0%, #422AFB 100%)";
@@ -58,9 +60,9 @@ SectionHeading.displayName = "SectionHeading";
 // ─── Props ───────────────────────────────────────────────────────────────────
 interface MemberMembershipAndBillingProps {
   memberId: string;
-  onAssignPlan: () => void;
-  onViewInvoice?: (invoiceNumber: string) => void;
-  onViewOrder?: (orderNumber: string) => void;
+  onAssignPlan?: () => void;
+  onViewInvoice?: (invoiceNo: string) => void;
+  onViewOrder?: (orderId: string) => void;
 }
 
 type TabKey = "membership" | "orders" | "invoices" | "payments";
@@ -74,44 +76,6 @@ export const MemberMembershipAndBilling = memo(({
   const [activeTab, setActiveTab] = useState<TabKey>("membership");
   const muted = useColorModeValue("gray.500", "gray.400");
   const border = useColorModeValue("rgba(226,232,240,0.6)", "rgba(255,255,255,0.06)");
-
-  // ── Tab scroll state checking for horizontal overflow ──
-  const [scrollState, setScrollState] = useState({ canScrollLeft: false, canScrollRight: false });
-  const tabsRef = useRef<HTMLDivElement>(null);
-
-  const checkScroll = useCallback(() => {
-    const el = tabsRef.current;
-    if (!el) return;
-    const { scrollLeft, scrollWidth, clientWidth } = el;
-    setScrollState({
-      canScrollLeft: scrollLeft > 1,
-      canScrollRight: scrollLeft + clientWidth < scrollWidth - 1,
-    });
-  }, []);
-
-  useEffect(() => {
-    const el = tabsRef.current;
-    if (!el) return;
-
-    checkScroll();
-
-    el.addEventListener("scroll", checkScroll);
-    window.addEventListener("resize", checkScroll);
-
-    return () => {
-      el.removeEventListener("scroll", checkScroll);
-      window.removeEventListener("resize", checkScroll);
-    };
-  }, [checkScroll, activeTab]);
-
-  const leftFadeBg = useColorModeValue(
-    "linear-gradient(90deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 100%)",
-    "linear-gradient(90deg, rgba(18,22,40,0.95) 0%, rgba(18,22,40,0) 100%)"
-  );
-  const rightFadeBg = useColorModeValue(
-    "linear-gradient(270deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 100%)",
-    "linear-gradient(270deg, rgba(18,22,40,0.95) 0%, rgba(18,22,40,0) 100%)"
-  );
 
   // Data States
   const [membership, setMembership] = useState<any>(null);
@@ -135,13 +99,12 @@ export const MemberMembershipAndBilling = memo(({
   const [paymentPageSize, setPaymentPageSize] = useState<PageSize>(12);
   const [loadingPayments, setLoadingPayments] = useState(false);
 
-  // ── Fetch Membership ──
+  // ── API Fetchers ──
   const fetchMembership = useCallback(() => {
-    if (!memberId) return;
     setLoadingMembership(true);
-    const sub = GymApiService.getMemberMembership(memberId).subscribe({
-      next: (data) => {
-        setMembership(data);
+    GymApiService.getMemberMembership(memberId).subscribe({
+      next: (res: any) => {
+        setMembership(res && res.data ? res : null);
         setLoadingMembership(false);
       },
       error: () => {
@@ -149,85 +112,57 @@ export const MemberMembershipAndBilling = memo(({
         setLoadingMembership(false);
       },
     });
-    return () => sub.unsubscribe();
   }, [memberId]);
 
-  // ── Fetch Orders ──
   const fetchOrders = useCallback(() => {
-    if (!memberId || activeTab !== "orders") return;
     setLoadingOrders(true);
-    const sub = GymApiService.getMemberOrders(memberId, orderPage + 1, orderPageSize).subscribe({
-      next: (res) => {
+    GymApiService.getMemberOrders(memberId, orderPage + 1, orderPageSize).subscribe({
+      next: (res: any) => {
         if (res.success) {
-          setOrders(res.data || []);
-          setOrderTotal(res.pagination?.total || 0);
+          setOrders(res.data);
+          setOrderTotal(res.pagination?.total || res.data.length);
         }
         setLoadingOrders(false);
       },
-      error: () => {
-        setOrders([]);
-        setLoadingOrders(false);
-      },
+      error: () => setLoadingOrders(false),
     });
-    return () => sub.unsubscribe();
-  }, [memberId, activeTab, orderPage, orderPageSize]);
+  }, [memberId, orderPage, orderPageSize]);
 
-  // ── Fetch Invoices ──
   const fetchInvoices = useCallback(() => {
-    if (!memberId || activeTab !== "invoices") return;
     setLoadingInvoices(true);
-    const sub = GymApiService.getMemberInvoices(memberId, invoicePage + 1, invoicePageSize).subscribe({
-      next: (res) => {
+    GymApiService.getMemberInvoices(memberId, invoicePage + 1, invoicePageSize).subscribe({
+      next: (res: any) => {
         if (res.success) {
-          setInvoices(res.data || []);
-          setInvoiceTotal(res.pagination?.total || 0);
+          setInvoices(res.data);
+          setInvoiceTotal(res.pagination?.total || res.data.length);
         }
         setLoadingInvoices(false);
       },
-      error: () => {
-        setInvoices([]);
-        setLoadingInvoices(false);
-      },
+      error: () => setLoadingInvoices(false),
     });
-    return () => sub.unsubscribe();
-  }, [memberId, activeTab, invoicePage, invoicePageSize]);
+  }, [memberId, invoicePage, invoicePageSize]);
 
-  // ── Fetch Payments ──
   const fetchPayments = useCallback(() => {
-    if (!memberId || activeTab !== "payments") return;
     setLoadingPayments(true);
-    const sub = GymApiService.getMemberPayments(memberId, paymentPage + 1, paymentPageSize).subscribe({
-      next: (res) => {
+    GymApiService.getMemberPayments(memberId, paymentPage + 1, paymentPageSize).subscribe({
+      next: (res: any) => {
         if (res.success) {
-          setPayments(res.data || []);
-          setPaymentTotal(res.pagination?.total || 0);
+          setPayments(res.data);
+          setPaymentTotal(res.pagination?.total || res.data.length);
         }
         setLoadingPayments(false);
       },
-      error: () => {
-        setPayments([]);
-        setLoadingPayments(false);
-      },
+      error: () => setLoadingPayments(false),
     });
-    return () => sub.unsubscribe();
-  }, [memberId, activeTab, paymentPage, paymentPageSize]);
+  }, [memberId, paymentPage, paymentPageSize]);
 
-  // Trigger fetches
+  // Sync data queries on active tab change
   useEffect(() => {
-    fetchMembership();
-  }, [fetchMembership]);
-
-  useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
-
-  useEffect(() => {
-    fetchInvoices();
-  }, [fetchInvoices]);
-
-  useEffect(() => {
-    fetchPayments();
-  }, [fetchPayments]);
+    if (activeTab === "membership") fetchMembership();
+    else if (activeTab === "orders") fetchOrders();
+    else if (activeTab === "invoices") fetchInvoices();
+    else if (activeTab === "payments") fetchPayments();
+  }, [activeTab, fetchMembership, fetchOrders, fetchInvoices, fetchPayments]);
 
   const daysRemaining = useMemo(() => {
     if (!membership?.data?.end_date) return null;
@@ -238,16 +173,16 @@ export const MemberMembershipAndBilling = memo(({
     return Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
   }, [membership]);
 
-  const tabList = useMemo(() => [
-    { key: "membership", label: "Membership", icon: Sparkles },
-    { key: "orders", label: "Orders", icon: ShoppingBag },
-    { key: "invoices", label: "Invoices", icon: Receipt },
-    { key: "payments", label: "Payments", icon: CreditCard },
-  ] as const, []);
+  const tabOptions = useMemo<readonly SegmentedOption[]>(() => [
+    { id: "membership", label: "Membership", icon: Sparkles },
+    { id: "orders", label: "Orders", icon: ShoppingBag },
+    { id: "invoices", label: "Invoices", icon: Receipt },
+    { id: "payments", label: "Payments", icon: CreditCard },
+  ], []);
 
-  // UI styling helpers
-  const activeTabColor = useColorModeValue("white", "gray.900");
-  const tabBg = useColorModeValue("gray.100", "rgba(255,255,255,0.04)");
+  const handleTabChange = useCallback((id: string) => {
+    setActiveTab(id as TabKey);
+  }, []);
 
   return (
     <VStack align="stretch" gap={5}>
@@ -255,621 +190,579 @@ export const MemberMembershipAndBilling = memo(({
       <Flex justify="space-between" align={{ base: "stretch", md: "center" }} direction={{ base: "column", md: "row" }} gap={3} pb={2} borderBottom="1px solid" borderColor={border}>
         <SectionHeading>Membership & Billing</SectionHeading>
         
-        <Box position="relative" maxW="full" w={{ base: "full", md: "auto" }}>
-          {/* Left scroll fade indicator */}
-          {scrollState.canScrollLeft && (
-            <Box
-              position="absolute"
-              left="0"
-              top="0"
-              bottom="0"
-              w="8"
-              pointerEvents="none"
-              zIndex={2}
-              style={{ background: leftFadeBg }}
-            />
-          )}
-
-          <HStack
-            ref={tabsRef}
-            gap={1}
-            bg={tabBg}
-            p={1}
-            borderRadius="xl"
-            overflowX="auto"
-            whiteSpace="nowrap"
-            w={{ base: "full", md: "auto" }}
-            maxW="full"
-            flexShrink={0}
-            css={{
-              "&::-webkit-scrollbar": { display: "none" },
-              "msOverflowStyle": "none",
-              "scrollbarWidth": "none",
-            }}
-          >
-            {tabList.map((tab) => {
-              const isActive = activeTab === tab.key;
-              return (
-                <Button
-                  key={tab.key}
-                  flexShrink={0}
-                  size="sm"
-                  h="32px"
-                  px={3}
-                  borderRadius="lg"
-                  variant={isActive ? "solid" : "ghost"}
-                  bg={isActive ? BRAND_HEX : "transparent"}
-                  color={isActive ? "white" : "app.text.muted"}
-                  fontWeight="800"
-                  fontSize="xs"
-                  onClick={() => setActiveTab(tab.key)}
-                  _hover={isActive ? {} : { bg: useColorModeValue("rgba(0,0,0,0.05)", "rgba(255,255,255,0.05)") }}
-                  transition="all 0.2s"
-                >
-                  <Icon as={tab.icon} boxSize={3} mr={1.5} />
-                  {tab.label}
-                </Button>
-              );
-            })}
-          </HStack>
-
-          {/* Right scroll fade indicator */}
-          {scrollState.canScrollRight && (
-            <Box
-              position="absolute"
-              right="0"
-              top="0"
-              bottom="0"
-              w="8"
-              pointerEvents="none"
-              zIndex={2}
-              style={{ background: rightFadeBg }}
-            />
-          )}
+        <Box maxW="full" overflowX="auto" css={{ "&::-webkit-scrollbar": { display: "none" }, scrollbarWidth: "none" }}>
+          <SegmentedControl
+            options={tabOptions}
+            activeId={activeTab}
+            onChange={handleTabChange}
+          />
         </Box>
       </Flex>
 
-      {/* ─── TAB 1: MEMBERSHIP ─── */}
-      {activeTab === "membership" && (
-        <Box>
-          {loadingMembership ? (
-            <VStack align="stretch" gap={4}>
-              <Skeleton h="100px" borderRadius="18px" />
-              <SimpleGrid columns={3} gap={3}>
-                <Skeleton h="60px" borderRadius="14px" />
-                <Skeleton h="60px" borderRadius="14px" />
-                <Skeleton h="60px" borderRadius="14px" />
-              </SimpleGrid>
-            </VStack>
-          ) : membership ? (
-            <VStack align="stretch" gap={4}>
-              {/* Plan Hero display */}
-              <Box
-                p={5}
-                borderRadius="18px"
-                position="relative"
-                overflow="hidden"
-                style={{ background: BRAND_GRADIENT }}
-              >
-                <Box position="absolute" top="-20px" right="-20px" w="100px" h="100px" borderRadius="full" bg="whiteAlpha.200" />
-                <Box position="absolute" bottom="-30px" left="-10px" w="70px" h="70px" borderRadius="full" bg="whiteAlpha.100" />
-
-                <Flex
-                  justify="space-between"
-                  align={{ base: "stretch", sm: "start" }}
-                  direction={{ base: "column", sm: "row" }}
-                  gap={4}
-                  position="relative"
-                >
-                  <VStack align="start" gap={1}>
-                    <Text fontSize="9px" fontWeight="900" color="whiteAlpha.700" letterSpacing="wider">CURRENT ACTIVE PLAN</Text>
-                    <Text fontSize="xl" fontWeight="950" color="white" letterSpacing="tight">{membership.data.plan_name}</Text>
-                    <HStack gap={2} mt={0.5}>
-                      <Badge bg="whiteAlpha.300" color="white" px={2} py={0.5} borderRadius="full" fontSize="9px" fontWeight="900" border="1px solid" borderColor="whiteAlpha.400">
-                        {membership.data.billing_cycle?.toUpperCase() ?? "MONTHLY"}
-                      </Badge>
-                      <Badge
-                        bg={membership.data.is_paid ? "rgba(1,181,116,0.3)" : "rgba(255,181,71,0.3)"}
-                        color="white"
-                        px={2} py={0.5} borderRadius="full" fontSize="9px" fontWeight="900"
-                        border="1px solid"
-                        borderColor={membership.data.is_paid ? "rgba(1,181,116,0.5)" : "rgba(255,181,71,0.5)"}
-                      >
-                        {membership.data.is_paid ? "PAID" : "UNPAID"}
-                      </Badge>
-                    </HStack>
-                  </VStack>
-
-                  <VStack align={{ base: "start", sm: "end" }} gap={0.5}>
-                    <Text fontSize="9px" fontWeight="900" color="whiteAlpha.700" letterSpacing="wider">AMOUNT</Text>
-                    <Text fontSize="2xl" fontWeight="950" color="white" letterSpacing="tight">
-                      {fmtCurrency(membership.data.price, membership.data.currency)}
-                    </Text>
-                    <Text fontSize="10px" color="whiteAlpha.700" fontWeight="600">
-                      per {BILLING_LABEL[membership.data.billing_cycle] ?? membership.data.billing_cycle}
-                    </Text>
-                  </VStack>
-                </Flex>
-              </Box>
-
-              {/* Coverage details */}
-              <SimpleGrid columns={{ base: 1, sm: 3 }} gap={3}>
-                {[
-                  { label: "Start Date", value: fmtDate(membership.data.start_date), icon: CalendarDays, color: BRAND_HEX },
-                  { label: "End Date", value: fmtDate(membership.data.end_date), icon: CalendarDays, color: daysRemaining !== null && daysRemaining <= 7 ? "#FFB547" : "#01B574" },
-                  { label: "Days Left", value: daysRemaining !== null ? `${daysRemaining}d` : "N/A", icon: Clock, color: daysRemaining !== null && daysRemaining <= 7 ? "#FFB547" : BRAND_HEX },
-                ].map(({ label, value, icon: RowIcon, color }) => {
-                  const cellBg = useColorModeValue("rgba(248,250,252,0.9)", "rgba(255,255,255,0.03)");
-                  const cellBorder = useColorModeValue("rgba(226,232,240,0.6)", "rgba(255,255,255,0.06)");
-                  return (
-                    <Box key={label} p={3} borderRadius="14px" bg={cellBg} border="1px solid" borderColor={cellBorder}>
-                      <Text fontSize="9px" fontWeight="800" color="app.text.muted" textTransform="uppercase" letterSpacing="wider" mb={1}>
-                        {label}
-                      </Text>
-                      <HStack gap={1.5}>
-                        <RowIcon size={12} color={color} />
-                        <Text fontSize="sm" fontWeight="800" color="app.text.primary">{value}</Text>
-                      </HStack>
-                    </Box>
-                  );
-                })}
-              </SimpleGrid>
-
-              {/* Payment Invoice Row Link */}
-              {membership.data.invoice_number && (
-                <Flex
-                  p={4}
-                  borderRadius="16px"
+      {/* Tab Panels with fixed minimum height to prevent layout shifts */}
+      <Box minH={{ base: "auto", md: "380px" }} w="full">
+        {/* ─── TAB 1: MEMBERSHIP ─── */}
+        {activeTab === "membership" && (
+          <Box>
+            {loadingMembership ? (
+              <VStack align="stretch" gap={4}>
+                <Skeleton height="140px" borderRadius="2xl" />
+                <Skeleton height="80px" borderRadius="xl" />
+              </VStack>
+            ) : membership ? (
+              <VStack align="stretch" gap={4.5}>
+                {/* Membership Details Card */}
+                <Box
+                  p={5}
+                  borderRadius="2xl"
+                  bg={useColorModeValue("rgba(248,250,252,0.6)", "rgba(255,255,255,0.02)")}
                   border="1px solid"
-                  borderColor={useColorModeValue("rgba(226,232,240,0.6)", "rgba(255,255,255,0.06)")}
-                  bg={useColorModeValue("rgba(248,250,252,0.8)", "rgba(255,255,255,0.02)")}
-                  align="center"
-                  justify="space-between"
-                  gap={4}
-                  cursor="pointer"
-                  onClick={() => onViewInvoice?.(membership.data.invoice_number)}
-                  transition="all 0.2s"
-                  _hover={{ borderColor: `${BRAND_HEX}35`, transform: "translateY(-2px)", bg: `${BRAND_HEX}06` }}
+                  borderColor={useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.06)")}
+                  position="relative"
+                  overflow="hidden"
                 >
-                  <HStack gap={3}>
-                    <Circle size={10} style={{ background: `${BRAND_HEX}15`, color: BRAND_HEX }}>
-                      <CreditCard size={16} />
-                    </Circle>
-                    <VStack align="start" gap={0}>
-                      <Text fontSize="sm" fontWeight="700" color="app.text.primary">{membership.data.invoice_number}</Text>
-                      <Text fontSize="xs" color={muted}>Active invoice details</Text>
-                    </VStack>
-                  </HStack>
-                  <HStack gap={2}>
-                    <Text fontSize="xs" fontWeight="700" style={{ color: BRAND_HEX }}>View Invoice</Text>
-                    <ChevronRight size={14} color={BRAND_HEX} />
-                  </HStack>
-                </Flex>
-              )}
+                  {/* Accent strip */}
+                  <Box position="absolute" top={0} left={0} right={0} h="3px" bg={BRAND_GRADIENT} />
 
-              {/* Renew Plan button */}
-              <Button
-                w="full"
-                h="42px"
-                borderRadius="xl"
-                fontWeight="900"
-                fontSize="sm"
-                style={{ background: BRAND_GRADIENT, color: "white" }}
-                boxShadow={`0 6px 18px ${BRAND_HEX}59`}
-                onClick={onAssignPlan}
-                _hover={{ transform: "translateY(-2px)", boxShadow: `0 12px 28px ${BRAND_HEX}80` }}
-                _active={{ transform: "scale(0.98)" }}
-                transition="all 0.25s"
-              >
-                <Zap size={14} style={{ marginRight: "6px" }} />
-                Renew / Change Plan
-              </Button>
-            </VStack>
-          ) : (
-            <VStack align="stretch" gap={4}>
-              <Box
-                p={8}
-                borderRadius="18px"
-                textAlign="center"
-                border="2px dashed"
-                borderColor={useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.08)")}
-                bg={useColorModeValue("rgba(248,250,252,0.5)", "rgba(255,255,255,0.02)")}
-              >
-                <VStack gap={4}>
-                  <Circle size={16} style={{ background: `${BRAND_HEX}12` }} color={BRAND_HEX}>
-                    <Sparkles size={24} />
+                  <VStack align="stretch" gap={4}>
+                    <Flex justify="space-between" align="start">
+                      <VStack align="start" gap={0.5}>
+                        <Text fontSize="2xs" color={muted} fontWeight="800" textTransform="uppercase" letterSpacing="wider">
+                          Current Subscription
+                        </Text>
+                        <Heading size="md" fontWeight="900" color="app.text.primary" letterSpacing="tight">
+                          {membership.plan_details?.name || "Active Plan"}
+                        </Heading>
+                      </VStack>
+                      <Badge colorPalette="green" variant="solid" borderRadius="full" px={3} py={0.5} fontWeight="900" fontSize="2xs">
+                        {membership.data.status}
+                      </Badge>
+                    </Flex>
+
+                    <SimpleGrid columns={2} gap={4}>
+                      <VStack align="start" gap={0.5}>
+                        <Text fontSize="3xs" color={muted} fontWeight="850" textTransform="uppercase">Price</Text>
+                        <Text fontSize="md" fontWeight="800" color="app.text.primary">
+                          {fmtCurrency(membership.data.price || 0)}
+                          <Text as="span" fontSize="xs" color={muted} fontWeight="600">
+                            /{BILLING_LABEL[membership.data.billing_cycle] || "cycle"}
+                          </Text>
+                        </Text>
+                      </VStack>
+                      <VStack align="start" gap={0.5}>
+                        <Text fontSize="3xs" color={muted} fontWeight="850" textTransform="uppercase">Ends On</Text>
+                        <Text fontSize="md" fontWeight="800" color="app.text.primary">
+                          {fmtDate(membership.data.end_date)}
+                        </Text>
+                      </VStack>
+                    </SimpleGrid>
+                  </VStack>
+                </Box>
+
+                {/* Days remaining badge notification */}
+                {daysRemaining !== null && (
+                  <Flex
+                    p={3.5}
+                    borderRadius="xl"
+                    align="center"
+                    gap={3}
+                    bg={daysRemaining <= 7 ? "orange.500/10" : "blue.500/8"}
+                    border="1px solid"
+                    borderColor={daysRemaining <= 7 ? "orange.500/20" : "blue.500/15"}
+                  >
+                    <Icon as={AlertCircle} boxSize={4} color={daysRemaining <= 7 ? "orange.500" : "blue.500"} />
+                    <Text fontSize="xs" fontWeight="700" color="app.text.primary">
+                      {daysRemaining === 0 ? (
+                        "Subscription expired today."
+                      ) : daysRemaining <= 7 ? (
+                        `Subscription ending soon: ${daysRemaining} days remaining.`
+                      ) : (
+                        `${daysRemaining} active days remaining on this plan.`
+                      )}
+                    </Text>
+                  </Flex>
+                )}
+
+                {membership.data.invoice_number && (
+                  <Flex
+                    p={4}
+                    borderRadius="16px"
+                    border="1px solid"
+                    borderColor={useColorModeValue("rgba(226,232,240,0.6)", "rgba(255,255,255,0.06)")}
+                    bg={useColorModeValue("rgba(248,250,252,0.8)", "rgba(255,255,255,0.02)")}
+                    align="center"
+                    justify="space-between"
+                    gap={4}
+                    cursor="pointer"
+                    onClick={() => onViewInvoice?.(membership.data.invoice_number)}
+                    transition="all 0.2s"
+                    _hover={{ borderColor: `${BRAND_HEX}35`, transform: "translateY(-2px)", bg: `${BRAND_HEX}06` }}
+                  >
+                    <HStack gap={3}>
+                      <Circle size={10} style={{ background: `${BRAND_HEX}15`, color: BRAND_HEX }}>
+                        <CreditCard size={16} />
+                      </Circle>
+                      <VStack align="start" gap={0}>
+                        <Text fontSize="sm" fontWeight="700" color="app.text.primary">{membership.data.invoice_number}</Text>
+                        <Text fontSize="xs" color={muted}>Active invoice details</Text>
+                      </VStack>
+                    </HStack>
+                    <HStack gap={2}>
+                      <Text fontSize="xs" fontWeight="700" style={{ color: BRAND_HEX }}>View Invoice</Text>
+                      <ChevronRight size={14} color={BRAND_HEX} />
+                    </HStack>
+                  </Flex>
+                )}
+
+                {/* Renew Plan button */}
+                <Button
+                  w="full"
+                  h="42px"
+                  borderRadius="xl"
+                  fontWeight="900"
+                  fontSize="sm"
+                  style={{ background: BRAND_GRADIENT, color: "white" }}
+                  boxShadow={`0 6px 18px ${BRAND_HEX}59`}
+                  onClick={onAssignPlan}
+                  _hover={{ transform: "translateY(-2px)", boxShadow: `0 12px 28px ${BRAND_HEX}80` }}
+                  _active={{ transform: "scale(0.98)" }}
+                  transition="all 0.25s"
+                >
+                  <Zap size={14} style={{ marginRight: "6px" }} />
+                  Renew / Change Plan
+                </Button>
+              </VStack>
+            ) : (
+              <VStack align="stretch" gap={4}>
+                {/* No Active Subscription State */}
+                <Flex
+                  direction="column"
+                  align="center"
+                  justify="center"
+                  p={8}
+                  borderRadius="2xl"
+                  border="2px dashed"
+                  borderColor={useColorModeValue("rgba(226,232,240,0.8)", "rgba(255,255,255,0.08)")}
+                  bg={useColorModeValue("rgba(248,250,252,0.5)", "rgba(255,255,255,0.02)")}
+                  gap={4}
+                  textAlign="center"
+                >
+                  <Circle size="12" style={{ background: "rgba(255,181,71,0.12)", color: "#FFB547" }}>
+                    <AlertCircle size={22} />
                   </Circle>
                   <VStack gap={1}>
-                    <Text fontSize="md" fontWeight="900" color="app.text.primary">
-                      No Active Membership
+                    <Text fontSize="sm" fontWeight="800" color="app.text.primary">
+                      No active subscription
                     </Text>
-                    <Text fontSize="sm" color={muted} fontWeight="500" maxW="xs" mx="auto">
-                      This member doesn't have an active plan. Assign a membership plan to activate their account.
+                    <Text fontSize="xs" color={muted} maxW="xs" fontWeight="600">
+                      This member is currently not enrolled in any membership plan.
                     </Text>
                   </VStack>
                   <Button
-                    h="46px"
-                    px={8}
+                    size="sm"
                     borderRadius="xl"
-                    fontWeight="900"
-                    fontSize="sm"
+                    fontWeight="800"
+                    px={5}
                     style={{ background: BRAND_GRADIENT, color: "white" }}
-                    boxShadow={`0 8px 24px ${BRAND_HEX}66`}
                     onClick={onAssignPlan}
-                    _hover={{ transform: "translateY(-2px)", boxShadow: `0 14px 32px ${BRAND_HEX}8c` }}
-                    _active={{ transform: "scale(0.98)" }}
-                    transition="all 0.25s"
                   >
-                    <Zap size={15} style={{ marginRight: "6px" }} />
                     Assign Membership Plan
                   </Button>
+                </Flex>
+              </VStack>
+            )}
+          </Box>
+        )}
+
+        {/* ─── TAB 2: ORDERS ─── */}
+        {activeTab === "orders" && (
+          <Box>
+            {loadingOrders ? (
+              <VStack align="stretch" gap={3.5}>
+                <Skeleton height="38px" borderRadius="xl" />
+                <Skeleton height="50px" borderRadius="xl" />
+                <Skeleton height="50px" borderRadius="xl" />
+              </VStack>
+            ) : orders.length > 0 ? (
+              <VStack align="stretch" gap={3}>
+                {/* Column Headers */}
+                <Grid
+                  templateColumns={{ base: "1.2fr 1fr 0.5fr", md: "1.5fr 1fr 1fr 1fr 0.5fr" }}
+                  gap={4}
+                  px={4}
+                  py={2}
+                  display={{ base: "none", sm: "grid" }}
+                  borderBottom="1px solid"
+                  borderColor={border}
+                >
+                  <Text fontSize="2xs" fontWeight="850" color={muted} textTransform="uppercase" letterSpacing="wider">ORDER NO.</Text>
+                  <Text fontSize="2xs" fontWeight="850" color={muted} textTransform="uppercase" letterSpacing="wider" display={{ base: "none", md: "block" }}>PLAN</Text>
+                  <Text fontSize="2xs" fontWeight="850" color={muted} textTransform="uppercase" letterSpacing="wider">AMOUNT</Text>
+                  <Text fontSize="2xs" fontWeight="850" color={muted} textTransform="uppercase" letterSpacing="wider" display={{ base: "none", md: "block" }}>STATUS</Text>
+                  <Text fontSize="2xs" fontWeight="850" color={muted} textTransform="uppercase" letterSpacing="wider" textAlign="right">ACTION</Text>
+                </Grid>
+
+                {/* Rows */}
+                <VStack align="stretch" gap={2.5}>
+                  {orders.map((order) => {
+                    const statusColors: Record<string, string> = {
+                      paid: "green",
+                      pending: "orange",
+                      failed: "red",
+                    };
+                    const color = statusColors[order.status.toLowerCase()] || "gray";
+                    return (
+                      <Grid
+                        key={order._id}
+                        templateColumns={{ base: "1.2fr 1fr 0.5fr", md: "1.5fr 1fr 1fr 1fr 0.5fr" }}
+                        gap={4}
+                        p={3.5}
+                        borderRadius="xl"
+                        alignItems="center"
+                        border="1px solid"
+                        borderColor={useColorModeValue("rgba(226,232,240,0.6)", "rgba(255,255,255,0.06)")}
+                        bg={useColorModeValue("rgba(255,255,255,0.4)", "rgba(255,255,255,0.015)")}
+                        transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+                        _hover={{
+                          bg: useColorModeValue("rgba(255,255,255,0.85)", "rgba(255,255,255,0.035)"),
+                          borderColor: `${BRAND_HEX}25`,
+                          transform: "translateY(-1.5px)",
+                          boxShadow: "0 4px 12px rgba(0,0,0,0.02)",
+                        }}
+                      >
+                        <HStack gap={3.5}>
+                          <Circle size={8} style={{ background: `${BRAND_HEX}12`, color: BRAND_HEX }} flexShrink={0}>
+                            <ShoppingBag size={14} />
+                          </Circle>
+                          <VStack align="start" gap={0} minW={0}>
+                            <HStack gap={1.5} flexWrap="wrap">
+                              <Text fontSize="xs" fontWeight="800" color="app.text.primary" lineClamp={1}>
+                                {order.order_number}
+                              </Text>
+                              <Box display={{ base: "inline-block", md: "none" }}>
+                                <Badge colorPalette={color} variant="subtle" borderRadius="full" px={1.5} py={0} fontSize="4xs" fontWeight="900">
+                                  {order.status}
+                                </Badge>
+                              </Box>
+                            </HStack>
+                            <Text fontSize="3xs" color={muted} fontWeight="650">{fmtDate(order.created_at)}</Text>
+                          </VStack>
+                        </HStack>
+
+                        <Text fontSize="xs" fontWeight="700" color="app.text.primary" display={{ base: "none", md: "block" }}>
+                          {order.planName || "Plan"}
+                        </Text>
+
+                        <Text fontSize="xs" fontWeight="900" color="app.text.primary">
+                          {fmtCurrency(order.total)}
+                        </Text>
+
+                        <Box display={{ base: "none", md: "block" }}>
+                          <Badge colorPalette={color} variant="subtle" borderRadius="full" px={2.5} py={0.5} fontSize="3xs" fontWeight="900">
+                            {order.status}
+                          </Badge>
+                        </Box>
+
+                        <Flex justify="end">
+                          <Button
+                            variant="ghost"
+                            h="26px"
+                            px={3}
+                            borderRadius="lg"
+                            fontWeight="800"
+                            fontSize="xs"
+                            style={{ color: BRAND_HEX }}
+                            _hover={{ bg: `${BRAND_HEX}0d` }}
+                            onClick={() => onViewOrder?.(order.order_number)}
+                          >
+                            View
+                          </Button>
+                        </Flex>
+                      </Grid>
+                    );
+                  })}
                 </VStack>
-              </Box>
-            </VStack>
-          )}
-        </Box>
-      )}
 
-      {/* ─── TAB 2: ORDERS ─── */}
-      {activeTab === "orders" && (
-        <Box>
-          {loadingOrders ? (
-            <VStack gap={3}>
-              <Skeleton h="40px" borderRadius="lg" />
-              <Skeleton h="40px" borderRadius="lg" />
-              <Skeleton h="40px" borderRadius="lg" />
-            </VStack>
-          ) : orders.length > 0 ? (
-            <VStack align="stretch" gap={4}>
-              <VStack align="stretch" gap={2.5}>
-                {/* Header Row */}
-                <Grid templateColumns="2fr 1fr 1.5fr 1.5fr 1fr" px={4} py={2} display={{ base: "none", md: "grid" }}>
-                  <Text fontSize="10px" fontWeight="800" color="app.text.muted" letterSpacing="wider">ORDER NUMBER</Text>
-                  <Text fontSize="10px" fontWeight="800" color="app.text.muted" letterSpacing="wider">STATUS</Text>
-                  <Text fontSize="10px" fontWeight="800" color="app.text.muted" letterSpacing="wider">TOTAL</Text>
-                  <Text fontSize="10px" fontWeight="800" color="app.text.muted" letterSpacing="wider">CREATED DATE</Text>
-                  <Text fontSize="10px" fontWeight="800" color="app.text.muted" letterSpacing="wider" textAlign="right">ACTION</Text>
+                <Pagination
+                  currentPage={orderPage}
+                  totalPages={Math.ceil(orderTotal / orderPageSize)}
+                  totalItems={orderTotal}
+                  pageSize={orderPageSize}
+                  onPageChange={setOrderPage}
+                  onPageSizeChange={setOrderPageSize}
+                />
+              </VStack>
+            ) : (
+              <Flex align="center" justify="center" p={8} direction="column" gap={3}>
+                <Circle size={10} style={{ background: "rgba(66,42,251,0.08)", color: BRAND_HEX }}>
+                  <AlertCircle size={18} />
+                </Circle>
+                <Text fontSize="xs" fontWeight="750" color="app.text.muted">No orders recorded for this member.</Text>
+              </Flex>
+            )}
+          </Box>
+        )}
+
+        {/* ─── TAB 3: INVOICES ─── */}
+        {activeTab === "invoices" && (
+          <Box>
+            {loadingInvoices ? (
+              <VStack align="stretch" gap={3.5}>
+                <Skeleton height="38px" borderRadius="xl" />
+                <Skeleton height="50px" borderRadius="xl" />
+                <Skeleton height="50px" borderRadius="xl" />
+              </VStack>
+            ) : invoices.length > 0 ? (
+              <VStack align="stretch" gap={3}>
+                {/* Column Headers */}
+                <Grid
+                  templateColumns={{ base: "1.2fr 1fr 0.5fr", md: "1.5fr 1fr 1fr 1fr 0.5fr" }}
+                  gap={4}
+                  px={4}
+                  py={2}
+                  display={{ base: "none", sm: "grid" }}
+                  borderBottom="1px solid"
+                  borderColor={border}
+                >
+                  <Text fontSize="2xs" fontWeight="850" color={muted} textTransform="uppercase" letterSpacing="wider">INVOICE NO.</Text>
+                  <Text fontSize="2xs" fontWeight="850" color={muted} textTransform="uppercase" letterSpacing="wider" display={{ base: "none", md: "block" }}>PLAN</Text>
+                  <Text fontSize="2xs" fontWeight="850" color={muted} textTransform="uppercase" letterSpacing="wider">AMOUNT</Text>
+                  <Text fontSize="2xs" fontWeight="850" color={muted} textTransform="uppercase" letterSpacing="wider" display={{ base: "none", md: "block" }}>STATUS</Text>
+                  <Text fontSize="2xs" fontWeight="850" color={muted} textTransform="uppercase" letterSpacing="wider" textAlign="right">ACTION</Text>
                 </Grid>
 
-                {/* Data Rows */}
-                {orders.map((order) => {
-                  const isCompleted = order.status === "completed";
-                  const statusColor = isCompleted ? "#01B574" : order.status === "pending" ? "#FFB547" : "#a0aec0";
-                  const rowBg = useColorModeValue("rgba(248,250,252,0.6)", "rgba(255,255,255,0.01)");
-                  
-                  return (
-                    <Grid
-                      key={order.order_number}
-                      templateColumns={{ base: "1fr 1fr", md: "2fr 1fr 1.5fr 1.5fr 1fr" }}
-                      gap={{ base: 2, md: 4 }}
-                      p={4}
-                      alignItems="center"
-                      borderRadius="xl"
-                      bg={rowBg}
-                      border="1px solid"
-                      borderColor={border}
-                      position="relative"
-                      pl={5}
-                      overflow="hidden"
-                      transition="all 0.25s cubic-bezier(0.175,0.885,0.32,1.275)"
-                      _hover={{
-                        transform: "translateY(-2px)",
-                        borderColor: `${BRAND_HEX}35`,
-                        bg: useColorModeValue("white", "rgba(255,255,255,0.04)"),
-                        boxShadow: useColorModeValue("0 8px 24px rgba(66,42,251,0.06)", "0 8px 24px rgba(0,0,0,0.2)")
-                      }}
-                    >
-                      {/* Left Accent indicator */}
-                      <Box position="absolute" left={0} top={0} bottom={0} w="4px" bg={statusColor} />
+                {/* Rows */}
+                <VStack align="stretch" gap={2.5}>
+                  {invoices.map((invoice) => {
+                    const statusColors: Record<string, string> = {
+                      paid: "green",
+                      unpaid: "red",
+                      overdue: "orange",
+                    };
+                    const color = statusColors[invoice.status.toLowerCase()] || "gray";
+                    return (
+                      <Grid
+                        key={invoice._id}
+                        templateColumns={{ base: "1.2fr 1fr 0.5fr", md: "1.5fr 1fr 1fr 1fr 0.5fr" }}
+                        gap={4}
+                        p={3.5}
+                        borderRadius="xl"
+                        alignItems="center"
+                        border="1px solid"
+                        borderColor={useColorModeValue("rgba(226,232,240,0.6)", "rgba(255,255,255,0.06)")}
+                        bg={useColorModeValue("rgba(255,255,255,0.4)", "rgba(255,255,255,0.015)")}
+                        transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+                        _hover={{
+                          bg: useColorModeValue("rgba(255,255,255,0.85)", "rgba(255,255,255,0.035)"),
+                          borderColor: `${BRAND_HEX}25`,
+                          transform: "translateY(-1.5px)",
+                          boxShadow: "0 4px 12px rgba(0,0,0,0.02)",
+                        }}
+                      >
+                        <HStack gap={3.5}>
+                          <Circle size={8} style={{ background: `${BRAND_HEX}12`, color: BRAND_HEX }} flexShrink={0}>
+                            <Receipt size={14} />
+                          </Circle>
+                          <VStack align="start" gap={0} minW={0}>
+                            <HStack gap={1.5} flexWrap="wrap">
+                              <Text fontSize="xs" fontWeight="800" color="app.text.primary" lineClamp={1}>
+                                {invoice.invoice_number}
+                              </Text>
+                              <Box display={{ base: "inline-block", md: "none" }}>
+                                <Badge colorPalette={color} variant="subtle" borderRadius="full" px={1.5} py={0} fontSize="4xs" fontWeight="900">
+                                  {invoice.status}
+                                </Badge>
+                              </Box>
+                            </HStack>
+                            <Text fontSize="3xs" color={muted} fontWeight="650">{fmtDate(invoice.created_at)}</Text>
+                          </VStack>
+                        </HStack>
 
-                      {/* Columns */}
-                      <VStack align="start" gap={0} gridColumn={{ base: "1 / span 2", md: "auto" }}>
-                        <Text fontSize="xs" fontWeight="800" color="app.text.primary">{order.order_number}</Text>
-                        <Text fontSize="9px" color="app.text.muted" display={{ base: "block", md: "none" }}>Order Number</Text>
-                      </VStack>
+                        <Text fontSize="xs" fontWeight="700" color="app.text.primary" display={{ base: "none", md: "block" }}>
+                          {invoice.planName || "Plan"}
+                        </Text>
 
-                      <Box>
-                        <Badge colorPalette={isCompleted ? "green" : order.status === "pending" ? "orange" : "gray"} variant="subtle" size="xs" borderRadius="full">
-                          {order.status}
-                        </Badge>
-                      </Box>
-
-                      <VStack align="start" gap={0}>
                         <Text fontSize="xs" fontWeight="900" color="app.text.primary">
-                          {fmtCurrency(order.total, order.currency)}
+                          {fmtCurrency(invoice.total)}
                         </Text>
-                        <Text fontSize="9px" color="app.text.muted" display={{ base: "block", md: "none" }}>Total Amount</Text>
-                      </VStack>
 
-                      <VStack align={{ base: "start", md: "start" }} gap={0}>
-                        <Text fontSize="xs" fontWeight="700" color="app.text.muted">
-                          {fmtDate(order.created_at)}
-                        </Text>
-                        <Text fontSize="9px" color="app.text.muted" display={{ base: "block", md: "none" }}>Created Date</Text>
-                      </VStack>
+                        <Box display={{ base: "none", md: "block" }}>
+                          <Badge colorPalette={color} variant="subtle" borderRadius="full" px={2.5} py={0.5} fontSize="3xs" fontWeight="900">
+                            {invoice.status}
+                          </Badge>
+                        </Box>
 
-                      <Flex justify="end" gridColumn={{ base: "2", md: "auto" }}>
-                        <Button
-                          size="xs"
-                          variant="ghost"
-                          h="28px"
-                          px={3}
-                          borderRadius="lg"
-                          fontWeight="800"
-                          style={{ color: BRAND_HEX }}
-                          _hover={{ bg: `${BRAND_HEX}0d` }}
-                          onClick={() => onViewOrder?.(order.order_number)}
-                        >
-                          View
-                        </Button>
-                      </Flex>
-                    </Grid>
-                  );
-                })}
+                        <Flex justify="end">
+                          <Button
+                            variant="ghost"
+                            h="26px"
+                            px={3}
+                            borderRadius="lg"
+                            fontWeight="800"
+                            fontSize="xs"
+                            style={{ color: BRAND_HEX }}
+                            _hover={{ bg: `${BRAND_HEX}0d` }}
+                            onClick={() => onViewInvoice?.(invoice.invoice_number)}
+                          >
+                            View
+                          </Button>
+                        </Flex>
+                      </Grid>
+                    );
+                  })}
+                </VStack>
+
+                <Pagination
+                  currentPage={invoicePage}
+                  totalPages={Math.ceil(invoiceTotal / invoicePageSize)}
+                  totalItems={invoiceTotal}
+                  pageSize={invoicePageSize}
+                  onPageChange={setInvoicePage}
+                  onPageSizeChange={setInvoicePageSize}
+                />
               </VStack>
+            ) : (
+              <Flex align="center" justify="center" p={8} direction="column" gap={3}>
+                <Circle size={10} style={{ background: "rgba(66,42,251,0.08)", color: BRAND_HEX }}>
+                  <AlertCircle size={18} />
+                </Circle>
+                <Text fontSize="xs" fontWeight="750" color="app.text.muted">No invoices recorded for this member.</Text>
+              </Flex>
+            )}
+          </Box>
+        )}
 
-              <Pagination
-                currentPage={orderPage}
-                totalPages={Math.ceil(orderTotal / orderPageSize)}
-                totalItems={orderTotal}
-                pageSize={orderPageSize}
-                onPageChange={setOrderPage}
-                onPageSizeChange={setOrderPageSize}
-              />
-            </VStack>
-          ) : (
-            <Flex align="center" justify="center" p={8} direction="column" gap={2}>
-              <AlertCircle size={24} color={BRAND_HEX} />
-              <Text fontSize="xs" fontWeight="700" color="app.text.muted">No orders found for this member.</Text>
-            </Flex>
-          )}
-        </Box>
-      )}
-
-      {/* ─── TAB 3: INVOICES ─── */}
-      {activeTab === "invoices" && (
-        <Box>
-          {loadingInvoices ? (
-            <VStack gap={3}>
-              <Skeleton h="40px" borderRadius="lg" />
-              <Skeleton h="40px" borderRadius="lg" />
-              <Skeleton h="40px" borderRadius="lg" />
-            </VStack>
-          ) : invoices.length > 0 ? (
-            <VStack align="stretch" gap={4}>
-              <VStack align="stretch" gap={2.5}>
-                {/* Header Row */}
-                <Grid templateColumns="2fr 1fr 1.2fr 1.3fr 1fr" px={4} py={2} display={{ base: "none", md: "grid" }}>
-                  <Text fontSize="10px" fontWeight="800" color="app.text.muted" letterSpacing="wider">INVOICE NUMBER</Text>
-                  <Text fontSize="10px" fontWeight="800" color="app.text.muted" letterSpacing="wider">STATUS</Text>
-                  <Text fontSize="10px" fontWeight="800" color="app.text.muted" letterSpacing="wider">TOTAL</Text>
-                  <Text fontSize="10px" fontWeight="800" color="app.text.muted" letterSpacing="wider">DUE DATE</Text>
-                  <Text fontSize="10px" fontWeight="800" color="app.text.muted" letterSpacing="wider" textAlign="right">ACTION</Text>
+        {/* ─── TAB 4: PAYMENTS ─── */}
+        {activeTab === "payments" && (
+          <Box>
+            {loadingPayments ? (
+              <VStack align="stretch" gap={3.5}>
+                <Skeleton height="38px" borderRadius="xl" />
+                <Skeleton height="50px" borderRadius="xl" />
+                <Skeleton height="50px" borderRadius="xl" />
+              </VStack>
+            ) : payments.length > 0 ? (
+              <VStack align="stretch" gap={3}>
+                {/* Column Headers */}
+                <Grid
+                  templateColumns={{ base: "1.2fr 1fr 0.5fr", md: "1.5fr 1fr 1.2fr 0.8fr 0.5fr" }}
+                  gap={4}
+                  px={4}
+                  py={2}
+                  display={{ base: "none", sm: "grid" }}
+                  borderBottom="1px solid"
+                  borderColor={border}
+                >
+                  <Text fontSize="2xs" fontWeight="850" color={muted} textTransform="uppercase" letterSpacing="wider">TRANSACTION ID</Text>
+                  <Text fontSize="2xs" fontWeight="850" color={muted} textTransform="uppercase" letterSpacing="wider">AMOUNT</Text>
+                  <Text fontSize="2xs" fontWeight="850" color={muted} textTransform="uppercase" letterSpacing="wider" display={{ base: "none", md: "block" }}>METHOD</Text>
+                  <Text fontSize="2xs" fontWeight="850" color={muted} textTransform="uppercase" letterSpacing="wider" display={{ base: "none", md: "block" }}>STATUS</Text>
+                  <Text fontSize="2xs" fontWeight="850" color={muted} textTransform="uppercase" letterSpacing="wider" textAlign="right">ACTION</Text>
                 </Grid>
 
-                {/* Data Rows */}
-                {invoices.map((invoice) => {
-                  const isPaid = invoice.status === "paid";
-                  const statusColor = isPaid ? "#01B574" : invoice.status === "sent" ? "#3965FF" : "#FFB547";
-                  const rowBg = useColorModeValue("rgba(248,250,252,0.6)", "rgba(255,255,255,0.01)");
-                  
-                  return (
-                    <Grid
-                      key={invoice.invoice_number}
-                      templateColumns={{ base: "1fr 1fr", md: "2fr 1fr 1.2fr 1.3fr 1fr" }}
-                      gap={{ base: 2, md: 4 }}
-                      p={4}
-                      alignItems="center"
-                      borderRadius="xl"
-                      bg={rowBg}
-                      border="1px solid"
-                      borderColor={border}
-                      position="relative"
-                      pl={5}
-                      overflow="hidden"
-                      transition="all 0.25s cubic-bezier(0.175,0.885,0.32,1.275)"
-                      _hover={{
-                        transform: "translateY(-2px)",
-                        borderColor: `${BRAND_HEX}35`,
-                        bg: useColorModeValue("white", "rgba(255,255,255,0.04)"),
-                        boxShadow: useColorModeValue("0 8px 24px rgba(66,42,251,0.06)", "0 8px 24px rgba(0,0,0,0.2)")
-                      }}
-                    >
-                      {/* Left Accent indicator */}
-                      <Box position="absolute" left={0} top={0} bottom={0} w="4px" bg={statusColor} />
+                {/* Rows */}
+                <VStack align="stretch" gap={2.5}>
+                  {payments.map((payment) => {
+                    const statusColors: Record<string, string> = {
+                      success: "green",
+                      pending: "orange",
+                      failed: "red",
+                    };
+                    const color = statusColors[payment.status.toLowerCase()] || "gray";
+                    return (
+                      <Grid
+                        key={payment._id}
+                        templateColumns={{ base: "1.2fr 1fr 0.5fr", md: "1.5fr 1fr 1.2fr 0.8fr 0.5fr" }}
+                        gap={4}
+                        p={3.5}
+                        borderRadius="xl"
+                        alignItems="center"
+                        border="1px solid"
+                        borderColor={useColorModeValue("rgba(226,232,240,0.6)", "rgba(255,255,255,0.06)")}
+                        bg={useColorModeValue("rgba(255,255,255,0.4)", "rgba(255,255,255,0.015)")}
+                        transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+                        _hover={{
+                          bg: useColorModeValue("rgba(255,255,255,0.85)", "rgba(255,255,255,0.035)"),
+                          borderColor: `${BRAND_HEX}25`,
+                          transform: "translateY(-1.5px)",
+                          boxShadow: "0 4px 12px rgba(0,0,0,0.02)",
+                        }}
+                      >
+                        <HStack gap={3.5}>
+                          <Circle size={8} style={{ background: `${BRAND_HEX}12`, color: BRAND_HEX }} flexShrink={0}>
+                            <CreditCard size={14} />
+                          </Circle>
+                          <VStack align="start" gap={0} minW={0}>
+                            <HStack gap={1.5} flexWrap="wrap">
+                              <Text fontSize="xs" fontWeight="800" color="app.text.primary" lineClamp={1}>
+                                {payment.transaction_id || "N/A"}
+                              </Text>
+                              <Box display={{ base: "inline-block", md: "none" }}>
+                                <Badge colorPalette={color} variant="subtle" borderRadius="full" px={1.5} py={0} fontSize="4xs" fontWeight="900">
+                                  {payment.status}
+                                </Badge>
+                              </Box>
+                            </HStack>
+                            <Text fontSize="3xs" color={muted} fontWeight="650">{fmtDate(payment.created_at)}</Text>
+                          </VStack>
+                        </HStack>
 
-                      <VStack align="start" gap={0} gridColumn={{ base: "1 / span 2", md: "auto" }}>
-                        <Text fontSize="xs" fontWeight="800" color="app.text.primary">{invoice.invoice_number}</Text>
-                        <Text fontSize="9px" color="app.text.muted" display={{ base: "block", md: "none" }}>Invoice Number</Text>
-                      </VStack>
-
-                      <Box>
-                        <Badge colorPalette={isPaid ? "green" : invoice.status === "sent" ? "blue" : "orange"} variant="subtle" size="xs" borderRadius="full">
-                          {invoice.status}
-                        </Badge>
-                      </Box>
-
-                      <VStack align="start" gap={0}>
                         <Text fontSize="xs" fontWeight="900" color="app.text.primary">
-                          {fmtCurrency(invoice.total, invoice.currency)}
+                          {fmtCurrency(payment.amount)}
                         </Text>
-                        <Text fontSize="9px" color="app.text.muted" display={{ base: "block", md: "none" }}>Total Amount</Text>
-                      </VStack>
 
-                      <VStack align={{ base: "start", md: "start" }} gap={0}>
-                        <Text fontSize="xs" fontWeight="700" color="app.text.muted">
-                          {fmtDate(invoice.due_date)}
-                        </Text>
-                        <Text fontSize="9px" color="app.text.muted" display={{ base: "block", md: "none" }}>Due Date</Text>
-                      </VStack>
+                        <VStack align="start" gap={0} display={{ base: "none", md: "flex" }}>
+                          <Text fontSize="xs" fontWeight="700" color="app.text.primary" textTransform="capitalize">
+                            {payment.method || "N/A"}
+                          </Text>
+                        </VStack>
 
-                      <Flex justify="end" gridColumn={{ base: "2", md: "auto" }}>
-                        <Button
-                          size="xs"
-                          variant="ghost"
-                          h="28px"
-                          px={3}
-                          borderRadius="lg"
-                          fontWeight="800"
-                          style={{ color: BRAND_HEX }}
-                          _hover={{ bg: `${BRAND_HEX}0d` }}
-                          onClick={() => onViewInvoice?.(invoice.invoice_number)}
-                        >
-                          View
-                        </Button>
-                      </Flex>
-                    </Grid>
-                  );
-                })}
+                        <Box display={{ base: "none", md: "block" }}>
+                          <Badge colorPalette={color} variant="subtle" borderRadius="full" px={2.5} py={0.5} fontSize="3xs" fontWeight="900">
+                            {payment.status}
+                          </Badge>
+                        </Box>
+
+                        <Flex justify="end">
+                          <Button
+                            variant="ghost"
+                            h="26px"
+                            px={3}
+                            borderRadius="lg"
+                            fontWeight="800"
+                            fontSize="xs"
+                            style={{ color: BRAND_HEX }}
+                            _hover={{ bg: `${BRAND_HEX}0d` }}
+                            onClick={() => onViewInvoice?.(payment.invoice_ref)}
+                          >
+                            View
+                          </Button>
+                        </Flex>
+                      </Grid>
+                    );
+                  })}
+                </VStack>
+
+                <Pagination
+                  currentPage={paymentPage}
+                  totalPages={Math.ceil(paymentTotal / paymentPageSize)}
+                  totalItems={paymentTotal}
+                  pageSize={paymentPageSize}
+                  onPageChange={setPaymentPage}
+                  onPageSizeChange={setPaymentPageSize}
+                />
               </VStack>
-
-              <Pagination
-                currentPage={invoicePage}
-                totalPages={Math.ceil(invoiceTotal / invoicePageSize)}
-                totalItems={invoiceTotal}
-                pageSize={invoicePageSize}
-                onPageChange={setInvoicePage}
-                onPageSizeChange={setInvoicePageSize}
-              />
-            </VStack>
-          ) : (
-            <Flex align="center" justify="center" p={8} direction="column" gap={2}>
-              <AlertCircle size={24} color={BRAND_HEX} />
-              <Text fontSize="xs" fontWeight="700" color="app.text.muted">No invoices found for this member.</Text>
-            </Flex>
-          )}
-        </Box>
-      )}
-
-      {/* ─── TAB 4: PAYMENTS ─── */}
-      {activeTab === "payments" && (
-        <Box>
-          {loadingPayments ? (
-            <VStack gap={3}>
-              <Skeleton h="40px" borderRadius="lg" />
-              <Skeleton h="40px" borderRadius="lg" />
-              <Skeleton h="40px" borderRadius="lg" />
-            </VStack>
-          ) : payments.length > 0 ? (
-            <VStack align="stretch" gap={4}>
-              <VStack align="stretch" gap={2.5}>
-                {/* Header Row */}
-                <Grid templateColumns="1.8fr 1.5fr 1fr 1fr 1.2fr 1.5fr 1fr" px={4} py={2} display={{ base: "none", md: "grid" }}>
-                  <Text fontSize="10px" fontWeight="800" color="app.text.muted" letterSpacing="wider">PAYMENT NUMBER</Text>
-                  <Text fontSize="10px" fontWeight="800" color="app.text.muted" letterSpacing="wider">INVOICE</Text>
-                  <Text fontSize="10px" fontWeight="800" color="app.text.muted" letterSpacing="wider">METHOD</Text>
-                  <Text fontSize="10px" fontWeight="800" color="app.text.muted" letterSpacing="wider">STATUS</Text>
-                  <Text fontSize="10px" fontWeight="800" color="app.text.muted" letterSpacing="wider">AMOUNT</Text>
-                  <Text fontSize="10px" fontWeight="800" color="app.text.muted" letterSpacing="wider">PAYMENT DATE</Text>
-                  <Text fontSize="10px" fontWeight="800" color="app.text.muted" letterSpacing="wider" textAlign="right">ACTION</Text>
-                </Grid>
-
-                {/* Data Rows */}
-                {payments.map((payment) => {
-                  const methodUpper = payment.method?.toUpperCase() || "CASH";
-                  const isSucceeded = payment.status === "succeeded" || payment.status === "completed" || payment.status === "paid" || payment.status === "captured";
-                  const statusPalette = isSucceeded ? "green" : payment.status === "failed" ? "red" : "orange";
-                  const accentColor = isSucceeded ? "#01B574" : payment.status === "failed" ? "#EE5D50" : "#FFB547";
-                  const rowBg = useColorModeValue("rgba(248,250,252,0.6)", "rgba(255,255,255,0.01)");
-                  
-                  return (
-                    <Grid
-                      key={payment.payment_number}
-                      templateColumns={{ base: "1fr 1fr", md: "1.8fr 1.5fr 1fr 1fr 1.2fr 1.5fr 1fr" }}
-                      gap={{ base: 2, md: 4 }}
-                      p={4}
-                      alignItems="center"
-                      borderRadius="xl"
-                      bg={rowBg}
-                      border="1px solid"
-                      borderColor={border}
-                      position="relative"
-                      pl={5}
-                      overflow="hidden"
-                      transition="all 0.25s cubic-bezier(0.175,0.885,0.32,1.275)"
-                      _hover={{
-                        transform: "translateY(-2px)",
-                        borderColor: `${BRAND_HEX}35`,
-                        bg: useColorModeValue("white", "rgba(255,255,255,0.04)"),
-                        boxShadow: useColorModeValue("0 8px 24px rgba(66,42,251,0.06)", "0 8px 24px rgba(0,0,0,0.2)")
-                      }}
-                    >
-                      {/* Left Accent indicator */}
-                      <Box position="absolute" left={0} top={0} bottom={0} w="4px" bg={accentColor} />
-
-                      <VStack align="start" gap={0} gridColumn={{ base: "1 / span 2", md: "auto" }}>
-                        <Text fontSize="xs" fontWeight="800" color="app.text.primary">{payment.payment_number}</Text>
-                        <Text fontSize="9px" color="app.text.muted" display={{ base: "block", md: "none" }}>Payment Number</Text>
-                      </VStack>
-
-                      <VStack align="start" gap={0}>
-                        <Text fontSize="xs" fontWeight="700" color="app.text.secondary">{payment.invoice_ref}</Text>
-                        <Text fontSize="9px" color="app.text.muted" display={{ base: "block", md: "none" }}>Invoice Reference</Text>
-                      </VStack>
-
-                      <Box>
-                        <Badge variant="outline" size="xs" borderRadius="full">
-                          {methodUpper}
-                        </Badge>
-                      </Box>
-
-                      <Box>
-                        <Badge colorPalette={statusPalette} variant="subtle" size="xs" borderRadius="full">
-                          {payment.status || "succeeded"}
-                        </Badge>
-                      </Box>
-
-                      <VStack align="start" gap={0}>
-                        <Text fontSize="xs" fontWeight="900" color="app.text.primary">
-                          {fmtCurrency(payment.amount, payment.currency)}
-                        </Text>
-                        <Text fontSize="9px" color="app.text.muted" display={{ base: "block", md: "none" }}>Amount Paid</Text>
-                      </VStack>
-
-                      <VStack align={{ base: "start", md: "start" }} gap={0}>
-                        <Text fontSize="xs" fontWeight="700" color="app.text.muted">
-                          {fmtDate(payment.payment_date)}
-                        </Text>
-                        <Text fontSize="9px" color="app.text.muted" display={{ base: "block", md: "none" }}>Payment Date</Text>
-                      </VStack>
-
-                      <Flex justify="end" gridColumn={{ base: "2", md: "auto" }}>
-                        <Button
-                          size="xs"
-                          variant="ghost"
-                          h="28px"
-                          px={3}
-                          borderRadius="lg"
-                          fontWeight="800"
-                          style={{ color: BRAND_HEX }}
-                          _hover={{ bg: `${BRAND_HEX}0d` }}
-                          onClick={() => onViewInvoice?.(payment.invoice_ref)}
-                        >
-                          View
-                        </Button>
-                      </Flex>
-                    </Grid>
-                  );
-                })}
-              </VStack>
-
-              <Pagination
-                currentPage={paymentPage}
-                totalPages={Math.ceil(paymentTotal / paymentPageSize)}
-                totalItems={paymentTotal}
-                pageSize={paymentPageSize}
-                onPageChange={setPaymentPage}
-                onPageSizeChange={setPaymentPageSize}
-              />
-            </VStack>
-          ) : (
-            <Flex align="center" justify="center" p={8} direction="column" gap={2}>
-              <AlertCircle size={24} color={BRAND_HEX} />
-              <Text fontSize="xs" fontWeight="700" color="app.text.muted">No payments recorded for this member.</Text>
-            </Flex>
-          )}
-        </Box>
-      )}
+            ) : (
+              <Flex align="center" justify="center" p={8} direction="column" gap={3}>
+                <Circle size={10} style={{ background: "rgba(66,42,251,0.08)", color: BRAND_HEX }}>
+                  <AlertCircle size={18} />
+                </Circle>
+                <Text fontSize="xs" fontWeight="750" color="app.text.muted">No payments recorded for this member.</Text>
+              </Flex>
+            )}
+          </Box>
+        )}
+      </Box>
     </VStack>
   );
 });
